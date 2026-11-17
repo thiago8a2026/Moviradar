@@ -1,31 +1,2239 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>MoviRadar - Bucaramanga | Alertas Viales en Vivo</title>
-    <meta name="description" content="MoviRadar Bucaramanga: aplicación web móvil en tiempo real para conductores y taxistas con alertas viales, mapa gratuito Leaflet OSM, fotos y videos." />
-    <meta property="og:title" content="MoviRadar - Bucaramanga | Alertas Viales en Vivo" />
-    <meta property="og:description" content="MoviRadar Bucaramanga: aplicación web móvil en tiempo real para conductores y taxistas con alertas viales, mapa gratuito Leaflet OSM, fotos y videos." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#020617" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="MoviRadar" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <!-- Leaflet CSS for OpenStreetMap rendering -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-slate-950 font-sans">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#020617" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>MoviRadar - Bucaramanga | Alertas Viales en Vivo</title>
+  <meta name="description" content="MoviRadar Bucaramanga: alertas viales en tiempo real para conductores y taxistas con mapa gratuito OpenStreetMap, GPS en vivo, fotos, videos y Firebase." />
+  <meta property="og:title" content="MoviRadar - Bucaramanga | Alertas Viales en Vivo" />
+  <meta property="og:description" content="MoviRadar Bucaramanga: alertas viales en tiempo real para conductores y taxistas con mapa gratuito OpenStreetMap, GPS en vivo y Firebase." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23020617'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2310b981' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%2306b6d4'/%3E%3C/svg%3E" />
 
+  <!-- Leaflet CSS (Gratuito vía CDN, sin API keys ni facturación) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    :root {
+      --bg-dark: #020617;
+      --surface: #0f172a;
+      --surface-light: #1e293b;
+      --border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #10b981;
+      --accent-cyan: #06b6d4;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Barra superior fija */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 62px;
+      background: rgba(2, 6, 23, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 12px;
+      z-index: 1000;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-icon.admin {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle.warn {
+      color: #fbbf24;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+
+    .brand-subtitle.warn .live-dot {
+      background-color: #f59e0b;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .role-btn, .count-chip, .auth-btn {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 9px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .role-btn, .auth-btn {
+      cursor: pointer;
+    }
+
+    .auth-btn.signed-in {
+      border-color: rgba(16, 185, 129, 0.6);
+      background: rgba(16, 185, 129, 0.14);
+      color: #6ee7b7;
+    }
+
+    .role-btn.admin {
+      border-color: rgba(245, 158, 11, 0.7);
+      background: rgba(245, 158, 11, 0.14);
+      color: #fcd34d;
+    }
+
+    /* Mapa principal ocupando toda la pantalla */
+    #map {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      margin-top: 62px;
+      z-index: 1;
+      background: #0b1120;
+    }
+
+    /* HUD velocidad y coordenadas arriba a la izquierda */
+    .gps-hud {
+      position: fixed;
+      top: 74px;
+      left: 12px;
+      z-index: 900;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+
+    .hud-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .hud-speed {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hud-coords {
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #e2e8f0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hud-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+    }
+
+    /* Botones flotantes del mapa (Zoom, GPS, Puntos) */
+    .map-controls {
+      position: fixed;
+      right: 12px;
+      top: 74px;
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border);
+      color: #f8fafc;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .map-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* Panel inferior flotante: acciones rápidas + botón principal */
+    .bottom-panel {
+      position: fixed;
+      bottom: 14px;
+      left: 12px;
+      right: 12px;
+      z-index: 950;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .quick-actions-bar {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .quick-btn {
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .quick-btn:active {
+      transform: scale(0.96);
+    }
+
+    .quick-btn.waze { border-color: rgba(56, 189, 248, 0.45); color: #7dd3fc; }
+    .quick-btn.gmaps { border-color: rgba(16, 185, 129, 0.45); color: #6ee7b7; }
+    .quick-btn.whatsapp { border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
+    .quick-btn.savept { border-color: rgba(245, 158, 11, 0.45); color: #fcd34d; }
+
+    .btn-report-main {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      min-height: 54px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+      transition: transform 0.15s ease;
+    }
+
+    .btn-report-main:active {
+      transform: scale(0.97);
+    }
+
+    /* Modales flotantes */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    @media (min-width: 640px) {
+      .modal-backdrop {
+        align-items: center;
+        padding: 16px;
+      }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 460px;
+      max-height: 92dvh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px 24px 0 0;
+      overflow-y: auto;
+      padding: 18px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    @media (min-width: 640px) {
+      .modal-card {
+        border-radius: 24px;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--surface-light);
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .btn-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .cat-option {
+      min-height: 46px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .cat-option.active {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .admin-pin-row {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      margin-bottom: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fcd34d;
+      cursor: pointer;
+    }
+
+    .admin-pin-row.visible {
+      display: flex;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      resize: none;
+      margin-bottom: 14px;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .media-upload-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 58px;
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.5);
+      padding: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .media-preview-wrap {
+      display: none;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .media-preview {
+      width: 100%;
+      max-height: 190px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: none;
+      background: #000;
+    }
+
+    .btn-clear-media {
+      margin-top: 6px;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .gps-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      min-height: 50px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    /* Lista de puntos frecuentes */
+    .points-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .point-item {
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .point-info {
+      min-width: 0;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .point-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .point-coords {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .point-delete {
+      min-width: 34px;
+      min-height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* Toast de aviso */
+    .toast {
+      position: fixed;
+      top: 74px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border: 1px solid var(--accent);
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 3000;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: none;
+      max-width: 92%;
+      text-align: center;
+    }
+
+    /* Burbujas personalizadas en Leaflet */
+    .leaflet-popup-content-wrapper {
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 14px;
+    }
+    .leaflet-popup-tip {
+      background: #0f172a;
+    }
+    .popup-card {
+      min-width: 210px;
+      max-width: 265px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .popup-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .popup-media {
+      width: 100%;
+      max-height: 155px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 8px;
+      border: 1px solid #334155;
+      background: #000;
+    }
+    .popup-meta {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .popup-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .popup-vote-btn {
+      flex: 1;
+      min-height: 32px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .popup-vote-btn.delete {
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+    .popup-vote-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Barra superior fija -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <div class="brand-icon" id="brandIcon">📡</div>
+        <div class="brand-text">
+          <h1>MoviRadar - Bucaramanga</h1>
+          <div class="brand-subtitle" id="syncStatus">
+            <span class="live-dot"></span>
+            <span id="syncStatusText">Conectando en vivo...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="auth-btn" id="btnGoogleAuth" title="Iniciar sesión con Google para reportar y votar">
+          Entrar
+        </button>
+        <button type="button" class="role-btn" id="btnToggleRole" title="Cambiar rol">
+          Ciudadano
+        </button>
+        <div class="count-chip" id="reportCountChip">0 alertas</div>
+      </div>
+    </header>
+
+    <!-- Contenedor principal del mapa gratuito OpenStreetMap -->
+    <main id="map"></main>
+
+    <!-- HUD compacto de velocidad y GPS en vivo -->
+    <div class="gps-hud">
+      <div class="hud-block">
+        <span class="hud-label">Velocidad</span>
+        <span class="hud-speed"><span id="hudSpeed">0.0</span> <small style="font-size:10px;color:#94a3b8;">km/h</small></span>
+      </div>
+      <div class="hud-divider"></div>
+      <div class="hud-block">
+        <span class="hud-label">GPS en vivo</span>
+        <span class="hud-coords" id="hudCoords">7.1193, -73.1227</span>
+      </div>
+    </div>
+
+    <!-- Controles rápidos del mapa -->
+    <div class="map-controls">
+      <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
+      <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
+      <button type="button" class="map-btn" id="btnLocateMe" title="Centrar mi ubicación GPS">🎯</button>
+      <button type="button" class="map-btn" id="btnOpenPoints" title="Puntos frecuentes guardados">⭐</button>
+    </div>
+
+    <!-- Panel inferior táctil: navegación externa + botón "+ Reportar Novedad" -->
+    <div class="bottom-panel">
+      <div class="quick-actions-bar">
+        <a href="#" target="_blank" rel="noopener noreferrer" class="quick-btn gmaps" id="btnGoogleMaps">
+          🗺️ Maps
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="quick-btn waze" id="btnWaze">
+          🚙 Waze
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="quick-btn whatsapp" id="btnWhatsApp">
+          📲 Compartir
+        </a>
+        <button type="button" class="quick-btn savept" id="btnQuickSavePoint">
+          ⭐ Guardar
+        </button>
+      </div>
+
+      <button type="button" class="btn-report-main" id="btnOpenReport">
+        <span>+ Reportar Novedad</span>
+      </button>
+    </div>
+
+    <!-- Toast de notificaciones -->
+    <div class="toast" id="toastBox"></div>
+
+    <!-- Modal flotante para crear reporte -->
+    <div class="modal-backdrop" id="reportModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Reportar novedad en Bucaramanga</h2>
+          <button type="button" class="btn-close" id="btnCloseModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <form id="reportForm">
+          <span class="form-label">1. Tipo de novedad *</span>
+          <div class="category-grid" id="categoryGrid">
+            <button type="button" class="cat-option active" data-type="Retén" data-color="#f97316" data-emoji="🚧">
+              <span>🚧</span><span>Retén</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Accidente" data-color="#ef4444" data-emoji="🚨">
+              <span>🚨</span><span>Accidente</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Vía cerrada" data-color="#dc2626" data-emoji="⛔">
+              <span>⛔</span><span>Vía cerrada</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Hueco" data-color="#eab308" data-emoji="🕳️">
+              <span>🕳️</span><span>Hueco</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Trancón" data-color="#f59e0b" data-emoji="🚗">
+              <span>🚗</span><span>Trancón</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Policía" data-color="#3b82f6" data-emoji="👮">
+              <span>👮</span><span>Policía</span>
+            </button>
+          </div>
+
+          <label class="admin-pin-row" id="adminFixedRow">
+            <input type="checkbox" id="chkIsFixed" />
+            <span>👑 Publicar como Ubicación Fija Oficial (no expira)</span>
+          </label>
+
+          <label class="form-label" for="reportDesc">2. Descripción corta *</label>
+          <textarea
+            id="reportDesc"
+            class="text-input"
+            rows="2"
+            required
+            maxlength="240"
+            placeholder="Ej. Carrera 27 con Calle 36, carril derecho bloqueado..."
+          ></textarea>
+
+          <span class="form-label">3. Foto o video (Cámara / Galería)</span>
+          <label class="media-upload-box" for="reportMedia">
+            <span>📷 Tomar foto o grabar video corto</span>
+          </label>
+          <input
+            type="file"
+            id="reportMedia"
+            accept="image/*,video/*"
+            capture="environment"
+            style="display: none;"
+          />
+
+          <div class="media-preview-wrap" id="mediaPreviewWrap">
+            <img id="previewImage" class="media-preview" alt="Vista previa" />
+            <video id="previewVideo" class="media-preview" controls playsinline></video>
+            <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar archivo</button>
+          </div>
+
+          <div class="gps-note" id="gpsStatusText">
+            📍 Se capturará tu ubicación GPS actual.
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnSubmitReport">
+            Publicar reporte en vivo
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal flotante de Puntos Frecuentes (localStorage) -->
+    <div class="modal-backdrop" id="pointsModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>⭐ Puntos Frecuentes (Local)</h2>
+          <button type="button" class="btn-close" id="btnClosePointsModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <form id="pointForm">
+          <label class="form-label" for="pointName">Guardar ubicación actual con nombre:</label>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <input
+              type="text"
+              id="pointName"
+              class="text-input"
+              style="margin-bottom:0;flex:1;"
+              required
+              maxlength="45"
+              placeholder="Ej. Base Taxi Cabecera, Casa, Terminal..."
+            />
+            <button type="submit" class="btn-submit" style="width:auto;padding:0 16px;min-height:42px;">
+              Guardar
+            </button>
+          </div>
+        </form>
+
+        <div class="points-list" id="pointsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS (Gratuito vía CDN, con respaldo automático multi-CDN) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator && (location.hostname === 'localhost' || location.hostname.includes('run.app'))) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        regs.forEach(function(reg) {
+          if (reg.active && reg.active.scriptURL && reg.active.scriptURL.includes('dev-sw')) {
+            reg.unregister();
+          }
+        });
+      }).catch(function() {});
+    }
+
+    function ensureLeafletAndStart(callback) {
+      if (typeof window.L !== 'undefined') {
+        callback();
+        return;
+      }
+      var fallbackUrls = [
+        'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'
+      ];
+      var idx = 0;
+      function tryNext() {
+        if (typeof window.L !== 'undefined') {
+          callback();
+          return;
+        }
+        if (idx >= fallbackUrls.length) {
+          var label = document.getElementById('syncStatusText');
+          if (label) label.textContent = 'Error cargando mapa (verifica conexión)';
+          return;
+        }
+        var script = document.createElement('script');
+        script.src = fallbackUrls[idx++];
+        script.onload = function() {
+          if (typeof window.L !== 'undefined') {
+            callback();
+          } else {
+            tryNext();
+          }
+        };
+        script.onerror = tryNext;
+        document.head.appendChild(script);
+      }
+      tryNext();
+    }
+
+    ensureLeafletAndStart(async function initMoviRadarApp() {
+    // =========================================================================
+    // 1. CONFIGURACIÓN OFICIAL DE FIREBASE MOVIRADAR (SDK MODULAR v10.8.0)
+    // =========================================================================
+    const [
+      { initializeApp },
+      {
+        initializeFirestore,
+        getFirestore,
+        collection,
+        doc,
+        addDoc,
+        updateDoc,
+        deleteDoc,
+        query,
+        limit,
+        onSnapshot,
+        getDocFromServer,
+        serverTimestamp,
+        increment
+      },
+      { getStorage, ref, uploadBytesResumable, getDownloadURL },
+      { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+    ] = await Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js'),
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js')
+    ]);
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDM7XCVECGfDG0JpsWamMZto-RjT02ml6w",
+      authDomain: "moviradar.firebaseapp.com",
+      projectId: "moviradar",
+      firestoreDatabaseId: "ai-studio-moviradar-632637ec-5b46-4bef-ac9f-005e7708bb75",
+      storageBucket: "moviradar.firebasestorage.app",
+      messagingSenderId: "535511934758",
+      appId: "1:535511934758:web:173651e4aa076830cbc3e7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    let db;
+    try {
+      db = initializeFirestore(
+        app,
+        { experimentalAutoDetectLongPolling: true },
+        firebaseConfig.firestoreDatabaseId
+      );
+    } catch (e) {
+      db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+    }
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    const OperationType = {
+      CREATE: 'create',
+      UPDATE: 'update',
+      DELETE: 'delete',
+      LIST: 'list',
+      GET: 'get',
+      WRITE: 'write'
+    };
+
+    function handleFirestoreError(error, operationType, path) {
+      const currentUser = auth.currentUser;
+      const errInfo = {
+        error: error instanceof Error ? error.message : String(error),
+        authInfo: {
+          userId: currentUser ? currentUser.uid : null,
+          email: currentUser ? currentUser.email : null,
+          emailVerified: currentUser ? currentUser.emailVerified : null,
+          isAnonymous: currentUser ? currentUser.isAnonymous : null,
+          tenantId: currentUser ? currentUser.tenantId : null,
+          providerInfo: currentUser && Array.isArray(currentUser.providerData)
+            ? currentUser.providerData.map((p) => ({ providerId: p.providerId, email: p.email }))
+            : []
+        },
+        operationType,
+        path
+      };
+      console.error('Firestore Error: ', JSON.stringify(errInfo));
+      throw new Error(JSON.stringify(errInfo));
+    }
+
+    async function testConnection() {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.error('Please check your Firebase configuration.');
+        }
+      }
+    }
+    testConnection();
+
+    // =========================================================================
+    // 2. CACHÉ LOCAL EN LOCALSTORAGE (GPS, REPORTES, COLA OFFLINE, PUNTOS, ROL)
+    // =========================================================================
+    const STORAGE_KEYS = {
+      LAST_GPS: 'moviradar_last_gps_v1',
+      CACHED_REPORTS: 'moviradar_cached_reports_v1',
+      PENDING_REPORTS: 'moviradar_pending_reports_v1',
+      FREQUENT_POINTS: 'moviradar_frequent_points_v1',
+      USER_ROLE: 'moviradar_user_role_v1'
+    };
+
+    const BUCARAMANGA_COORDS = [7.1193, -73.1227];
+    const BUCARAMANGA_DEFAULT = { lat: 7.1193, lng: -73.1227 };
+    const INITIAL_ZOOM = 14;
+    const COLLECTION_NAME = 'reportes';
+
+    function safeReadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        return JSON.parse(raw);
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function loadCachedGps() {
+      const parsed = safeReadJson(STORAGE_KEYS.LAST_GPS, null);
+      if (
+        parsed &&
+        typeof parsed.lat === 'number' &&
+        typeof parsed.lng === 'number' &&
+        !Number.isNaN(parsed.lat) &&
+        !Number.isNaN(parsed.lng)
+      ) {
+        return parsed;
+      }
+      return null;
+    }
+
+    function saveCachedGps(lat, lng) {
+      try {
+        localStorage.setItem(
+          STORAGE_KEYS.LAST_GPS,
+          JSON.stringify({ lat, lng, updatedAt: Date.now() })
+        );
+      } catch (e) {}
+    }
+
+    function loadCachedReports() {
+      const list = safeReadJson(STORAGE_KEYS.CACHED_REPORTS, []);
+      return Array.isArray(list) ? list : [];
+    }
+
+    function saveCachedReports(reports) {
+      try {
+        const serializable = reports.slice(0, 120).map((rep) => ({
+          id: rep.id,
+          lat: Number(rep.lat),
+          lng: Number(rep.lng),
+          tipo: rep.tipo || rep.type || 'Novedad',
+          descripcion: rep.descripcion || rep.description || '',
+          createdAtMs: extractTimestampMs(rep),
+          urlFoto: rep.urlFoto || rep.mediaUrl || null,
+          mediaType: rep.mediaType || null,
+          isFixed: Boolean(rep.isFixed),
+          confirmations: Number(rep.confirmations || 1),
+          denials: Number(rep.denials || 0)
+        }));
+        localStorage.setItem(STORAGE_KEYS.CACHED_REPORTS, JSON.stringify(serializable));
+      } catch (e) {}
+    }
+
+    function loadPendingReports() {
+      const queue = safeReadJson(STORAGE_KEYS.PENDING_REPORTS, []);
+      return Array.isArray(queue) ? queue : [];
+    }
+
+    function savePendingReports(queue) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.PENDING_REPORTS, JSON.stringify(queue));
+        return true;
+      } catch (e) {
+        try {
+          const compact = queue.map((item) => ({
+            ...item,
+            mediaDataUrl: null,
+            fileName: null
+          }));
+          localStorage.setItem(STORAGE_KEYS.PENDING_REPORTS, JSON.stringify(compact));
+          return false;
+        } catch (err) {
+          return false;
+        }
+      }
+    }
+
+    function loadFrequentPoints() {
+      const pts = safeReadJson(STORAGE_KEYS.FREQUENT_POINTS, null);
+      if (Array.isArray(pts)) return pts;
+      return [
+        { id: 'pt_bga_centro', name: 'Parque Santander (Centro)', lat: 7.1193, lng: -73.1227 }
+      ];
+    }
+
+    function saveFrequentPoints(points) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.FREQUENT_POINTS, JSON.stringify(points));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 3. MAPA GRATUITO OPENSTREETMAP CON LEAFLET (CERO CLAVES DE PAGO)
+    // =========================================================================
+    const initialCachedGps = loadCachedGps();
+    const initialMapCenter = initialCachedGps
+      ? [initialCachedGps.lat, initialCachedGps.lng]
+      : BUCARAMANGA_COORDS;
+    const initialMapZoom = initialCachedGps ? 15 : INITIAL_ZOOM;
+
+    const map = L.map('map', { zoomControl: false }).setView(initialMapCenter, initialMapZoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const markersLayer = L.layerGroup().addTo(map);
+    const frequentPointsLayer = L.layerGroup().addTo(map);
+    let userMarker = null;
+    let latestGps = initialCachedGps
+      ? { lat: initialCachedGps.lat, lng: initialCachedGps.lng, isDefault: false, isCached: true }
+      : null;
+    let hasKnownRealGps = Boolean(initialCachedGps);
+    let hasReceivedLiveGps = false;
+    let lastServerReports = loadCachedReports();
+    let isSyncingPending = false;
+    let firestoreConnected = false;
+
+    // =========================================================================
+    // 4. ROL DE USUARIO (CIUDADANO VS ADMINISTRADOR GENERAL)
+    // =========================================================================
+    let userRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE) === 'admin' ? 'admin' : 'citizen';
+
+    function applyRoleUI() {
+      const btn = document.getElementById('btnToggleRole');
+      const icon = document.getElementById('brandIcon');
+      const adminRow = document.getElementById('adminFixedRow');
+      if (userRole === 'admin') {
+        btn.textContent = '👑 Admin';
+        btn.classList.add('admin');
+        icon.textContent = '👑';
+        icon.classList.add('admin');
+        adminRow.classList.add('visible');
+      } else {
+        btn.textContent = 'Ciudadano';
+        btn.classList.remove('admin');
+        icon.textContent = '📡';
+        icon.classList.remove('admin');
+        adminRow.classList.remove('visible');
+        document.getElementById('chkIsFixed').checked = false;
+      }
+    }
+
+    document.getElementById('btnToggleRole').addEventListener('click', () => {
+      userRole = userRole === 'admin' ? 'citizen' : 'admin';
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER_ROLE, userRole);
+      } catch (e) {}
+      applyRoleUI();
+      renderCombinedReports(lastServerReports);
+      showToast(
+        userRole === 'admin'
+          ? 'Modo Administrador General: puedes fijar alertas doradas y retirar reportes.'
+          : 'Modo Ciudadano activo.'
+      );
+    });
+    applyRoleUI();
+
+    // =========================================================================
+    // 5. UTILIDADES UI, ENLACES EXTERNOS (MAPS/WAZE/WHATSAPP) Y RED
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      box.textContent = msg;
+      box.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        box.style.display = 'none';
+      }, 3800);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = String(text || '');
+      return div.innerHTML;
+    }
+
+    function formatTimeLabel(createdAtMs) {
+      if (!createdAtMs) return 'Ahora';
+      const diffMin = Math.max(0, Math.floor((Date.now() - createdAtMs) / 60000));
+      if (diffMin < 1) return 'Hace un momento';
+      if (diffMin < 60) return `Hace ${diffMin} min`;
+      const diffHours = Math.floor(diffMin / 60);
+      if (diffHours < 24) return `Hace ${diffHours} h`;
+      return new Date(createdAtMs).toLocaleTimeString('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function updateQuickExternalLinks(lat, lng) {
+      const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      const wazeUrl = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+      const waText = encodeURIComponent(
+        `📍 Mi ubicación actual en MoviRadar Bucaramanga: ${gmapsUrl}`
+      );
+      document.getElementById('btnGoogleMaps').href = gmapsUrl;
+      document.getElementById('btnWaze').href = wazeUrl;
+      document.getElementById('btnWhatsApp').href = `https://wa.me/?text=${waText}`;
+    }
+    updateQuickExternalLinks(initialMapCenter[0], initialMapCenter[1]);
+
+    function setSyncStatus(text, isWarning = false) {
+      const el = document.getElementById('syncStatus');
+      const label = document.getElementById('syncStatusText');
+      label.textContent = text;
+      el.classList.toggle('warn', isWarning);
+    }
+
+    function updateNetworkAndSyncStatus() {
+      const pendingCount = loadPendingReports().length;
+      if (!navigator.onLine) {
+        const suffix = pendingCount > 0 ? ` · ${pendingCount} pendiente(s)` : '';
+        setSyncStatus(`Sin internet · Caché local${suffix}`, true);
+        return;
+      }
+      if (isSyncingPending && pendingCount > 0) {
+        setSyncStatus(`Sincronizando ${pendingCount} pendiente(s)...`, true);
+        return;
+      }
+      if (pendingCount > 0) {
+        setSyncStatus(`En línea · ${pendingCount} pendiente(s)`, true);
+        return;
+      }
+      setSyncStatus(firestoreConnected ? 'En vivo · Firestore' : 'Conectando con Firestore...', false);
+    }
+
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function dataUrlToBlob(dataUrl) {
+      const res = await fetch(dataUrl);
+      return await res.blob();
+    }
+
+    function withTimeout(promise, ms) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('NETWORK_TIMEOUT')), ms);
+        promise.then(
+          (val) => {
+            clearTimeout(timer);
+            resolve(val);
+          },
+          (err) => {
+            clearTimeout(timer);
+            reject(err);
+          }
+        );
+      });
+    }
+
+    // =========================================================================
+    // 6. MARCADORES PERSONALIZADOS, POPUPS Y FIRESTORE EN TIEMPO REAL
+    // =========================================================================
+    const TIPO_META_MAP = {
+      'reten': { emoji: '🚧', color: '#f97316', label: 'Retén' },
+      'retén': { emoji: '🚧', color: '#f97316', label: 'Retén' },
+      'accidente': { emoji: '🚨', color: '#ef4444', label: 'Accidente' },
+      'via cerrada': { emoji: '⛔', color: '#dc2626', label: 'Vía cerrada' },
+      'vía cerrada': { emoji: '⛔', color: '#dc2626', label: 'Vía cerrada' },
+      'hueco': { emoji: '🕳️', color: '#eab308', label: 'Hueco' },
+      'trancon': { emoji: '🚗', color: '#f59e0b', label: 'Trancón' },
+      'trancón': { emoji: '🚗', color: '#f59e0b', label: 'Trancón' },
+      'policia': { emoji: '👮', color: '#3b82f6', label: 'Policía' },
+      'policía': { emoji: '👮', color: '#3b82f6', label: 'Policía' }
+    };
+
+    function getTipoMeta(tipo) {
+      const key = String(tipo || '').trim().toLowerCase();
+      return TIPO_META_MAP[key] || { emoji: '📍', color: '#ef4444', label: tipo || 'Novedad' };
+    }
+
+    function extractTimestampMs(data) {
+      if (data.timestamp && typeof data.timestamp.toMillis === 'function') {
+        return data.timestamp.toMillis();
+      }
+      if (typeof data.timestamp === 'number') return data.timestamp;
+      if (typeof data.createdAtMs === 'number') return data.createdAtMs;
+      return Date.now();
+    }
+
+    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false) {
+      const bg = isFixed ? 'linear-gradient(135deg,#fcd34d,#d97706)' : (color || '#ef4444');
+      const borderColor = isPending ? '#fbbf24' : '#ffffff';
+      const badge = isPending
+        ? `<span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#020617;border:1.5px solid #020617;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:900;">⏳</span>`
+        : isFixed
+        ? `<span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#020617;border:1.5px solid #fbbf24;font-size:10px;display:flex;align-items:center;justify-content:center;">👑</span>`
+        : '';
+
+      return L.divIcon({
+        className: 'custom-pin',
+        html: `<div style="
+          position:relative;
+          width:38px;height:38px;border-radius:50%;
+          background:${bg};border:2px solid ${borderColor};
+          display:flex;align-items:center;justify-content:center;
+          font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,0.55);
+        ">${emoji || '📍'}${badge}</div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+        popupAnchor: [0, -18]
+      });
+    }
+
+    function renderReports(reportsList) {
+      markersLayer.clearLayers();
+
+      reportsList.forEach((rep) => {
+        const lat = Number(rep.lat);
+        const lng = Number(rep.lng);
+        if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+        const tipoTexto = rep.tipo || rep.type || 'Novedad';
+        const meta = getTipoMeta(tipoTexto);
+        const descripcionTexto = rep.descripcion || rep.description || 'Novedad reportada en Bucaramanga.';
+        const fotoUrl = rep.urlFoto || rep.mediaUrl || rep.mediaDataUrl || null;
+        const timeMs = extractTimestampMs(rep);
+        const isPending = Boolean(rep.isPending);
+        const isFixed = Boolean(rep.isFixed);
+
+        const marker = L.marker([lat, lng], {
+          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed),
+          zIndexOffset: isFixed ? 700 : 400
+        });
+
+        let mediaHtml = '';
+        if (fotoUrl) {
+          const isVideo =
+            rep.mediaType === 'video' ||
+            /^data:video\//i.test(fotoUrl) ||
+            /\.(mp4|webm|mov|m4v)(\?|$)/i.test(fotoUrl);
+          mediaHtml = isVideo
+            ? `<video src="${escapeHtml(fotoUrl)}" class="popup-media" controls playsinline preload="metadata"></video>`
+            : `<img src="${escapeHtml(fotoUrl)}" class="popup-media" alt="Foto del reporte" loading="lazy" />`;
+        }
+
+        const confirmations = Number(rep.confirmations || 1);
+        const denials = Number(rep.denials || 0);
+        const adminDeleteBtn = userRole === 'admin' && !isPending
+          ? `<button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Retirar</button>`
+          : '';
+
+        const actionsHtml = isPending
+          ? `<div class="popup-meta" style="color:#fbbf24;font-weight:700;margin-top:8px;">⏳ Guardado sin internet · Se subirá a Firestore al recuperar señal</div>`
+          : `<div class="popup-actions">
+              <button type="button" class="popup-vote-btn" onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">👍 Sigue (${confirmations})</button>
+              <button type="button" class="popup-vote-btn" onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">✅ Ya pasó (${denials})</button>
+              ${adminDeleteBtn}
+            </div>`;
+
+        const badgeColor = isFixed ? '#d97706' : meta.color;
+        const badgePrefix = isFixed ? '👑 Fija · ' : '';
+
+        marker.bindPopup(`
+          <div class="popup-card">
+            <span class="popup-badge" style="background:${escapeHtml(badgeColor)}">
+              ${badgePrefix}${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
+            </span>
+            <div>${escapeHtml(descripcionTexto)}</div>
+            ${mediaHtml}
+            <div class="popup-meta">🕒 ${formatTimeLabel(timeMs)} · 📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+            ${actionsHtml}
+          </div>
+        `);
+        marker._reportId = rep.id;
+        markersLayer.addLayer(marker);
+      });
+
+      document.getElementById('reportCountChip').textContent =
+        `${reportsList.length} ${reportsList.length === 1 ? 'alerta' : 'alertas'}`;
+    }
+
+    function renderCombinedReports(serverReports) {
+      const pending = loadPendingReports().map((item) => ({
+        ...item,
+        id: item.localId,
+        isPending: true
+      }));
+      renderReports([...pending, ...(Array.isArray(serverReports) ? serverReports : [])]);
+    }
+
+    renderCombinedReports(lastServerReports);
+    updateNetworkAndSyncStatus();
+
+    const btnGoogleAuth = document.getElementById('btnGoogleAuth');
+
+    function updateAuthUI(user) {
+      if (!btnGoogleAuth) return;
+      if (user) {
+        const firstName = (user.displayName || user.email || 'Cuenta').split(' ')[0].slice(0, 12);
+        btnGoogleAuth.textContent = `✓ ${firstName}`;
+        btnGoogleAuth.classList.add('signed-in');
+        btnGoogleAuth.title = `Conectado como ${user.email || 'Usuario'} (clic para cerrar sesión)`;
+      } else {
+        btnGoogleAuth.textContent = 'Entrar';
+        btnGoogleAuth.classList.remove('signed-in');
+        btnGoogleAuth.title = 'Iniciar sesión con Google para reportar y votar';
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      updateAuthUI(user);
+      if (user && user.email === 'faoj2013@gmail.com' && userRole !== 'admin') {
+        userRole = 'admin';
+        try {
+          localStorage.setItem(STORAGE_KEYS.USER_ROLE, userRole);
+        } catch (e) {}
+        applyRoleUI();
+        renderCombinedReports(lastServerReports);
+      }
+      if (user && navigator.onLine && loadPendingReports().length > 0) {
+        sincronizarReportesPendientes();
+      }
+    });
+
+    async function ensureAuthenticated() {
+      if (auth.currentUser) return auth.currentUser;
+      const result = await signInWithPopup(auth, googleProvider);
+      return result.user;
+    }
+
+    if (btnGoogleAuth) {
+      btnGoogleAuth.addEventListener('click', async () => {
+        if (auth.currentUser) {
+          await signOut(auth);
+          showToast('Sesión cerrada.');
+          return;
+        }
+        try {
+          await signInWithPopup(auth, googleProvider);
+          showToast('Sesión iniciada con Google.');
+        } catch (err) {
+          console.error('Error iniciando sesión con Google:', err);
+          showToast('No se pudo iniciar sesión con Google.');
+        }
+      });
+    }
+
+    window.voteReport = async function(reportId, voteType) {
+      if (!reportId) return;
+      if (!navigator.onLine) {
+        showToast('Sin internet. Los votos requieren conexión activa.');
+        return;
+      }
+      const path = `${COLLECTION_NAME}/${reportId}`;
+      try {
+        await ensureAuthenticated();
+        const docRef = doc(db, COLLECTION_NAME, reportId);
+        await updateDoc(
+          docRef,
+          voteType === 'confirm'
+            ? { confirmations: increment(1) }
+            : { denials: increment(1) }
+        );
+        showToast(
+          voteType === 'confirm'
+            ? 'Confirmaste que la novedad sigue activa.'
+            : 'Reportaste que la vía ya está despejada.'
+        );
+      } catch (err) {
+        if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
+          showToast('Inicia sesión con Google para confirmar reportes.');
+          return;
+        }
+        showToast('No se pudo actualizar el voto.');
+        handleFirestoreError(err, OperationType.UPDATE, path);
+      }
+    };
+
+    window.deleteReportFromFirestore = async function(reportId) {
+      if (!reportId || userRole !== 'admin') return;
+      const path = `${COLLECTION_NAME}/${reportId}`;
+      try {
+        await ensureAuthenticated();
+        await deleteDoc(doc(db, COLLECTION_NAME, reportId));
+        showToast('Alerta retirada por el Administrador.');
+      } catch (err) {
+        if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
+          showToast('Inicia sesión con Google para retirar reportes.');
+          return;
+        }
+        showToast('Solo el autor o el Administrador pueden retirar este reporte.');
+        handleFirestoreError(err, OperationType.DELETE, path);
+      }
+    };
+
+    function startFirestoreListener() {
+      const twelveHoursAgo = Date.now() - 12 * 60 * 60 * 1000;
+      const reportesQuery = query(collection(db, COLLECTION_NAME), limit(150));
+
+      onSnapshot(
+        reportesQuery,
+        (snapshot) => {
+          if (!navigator.onLine && snapshot.empty && lastServerReports.length > 0) {
+            renderCombinedReports(lastServerReports);
+            updateNetworkAndSyncStatus();
+            return;
+          }
+
+          const activeReports = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const timeMs = extractTimestampMs(data);
+            const denials = Number(data.denials || 0);
+            const confirmations = Number(data.confirmations || 1);
+            const isFixed = Boolean(data.isFixed);
+            const isExpired = !isFixed && timeMs < twelveHoursAgo;
+            const isResolved = !isFixed && denials >= 3 && denials > confirmations;
+
+            if (!isExpired && !isResolved) {
+              activeReports.push({ id: docSnap.id, ...data, _sortMs: timeMs });
+            }
+          });
+
+          activeReports.sort((a, b) => {
+            if (Boolean(a.isFixed) !== Boolean(b.isFixed)) return a.isFixed ? -1 : 1;
+            return b._sortMs - a._sortMs;
+          });
+
+          lastServerReports = activeReports;
+          saveCachedReports(activeReports);
+          firestoreConnected = true;
+
+          renderCombinedReports(activeReports);
+          updateNetworkAndSyncStatus();
+
+          if (navigator.onLine && auth.currentUser && loadPendingReports().length > 0) {
+            sincronizarReportesPendientes();
+          }
+        },
+        (error) => {
+          firestoreConnected = false;
+          renderCombinedReports(lastServerReports);
+
+          if (!navigator.onLine) {
+            updateNetworkAndSyncStatus();
+          } else if (error && error.code === 'permission-denied') {
+            setSyncStatus('Permiso Firestore requerido', true);
+            showToast('Error de permisos en Firestore.');
+            handleFirestoreError(error, OperationType.LIST, COLLECTION_NAME);
+          } else {
+            console.error('Error escuchando Firestore:', error);
+            setSyncStatus('Reconectando · Caché local', true);
+          }
+        }
+      );
+    }
+
+    // =========================================================================
+    // 7. GEOLOCALIZACIÓN GPS EN TIEMPO REAL (PRIORIDAD AL GPS REAL)
+    // =========================================================================
+    let gpsWatchId = null;
+    let isFollowingUser = true;
+    let hasUsedDefaultFallback = false;
+
+    map.on('dragstart', () => {
+      isFollowingUser = false;
+    });
+
+    function updateUserPositionOnMap(lat, lng, mode = 'live', speedMs = null) {
+      const isDefault = mode === 'default';
+      const isCached = mode === 'cached';
+      latestGps = { lat, lng, isDefault, isCached };
+
+      document.getElementById('hudCoords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      if (typeof speedMs === 'number' && speedMs >= 0) {
+        document.getElementById('hudSpeed').textContent = (speedMs * 3.6).toFixed(1);
+      }
+      updateQuickExternalLinks(lat, lng);
+
+      const popupLabel = isDefault
+        ? '📍 Bucaramanga (ubicación por defecto)'
+        : isCached
+        ? '📌 Última ubicación GPS conocida (caché local)'
+        : '🔵 Tu ubicación GPS en tiempo real';
+
+      const markerColor = isDefault ? '#10b981' : isCached ? '#38bdf8' : '#2563eb';
+
+      if (!userMarker) {
+        userMarker = L.circleMarker([lat, lng], {
+          radius: 10,
+          fillColor: markerColor,
+          color: '#ffffff',
+          weight: 3,
+          fillOpacity: 1
+        }).addTo(map).bindPopup(popupLabel);
+      } else {
+        userMarker.setLatLng([lat, lng]);
+        userMarker.setStyle({ fillColor: markerColor });
+        userMarker.setPopupContent(popupLabel);
+      }
+
+      const gpsNote = document.getElementById('gpsStatusText');
+      if (gpsNote) {
+        if (isDefault) {
+          gpsNote.textContent = `📍 Ubicación por defecto en Bucaramanga (${lat.toFixed(4)}, ${lng.toFixed(4)}).`;
+        } else if (isCached) {
+          gpsNote.textContent = `📌 Última posición GPS guardada (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+        } else {
+          gpsNote.textContent = `🔵 GPS en tiempo real activo (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+        }
+      }
+    }
+
+    if (initialCachedGps) {
+      updateUserPositionOnMap(initialCachedGps.lat, initialCachedGps.lng, 'cached');
+    }
+
+    function aplicarPorDefectoUnaSolaVez(centrarMapa = false) {
+      if (hasReceivedLiveGps || hasKnownRealGps || hasUsedDefaultFallback) {
+        return;
+      }
+      hasUsedDefaultFallback = true;
+      updateUserPositionOnMap(BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng, 'default');
+      if (centrarMapa) {
+        map.setView([BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng], INITIAL_ZOOM);
+      }
+    }
+
+    function manejarCoordenadasGpsReales(pos, forceCenter = false) {
+      if (!pos || !pos.coords) return;
+      const lat = Number(pos.coords.latitude);
+      const lng = Number(pos.coords.longitude);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+      const firstLiveFix = !hasReceivedLiveGps;
+      hasReceivedLiveGps = true;
+      hasKnownRealGps = true;
+
+      saveCachedGps(lat, lng);
+      updateUserPositionOnMap(lat, lng, 'live', pos.coords.speed);
+
+      if (firstLiveFix || forceCenter) {
+        isFollowingUser = true;
+        map.setView([lat, lng], Math.max(map.getZoom(), 16), { animate: true });
+      } else if (isFollowingUser) {
+        map.panTo([lat, lng], { animate: true, duration: 0.5 });
+      }
+    }
+
+    function iniciarSeguimientoGpsEnTiempoReal(forceCenterOnFirstFix = false) {
+      if (!navigator.geolocation) {
+        aplicarPorDefectoUnaSolaVez(true);
+        return;
+      }
+
+      if (gpsWatchId !== null) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => manejarCoordenadasGpsReales(pos, forceCenterOnFirstFix),
+        (err) => {
+          if (err && err.code === err.PERMISSION_DENIED) {
+            aplicarPorDefectoUnaSolaVez(false);
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            (pos) => manejarCoordenadasGpsReales(pos, forceCenterOnFirstFix),
+            () => aplicarPorDefectoUnaSolaVez(false),
+            { enableHighAccuracy: false, maximumAge: 30000, timeout: 10000 }
+          );
+        },
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+      );
+
+      try {
+        gpsWatchId = navigator.geolocation.watchPosition(
+          (pos) => manejarCoordenadasGpsReales(pos, false),
+          (error) => {
+            if (error && error.code === error.PERMISSION_DENIED) {
+              aplicarPorDefectoUnaSolaVez(false);
+              if (gpsWatchId !== null) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null;
+              }
+            } else {
+              aplicarPorDefectoUnaSolaVez(false);
+            }
+          },
+          { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 }
+        );
+      } catch (e) {
+        aplicarPorDefectoUnaSolaVez(false);
+      }
+    }
+
+    iniciarSeguimientoGpsEnTiempoReal(false);
+
+    document.getElementById('btnZoomIn').addEventListener('click', () => map.zoomIn());
+    document.getElementById('btnZoomOut').addEventListener('click', () => map.zoomOut());
+    document.getElementById('btnLocateMe').addEventListener('click', () => {
+      isFollowingUser = true;
+      if (latestGps && !latestGps.isDefault) {
+        map.flyTo([latestGps.lat, latestGps.lng], 16);
+        showToast(
+          hasReceivedLiveGps
+            ? 'Centrado en tu ubicación GPS en tiempo real.'
+            : 'Centrado en tu última ubicación GPS conocida.'
+        );
+        if (gpsWatchId === null) {
+          iniciarSeguimientoGpsEnTiempoReal(true);
+        }
+      } else {
+        hasUsedDefaultFallback = false;
+        iniciarSeguimientoGpsEnTiempoReal(true);
+        showToast('Buscando tu ubicación GPS en vivo...');
+      }
+    });
+
+    // =========================================================================
+    // 8. PUNTOS FRECUENTES GUARDADOS EN LOCALSTORAGE
+    // =========================================================================
+    const pointsModal = document.getElementById('pointsModal');
+    let frequentPoints = loadFrequentPoints();
+
+    function renderFrequentPoints() {
+      frequentPointsLayer.clearLayers();
+      const listEl = document.getElementById('pointsList');
+      listEl.innerHTML = '';
+
+      frequentPoints.forEach((pt) => {
+        const marker = L.marker([pt.lat, pt.lng], {
+          zIndexOffset: 200,
+          icon: L.divIcon({
+            className: 'custom-point-pin',
+            html: `<div style="width:28px;height:28px;border-radius:50%;background:#06b6d4;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 3px 10px rgba(0,0,0,0.45);">⭐</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+          })
+        }).bindPopup(`<strong>⭐ ${escapeHtml(pt.name)}</strong><br/><small>${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</small>`);
+        frequentPointsLayer.addLayer(marker);
+
+        const row = document.createElement('div');
+        row.className = 'point-item';
+        row.innerHTML = `
+          <div class="point-info">
+            <div class="point-title">⭐ ${escapeHtml(pt.name)}</div>
+            <div class="point-coords">${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</div>
+          </div>
+          <button type="button" class="point-delete" title="Borrar">🗑️</button>
+        `;
+        row.querySelector('.point-info').addEventListener('click', () => {
+          isFollowingUser = false;
+          pointsModal.classList.remove('open');
+          map.flyTo([pt.lat, pt.lng], 16);
+          showToast(`Centrando en "${pt.name}"`);
+        });
+        row.querySelector('.point-delete').addEventListener('click', () => {
+          frequentPoints = frequentPoints.filter((p) => p.id !== pt.id);
+          saveFrequentPoints(frequentPoints);
+          renderFrequentPoints();
+          showToast('Punto frecuente eliminado.');
+        });
+        listEl.appendChild(row);
+      });
+
+      if (frequentPoints.length === 0) {
+        listEl.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;padding:12px;">Aún no tienes puntos guardados.</div>';
+      }
+    }
+
+    renderFrequentPoints();
+
+    document.getElementById('btnOpenPoints').addEventListener('click', () => {
+      pointsModal.classList.add('open');
+    });
+    document.getElementById('btnQuickSavePoint').addEventListener('click', () => {
+      pointsModal.classList.add('open');
+      setTimeout(() => document.getElementById('pointName').focus(), 100);
+    });
+    document.getElementById('btnClosePointsModal').addEventListener('click', () => {
+      pointsModal.classList.remove('open');
+    });
+    pointsModal.addEventListener('click', (e) => {
+      if (e.target === pointsModal) pointsModal.classList.remove('open');
+    });
+
+    document.getElementById('pointForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('pointName');
+      const name = input.value.trim();
+      if (!name) return;
+      const coords = await getReportCoordinates();
+      frequentPoints.unshift({
+        id: `pt_${Date.now()}`,
+        name,
+        lat: coords.lat,
+        lng: coords.lng
+      });
+      saveFrequentPoints(frequentPoints);
+      renderFrequentPoints();
+      input.value = '';
+      showToast(`Punto "${name}" guardado en este dispositivo.`);
+    });
+
+    // =========================================================================
+    // 9. MODAL "+ REPORTAR NOVEDAD", MULTIMEDIA Y COLA OFFLINE CON FIRESTORE
+    // =========================================================================
+    const modal = document.getElementById('reportModal');
+    const reportForm = document.getElementById('reportForm');
+    const mediaInput = document.getElementById('reportMedia');
+    const mediaPreviewWrap = document.getElementById('mediaPreviewWrap');
+    const previewImage = document.getElementById('previewImage');
+    const previewVideo = document.getElementById('previewVideo');
+    const btnClearMedia = document.getElementById('btnClearMedia');
+    const btnSubmit = document.getElementById('btnSubmitReport');
+
+    let selectedCategory = { type: 'Retén', color: '#f97316', emoji: '🚧' };
+    let pendingBlob = null;
+    let pendingMediaType = null;
+    let pendingFileName = null;
+    let previewObjectUrl = null;
+
+    function resetMediaState() {
+      if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+      }
+      mediaInput.value = '';
+      mediaPreviewWrap.style.display = 'none';
+      previewImage.style.display = 'none';
+      previewVideo.style.display = 'none';
+      previewImage.removeAttribute('src');
+      previewVideo.removeAttribute('src');
+      pendingBlob = null;
+      pendingMediaType = null;
+      pendingFileName = null;
+    }
+
+    document.getElementById('btnOpenReport').addEventListener('click', () => modal.classList.add('open'));
+    document.getElementById('btnCloseModal').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+    btnClearMedia.addEventListener('click', resetMediaState);
+
+    document.querySelectorAll('.cat-option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-option').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCategory = {
+          type: btn.dataset.type,
+          color: btn.dataset.color,
+          emoji: btn.dataset.emoji
+        };
+      });
+    });
+
+    mediaInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      resetMediaState();
+
+      if (file.type.startsWith('image/')) {
+        const img = new Image();
+        const rawUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(rawUrl);
+          const maxW = 1080;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW) {
+            h = Math.round((h * maxW) / w);
+            w = maxW;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) return;
+              pendingBlob = blob;
+              pendingMediaType = 'image';
+              pendingFileName = `foto_${Date.now()}.jpg`;
+              previewObjectUrl = URL.createObjectURL(blob);
+              previewImage.src = previewObjectUrl;
+              previewImage.style.display = 'block';
+              mediaPreviewWrap.style.display = 'block';
+            },
+            'image/jpeg',
+            0.8
+          );
+        };
+        img.src = rawUrl;
+      } else if (file.type.startsWith('video/')) {
+        if (file.size > 25 * 1024 * 1024) {
+          showToast('El video supera los 25 MB. Graba un clip más corto.');
+          return;
+        }
+        pendingBlob = file;
+        pendingMediaType = 'video';
+        const ext = (file.name && file.name.split('.').pop()) || 'mp4';
+        pendingFileName = `video_${Date.now()}.${ext}`;
+        previewObjectUrl = URL.createObjectURL(file);
+        previewVideo.src = previewObjectUrl;
+        previewVideo.style.display = 'block';
+        mediaPreviewWrap.style.display = 'block';
+      }
+    });
+
+    function getReportCoordinates() {
+      return new Promise((resolve) => {
+        if (latestGps && !latestGps.isDefault) {
+          resolve({ lat: latestGps.lat, lng: latestGps.lng, simulated: false });
+          return;
+        }
+        const cached = loadCachedGps();
+        if (cached) {
+          resolve({ lat: cached.lat, lng: cached.lng, simulated: false });
+          return;
+        }
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              manejarCoordenadasGpsReales(pos, false);
+              resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, simulated: false });
+            },
+            () => resolve({ lat: BUCARAMANGA_DEFAULT.lat, lng: BUCARAMANGA_DEFAULT.lng, simulated: true }),
+            { enableHighAccuracy: false, maximumAge: 15000, timeout: 4000 }
+          );
+          return;
+        }
+        resolve({ lat: BUCARAMANGA_DEFAULT.lat, lng: BUCARAMANGA_DEFAULT.lng, simulated: true });
+      });
+    }
+
+    function uploadMediaToStorage(blob, fileName, onProgress) {
+      return new Promise((resolve, reject) => {
+        const storageRef = ref(storage, `moviradar_media/${fileName}`);
+        const uploadTask = uploadBytesResumable(storageRef, blob, {
+          contentType: blob.type || (pendingMediaType === 'video' ? 'video/mp4' : 'image/jpeg')
+        });
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            if (snapshot.totalBytes > 0) {
+              onProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100));
+            }
+          },
+          (error) => reject(error),
+          async () => {
+            try {
+              resolve(await getDownloadURL(uploadTask.snapshot.ref));
+            } catch (err) {
+              reject(err);
+            }
+          }
+        );
+      });
+    }
+
+    async function enqueueOfflineReport(coords, descripcion, isFixed, blob, mediaType, fileName) {
+      let mediaDataUrl = null;
+      if (blob && blob.size <= 2 * 1024 * 1024) {
+        try {
+          mediaDataUrl = await blobToDataUrl(blob);
+        } catch (e) {
+          mediaDataUrl = null;
+        }
+      }
+
+      const localId = `pending_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const queue = loadPendingReports();
+      queue.push({
+        localId,
+        lat: coords.lat,
+        lng: coords.lng,
+        tipo: selectedCategory.type,
+        descripcion: descripcion.slice(0, 400),
+        isFixed,
+        createdAtMs: Date.now(),
+        mediaDataUrl,
+        mediaType: mediaDataUrl ? mediaType : null,
+        fileName: mediaDataUrl ? fileName : null,
+        confirmations: 1,
+        denials: 0
+      });
+      const savedWithMedia = savePendingReports(queue);
+
+      renderCombinedReports(lastServerReports);
+      updateNetworkAndSyncStatus();
+
+      map.flyTo([coords.lat, coords.lng], 16);
+      setTimeout(() => {
+        markersLayer.eachLayer((layer) => {
+          if (layer._reportId === localId) layer.openPopup();
+        });
+      }, 450);
+
+      reportForm.reset();
+      resetMediaState();
+      modal.classList.remove('open');
+
+      showToast(
+        blob && !savedWithMedia
+          ? 'Sin internet: reporte guardado sin archivo pesado; se sincronizará con Firestore.'
+          : 'Sin internet: reporte guardado localmente y se enviará a Firestore al recuperar señal.'
+      );
+    }
+
+    async function sincronizarReportesPendientes() {
+      if (isSyncingPending || !navigator.onLine || !auth.currentUser) return;
+      const initialQueue = loadPendingReports();
+      if (initialQueue.length === 0) return;
+
+      isSyncingPending = true;
+      updateNetworkAndSyncStatus();
+      let syncedCount = 0;
+
+      try {
+        const currentUser = auth.currentUser;
+        const canFix = Boolean(currentUser.email === 'faoj2013@gmail.com');
+        for (const item of initialQueue) {
+          if (!navigator.onLine) break;
+
+          let urlFoto = null;
+          if (item.mediaDataUrl && item.fileName) {
+            const blob = await dataUrlToBlob(item.mediaDataUrl);
+            urlFoto = await withTimeout(uploadMediaToStorage(blob, item.fileName, () => {}), 20000);
+          }
+
+          await withTimeout(
+            addDoc(collection(db, COLLECTION_NAME), {
+              lat: Number(item.lat),
+              lng: Number(item.lng),
+              tipo: String(item.tipo || 'Retén').slice(0, 40),
+              descripcion: String(item.descripcion || 'Novedad vial').trim().slice(0, 400),
+              isFixed: canFix && Boolean(item.isFixed),
+              timestamp: serverTimestamp(),
+              urlFoto,
+              mediaType: urlFoto ? item.mediaType : null,
+              confirmations: 1,
+              denials: 0,
+              authorId: currentUser.uid
+            }),
+            15000
+          );
+
+          syncedCount += 1;
+          const remaining = loadPendingReports().filter((q) => q.localId !== item.localId);
+          savePendingReports(remaining);
+          renderCombinedReports(lastServerReports);
+          updateNetworkAndSyncStatus();
+        }
+
+        if (syncedCount > 0) {
+          showToast(
+            `✅ ${syncedCount} ${syncedCount === 1 ? 'reporte sincronizado' : 'reportes sincronizados'} con Firestore.`
+          );
+        }
+      } catch (err) {
+        console.warn('Sincronización pausada:', err);
+      } finally {
+        isSyncingPending = false;
+        updateNetworkAndSyncStatus();
+      }
+    }
+
+    async function guardarReporteEnFirestore(e) {
+      e.preventDefault();
+      const rawDesc = document.getElementById('reportDesc').value.trim();
+      if (rawDesc.length < 2) {
+        showToast('Escribe al menos 2 caracteres para describir la novedad.');
+        return;
+      }
+      const descripcion = rawDesc.slice(0, 400);
+      const wantsFixed = userRole === 'admin' && document.getElementById('chkIsFixed').checked;
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Obteniendo ubicación GPS...';
+
+      try {
+        const coords = await getReportCoordinates();
+
+        if (!navigator.onLine) {
+          await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingBlob, pendingMediaType, pendingFileName);
+          return;
+        }
+
+        btnSubmit.textContent = 'Verificando cuenta...';
+        const user = await ensureAuthenticated();
+        const isFixed = wantsFixed && user.email === 'faoj2013@gmail.com';
+
+        let urlFoto = null;
+        if (pendingBlob && pendingFileName) {
+          btnSubmit.textContent = 'Subiendo archivo 0%...';
+          urlFoto = await withTimeout(
+            uploadMediaToStorage(pendingBlob, pendingFileName, (pct) => {
+              btnSubmit.textContent = `Subiendo archivo ${pct}%...`;
+            }),
+            20000
+          );
+        }
+
+        btnSubmit.textContent = 'Guardando en Firestore...';
+
+        const docRef = await withTimeout(
+          addDoc(collection(db, COLLECTION_NAME), {
+            lat: Number(coords.lat),
+            lng: Number(coords.lng),
+            tipo: String(selectedCategory.type).slice(0, 40),
+            descripcion,
+            isFixed,
+            timestamp: serverTimestamp(),
+            urlFoto,
+            mediaType: urlFoto ? pendingMediaType : null,
+            confirmations: 1,
+            denials: 0,
+            authorId: user.uid
+          }),
+          12000
+        );
+
+        map.flyTo([coords.lat, coords.lng], 16);
+        setTimeout(() => {
+          markersLayer.eachLayer((layer) => {
+            if (layer._reportId === docRef.id) layer.openPopup();
+          });
+        }, 550);
+
+        reportForm.reset();
+        resetMediaState();
+        modal.classList.remove('open');
+
+        showToast(
+          coords.simulated
+            ? '¡Reporte publicado en Firebase (zona Bucaramanga)!'
+            : '¡Reporte publicado en vivo con tu GPS!'
+        );
+      } catch (err) {
+        if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
+          showToast('Inicia sesión con Google para publicar el reporte.');
+          return;
+        }
+        console.error('Error publicando reporte en Firebase:', err);
+        if (err && err.code === 'storage/unauthorized') {
+          showToast('Sin permiso en Firebase Storage. Revisa las reglas de Storage.');
+        } else if (err && err.code === 'permission-denied') {
+          showToast('Sin permiso en Firestore.');
+          handleFirestoreError(err, OperationType.CREATE, COLLECTION_NAME);
+        } else {
+          const coords = await getReportCoordinates();
+          await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingBlob, pendingMediaType, pendingFileName);
+        }
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Publicar reporte en vivo';
+      }
+    }
+
+    reportForm.addEventListener('submit', guardarReporteEnFirestore);
+
+    window.addEventListener('offline', () => {
+      updateNetworkAndSyncStatus();
+      showToast('Sin internet: se mantiene tu última posición GPS y los marcadores en caché.');
+    });
+
+    window.addEventListener('online', () => {
+      updateNetworkAndSyncStatus();
+      showToast('Señal recuperada. Sincronizando reportes con Firestore...');
+      sincronizarReportesPendientes();
+    });
+
+    setInterval(() => {
+      if (navigator.onLine && loadPendingReports().length > 0 && !isSyncingPending) {
+        sincronizarReportesPendientes();
+      }
+    }, 15000);
+
+    startFirestoreListener();
+    if (navigator.onLine) {
+      sincronizarReportesPendientes();
+    }
+    });
+  </script>
+</body>
+</html>

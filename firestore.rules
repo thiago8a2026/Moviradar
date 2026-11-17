@@ -2,77 +2,112 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Función auxiliar: verifica si el usuario ha iniciado sesión
-    function isAuthenticated() {
+    // Safety net: deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
       return request.auth != null;
     }
 
-    // Función auxiliar: verifica si el usuario autenticado es el autor del reporte
-    function isAuthor(data) {
-      return isAuthenticated() && (
-        (data.authorId != null && data.authorId == request.auth.uid) ||
-        (data.userId != null && data.userId == request.auth.uid)
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'faoj2013@gmail.com'
       );
     }
 
-    // ==========================================
-    // Colección: mobility_reports (o reports)
-    // ==========================================
-    match /mobility_reports/{reportId} {
-      // 1. Lectura: Solo usuarios autenticados pueden ver las alertas viales en el mapa
-      allow read: if isAuthenticated();
-
-      // 2. Creación: Solo usuarios autenticados pueden crear reportes,
-      // obligando a que 'authorId' o 'userId' coincida con su UID real
-      allow create: if isAuthenticated() && (
-        (request.resource.data.authorId == request.auth.uid) ||
-        (request.resource.data.userId == request.auth.uid)
-      );
-
-      // 3. Modificación: 
-      // - El autor original puede editar su reporte.
-      // - O la comunidad puede votar (confirmar/denegar) sin alterar los datos del autor ni coordenadas.
-      allow update: if isAuthenticated() && (
-        // Caso A: El autor modifica su propio reporte
-        isAuthor(resource.data) ||
-        // Caso B: Voto ciudadano de confirmación/descarte (no altera autor ni ubicación)
-        (
-          request.resource.data.authorId == resource.data.authorId &&
-          request.resource.data.latitude == resource.data.latitude &&
-          request.resource.data.longitude == resource.data.longitude
-        )
-      );
-
-      // 4. Eliminación: Estrictamente restringida al autor del reporte
-      allow delete: if isAuthor(resource.data);
+    function isValidReporte(data) {
+      return data.keys().hasAll([
+          'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
+          'timestamp', 'confirmations', 'denials', 'authorId'
+        ])
+        && data.keys().hasOnly([
+          'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
+          'timestamp', 'urlFoto', 'mediaType', 'confirmations', 'denials', 'authorId'
+        ])
+        && data.lat is number && data.lat >= -90 && data.lat <= 90
+        && data.lng is number && data.lng >= -180 && data.lng <= 180
+        && data.tipo is string && data.tipo.size() >= 2 && data.tipo.size() <= 40
+        && data.descripcion is string && data.descripcion.size() >= 2 && data.descripcion.size() <= 400
+        && data.isFixed is bool
+        && data.timestamp is timestamp
+        && data.confirmations is int && data.confirmations >= 0
+        && data.denials is int && data.denials >= 0
+        && data.authorId is string && isValidId(data.authorId)
+        && (!('urlFoto' in data) || data.urlFoto == null || (data.urlFoto is string && data.urlFoto.size() <= 1024))
+        && (!('mediaType' in data) || data.mediaType == null || data.mediaType == 'image' || data.mediaType == 'video');
     }
 
-    // Compatibilidad con alias '/reports'
-    match /reports/{reportId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && (
-        (request.resource.data.authorId == request.auth.uid) ||
-        (request.resource.data.userId == request.auth.uid)
-      );
-      allow update: if isAuthenticated() && (
-        isAuthor(resource.data) ||
-        (
-          request.resource.data.authorId == resource.data.authorId &&
-          request.resource.data.latitude == resource.data.latitude &&
-          request.resource.data.longitude == resource.data.longitude
-        )
-      );
-      allow delete: if isAuthor(resource.data);
+    match /reportes/{reportId} {
+      // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
+      allow get: if isValidId(reportId);
+      allow list: if request.query.limit != null && request.query.limit <= 200;
+
+      allow create: if isVerifiedUser()
+        && isValidId(reportId)
+        && isValidReporte(incoming())
+        && incoming().authorId == request.auth.uid
+        && incoming().timestamp == request.time
+        && incoming().confirmations == 1
+        && incoming().denials == 0
+        && (incoming().isFixed == false || isAdmin());
+
+      allow update: if isVerifiedUser()
+        && isValidId(reportId)
+        && isValidReporte(incoming())
+        && incoming().authorId == existing().authorId
+        && incoming().timestamp == existing().timestamp
+        && incoming().lat == existing().lat
+        && incoming().lng == existing().lng
+        && (
+          isAdmin() ||
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['confirmations'])
+            && incoming().confirmations == existing().confirmations + 1
+          ) ||
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['denials'])
+            && incoming().denials == existing().denials + 1
+          ) ||
+          (
+            existing().authorId == request.auth.uid
+            && incoming().isFixed == existing().isFixed
+            && incoming().diff(existing()).affectedKeys().hasOnly(['tipo', 'descripcion', 'urlFoto', 'mediaType'])
+          )
+        );
+
+      allow delete: if isVerifiedUser()
+        && isValidId(reportId)
+        && (existing().authorId == request.auth.uid || isAdmin());
     }
 
-    // ==========================================
-    // Colección: users (Perfiles ciudadanos)
-    // ==========================================
-    match /users/{userId} {
-      // Lectura para usuarios autenticados
-      allow read: if isAuthenticated();
-      // Escritura y actualización solo para el propio usuario
-      allow create, update, delete: if isAuthenticated() && request.auth.uid == userId;
+    match /admins/{adminId} {
+      allow get: if isVerifiedUser() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin()
+        && isValidId(adminId)
+        && incoming().keys().hasAll(['email', 'role'])
+        && incoming().keys().hasOnly(['email', 'role'])
+        && incoming().email is string && incoming().email.size() <= 200
+        && incoming().role == 'admin';
     }
   }
 }

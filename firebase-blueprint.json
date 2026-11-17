@@ -1,0 +1,102 @@
+{
+  "entities": {
+    "Reporte": {
+      "title": "Reporte Vial MoviRadar",
+      "description": "Alerta vial ciudadana u oficial georreferenciada en tiempo real para Bucaramanga y su área metropolitana.",
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "description": "Latitud GPS del reporte vial."
+        },
+        "lng": {
+          "type": "number",
+          "description": "Longitud GPS del reporte vial."
+        },
+        "tipo": {
+          "type": "string",
+          "description": "Categoría de novedad vial (Retén / Control, Accidente, Trancón, Peligro / Hueco, Vía Cerrada).",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "descripcion": {
+          "type": "string",
+          "description": "Descripción breve de la novedad vial reportada.",
+          "minLength": 2,
+          "maxLength": 400
+        },
+        "isFixed": {
+          "type": "boolean",
+          "description": "Indica si es una alerta fija oficial publicada por un Administrador."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo asignada por el servidor de Firestore."
+        },
+        "urlFoto": {
+          "type": "string",
+          "description": "URL opcional de foto o video en Firebase Storage.",
+          "maxLength": 1024
+        },
+        "mediaType": {
+          "type": "string",
+          "enum": ["image", "video"],
+          "description": "Tipo de evidencia multimedia adjunta."
+        },
+        "confirmations": {
+          "type": "integer",
+          "description": "Número de confirmaciones ciudadanas (Sigue ahí)."
+        },
+        "denials": {
+          "type": "integer",
+          "description": "Número de reportes de vía despejada (Ya pasó)."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID de Firebase Auth del conductor que creó el reporte.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "lat",
+        "lng",
+        "tipo",
+        "descripcion",
+        "isFixed",
+        "timestamp",
+        "confirmations",
+        "denials",
+        "authorId"
+      ]
+    },
+    "AdminUser": {
+      "title": "Administrador MoviRadar",
+      "description": "Registro de administrador autorizado para publicar alertas fijas y moderar reportes.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/reportes/{reportId}": {
+      "schema": { "$ref": "#/entities/Reporte" },
+      "description": "Colección principal en tiempo real de reportes viales en Bucaramanga."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Documentos de administradores autorizados."
+    }
+  }
+}

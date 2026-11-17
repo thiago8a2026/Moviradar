@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Safety net: deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'faoj2013@gmail.com'
+      );
+    }
+
+    function isValidReporte(data) {
+      return data.keys().hasAll([
+          'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
+          'timestamp', 'confirmations', 'denials', 'authorId'
+        ])
+        && data.keys().hasOnly([
+          'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
+          'timestamp', 'urlFoto', 'mediaType', 'confirmations', 'denials', 'authorId'
+        ])
+        && data.lat is number && data.lat >= -90 && data.lat <= 90
+        && data.lng is number && data.lng >= -180 && data.lng <= 180
+        && data.tipo is string && data.tipo.size() >= 2 && data.tipo.size() <= 40
+        && data.descripcion is string && data.descripcion.size() >= 2 && data.descripcion.size() <= 400
+        && data.isFixed is bool
+        && data.timestamp is timestamp
+        && data.confirmations is int && data.confirmations >= 0
+        && data.denials is int && data.denials >= 0
+        && data.authorId is string && isValidId(data.authorId)
+        && (!('urlFoto' in data) || data.urlFoto == null || (data.urlFoto is string && data.urlFoto.size() <= 1024))
+        && (!('mediaType' in data) || data.mediaType == null || data.mediaType == 'image' || data.mediaType == 'video');
+    }
+
+    match /reportes/{reportId} {
+      // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
+      allow get: if isValidId(reportId);
+      allow list: if request.query.limit != null && request.query.limit <= 200;
+
+      allow create: if isVerifiedUser()
+        && isValidId(reportId)
+        && isValidReporte(incoming())
+        && incoming().authorId == request.auth.uid
+        && incoming().timestamp == request.time
+        && incoming().confirmations == 1
+        && incoming().denials == 0
+        && (incoming().isFixed == false || isAdmin());
+
+      allow update: if isVerifiedUser()
+        && isValidId(reportId)
+        && isValidReporte(incoming())
+        && incoming().authorId == existing().authorId
+        && incoming().timestamp == existing().timestamp
+        && incoming().lat == existing().lat
+        && incoming().lng == existing().lng
+        && (
+          isAdmin() ||
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['confirmations'])
+            && incoming().confirmations == existing().confirmations + 1
+          ) ||
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['denials'])
+            && incoming().denials == existing().denials + 1
+          ) ||
+          (
+            existing().authorId == request.auth.uid
+            && incoming().isFixed == existing().isFixed
+            && incoming().diff(existing()).affectedKeys().hasOnly(['tipo', 'descripcion', 'urlFoto', 'mediaType'])
+          )
+        );
+
+      allow delete: if isVerifiedUser()
+        && isValidId(reportId)
+        && (existing().authorId == request.auth.uid || isAdmin());
+    }
+
+    match /admins/{adminId} {
+      allow get: if isVerifiedUser() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin()
+        && isValidId(adminId)
+        && incoming().keys().hasAll(['email', 'role'])
+        && incoming().keys().hasOnly(['email', 'role'])
+        && incoming().email is string && incoming().email.size() <= 200
+        && incoming().role == 'admin';
+    }
+  }
+}
