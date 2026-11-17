@@ -1,0 +1,6 @@
+{
+  "name": "MoviRadar",
+  "description": "Aplicación web móvil progresiva (PWA) de movilidad ciudadana con GPS en vivo, mapa interactivo Leaflet OSM, Waze, Google Maps y puntos frecuentes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

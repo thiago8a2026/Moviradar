@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Función auxiliar: verifica si el usuario ha iniciado sesión
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Función auxiliar: verifica si el usuario autenticado es el autor del reporte
+    function isAuthor(data) {
+      return isAuthenticated() && (
+        (data.authorId != null && data.authorId == request.auth.uid) ||
+        (data.userId != null && data.userId == request.auth.uid)
+      );
+    }
+
+    // ==========================================
+    // Colección: mobility_reports (o reports)
+    // ==========================================
+    match /mobility_reports/{reportId} {
+      // 1. Lectura: Solo usuarios autenticados pueden ver las alertas viales en el mapa
+      allow read: if isAuthenticated();
+
+      // 2. Creación: Solo usuarios autenticados pueden crear reportes,
+      // obligando a que 'authorId' o 'userId' coincida con su UID real
+      allow create: if isAuthenticated() && (
+        (request.resource.data.authorId == request.auth.uid) ||
+        (request.resource.data.userId == request.auth.uid)
+      );
+
+      // 3. Modificación: 
+      // - El autor original puede editar su reporte.
+      // - O la comunidad puede votar (confirmar/denegar) sin alterar los datos del autor ni coordenadas.
+      allow update: if isAuthenticated() && (
+        // Caso A: El autor modifica su propio reporte
+        isAuthor(resource.data) ||
+        // Caso B: Voto ciudadano de confirmación/descarte (no altera autor ni ubicación)
+        (
+          request.resource.data.authorId == resource.data.authorId &&
+          request.resource.data.latitude == resource.data.latitude &&
+          request.resource.data.longitude == resource.data.longitude
+        )
+      );
+
+      // 4. Eliminación: Estrictamente restringida al autor del reporte
+      allow delete: if isAuthor(resource.data);
+    }
+
+    // Compatibilidad con alias '/reports'
+    match /reports/{reportId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (
+        (request.resource.data.authorId == request.auth.uid) ||
+        (request.resource.data.userId == request.auth.uid)
+      );
+      allow update: if isAuthenticated() && (
+        isAuthor(resource.data) ||
+        (
+          request.resource.data.authorId == resource.data.authorId &&
+          request.resource.data.latitude == resource.data.latitude &&
+          request.resource.data.longitude == resource.data.longitude
+        )
+      );
+      allow delete: if isAuthor(resource.data);
+    }
+
+    // ==========================================
+    // Colección: users (Perfiles ciudadanos)
+    // ==========================================
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+  }
+}
