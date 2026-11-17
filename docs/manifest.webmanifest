@@ -1,0 +1,31 @@
+{
+  "id": "./",
+  "name": "MoviRadar - Bucaramanga",
+  "short_name": "MoviRadar",
+  "description": "Alertas viales y tráfico en tiempo real en Bucaramanga con mapa Leaflet OpenStreetMap, GPS en vivo y Firebase.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "navigation",
+    "travel",
+    "utilities"
+  ]
+}

@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#020617" />
+  <title>MoviRadar - Bucaramanga | Alertas Viales en Vivo</title>
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+
+  <!-- Leaflet CSS (Gratuito vía CDN, sin claves ni facturación) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg-dark: #020617;
+      --surface: #0f172a;
+      --surface-light: #1e293b;
+      --border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #10b981;
+      --accent-cyan: #06b6d4;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Barra superior fija */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 62px;
+      background: rgba(2, 6, 23, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 1000;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .brand-subtitle.warn {
+      color: #fbbf24;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+
+    .brand-subtitle.warn .live-dot {
+      background-color: #f59e0b;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    .count-chip {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Mapa principal ocupando la pantalla */
+    #map {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      margin-top: 62px;
+      z-index: 1;
+      background: #0b1120;
+    }
+
+    /* Botones flotantes del mapa (GPS y Zoom) */
+    .map-controls {
+      position: fixed;
+      right: 14px;
+      top: 78px;
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border);
+      color: #f8fafc;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .map-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* Panel inferior flotante */
+    .bottom-panel {
+      position: fixed;
+      bottom: 18px;
+      left: 14px;
+      right: 14px;
+      z-index: 950;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .btn-report-main {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 420px;
+      min-height: 54px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+      transition: transform 0.15s ease;
+    }
+
+    .btn-report-main:active {
+      transform: scale(0.97);
+    }
+
+    /* Modal flotante de reporte */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    @media (min-width: 640px) {
+      .modal-backdrop {
+        align-items: center;
+        padding: 16px;
+      }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 460px;
+      max-height: 92dvh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px 24px 0 0;
+      overflow-y: auto;
+      padding: 18px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    @media (min-width: 640px) {
+      .modal-card {
+        border-radius: 24px;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--surface-light);
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .btn-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .cat-option {
+      min-height: 48px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .cat-option.active {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      resize: none;
+      margin-bottom: 14px;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .media-upload-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 60px;
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.5);
+      padding: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .media-preview-wrap {
+      display: none;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .media-preview {
+      width: 100%;
+      max-height: 190px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: none;
+      background: #000;
+    }
+
+    .btn-clear-media {
+      margin-top: 6px;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .gps-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      min-height: 50px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    /* Toast de aviso */
+    .toast {
+      position: fixed;
+      top: 74px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border: 1px solid var(--accent);
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 3000;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: none;
+      max-width: 92%;
+      text-align: center;
+    }
+
+    /* Personalización de burbuja Leaflet */
+    .leaflet-popup-content-wrapper {
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 14px;
+    }
+    .leaflet-popup-tip {
+      background: #0f172a;
+    }
+    .popup-card {
+      min-width: 210px;
+      max-width: 265px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .popup-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .popup-media {
+      width: 100%;
+      max-height: 155px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 8px;
+      border: 1px solid #334155;
+      background: #000;
+    }
+    .popup-meta {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .popup-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .popup-vote-btn {
+      flex: 1;
+      min-height: 32px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .popup-vote-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Barra superior fija -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <div class="brand-icon">📡</div>
+        <div class="brand-text">
+          <h1>MoviRadar - Bucaramanga</h1>
+          <div class="brand-subtitle" id="syncStatus">
+            <span class="live-dot"></span>
+            <span id="syncStatusText">Conectando en vivo...</span>
+          </div>
+        </div>
+      </div>
+      <div class="count-chip" id="reportCountChip">0 alertas</div>
+    </header>
+
+    <!-- Contenedor principal del mapa gratuito OpenStreetMap -->
+    <main id="map"></main>
+
+    <!-- Controles rápidos del mapa -->
+    <div class="map-controls">
+      <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
+      <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
+      <button type="button" class="map-btn" id="btnLocateMe" title="Mi ubicación GPS">🎯</button>
+    </div>
+
+    <!-- Botón inferior "+ Reportar Novedad" -->
+    <div class="bottom-panel">
+      <button type="button" class="btn-report-main" id="btnOpenReport">
+        <span>+ Reportar Novedad</span>
+      </button>
+    </div>
+
+    <!-- Toast de confirmación -->
+    <div class="toast" id="toastBox"></div>
+
+    <!-- Modal flotante para crear reporte -->
+    <div class="modal-backdrop" id="reportModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Reportar novedad en Bucaramanga</h2>
+          <button type="button" class="btn-close" id="btnCloseModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <form id="reportForm">
+          <span class="form-label">1. Tipo de novedad *</span>
+          <div class="category-grid" id="categoryGrid">
+            <button type="button" class="cat-option active" data-type="Retén" data-color="#f97316" data-emoji="🚧">
+              <span>🚧</span><span>Retén</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Accidente" data-color="#ef4444" data-emoji="🚨">
+              <span>🚨</span><span>Accidente</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Vía cerrada" data-color="#dc2626" data-emoji="⛔">
+              <span>⛔</span><span>Vía cerrada</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Hueco" data-color="#eab308" data-emoji="🕳️">
+              <span>🕳️</span><span>Hueco</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Trancón" data-color="#f59e0b" data-emoji="🚗">
+              <span>🚗</span><span>Trancón</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Policía" data-color="#3b82f6" data-emoji="👮">
+              <span>👮</span><span>Policía</span>
+            </button>
+          </div>
+
+          <label class="form-label" for="reportDesc">2. Descripción corta *</label>
+          <textarea
+            id="reportDesc"
+            class="text-input"
+            rows="2"
+            required
+            maxlength="240"
+            placeholder="Ej. Carrera 27 con Calle 36, carril derecho bloqueado..."
+          ></textarea>
+
+          <span class="form-label">3. Foto o video (Cámara / Galería)</span>
+          <label class="media-upload-box" for="reportMedia">
+            <span>📷 Tomar foto o grabar video corto</span>
+          </label>
+          <input
+            type="file"
+            id="reportMedia"
+            accept="image/*,video/*"
+            capture="environment"
+            style="display: none;"
+          />
+
+          <div class="media-preview-wrap" id="mediaPreviewWrap">
+            <img id="previewImage" class="media-preview" alt="Vista previa" />
+            <video id="previewVideo" class="media-preview" controls playsinline></video>
+            <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar archivo</button>
+          </div>
+
+          <div class="gps-note" id="gpsStatusText">
+            📍 Se capturará tu ubicación GPS actual (o zona de Bucaramanga).
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnSubmitReport">
+            Publicar reporte en vivo
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS (Gratuito vía CDN) -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyx0NV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <!-- Importar los SDKs de Firebase por CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <script>
+    // Configuración oficial de MoviRadar Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDM7XCVECGfDG0JpsWamMZto-RjT02ml6w",
+      authDomain: "moviradar.firebaseapp.com",
+      projectId: "moviradar",
+      storageBucket: "moviradar.firebasestorage.app",
+      messagingSenderId: "535511934758",
+      appId: "1:535511934758:web:3415437a4f4bdfc0cbc3e7"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // =========================================================================
+    // 1. CACHÉ LOCAL (localStorage): GPS, MARCADORES PREVIOS Y COLA OFFLINE
+    // =========================================================================
+    const STORAGE_KEYS = {
+      LAST_GPS: 'moviradar_last_gps_v1',
+      CACHED_REPORTS: 'moviradar_cached_reports_v1',
+      PENDING_REPORTS: 'moviradar_pending_reports_v1'
+    };
+
+    const BUCARAMANGA_COORDS = [7.1193, -73.1227];
+    const BUCARAMANGA_DEFAULT = { lat: 7.1193, lng: -73.1227 };
+    const INITIAL_ZOOM = 14;
+    const COLLECTION_NAME = 'reportes';
+
+    function loadCachedGps() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.LAST_GPS);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (
+          typeof parsed.lat === 'number' &&
+          typeof parsed.lng === 'number' &&
+          !Number.isNaN(parsed.lat) &&
+          !Number.isNaN(parsed.lng)
+        ) {
+          return parsed;
+        }
+      } catch (e) {
+        // Ignorar errores de lectura en localStorage
+      }
+      return null;
+    }
+
+    function saveCachedGps(lat, lng) {
+      try {
+        localStorage.setItem(
+          STORAGE_KEYS.LAST_GPS,
+          JSON.stringify({ lat, lng, updatedAt: Date.now() })
+        );
+      } catch (e) {
+        // Ignorar errores de cuota
+      }
+    }
+
+    function loadCachedReports() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.CACHED_REPORTS);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCachedReports(reports) {
+      try {
+        const serializable = reports.slice(0, 120).map((rep) => ({
+          id: rep.id,
+          lat: Number(rep.lat),
+          lng: Number(rep.lng),
+          tipo: rep.tipo || rep.type || 'Novedad',
+          descripcion: rep.descripcion || rep.description || '',
+          createdAtMs: extractTimestampMs(rep),
+          urlFoto: rep.urlFoto || rep.mediaUrl || null,
+          mediaType: rep.mediaType || null,
+          confirmations: Number(rep.confirmations || 1),
+          denials: Number(rep.denials || 0)
+        }));
+        localStorage.setItem(STORAGE_KEYS.CACHED_REPORTS, JSON.stringify(serializable));
+      } catch (e) {
+        // Ignorar errores de cuota
+      }
+    }
+
+    function loadPendingReports() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.PENDING_REPORTS);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function savePendingReports(queue) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.PENDING_REPORTS, JSON.stringify(queue));
+        return true;
+      } catch (e) {
+        // Si excede la cuota por un archivo pesado, guardar sin el archivo para no perder el reporte
+        try {
+          const compactQueue = queue.map((item) => ({
+            ...item,
+            mediaDataUrl: null,
+            fileName: null
+          }));
+          localStorage.setItem(STORAGE_KEYS.PENDING_REPORTS, JSON.stringify(compactQueue));
+          return false;
+        } catch (err) {
+          return false;
+        }
+      }
+    }
+
+    // =========================================================================
+    // 2. MAPA GRATUITO OPENSTREETMAP (MANTIENE ÚLTIMA POSICIÓN GPS EN CACHÉ)
+    // =========================================================================
+    const initialCachedGps = loadCachedGps();
+    const initialMapCenter = initialCachedGps
+      ? [initialCachedGps.lat, initialCachedGps.lng]
+      : BUCARAMANGA_COORDS;
+    const initialMapZoom = initialCachedGps ? 15 : INITIAL_ZOOM;
+
+    const map = L.map('map', { zoomControl: false }).setView(initialMapCenter, initialMapZoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const markersLayer = L.layerGroup().addTo(map);
+    let userMarker = null;
+    let latestGps = initialCachedGps
+      ? { lat: initialCachedGps.lat, lng: initialCachedGps.lng, isDefault: false, isCached: true }
+      : null;
+    let hasKnownRealGps = Boolean(initialCachedGps);
+    let hasReceivedLiveGps = false;
+    let lastServerReports = loadCachedReports();
+    let isSyncingPending = false;
+    let firestoreConnected = false;
+
+    // =========================================================================
+    // 3. UTILIDADES UI (Toast, Escapado HTML, Tiempo Relativo, Estado Red)
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      box.textContent = msg;
+      box.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        box.style.display = 'none';
+      }, 3800);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = String(text || '');
+      return div.innerHTML;
+    }
+
+    function formatTimeLabel(createdAtMs) {
+      if (!createdAtMs) return 'Ahora';
+      const diffMin = Math.max(0, Math.floor((Date.now() - createdAtMs) / 60000));
+      if (diffMin < 1) return 'Hace un momento';
+      if (diffMin < 60) return `Hace ${diffMin} min`;
+      const diffHours = Math.floor(diffMin / 60);
+      if (diffHours < 24) return `Hace ${diffHours} h`;
+      return new Date(createdAtMs).toLocaleTimeString('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function setSyncStatus(text, isWarning = false) {
+      const el = document.getElementById('syncStatus');
+      const label = document.getElementById('syncStatusText');
+      label.textContent = text;
+      el.classList.toggle('warn', isWarning);
+    }
+
+    function updateNetworkAndSyncStatus() {
+      const pendingCount = loadPendingReports().length;
+      if (!navigator.onLine) {
+        const suffix = pendingCount > 0 ? ` · ${pendingCount} pendiente(s)` : '';
+        setSyncStatus(`Sin internet · Caché local${suffix}`, true);
+        return;
+      }
+      if (isSyncingPending && pendingCount > 0) {
+        setSyncStatus(`Sincronizando ${pendingCount} pendiente(s)...`, true);
+        return;
+      }
+      if (pendingCount > 0) {
+        setSyncStatus(`En línea · ${pendingCount} pendiente(s) por enviar`, true);
+        return;
+      }
+      if (firestoreConnected) {
+        setSyncStatus('En vivo · Firestore', false);
+      } else {
+        setSyncStatus('Conectando con Firestore...', false);
+      }
+    }
+
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('No se pudo leer el archivo para caché local.'));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function dataUrlToBlob(dataUrl) {
+      const res = await fetch(dataUrl);
+      return await res.blob();
+    }
+
+    function withTimeout(promise, ms) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('NETWORK_TIMEOUT')), ms);
+        promise.then(
+          (val) => {
+            clearTimeout(timer);
+            resolve(val);
+          },
+          (err) => {
+            clearTimeout(timer);
+            reject(err);
+          }
+        );
+      });
+    }
+
+    // =========================================================================
+    // 4. MARCADORES PERSONALIZADOS Y POPUPS CON MULTIMEDIA + CACHÉ VISIBLE
+    // =========================================================================
+    const TIPO_META_MAP = {
+      'reten': { emoji: '🚧', color: '#f97316', label: 'Retén' },
+      'retén': { emoji: '🚧', color: '#f97316', label: 'Retén' },
+      'accidente': { emoji: '🚨', color: '#ef4444', label: 'Accidente' },
+      'via cerrada': { emoji: '⛔', color: '#dc2626', label: 'Vía cerrada' },
+      'vía cerrada': { emoji: '⛔', color: '#dc2626', label: 'Vía cerrada' },
+      'hueco': { emoji: '🕳️', color: '#eab308', label: 'Hueco' },
+      'trancon': { emoji: '🚗', color: '#f59e0b', label: 'Trancón' },
+      'trancón': { emoji: '🚗', color: '#f59e0b', label: 'Trancón' },
+      'policia': { emoji: '👮', color: '#3b82f6', label: 'Policía' },
+      'policía': { emoji: '👮', color: '#3b82f6', label: 'Policía' }
+    };
+
+    function getTipoMeta(tipo) {
+      const key = String(tipo || '').trim().toLowerCase();
+      return TIPO_META_MAP[key] || { emoji: '📍', color: '#ef4444', label: tipo || 'Novedad' };
+    }
+
+    function extractTimestampMs(data) {
+      if (data.timestamp && typeof data.timestamp.toMillis === 'function') {
+        return data.timestamp.toMillis();
+      }
+      if (typeof data.timestamp === 'number') {
+        return data.timestamp;
+      }
+      if (typeof data.createdAtMs === 'number') {
+        return data.createdAtMs;
+      }
+      return Date.now();
+    }
+
+    function createCustomMarkerIcon(emoji, color, isPending = false) {
+      const borderColor = isPending ? '#fbbf24' : '#ffffff';
+      const pendingBadge = isPending
+        ? `<span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#020617;border:1.5px solid #020617;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:900;">⏳</span>`
+        : '';
+
+      return L.divIcon({
+        className: 'custom-pin',
+        html: `<div style="
+          position:relative;
+          width:38px;height:38px;border-radius:50%;
+          background:${color || '#ef4444'};border:2px solid ${borderColor};
+          display:flex;align-items:center;justify-content:center;
+          font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,0.55);
+        ">${emoji || '📍'}${pendingBadge}</div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+        popupAnchor: [0, -18]
+      });
+    }
+
+    function renderReports(reportsList) {
+      // Limpiar pines anteriores antes de pintar los reportes actualizados
+      markersLayer.clearLayers();
+
+      reportsList.forEach((rep) => {
+        const lat = Number(rep.lat);
+        const lng = Number(rep.lng);
+        if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+        const tipoTexto = rep.tipo || rep.type || 'Novedad';
+        const meta = getTipoMeta(tipoTexto);
+        const descripcionTexto = rep.descripcion || rep.description || 'Novedad reportada en Bucaramanga.';
+        const fotoUrl = rep.urlFoto || rep.mediaUrl || rep.mediaDataUrl || null;
+        const timeMs = extractTimestampMs(rep);
+        const isPending = Boolean(rep.isPending);
+
+        const marker = L.marker([lat, lng], {
+          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending)
+        });
+
+        let mediaHtml = '';
+        if (fotoUrl) {
+          const isVideo =
+            rep.mediaType === 'video' ||
+            /^data:video\//i.test(fotoUrl) ||
+            /\.(mp4|webm|mov|m4v)(\?|$)/i.test(fotoUrl);
+          if (isVideo) {
+            mediaHtml = `<video src="${escapeHtml(fotoUrl)}" class="popup-media" controls playsinline preload="metadata"></video>`;
+          } else {
+            mediaHtml = `<img src="${escapeHtml(fotoUrl)}" class="popup-media" alt="Foto del reporte" loading="lazy" />`;
+          }
+        }
+
+        const confirmations = Number(rep.confirmations || 1);
+        const denials = Number(rep.denials || 0);
+
+        const actionsHtml = isPending
+          ? `<div class="popup-meta" style="color:#fbbf24;font-weight:700;margin-top:8px;">⏳ Guardado sin internet · Se subirá a Firestore al recuperar señal</div>`
+          : `<div class="popup-actions">
+              <button type="button" class="popup-vote-btn" onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">
+                👍 Sigue (${confirmations})
+              </button>
+              <button type="button" class="popup-vote-btn" onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">
+                ✅ Ya pasó (${denials})
+              </button>
+            </div>`;
+
+        const popupHtml = `
+          <div class="popup-card">
+            <span class="popup-badge" style="background:${escapeHtml(meta.color)}">
+              ${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
+            </span>
+            <div>${escapeHtml(descripcionTexto)}</div>
+            ${mediaHtml}
+            <div class="popup-meta">
+              🕒 ${formatTimeLabel(timeMs)} · 📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}
+            </div>
+            ${actionsHtml}
+          </div>
+        `;
+
+        marker.bindPopup(popupHtml);
+        marker._reportId = rep.id;
+        markersLayer.addLayer(marker);
+      });
+
+      document.getElementById('reportCountChip').textContent =
+        `${reportsList.length} ${reportsList.length === 1 ? 'alerta' : 'alertas'}`;
+    }
+
+    function renderCombinedReports(serverReports) {
+      const pending = loadPendingReports().map((item) => ({
+        ...item,
+        id: item.localId,
+        isPending: true
+      }));
+      const combined = [...pending, ...(Array.isArray(serverReports) ? serverReports : [])];
+      renderReports(combined);
+    }
+
+    // Mostrar inmediatamente marcadores cacheados y pendientes al abrir la app (incluso sin internet)
+    renderCombinedReports(lastServerReports);
+    updateNetworkAndSyncStatus();
+
+    // Votación comunitaria en Firestore
+    window.voteReport = async function(reportId, voteType) {
+      if (!reportId) return;
+      if (!navigator.onLine) {
+        showToast('Sin internet. Los votos requieren conexión activa.');
+        return;
+      }
+      try {
+        const docRef = db.collection('reportes').doc(reportId);
+        if (voteType === 'confirm') {
+          await docRef.update({
+            confirmations: firebase.firestore.FieldValue.increment(1)
+          });
+          showToast('Confirmaste que la novedad sigue activa.');
+        } else {
+          await docRef.update({
+            denials: firebase.firestore.FieldValue.increment(1)
+          });
+          showToast('Reportaste que la vía ya está despejada.');
+        }
+      } catch (err) {
+        console.error('Error al votar en Firestore:', err);
+        showToast('No se pudo actualizar el voto (revisa reglas de Firestore).');
+      }
+    };
+
+    // =========================================================================
+    // 5. ESCUCHA EN TIEMPO REAL CON FIRESTORE + CONSERVACIÓN DE CACHÉ OFFLINE
+    // =========================================================================
+    function startFirestoreListener() {
+      const twelveHoursAgo = Date.now() - 12 * 60 * 60 * 1000;
+
+      db.collection('reportes').onSnapshot(
+        (snapshot) => {
+          // Si estamos offline y el snapshot llega vacío, conservar los marcadores previos cacheados
+          if (!navigator.onLine && snapshot.empty && lastServerReports.length > 0) {
+            renderCombinedReports(lastServerReports);
+            updateNetworkAndSyncStatus();
+            return;
+          }
+
+          const activeReports = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const timeMs = extractTimestampMs(data);
+            const denials = Number(data.denials || 0);
+            const confirmations = Number(data.confirmations || 1);
+            const isExpired = timeMs < twelveHoursAgo;
+            const isResolved = denials >= 3 && denials > confirmations;
+
+            if (!isExpired && !isResolved) {
+              activeReports.push({ id: doc.id, ...data, _sortMs: timeMs });
+            }
+          });
+
+          activeReports.sort((a, b) => b._sortMs - a._sortMs);
+          lastServerReports = activeReports;
+          saveCachedReports(activeReports);
+          firestoreConnected = true;
+
+          renderCombinedReports(activeReports);
+          updateNetworkAndSyncStatus();
+
+          if (navigator.onLine && loadPendingReports().length > 0) {
+            sincronizarReportesPendientes();
+          }
+        },
+        (error) => {
+          console.error('Error escuchando Firestore:', error);
+          firestoreConnected = false;
+          // Mantener visibles los marcadores cacheados y reportes pendientes
+          renderCombinedReports(lastServerReports);
+
+          if (!navigator.onLine) {
+            updateNetworkAndSyncStatus();
+          } else if (error.code === 'permission-denied') {
+            setSyncStatus('Permiso Firestore requerido', true);
+            showToast('Activa reglas en Firestore para la colección "reportes".');
+          } else {
+            setSyncStatus('Reconectando · Caché local', true);
+          }
+        }
+      );
+    }
+
+    // =========================================================================
+    // 6. GEOLOCALIZACIÓN GPS EN TIEMPO REAL (watchPosition + getCurrentPosition)
+    //    PRIORIDAD ABSOLUTA AL GPS REAL · SIN REINICIOS A BUCARAMANGA_DEFAULT
+    // =========================================================================
+    let gpsWatchId = null;
+    let isFollowingUser = true;
+    let hasUsedDefaultFallback = false;
+
+    // Si el usuario mueve el mapa manualmente, pausar el auto-seguimiento hasta pulsar centrar
+    map.on('dragstart', () => {
+      isFollowingUser = false;
+    });
+
+    function updateUserPositionOnMap(lat, lng, mode = 'live') {
+      const isDefault = mode === 'default';
+      const isCached = mode === 'cached';
+      latestGps = { lat, lng, isDefault, isCached };
+
+      const popupLabel = isDefault
+        ? '📍 Bucaramanga (ubicación por defecto)'
+        : isCached
+        ? '📌 Última ubicación GPS conocida (caché local)'
+        : '🔵 Tu ubicación GPS en tiempo real';
+
+      const markerColor = isDefault ? '#10b981' : isCached ? '#38bdf8' : '#2563eb';
+
+      if (!userMarker) {
+        userMarker = L.circleMarker([lat, lng], {
+          radius: 10,
+          fillColor: markerColor,
+          color: '#ffffff',
+          weight: 3,
+          fillOpacity: 1
+        }).addTo(map).bindPopup(popupLabel);
+      } else {
+        userMarker.setLatLng([lat, lng]);
+        userMarker.setStyle({ fillColor: markerColor });
+        userMarker.setPopupContent(popupLabel);
+      }
+
+      const gpsNote = document.getElementById('gpsStatusText');
+      if (gpsNote) {
+        if (isDefault) {
+          gpsNote.textContent = `📍 Ubicación por defecto en Bucaramanga (${lat.toFixed(4)}, ${lng.toFixed(4)}).`;
+        } else if (isCached) {
+          gpsNote.textContent = `📌 Última posición GPS guardada (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+        } else {
+          gpsNote.textContent = `🔵 GPS en tiempo real activo (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+        }
+      }
+    }
+
+    // Si ya había una última posición GPS guardada en localStorage, dibujarla de inmediato
+    if (initialCachedGps) {
+      updateUserPositionOnMap(initialCachedGps.lat, initialCachedGps.lng, 'cached');
+    }
+
+    function aplicarPorDefectoUnaSolaVez(centrarMapa = false) {
+      // REGLA ESTRICTA: Nunca sobrescribir si el GPS real ya respondió, si hay caché o si ya se aplicó una vez
+      if (hasReceivedLiveGps || hasKnownRealGps || hasUsedDefaultFallback) {
+        return;
+      }
+      hasUsedDefaultFallback = true;
+      updateUserPositionOnMap(
+        BUCARAMANGA_DEFAULT.lat,
+        BUCARAMANGA_DEFAULT.lng,
+        'default'
+      );
+      if (centrarMapa) {
+        map.setView([BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng], INITIAL_ZOOM);
+      }
+    }
+
+    function manejarCoordenadasGpsReales(pos, forceCenter = false) {
+      if (!pos || !pos.coords) return;
+      const lat = Number(pos.coords.latitude);
+      const lng = Number(pos.coords.longitude);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+      const firstLiveFix = !hasReceivedLiveGps;
+      hasReceivedLiveGps = true;
+      hasKnownRealGps = true;
+
+      saveCachedGps(lat, lng);
+      updateUserPositionOnMap(lat, lng, 'live');
+
+      // Prioridad absoluta al GPS real: centrar en la primera lectura real o si el usuario sigue el GPS
+      if (firstLiveFix || forceCenter) {
+        isFollowingUser = true;
+        map.setView([lat, lng], Math.max(map.getZoom(), 16), { animate: true });
+      } else if (isFollowingUser) {
+        map.panTo([lat, lng], { animate: true, duration: 0.5 });
+      }
+    }
+
+    function iniciarSeguimientoGpsEnTiempoReal(forceCenterOnFirstFix = false) {
+      if (!navigator.geolocation) {
+        aplicarPorDefectoUnaSolaVez(true);
+        return;
+      }
+
+      if (gpsWatchId !== null) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+      }
+
+      // 1) Lectura rápida inicial con getCurrentPosition (y respaldo sin alta precisión si tarda)
+      navigator.geolocation.getCurrentPosition(
+        (pos) => manejarCoordenadasGpsReales(pos, forceCenterOnFirstFix),
+        (err) => {
+          if (err && err.code === err.PERMISSION_DENIED) {
+            aplicarPorDefectoUnaSolaVez(false);
+            return;
+          }
+          // Reintento rápido vía Wi-Fi / red móvil si el GPS satelital tardó en responder
+          navigator.geolocation.getCurrentPosition(
+            (pos) => manejarCoordenadasGpsReales(pos, forceCenterOnFirstFix),
+            () => {
+              aplicarPorDefectoUnaSolaVez(false);
+            },
+            {
+              enableHighAccuracy: false,
+              maximumAge: 30000,
+              timeout: 10000
+            }
+          );
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 10000,
+          timeout: 10000
+        }
+      );
+
+      // 2) Seguimiento continuo en tiempo real con watchPosition
+      try {
+        gpsWatchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            manejarCoordenadasGpsReales(pos, false);
+          },
+          (error) => {
+            // Solo usar Bucaramanga una única vez al iniciar si el permiso fue denegado o no hay ningún dato GPS
+            if (error && error.code === error.PERMISSION_DENIED) {
+              aplicarPorDefectoUnaSolaVez(false);
+              if (gpsWatchId !== null) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null;
+              }
+            } else {
+              aplicarPorDefectoUnaSolaVez(false);
+            }
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 3000,
+            timeout: 20000
+          }
+        );
+      } catch (e) {
+        aplicarPorDefectoUnaSolaVez(false);
+      }
+    }
+
+    // Iniciar escucha continua del GPS en tiempo real al abrir la aplicación
+    iniciarSeguimientoGpsEnTiempoReal(false);
+
+    document.getElementById('btnZoomIn').addEventListener('click', () => map.zoomIn());
+    document.getElementById('btnZoomOut').addEventListener('click', () => map.zoomOut());
+    document.getElementById('btnLocateMe').addEventListener('click', () => {
+      isFollowingUser = true;
+      if (latestGps && !latestGps.isDefault) {
+        map.flyTo([latestGps.lat, latestGps.lng], 16);
+        showToast(
+          hasReceivedLiveGps
+            ? 'Centrado en tu ubicación GPS en tiempo real.'
+            : 'Centrado en tu última ubicación GPS conocida.'
+        );
+        // Asegurar que el watchPosition siga activo
+        if (gpsWatchId === null) {
+          iniciarSeguimientoGpsEnTiempoReal(true);
+        }
+      } else {
+        hasUsedDefaultFallback = false;
+        iniciarSeguimientoGpsEnTiempoReal(true);
+        showToast('Buscando tu ubicación GPS en vivo...');
+      }
+    });
+
+    // =========================================================================
+    // 7. MODAL "+ REPORTAR NOVEDAD" + COLA OFFLINE EN LOCALSTORAGE + FIRESTORE
+    // =========================================================================
+    const modal = document.getElementById('reportModal');
+    const reportForm = document.getElementById('reportForm');
+    const mediaInput = document.getElementById('reportMedia');
+    const mediaPreviewWrap = document.getElementById('mediaPreviewWrap');
+    const previewImage = document.getElementById('previewImage');
+    const previewVideo = document.getElementById('previewVideo');
+    const btnClearMedia = document.getElementById('btnClearMedia');
+    const btnSubmit = document.getElementById('btnSubmitReport');
+
+    let selectedCategory = {
+      type: 'Retén',
+      color: '#f97316',
+      emoji: '🚧'
+    };
+    let pendingBlob = null;
+    let pendingMediaType = null;
+    let pendingFileName = null;
+    let previewObjectUrl = null;
+
+    function resetMediaState() {
+      if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+      }
+      mediaInput.value = '';
+      mediaPreviewWrap.style.display = 'none';
+      previewImage.style.display = 'none';
+      previewVideo.style.display = 'none';
+      previewImage.removeAttribute('src');
+      previewVideo.removeAttribute('src');
+      pendingBlob = null;
+      pendingMediaType = null;
+      pendingFileName = null;
+    }
+
+    document.getElementById('btnOpenReport').addEventListener('click', () => {
+      modal.classList.add('open');
+    });
+
+    document.getElementById('btnCloseModal').addEventListener('click', () => {
+      modal.classList.remove('open');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+
+    btnClearMedia.addEventListener('click', resetMediaState);
+
+    document.querySelectorAll('.cat-option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-option').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCategory = {
+          type: btn.dataset.type,
+          color: btn.dataset.color,
+          emoji: btn.dataset.emoji
+        };
+      });
+    });
+
+    // Comprimir foto para datos móviles rápidos o preparar video corto
+    mediaInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      resetMediaState();
+
+      if (file.type.startsWith('image/')) {
+        const img = new Image();
+        const rawUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(rawUrl);
+          const maxW = 1080;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW) {
+            h = Math.round((h * maxW) / w);
+            w = maxW;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) return;
+              pendingBlob = blob;
+              pendingMediaType = 'image';
+              pendingFileName = `foto_${Date.now()}.jpg`;
+              previewObjectUrl = URL.createObjectURL(blob);
+              previewImage.src = previewObjectUrl;
+              previewImage.style.display = 'block';
+              mediaPreviewWrap.style.display = 'block';
+            },
+            'image/jpeg',
+            0.8
+          );
+        };
+        img.src = rawUrl;
+      } else if (file.type.startsWith('video/')) {
+        if (file.size > 25 * 1024 * 1024) {
+          showToast('El video supera los 25 MB. Graba un clip más corto.');
+          return;
+        }
+        pendingBlob = file;
+        pendingMediaType = 'video';
+        const ext = (file.name && file.name.split('.').pop()) || 'mp4';
+        pendingFileName = `video_${Date.now()}.${ext}`;
+        previewObjectUrl = URL.createObjectURL(file);
+        previewVideo.src = previewObjectUrl;
+        previewVideo.style.display = 'block';
+        mediaPreviewWrap.style.display = 'block';
+      }
+    });
+
+    function getReportCoordinates() {
+      return new Promise((resolve) => {
+        if (latestGps && !latestGps.isDefault) {
+          resolve({ lat: latestGps.lat, lng: latestGps.lng, simulated: false });
+          return;
+        }
+        const cached = loadCachedGps();
+        if (cached) {
+          resolve({ lat: cached.lat, lng: cached.lng, simulated: false });
+          return;
+        }
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              manejarCoordenadasGpsReales(pos, false);
+              resolve({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+                simulated: false
+              });
+            },
+            () => {
+              resolve({
+                lat: BUCARAMANGA_DEFAULT.lat,
+                lng: BUCARAMANGA_DEFAULT.lng,
+                simulated: true
+              });
+            },
+            { enableHighAccuracy: false, maximumAge: 15000, timeout: 4000 }
+          );
+          return;
+        }
+        resolve({
+          lat: BUCARAMANGA_DEFAULT.lat,
+          lng: BUCARAMANGA_DEFAULT.lng,
+          simulated: true
+        });
+      });
+    }
+
+    function uploadMediaToStorage(blob, fileName, onProgress) {
+      return new Promise((resolve, reject) => {
+        const storageRef = storage.ref().child(`moviradar_media/${fileName}`);
+        const uploadTask = storageRef.put(blob, {
+          contentType: blob.type || (pendingMediaType === 'video' ? 'video/mp4' : 'image/jpeg')
+        });
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            if (snapshot.totalBytes > 0) {
+              const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              onProgress(pct);
+            }
+          },
+          (error) => reject(error),
+          async () => {
+            try {
+              const url = await uploadTask.snapshot.ref.getDownloadURL();
+              resolve(url);
+            } catch (err) {
+              reject(err);
+            }
+          }
+        );
+      });
+    }
+
+    async function enqueueOfflineReport(coords, descripcion, blob, mediaType, fileName) {
+      let mediaDataUrl = null;
+      if (blob && blob.size <= 2 * 1024 * 1024) {
+        try {
+          mediaDataUrl = await blobToDataUrl(blob);
+        } catch (e) {
+          mediaDataUrl = null;
+        }
+      }
+
+      const localId = `pending_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const pendingItem = {
+        localId,
+        lat: coords.lat,
+        lng: coords.lng,
+        tipo: selectedCategory.type,
+        descripcion,
+        createdAtMs: Date.now(),
+        mediaDataUrl,
+        mediaType: mediaDataUrl ? mediaType : null,
+        fileName: mediaDataUrl ? fileName : null,
+        confirmations: 1,
+        denials: 0
+      };
+
+      const queue = loadPendingReports();
+      queue.push(pendingItem);
+      const savedWithMedia = savePendingReports(queue);
+
+      renderCombinedReports(lastServerReports);
+      updateNetworkAndSyncStatus();
+
+      map.flyTo([coords.lat, coords.lng], 16);
+      setTimeout(() => {
+        markersLayer.eachLayer((layer) => {
+          if (layer._reportId === localId) {
+            layer.openPopup();
+          }
+        });
+      }, 450);
+
+      reportForm.reset();
+      resetMediaState();
+      modal.classList.remove('open');
+
+      if (blob && !savedWithMedia) {
+        showToast('Sin internet: reporte guardado sin archivo pesado; se sincronizará con Firestore.');
+      } else {
+        showToast('Sin internet: reporte guardado localmente y se enviará a Firestore al recuperar señal.');
+      }
+    }
+
+    async function sincronizarReportesPendientes() {
+      if (isSyncingPending || !navigator.onLine) return;
+      const initialQueue = loadPendingReports();
+      if (initialQueue.length === 0) return;
+
+      isSyncingPending = true;
+      updateNetworkAndSyncStatus();
+      let syncedCount = 0;
+
+      try {
+        for (const item of initialQueue) {
+          if (!navigator.onLine) break;
+
+          let urlFoto = null;
+          if (item.mediaDataUrl && item.fileName) {
+            const blob = await dataUrlToBlob(item.mediaDataUrl);
+            urlFoto = await withTimeout(
+              uploadMediaToStorage(blob, item.fileName, () => {}),
+              20000
+            );
+          }
+
+          await withTimeout(
+            db.collection('reportes').add({
+              lat: item.lat,
+              lng: item.lng,
+              tipo: item.tipo,
+              descripcion: item.descripcion,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              urlFoto: urlFoto,
+              mediaType: urlFoto ? item.mediaType : null,
+              confirmations: 1,
+              denials: 0
+            }),
+            15000
+          );
+
+          syncedCount += 1;
+          const remaining = loadPendingReports().filter((q) => q.localId !== item.localId);
+          savePendingReports(remaining);
+          renderCombinedReports(lastServerReports);
+          updateNetworkAndSyncStatus();
+        }
+
+        if (syncedCount > 0) {
+          showToast(
+            `✅ ${syncedCount} ${syncedCount === 1 ? 'reporte pendiente sincronizado' : 'reportes pendientes sincronizados'} con Firestore.`
+          );
+        }
+      } catch (err) {
+        console.warn('Sincronización pausada hasta recuperar estabilidad de red:', err);
+      } finally {
+        isSyncingPending = false;
+        updateNetworkAndSyncStatus();
+      }
+    }
+
+    async function guardarReporteEnFirestore(e) {
+      e.preventDefault();
+      const descripcion = document.getElementById('reportDesc').value.trim();
+      if (!descripcion) return;
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Obteniendo ubicación GPS...';
+
+      try {
+        const coords = await getReportCoordinates();
+
+        // Si no hay conexión a internet, guardar temporalmente en localStorage para sincronizar luego
+        if (!navigator.onLine) {
+          await enqueueOfflineReport(
+            coords,
+            descripcion,
+            pendingBlob,
+            pendingMediaType,
+            pendingFileName
+          );
+          return;
+        }
+
+        let urlFoto = null;
+        if (pendingBlob && pendingFileName) {
+          btnSubmit.textContent = 'Subiendo archivo 0%...';
+          urlFoto = await withTimeout(
+            uploadMediaToStorage(pendingBlob, pendingFileName, (pct) => {
+              btnSubmit.textContent = `Subiendo archivo ${pct}%...`;
+            }),
+            20000
+          );
+        }
+
+        btnSubmit.textContent = 'Guardando en Firestore...';
+
+        const docRef = await withTimeout(
+          db.collection('reportes').add({
+            lat: coords.lat,
+            lng: coords.lng,
+            tipo: selectedCategory.type,
+            descripcion: descripcion,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            urlFoto: urlFoto,
+            mediaType: urlFoto ? pendingMediaType : null,
+            confirmations: 1,
+            denials: 0
+          }),
+          12000
+        );
+
+        // Enfocar mapa en el nuevo reporte y abrir su burbuja
+        map.flyTo([coords.lat, coords.lng], 16);
+        setTimeout(() => {
+          markersLayer.eachLayer((layer) => {
+            if (layer._reportId === docRef.id) {
+              layer.openPopup();
+            }
+          });
+        }, 550);
+
+        reportForm.reset();
+        resetMediaState();
+        modal.classList.remove('open');
+
+        showToast(
+          coords.simulated
+            ? '¡Reporte publicado en Firebase (zona Bucaramanga)!'
+            : '¡Reporte publicado en vivo con tu GPS!'
+        );
+      } catch (err) {
+        console.error('Error publicando reporte en Firebase:', err);
+        if (err && err.code === 'storage/unauthorized') {
+          showToast('Sin permiso en Firebase Storage. Revisa las reglas de Storage.');
+        } else if (err && err.code === 'permission-denied') {
+          showToast('Sin permiso en Firestore. Revisa las reglas de Firestore.');
+        } else {
+          // Si falla por red o timeout en carretera, respaldar en caché local automáticamente
+          const coords = await getReportCoordinates();
+          await enqueueOfflineReport(
+            coords,
+            descripcion,
+            pendingBlob,
+            pendingMediaType,
+            pendingFileName
+          );
+        }
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Publicar reporte en vivo';
+      }
+    }
+
+    reportForm.addEventListener('submit', guardarReporteEnFirestore);
+
+    // Eventos de red: mantener caché offline y sincronizar apenas vuelva la señal
+    window.addEventListener('offline', () => {
+      updateNetworkAndSyncStatus();
+      showToast('Sin conexión a internet. Se mantiene tu última posición GPS y los marcadores en caché.');
+    });
+
+    window.addEventListener('online', () => {
+      updateNetworkAndSyncStatus();
+      showToast('Señal recuperada. Sincronizando reportes con Firestore...');
+      sincronizarReportesPendientes();
+    });
+
+    // Reintento periódico si quedan reportes pendientes y hay conexión
+    setInterval(() => {
+      if (navigator.onLine && loadPendingReports().length > 0 && !isSyncingPending) {
+        sincronizarReportesPendientes();
+      }
+    }, 15000);
+
+    // Iniciar escucha en tiempo real en Firestore y sincronizar cola pendiente si hay red
+    startFirestoreListener();
+    if (navigator.onLine) {
+      sincronizarReportesPendientes();
+    }
+  </script>
+</body>
+</html>
