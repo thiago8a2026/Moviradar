@@ -1604,11 +1604,30 @@
     }
 
     // =========================================================================
-    // 7. GEOLOCALIZACIÓN GPS EN TIEMPO REAL (PRIORIDAD AL GPS REAL)
+    // 7. GEOLOCALIZACIÓN GPS EN TIEMPO REAL (WATCH + RESCATE ACTIVO CADA 3.5s)
     // =========================================================================
     let gpsWatchId = null;
+    let gpsWakeupIntervalId = null;
+    let gpsPollInFlight = false;
+    let gpsPollStartedAt = 0;
+    let gpsPermissionDenied = false;
+    let lastGpsFixTimestamp = 0;
     let isFollowingUser = true;
     let hasUsedDefaultFallback = false;
+
+    const GPS_WATCH_OPTIONS = {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 15000
+    };
+
+    const GPS_WAKEUP_OPTIONS = {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 8000
+    };
+
+    const GPS_WAKEUP_INTERVAL_MS = 3500;
 
     map.on('dragstart', () => {
       isFollowingUser = false;
@@ -1645,6 +1664,9 @@
         userMarker.setLatLng([lat, lng]);
         userMarker.setStyle({ fillColor: markerColor });
         userMarker.setPopupContent(popupLabel);
+      }
+      if (typeof userMarker.bringToFront === 'function') {
+        userMarker.bringToFront();
       }
 
       const gpsNote = document.getElementById('gpsStatusText');
@@ -1683,6 +1705,8 @@
       const firstLiveFix = !hasReceivedLiveGps;
       hasReceivedLiveGps = true;
       hasKnownRealGps = true;
+      gpsPermissionDenied = false;
+      lastGpsFixTimestamp = Date.now();
 
       saveCachedGps(lat, lng);
       updateUserPositionOnMap(lat, lng, 'live', pos.coords.speed);
@@ -1691,8 +1715,76 @@
         isFollowingUser = true;
         map.setView([lat, lng], Math.max(map.getZoom(), 16), { animate: true });
       } else if (isFollowingUser) {
-        map.panTo([lat, lng], { animate: true, duration: 0.5 });
+        map.panTo([lat, lng], { animate: true, duration: 0.35, noMoveStart: true });
       }
+    }
+
+    function registrarWatchGps() {
+      if (!navigator.geolocation || gpsPermissionDenied) return;
+      if (gpsWatchId !== null) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+      }
+
+      try {
+        gpsWatchId = navigator.geolocation.watchPosition(
+          (pos) => manejarCoordenadasGpsReales(pos, false),
+          (error) => {
+            if (error && error.code === error.PERMISSION_DENIED) {
+              gpsPermissionDenied = true;
+              aplicarPorDefectoUnaSolaVez(false);
+              if (gpsWatchId !== null) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null;
+              }
+              if (gpsWakeupIntervalId !== null) {
+                clearInterval(gpsWakeupIntervalId);
+                gpsWakeupIntervalId = null;
+              }
+            } else {
+              // Ante micro-pérdida de señal, nunca reinicia ni borra la posición real conocida
+              aplicarPorDefectoUnaSolaVez(false);
+            }
+          },
+          GPS_WATCH_OPTIONS
+        );
+      } catch (e) {
+        aplicarPorDefectoUnaSolaVez(false);
+      }
+    }
+
+    function despertarChipGps(forceCenter = false) {
+      if (!navigator.geolocation || gpsPermissionDenied) return;
+      if (gpsPollInFlight && Date.now() - gpsPollStartedAt < 9500) return;
+
+      gpsPollInFlight = true;
+      gpsPollStartedAt = Date.now();
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          gpsPollInFlight = false;
+          manejarCoordenadasGpsReales(pos, forceCenter);
+        },
+        (err) => {
+          gpsPollInFlight = false;
+          if (err && err.code === err.PERMISSION_DENIED) {
+            gpsPermissionDenied = true;
+            aplicarPorDefectoUnaSolaVez(false);
+            if (gpsWakeupIntervalId !== null) {
+              clearInterval(gpsWakeupIntervalId);
+              gpsWakeupIntervalId = null;
+            }
+            return;
+          }
+
+          // Si watchPosition lleva > 12s congelado por corte de señal, lo reactiva automáticamente
+          if (lastGpsFixTimestamp > 0 && Date.now() - lastGpsFixTimestamp > 12000) {
+            registrarWatchGps();
+          }
+          aplicarPorDefectoUnaSolaVez(false);
+        },
+        GPS_WAKEUP_OPTIONS
+      );
     }
 
     function iniciarSeguimientoGpsEnTiempoReal(forceCenterOnFirstFix = false) {
@@ -1701,47 +1793,35 @@
         return;
       }
 
-      if (gpsWatchId !== null) {
-        navigator.geolocation.clearWatch(gpsWatchId);
-        gpsWatchId = null;
+      gpsPermissionDenied = false;
+
+      if (gpsWakeupIntervalId !== null) {
+        clearInterval(gpsWakeupIntervalId);
+        gpsWakeupIntervalId = null;
       }
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => manejarCoordenadasGpsReales(pos, forceCenterOnFirstFix),
-        (err) => {
-          if (err && err.code === err.PERMISSION_DENIED) {
-            aplicarPorDefectoUnaSolaVez(false);
-            return;
-          }
-          navigator.geolocation.getCurrentPosition(
-            (pos) => manejarCoordenadasGpsReales(pos, forceCenterOnFirstFix),
-            () => aplicarPorDefectoUnaSolaVez(false),
-            { enableHighAccuracy: false, maximumAge: 30000, timeout: 10000 }
-          );
-        },
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
-      );
+      // 1. Lectura inicial inmediata de alta precisión (maximumAge: 0)
+      despertarChipGps(forceCenterOnFirstFix);
 
-      try {
-        gpsWatchId = navigator.geolocation.watchPosition(
-          (pos) => manejarCoordenadasGpsReales(pos, false),
-          (error) => {
-            if (error && error.code === error.PERMISSION_DENIED) {
-              aplicarPorDefectoUnaSolaVez(false);
-              if (gpsWatchId !== null) {
-                navigator.geolocation.clearWatch(gpsWatchId);
-                gpsWatchId = null;
-              }
-            } else {
-              aplicarPorDefectoUnaSolaVez(false);
-            }
-          },
-          { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 }
-        );
-      } catch (e) {
-        aplicarPorDefectoUnaSolaVez(false);
-      }
+      // 2. Escucha continua en tiempo real con parámetros estrictos (maximumAge: 0)
+      registrarWatchGps();
+
+      // 3. Respaldo activo cada 3.5 segundos para despertar el chip GPS tras micro-cortes
+      gpsWakeupIntervalId = setInterval(() => {
+        if (!document.hidden) {
+          despertarChipGps(false);
+        }
+      }, GPS_WAKEUP_INTERVAL_MS);
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !gpsPermissionDenied) {
+        despertarChipGps(false);
+        if (gpsWatchId === null) {
+          registrarWatchGps();
+        }
+      }
+    });
 
     iniciarSeguimientoGpsEnTiempoReal(false);
 
@@ -1749,6 +1829,7 @@
     document.getElementById('btnZoomOut').addEventListener('click', () => map.zoomOut());
     document.getElementById('btnLocateMe').addEventListener('click', () => {
       isFollowingUser = true;
+      gpsPermissionDenied = false;
       if (latestGps && !latestGps.isDefault) {
         map.flyTo([latestGps.lat, latestGps.lng], 16);
         showToast(
@@ -1756,7 +1837,8 @@
             ? 'Centrado en tu ubicación GPS en tiempo real.'
             : 'Centrado en tu última ubicación GPS conocida.'
         );
-        if (gpsWatchId === null) {
+        despertarChipGps(true);
+        if (gpsWatchId === null || gpsWakeupIntervalId === null) {
           iniciarSeguimientoGpsEnTiempoReal(true);
         }
       } else {
@@ -1977,7 +2059,7 @@
               resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, simulated: false });
             },
             () => resolve({ lat: BUCARAMANGA_DEFAULT.lat, lng: BUCARAMANGA_DEFAULT.lng, simulated: true }),
-            { enableHighAccuracy: false, maximumAge: 15000, timeout: 4000 }
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 6000 }
           );
           return;
         }
