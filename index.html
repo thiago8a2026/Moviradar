@@ -1627,7 +1627,7 @@
       timeout: 8000
     };
 
-    const GPS_WAKEUP_INTERVAL_MS = 3500;
+    const GPS_WAKEUP_INTERVAL_MS = 4000;
 
     map.on('dragstart', () => {
       isFollowingUser = false;
@@ -1806,7 +1806,7 @@
       // 2. Escucha continua en tiempo real con parámetros estrictos (maximumAge: 0)
       registrarWatchGps();
 
-      // 3. Respaldo activo cada 3.5 segundos para despertar el chip GPS tras micro-cortes
+      // 3. Respaldo activo cada 4 segundos para despertar el chip GPS tras micro-cortes
       gpsWakeupIntervalId = setInterval(() => {
         if (!document.hidden) {
           despertarChipGps(false);
@@ -1814,14 +1814,27 @@
       }, GPS_WAKEUP_INTERVAL_MS);
     }
 
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && !gpsPermissionDenied) {
-        despertarChipGps(false);
-        if (gpsWatchId === null) {
-          registrarWatchGps();
-        }
+    function reanudarGpsAlVolverPrimerPlano() {
+      if (document.hidden || gpsPermissionDenied) return;
+      if (gpsPollInFlight && Date.now() - gpsPollStartedAt > 4000) {
+        gpsPollInFlight = false;
       }
-    });
+      despertarChipGps(false);
+      if (gpsWatchId === null || (lastGpsFixTimestamp > 0 && Date.now() - lastGpsFixTimestamp > 6000)) {
+        registrarWatchGps();
+      }
+      if (gpsWakeupIntervalId === null) {
+        gpsWakeupIntervalId = setInterval(() => {
+          if (!document.hidden) {
+            despertarChipGps(false);
+          }
+        }, GPS_WAKEUP_INTERVAL_MS);
+      }
+    }
+
+    document.addEventListener('visibilitychange', reanudarGpsAlVolverPrimerPlano);
+    window.addEventListener('pageshow', reanudarGpsAlVolverPrimerPlano);
+    window.addEventListener('focus', reanudarGpsAlVolverPrimerPlano);
 
     iniciarSeguimientoGpsEnTiempoReal(false);
 
