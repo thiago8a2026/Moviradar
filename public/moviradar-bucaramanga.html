@@ -1604,43 +1604,50 @@
     }
 
     // =========================================================================
-    // 7. GEOLOCALIZACIÓN GPS EN TIEMPO REAL (WATCH + RESCATE ACTIVO CADA 3.5s)
+    // 7. GEOLOCALIZACIÓN GPS CON AUTO-RECONEXIÓN (WATCHDOG CADA 3s / >6s)
     // =========================================================================
     let gpsWatchId = null;
-    let gpsWakeupIntervalId = null;
-    let gpsPollInFlight = false;
-    let gpsPollStartedAt = 0;
+    let gpsWatchdogIntervalId = null;
+    let lastGpsSuccessAt = 0;
+    let lastGpsLifecycleAt = 0;
+    let previousLiveFix = null;
     let gpsPermissionDenied = false;
-    let lastGpsFixTimestamp = 0;
     let isFollowingUser = true;
     let hasUsedDefaultFallback = false;
 
-    const GPS_WATCH_OPTIONS = {
+    const GPS_STRICT_OPTIONS = {
       enableHighAccuracy: true,
       maximumAge: 0,
       timeout: 15000
     };
 
-    const GPS_WAKEUP_OPTIONS = {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 8000
-    };
-
-    const GPS_WAKEUP_INTERVAL_MS = 4000;
+    const GPS_WATCHDOG_CHECK_MS = 3000;
+    const GPS_STALE_LIMIT_MS = 6000;
 
     map.on('dragstart', () => {
       isFollowingUser = false;
     });
 
-    function updateUserPositionOnMap(lat, lng, mode = 'live', speedMs = null) {
+    function calcularDistanciaMetros(lat1, lng1, lat2, lng2) {
+      const R = 6371000;
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function updateUserPositionOnMap(lat, lng, mode = 'live', speedKmh = null) {
       const isDefault = mode === 'default';
       const isCached = mode === 'cached';
       latestGps = { lat, lng, isDefault, isCached };
 
       document.getElementById('hudCoords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      if (typeof speedMs === 'number' && speedMs >= 0) {
-        document.getElementById('hudSpeed').textContent = (speedMs * 3.6).toFixed(1);
+      if (typeof speedKmh === 'number' && !Number.isNaN(speedKmh) && speedKmh >= 0) {
+        document.getElementById('hudSpeed').textContent = speedKmh.toFixed(1);
       }
       updateQuickExternalLinks(lat, lng);
 
@@ -1690,10 +1697,29 @@
         return;
       }
       hasUsedDefaultFallback = true;
-      updateUserPositionOnMap(BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng, 'default');
+      updateUserPositionOnMap(BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng, 'default', 0);
       if (centrarMapa) {
         map.setView([BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng], INITIAL_ZOOM);
       }
+    }
+
+    function detenerSuscripcionWatchGps() {
+      if (gpsWatchId !== null && navigator.geolocation) {
+        try {
+          navigator.geolocation.clearWatch(gpsWatchId);
+        } catch (e) {}
+      }
+      gpsWatchId = null;
+    }
+
+    function manejarErrorPermisoDenegadoGps() {
+      gpsPermissionDenied = true;
+      detenerSuscripcionWatchGps();
+      if (gpsWatchdogIntervalId !== null) {
+        clearInterval(gpsWatchdogIntervalId);
+        gpsWatchdogIntervalId = null;
+      }
+      aplicarPorDefectoUnaSolaVez(false);
     }
 
     function manejarCoordenadasGpsReales(pos, forceCenter = false) {
@@ -1702,14 +1728,30 @@
       const lng = Number(pos.coords.longitude);
       if (Number.isNaN(lat) || Number.isNaN(lng)) return;
 
+      const nowMs = Date.now();
       const firstLiveFix = !hasReceivedLiveGps;
+
+      // Bandera/marca de tiempo de la última coordenada válida recibida
+      lastGpsSuccessAt = nowMs;
+      lastGpsLifecycleAt = nowMs;
       hasReceivedLiveGps = true;
       hasKnownRealGps = true;
       gpsPermissionDenied = false;
-      lastGpsFixTimestamp = Date.now();
+
+      // Velocidad real en km/h para el HUD (nativa del chip GPS o estimada por desplazamiento)
+      let speedKmh = 0;
+      if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0) {
+        speedKmh = pos.coords.speed * 3.6;
+      } else if (previousLiveFix && nowMs - previousLiveFix.timestamp >= 1000) {
+        const dtSec = (nowMs - previousLiveFix.timestamp) / 1000;
+        const distM = calcularDistanciaMetros(previousLiveFix.lat, previousLiveFix.lng, lat, lng);
+        const calcKmh = distM >= 2 ? (distM / dtSec) * 3.6 : 0;
+        speedKmh = calcKmh <= 180 ? calcKmh : 0;
+      }
+      previousLiveFix = { lat, lng, timestamp: nowMs };
 
       saveCachedGps(lat, lng);
-      updateUserPositionOnMap(lat, lng, 'live', pos.coords.speed);
+      updateUserPositionOnMap(lat, lng, 'live', speedKmh);
 
       if (firstLiveFix || forceCenter) {
         isFollowingUser = true;
@@ -1719,72 +1761,70 @@
       }
     }
 
-    function registrarWatchGps() {
-      if (!navigator.geolocation || gpsPermissionDenied) return;
-      if (gpsWatchId !== null) {
-        navigator.geolocation.clearWatch(gpsWatchId);
-        gpsWatchId = null;
+    function destruirYReiniciarGps(forceCenter = false) {
+      if (!navigator.geolocation) {
+        aplicarPorDefectoUnaSolaVez(true);
+        return;
+      }
+      if (gpsPermissionDenied) return;
+
+      // 1. Destruir por completo el watchPosition congelado y limpiar la variable
+      detenerSuscripcionWatchGps();
+      lastGpsLifecycleAt = Date.now();
+
+      // 2. Disparar lectura única directa para despertar el chip GNSS del celular
+      try {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => manejarCoordenadasGpsReales(pos, forceCenter),
+          (err) => {
+            if (err && err.code === err.PERMISSION_DENIED) {
+              manejarErrorPermisoDenegadoGps();
+            } else {
+              aplicarPorDefectoUnaSolaVez(false);
+            }
+          },
+          GPS_STRICT_OPTIONS
+        );
+      } catch (e) {
+        aplicarPorDefectoUnaSolaVez(false);
       }
 
+      // 3. Crear una nueva suscripción limpia de watchPosition desde cero
       try {
         gpsWatchId = navigator.geolocation.watchPosition(
           (pos) => manejarCoordenadasGpsReales(pos, false),
           (error) => {
             if (error && error.code === error.PERMISSION_DENIED) {
-              gpsPermissionDenied = true;
-              aplicarPorDefectoUnaSolaVez(false);
-              if (gpsWatchId !== null) {
-                navigator.geolocation.clearWatch(gpsWatchId);
-                gpsWatchId = null;
-              }
-              if (gpsWakeupIntervalId !== null) {
-                clearInterval(gpsWakeupIntervalId);
-                gpsWakeupIntervalId = null;
-              }
+              manejarErrorPermisoDenegadoGps();
             } else {
-              // Ante micro-pérdida de señal, nunca reinicia ni borra la posición real conocida
               aplicarPorDefectoUnaSolaVez(false);
             }
           },
-          GPS_WATCH_OPTIONS
+          GPS_STRICT_OPTIONS
         );
       } catch (e) {
+        gpsWatchId = null;
         aplicarPorDefectoUnaSolaVez(false);
       }
     }
 
-    function despertarChipGps(forceCenter = false) {
-      if (!navigator.geolocation || gpsPermissionDenied) return;
-      if (gpsPollInFlight && Date.now() - gpsPollStartedAt < 9500) return;
+    function iniciarWatchdogAutoReconexionGps() {
+      if (gpsWatchdogIntervalId !== null) {
+        clearInterval(gpsWatchdogIntervalId);
+        gpsWatchdogIntervalId = null;
+      }
 
-      gpsPollInFlight = true;
-      gpsPollStartedAt = Date.now();
+      // Watchdog cada 3 segundos: si pasan > 6 segundos sin nueva coordenada, destruye y reinicia el GPS
+      gpsWatchdogIntervalId = setInterval(() => {
+        if (document.hidden || gpsPermissionDenied || !navigator.geolocation) return;
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          gpsPollInFlight = false;
-          manejarCoordenadasGpsReales(pos, forceCenter);
-        },
-        (err) => {
-          gpsPollInFlight = false;
-          if (err && err.code === err.PERMISSION_DENIED) {
-            gpsPermissionDenied = true;
-            aplicarPorDefectoUnaSolaVez(false);
-            if (gpsWakeupIntervalId !== null) {
-              clearInterval(gpsWakeupIntervalId);
-              gpsWakeupIntervalId = null;
-            }
-            return;
-          }
+        const ultimaReferencia = Math.max(lastGpsSuccessAt, lastGpsLifecycleAt);
+        const tiempoSinSenalMs = Date.now() - ultimaReferencia;
 
-          // Si watchPosition lleva > 12s congelado por corte de señal, lo reactiva automáticamente
-          if (lastGpsFixTimestamp > 0 && Date.now() - lastGpsFixTimestamp > 12000) {
-            registrarWatchGps();
-          }
-          aplicarPorDefectoUnaSolaVez(false);
-        },
-        GPS_WAKEUP_OPTIONS
-      );
+        if (gpsWatchId === null || tiempoSinSenalMs > GPS_STALE_LIMIT_MS) {
+          destruirYReiniciarGps(false);
+        }
+      }, GPS_WATCHDOG_CHECK_MS);
     }
 
     function iniciarSeguimientoGpsEnTiempoReal(forceCenterOnFirstFix = false) {
@@ -1792,43 +1832,19 @@
         aplicarPorDefectoUnaSolaVez(true);
         return;
       }
-
       gpsPermissionDenied = false;
-
-      if (gpsWakeupIntervalId !== null) {
-        clearInterval(gpsWakeupIntervalId);
-        gpsWakeupIntervalId = null;
-      }
-
-      // 1. Lectura inicial inmediata de alta precisión (maximumAge: 0)
-      despertarChipGps(forceCenterOnFirstFix);
-
-      // 2. Escucha continua en tiempo real con parámetros estrictos (maximumAge: 0)
-      registrarWatchGps();
-
-      // 3. Respaldo activo cada 4 segundos para despertar el chip GPS tras micro-cortes
-      gpsWakeupIntervalId = setInterval(() => {
-        if (!document.hidden) {
-          despertarChipGps(false);
-        }
-      }, GPS_WAKEUP_INTERVAL_MS);
+      destruirYReiniciarGps(forceCenterOnFirstFix);
+      iniciarWatchdogAutoReconexionGps();
     }
 
     function reanudarGpsAlVolverPrimerPlano() {
       if (document.hidden || gpsPermissionDenied) return;
-      if (gpsPollInFlight && Date.now() - gpsPollStartedAt > 4000) {
-        gpsPollInFlight = false;
+      const ultimaReferencia = Math.max(lastGpsSuccessAt, lastGpsLifecycleAt);
+      if (gpsWatchId === null || Date.now() - ultimaReferencia > GPS_STALE_LIMIT_MS) {
+        destruirYReiniciarGps(false);
       }
-      despertarChipGps(false);
-      if (gpsWatchId === null || (lastGpsFixTimestamp > 0 && Date.now() - lastGpsFixTimestamp > 6000)) {
-        registrarWatchGps();
-      }
-      if (gpsWakeupIntervalId === null) {
-        gpsWakeupIntervalId = setInterval(() => {
-          if (!document.hidden) {
-            despertarChipGps(false);
-          }
-        }, GPS_WAKEUP_INTERVAL_MS);
+      if (gpsWatchdogIntervalId === null) {
+        iniciarWatchdogAutoReconexionGps();
       }
     }
 
@@ -1850,10 +1866,7 @@
             ? 'Centrado en tu ubicación GPS en tiempo real.'
             : 'Centrado en tu última ubicación GPS conocida.'
         );
-        despertarChipGps(true);
-        if (gpsWatchId === null || gpsWakeupIntervalId === null) {
-          iniciarSeguimientoGpsEnTiempoReal(true);
-        }
+        iniciarSeguimientoGpsEnTiempoReal(true);
       } else {
         hasUsedDefaultFallback = false;
         iniciarSeguimientoGpsEnTiempoReal(true);
