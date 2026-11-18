@@ -7,11 +7,14 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MoviRadar - Bucaramanga | Alertas Viales en Vivo</title>
-  <meta name="description" content="MoviRadar Bucaramanga: alertas viales en tiempo real para conductores y taxistas con mapa gratuito OpenStreetMap, GPS en vivo, fotos, videos y Firebase." />
-  <meta property="og:title" content="MoviRadar - Bucaramanga | Alertas Viales en Vivo" />
-  <meta property="og:description" content="MoviRadar Bucaramanga: alertas viales en tiempo real para conductores y taxistas con mapa gratuito OpenStreetMap, GPS en vivo y Firebase." />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23020617'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2310b981' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%2306b6d4'/%3E%3C/svg%3E" />
+  <meta name="apple-mobile-web-app-title" content="AN-THI" />
+  <title>AN-THI | Radar Vial Antitodo</title>
+  <meta name="description" content="AN-THI (Andrés y Thiago): radar vial antitodo en tiempo real (anti-retenes, anti-grúas, anti-cepos y anti-accidentes) con mapa OpenStreetMap, GPS continuo y alertas sónar." />
+  <meta property="og:title" content="AN-THI | Radar Vial Antitodo" />
+  <meta property="og:description" content="AN-THI: radar vial antitodo en tiempo real para prevenir retenes, grúas, cepos y accidentes con GPS en vivo y notificaciones." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
 
   <!-- Leaflet CSS (Gratuito vía CDN, sin API keys ni facturación) -->
   <link
@@ -1519,7 +1522,7 @@
       <div class="brand-group">
         <div class="brand-icon" id="brandIcon">📡</div>
         <div class="brand-text">
-          <h1>MoviRadar - Bucaramanga</h1>
+          <h1>AN-THI · Antitodo</h1>
           <div class="brand-subtitle" id="syncStatus">
             <span class="live-dot"></span>
             <span id="syncStatusText">Conectando en vivo...</span>
@@ -1763,16 +1766,16 @@
       </div>
     </div>
 
-    <!-- Modal flotante de Buzón de Sugerencias - MoviRadar -->
+    <!-- Modal flotante de Buzón de Sugerencias - AN-THI -->
     <div class="modal-backdrop" id="suggestionModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>📮 Buzón de Sugerencias - MoviRadar</h2>
+          <h2>📮 Buzón de Sugerencias - AN-THI</h2>
           <button type="button" class="btn-close" id="btnCloseSuggestionModal" aria-label="Cerrar">✕</button>
         </div>
 
         <p class="suggestion-intro">
-          ¿Tienes ideas, consejos o encontraste algún fallo? Escríbenos para seguir mejorando MoviRadar en Bucaramanga.
+          ¿Tienes ideas, consejos o encontraste algún fallo? Escríbenos para seguir mejorando AN-THI (radar vial antitodo).
         </p>
 
         <form id="suggestionForm">
@@ -1804,7 +1807,7 @@
     <div class="modal-backdrop" id="authModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 id="authModalTitle">Acceso a MoviRadar</h2>
+          <h2 id="authModalTitle">Acceso a AN-THI</h2>
           <button type="button" class="btn-close" id="btnCloseAuthModal" aria-label="Cerrar">✕</button>
         </div>
 
@@ -1861,7 +1864,7 @@
 
         <div id="authSignedInView" style="display:none;">
           <div class="auth-account-box">
-            <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">Sesión activa en MoviRadar</div>
+            <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">Sesión activa en AN-THI</div>
             <div id="authUserEmailLabel" style="font-weight:800;color:#6ee7b7;word-break:break-all;"></div>
           </div>
           <button type="button" class="btn-logout" id="btnSignOut">
@@ -2017,7 +2020,33 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    if ('serviceWorker' in navigator && (location.hostname === 'localhost' || location.hostname.includes('run.app'))) {
+    window.__anthiSwRegistration = null;
+
+    window.requestAnthiNotificationPermission = function requestAnthiNotificationPermission() {
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        return Promise.resolve('unsupported');
+      }
+      if (Notification.permission !== 'default') {
+        return Promise.resolve(Notification.permission);
+      }
+      try {
+        return Notification.requestPermission().catch(function() { return 'default'; });
+      } catch (e) {
+        return Promise.resolve('default');
+      }
+    };
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      window.requestAnthiNotificationPermission();
+      var retryNotifOnGesture = function() {
+        if ('Notification' in window && Notification.permission === 'default') {
+          window.requestAnthiNotificationPermission();
+        }
+      };
+      document.addEventListener('pointerdown', retryNotifOnGesture, { once: true, passive: true });
+    }
+
+    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(regs) {
         regs.forEach(function(reg) {
           if (reg.active && reg.active.scriptURL && reg.active.scriptURL.includes('dev-sw')) {
@@ -2025,6 +2054,27 @@
           }
         });
       }).catch(function() {});
+
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        .then(function(reg) {
+          window.__anthiSwRegistration = reg;
+          if ('periodicSync' in reg && reg.periodicSync && typeof reg.periodicSync.register === 'function') {
+            reg.periodicSync.register('anthi-radar-sync', { minInterval: 60000 }).catch(function() {});
+          }
+        })
+        .catch(function(err) {
+          console.warn('No se pudo registrar el Service Worker de AN-THI:', err);
+        });
+
+      navigator.serviceWorker.addEventListener('message', function(event) {
+        var msg = event && event.data;
+        if (!msg || typeof msg !== 'object') return;
+        if (msg.type === 'AN_THI_SW_TICK' && typeof window.__anthiOnBackgroundTick === 'function') {
+          window.__anthiOnBackgroundTick();
+        } else if (msg.type === 'AN_THI_FOCUS_ALERT' && typeof window.__anthiFocusAlertById === 'function') {
+          window.__anthiFocusAlertById(msg.reportId, msg.lat, msg.lng);
+        }
+      });
     }
 
     function ensureLeafletAndStart(callback) {
@@ -2448,7 +2498,7 @@
     function updateQuickExternalLinks(lat, lng) {
       const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       const waText = encodeURIComponent(
-        `📍 Mi ubicación actual en MoviRadar Bucaramanga: ${gmapsUrl}`
+        `📍 Mi ubicación actual en AN-THI (Radar Antitodo): ${gmapsUrl}`
       );
       const waBtn = document.getElementById('btnWhatsApp');
       if (waBtn) {
@@ -2861,12 +2911,12 @@
       setAuthMode(defaultMode);
       const user = auth.currentUser;
       if (user) {
-        authModalTitle.textContent = 'Cuenta MoviRadar';
+        authModalTitle.textContent = 'Cuenta AN-THI';
         authSignedOutView.style.display = 'none';
         authSignedInView.style.display = 'block';
         authUserEmailLabel.textContent = user.email || 'Usuario conectado';
       } else {
-        authModalTitle.textContent = 'Acceso a MoviRadar';
+        authModalTitle.textContent = 'Acceso a AN-THI';
         authSignedOutView.style.display = 'block';
         authSignedInView.style.display = 'none';
       }
@@ -3176,8 +3226,9 @@
           updateNetworkAndSyncStatus();
           if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
             evaluarAlertasEnRutaActual(false);
-          } else if (typeof evaluarRadarProximidadCercana === 'function') {
-            evaluarRadarProximidadCercana();
+          }
+          if (typeof evaluarRadarProximidadCercana === 'function') {
+            evaluarRadarProximidadCercana(true);
           }
 
           if (navigator.onLine && auth.currentUser && loadPendingReports().length > 0) {
@@ -3218,6 +3269,7 @@
     };
 
     let gpsPollingIntervalId = null;
+    let gpsWatchId = null;
     let gpsPollInFlight = false;
     let gpsPollStartedAt = 0;
     let lastGpsSuccessAt = 0;
@@ -3320,6 +3372,12 @@
         clearInterval(gpsPollingIntervalId);
         gpsPollingIntervalId = null;
       }
+      if (gpsWatchId !== null && navigator.geolocation) {
+        try {
+          navigator.geolocation.clearWatch(gpsWatchId);
+        } catch (e) {}
+        gpsWatchId = null;
+      }
       gpsPollInFlight = false;
     }
 
@@ -3410,7 +3468,7 @@
       saveCachedGps(currentLat, currentLng);
       updateUserPositionOnMap(currentLat, currentLng, 'live', currentSpeedKmh, accuracy);
 
-      if (!isPickingReportPin) {
+      if (!document.hidden && !isPickingReportPin) {
         if (firstLiveFix || forceCenter) {
           isFollowingUser = true;
           map.setView([currentLat, currentLng], Math.max(map.getZoom(), 16), { animate: true });
@@ -3421,8 +3479,9 @@
 
       if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
         evaluarAlertasEnRutaActual(false);
-      } else if (typeof evaluarRadarProximidadCercana === 'function') {
-        evaluarRadarProximidadCercana();
+      }
+      if (typeof evaluarRadarProximidadCercana === 'function') {
+        evaluarRadarProximidadCercana(true);
       }
     }
 
@@ -3472,11 +3531,37 @@
 
     function asegurarBucleSondeoGps() {
       if (!navigator.geolocation || gpsPermissionDenied) return;
+      if (gpsWatchId === null) {
+        try {
+          gpsWatchId = navigator.geolocation.watchPosition(
+            (pos) => {
+              gpsPollInFlight = false;
+              procesarLecturaSondeoGps(pos, false);
+            },
+            (err) => {
+              if (err && err.code === err.PERMISSION_DENIED) {
+                gpsPermissionDenied = true;
+                detenerSondeoGps();
+                aplicarPorDefectoUnaSolaVez(false);
+              }
+            },
+            {
+              enableHighAccuracy: true,
+              maximumAge: 2500,
+              timeout: 10000
+            }
+          );
+        } catch (e) {}
+      }
       if (gpsPollingIntervalId !== null) return;
 
+      // Mantener rastreo activo tanto en primer plano como en segundo plano
       gpsPollingIntervalId = setInterval(() => {
-        if (!document.hidden && !gpsPermissionDenied) {
+        if (!gpsPermissionDenied) {
           ejecutarSondeoGps(false);
+          if (typeof evaluarRadarProximidadCercana === 'function') {
+            evaluarRadarProximidadCercana(true);
+          }
         }
       }, GPS_POLL_INTERVAL_MS);
     }
@@ -3492,12 +3577,44 @@
       asegurarBucleSondeoGps();
     }
 
+    function syncRadarWithServiceWorker() {
+      const controller = navigator.serviceWorker && navigator.serviceWorker.controller;
+      if (controller) {
+        try {
+          controller.postMessage({
+            type: 'AN_THI_RADAR_KEEPALIVE',
+            lat: currentLat,
+            lng: currentLng,
+            activeCount: Array.isArray(lastServerReports) ? lastServerReports.length : 0
+          });
+        } catch (e) {}
+      }
+    }
+
     function reanudarSondeoEnPrimerPlano() {
-      if (document.hidden || gpsPermissionDenied) return;
+      if (gpsPermissionDenied) return;
+      if (document.hidden) {
+        // En segundo plano mantenemos keepalive y evaluación continua del radar
+        syncRadarWithServiceWorker();
+        if (typeof evaluarRadarProximidadCercana === 'function') {
+          evaluarRadarProximidadCercana(true);
+        }
+        return;
+      }
       gpsPollInFlight = false;
       ejecutarSondeoGps(false);
       asegurarBucleSondeoGps();
     }
+
+    window.__anthiOnBackgroundTick = function() {
+      if (!gpsPermissionDenied) {
+        ejecutarSondeoGps(false);
+        if (typeof evaluarRadarProximidadCercana === 'function') {
+          evaluarRadarProximidadCercana(true);
+        }
+        syncRadarWithServiceWorker();
+      }
+    };
 
     document.addEventListener('visibilitychange', reanudarSondeoEnPrimerPlano);
     window.addEventListener('pageshow', reanudarSondeoEnPrimerPlano);
@@ -3818,16 +3935,21 @@
     let isPickingDestOnMap = false;
     let selectedDestEmoji = '📍';
 
-    const PROXIMITY_USER_RADIUS_METERS = 550;
+    const PROXIMITY_USER_RADIUS_METERS = 450;
     const PROXIMITY_CORRIDOR_METERS = 700;
     const PROXIMITY_DEST_RADIUS_METERS = 1050;
+    const SONAR_REPEAT_INTERVAL_MS = 30000;
+    const BACKGROUND_PUSH_REPEAT_MS = 30000;
 
     // Sintetizador Web Audio API para el sonido de Sónar de Submarino
     const btnToggleSonarAudio = document.getElementById('btnToggleSonarAudio');
     let sonarAudioCtx = null;
     let isSonarAudioEnabled = safeReadJson(STORAGE_KEYS.SONAR_AUDIO, true) !== false;
     let lastSonarPingAt = 0;
+    let lastNearbySonarAt = 0;
     let lastNearbySonarSignature = '';
+    let lastBackgroundPushAt = 0;
+    let lastBackgroundPushSignature = '';
 
     function ensureSonarAudioContext() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -3920,8 +4042,69 @@
       }
     }
 
-    function evaluarRadarProximidadCercana() {
-      if (activeRouteDestination || !hasKnownRealGps) return;
+    function sendAnthiBackgroundPush(closestHit, totalNearbyCount) {
+      if (!closestHit || !closestHit.rep) return;
+      if (typeof window === 'undefined' || !('Notification' in window)) return;
+      if (Notification.permission !== 'granted') return;
+
+      const rep = closestHit.rep;
+      const meta = getTipoMeta(rep.tipo || rep.type || 'Novedad');
+      const distMeters = Math.round(closestHit.dist);
+      const desc = String(rep.descripcion || '').trim();
+      const extraSuffix = totalNearbyCount > 1 ? ` (+${totalNearbyCount - 1} alerta(s) cerca)` : '';
+      const title = '⚠️ ¡Alerta AN-THI!';
+      const body = `${meta.emoji} ${meta.label} a ${distMeters} m de tu ubicación${desc ? ` · ${desc}` : ''}${extraSuffix}`;
+
+      const payload = {
+        type: 'AN_THI_ALERT',
+        title,
+        body,
+        tag: `anthi-alert-${rep.id || 'nearby'}`,
+        reportId: rep.id || null,
+        lat: Number(rep.lat) || null,
+        lng: Number(rep.lng) || null
+      };
+
+      const swReg = window.__anthiSwRegistration;
+      if (swReg && typeof swReg.showNotification === 'function') {
+        swReg.showNotification(title, {
+          body,
+          icon: '/icon.svg',
+          badge: '/icon.svg',
+          tag: payload.tag,
+          renotify: true,
+          requireInteraction: true,
+          vibrate: [280, 120, 280, 120, 420],
+          data: {
+            url: '/',
+            reportId: payload.reportId,
+            lat: payload.lat,
+            lng: payload.lng
+          }
+        }).catch(() => {});
+      } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        try {
+          navigator.serviceWorker.controller.postMessage(payload);
+        } catch (e) {}
+      } else {
+        try {
+          new Notification(title, {
+            body,
+            icon: '/icon.svg',
+            tag: payload.tag
+          });
+        } catch (e) {}
+      }
+
+      if (navigator.vibrate) {
+        try {
+          navigator.vibrate([260, 110, 260, 110, 380]);
+        } catch (e) {}
+      }
+    }
+
+    function evaluarRadarProximidadCercana(allowRepeatInterval = true) {
+      if (!hasKnownRealGps || gpsPermissionDenied) return;
       const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
@@ -3938,21 +4121,107 @@
         }
       });
 
+      if (!activeRouteDestination) {
+        routeLayer.clearLayers();
+        if (nearbyHits.length > 0) {
+          L.circle([origLat, origLng], {
+            radius: PROXIMITY_USER_RADIUS_METERS,
+            color: '#ef4444',
+            weight: 1.5,
+            opacity: 0.45,
+            fillColor: '#ef4444',
+            fillOpacity: 0.06,
+            interactive: false
+          }).addTo(routeLayer);
+
+          L.marker([origLat, origLng], {
+            interactive: false,
+            zIndexOffset: 250,
+            icon: L.divIcon({
+              className: 'custom-user-radar',
+              html: `<div class="moviradar-user-radar danger">
+                <div class="moviradar-radar-ring outer"></div>
+                <div class="moviradar-radar-ring"></div>
+                <div class="moviradar-sweep-cone"></div>
+              </div>`,
+              iconSize: [112, 112],
+              iconAnchor: [56, 56]
+            })
+          }).addTo(routeLayer);
+
+          nearbyHits.forEach(({ rep }) => {
+            L.marker([Number(rep.lat), Number(rep.lng)], {
+              interactive: false,
+              zIndexOffset: 350,
+              icon: L.divIcon({
+                className: 'custom-alert-beacon',
+                html: '<div class="moviradar-alert-beacon"></div>',
+                iconSize: [48, 48],
+                iconAnchor: [24, 24]
+              })
+            }).addTo(routeLayer);
+          });
+        }
+      }
+
       if (nearbyHits.length === 0) {
         lastNearbySonarSignature = '';
+        lastBackgroundPushSignature = '';
         return;
       }
 
       nearbyHits.sort((a, b) => a.dist - b.dist);
+      const closest = nearbyHits[0];
+      const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
       const sig = nearbyHits.map((h) => h.rep.id).join(',');
-      if (sig !== lastNearbySonarSignature) {
+      const nowMs = Date.now();
+      const isNewSignature = sig !== lastNearbySonarSignature;
+      const shouldRepeatSonar = allowRepeatInterval && (nowMs - lastNearbySonarAt >= SONAR_REPEAT_INTERVAL_MS);
+
+      if (isNewSignature || shouldRepeatSonar) {
         lastNearbySonarSignature = sig;
-        const closest = nearbyHits[0];
-        const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
+        lastNearbySonarAt = nowMs;
         playSubmarineSonarPing(false);
-        showToast(`📡 Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`);
+        if (navigator.vibrate) {
+          try {
+            navigator.vibrate([220, 100, 220]);
+          } catch (e) {}
+        }
+        if (!document.hidden) {
+          showToast(`📡 AN-THI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`);
+        }
+      }
+
+      const isBackgroundMode = document.hidden || (typeof document.hasFocus === 'function' && !document.hasFocus());
+      if (isBackgroundMode) {
+        const isNewPushSig = sig !== lastBackgroundPushSignature;
+        const shouldRepeatPush = nowMs - lastBackgroundPushAt >= BACKGROUND_PUSH_REPEAT_MS;
+        if (isNewPushSig || shouldRepeatPush) {
+          lastBackgroundPushSignature = sig;
+          lastBackgroundPushAt = nowMs;
+          sendAnthiBackgroundPush(closest, nearbyHits.length);
+        }
       }
     }
+
+    window.__anthiFocusAlertById = function(reportId, lat, lng) {
+      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
+      const allActive = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+      const found = reportId ? allActive.find((r) => String(r.id) === String(reportId)) : null;
+      if (found && typeof focusAlertOnMap === 'function') {
+        focusAlertOnMap(found);
+      } else if (lat && lng) {
+        isFollowingUser = false;
+        map.setView([Number(lat), Number(lng)], 16, { animate: true });
+      }
+    };
+
+    setInterval(() => {
+      if (!gpsPermissionDenied) {
+        evaluarRadarProximidadCercana(true);
+        syncRadarWithServiceWorker();
+      }
+    }, 5000);
 
     if (btnToggleSonarAudio) {
       updateSonarAudioButtonUI();

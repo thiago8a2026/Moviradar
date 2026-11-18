@@ -16,9 +16,9 @@ export default defineConfig(() => {
         includeAssets: ['icon.svg', 'manifest.webmanifest'],
         manifest: {
           id: '/',
-          name: 'MoviRadar - Movilidad Ciudadana',
-          short_name: 'MoviRadar',
-          description: 'Aplicación web móvil progresiva (PWA) de movilidad ciudadana con GPS en vivo, mapa interactivo Leaflet OSM, Waze, Google Maps y puntos frecuentes.',
+          name: 'AN-THI - Radar Vial Antitodo',
+          short_name: 'AN-THI',
+          description: 'AN-THI (Andrés y Thiago): radar vial preventivo antitodo en Bucaramanga con GPS en vivo, mapa OpenStreetMap y alertas en segundo plano.',
           theme_color: '#020617',
           background_color: '#020617',
           display: 'standalone',
