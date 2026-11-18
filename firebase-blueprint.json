@@ -21,8 +21,8 @@
         },
         "descripcion": {
           "type": "string",
-          "description": "Descripción breve de la novedad vial reportada.",
-          "minLength": 2,
+          "description": "Indicación o referencia rápida opcional de la novedad vial reportada.",
+          "minLength": 0,
           "maxLength": 400
         },
         "isFixed": {

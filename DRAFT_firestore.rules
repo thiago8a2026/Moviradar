@@ -42,7 +42,7 @@ service cloud.firestore {
         && data.lat is number && data.lat >= -90 && data.lat <= 90
         && data.lng is number && data.lng >= -180 && data.lng <= 180
         && data.tipo is string && data.tipo.size() >= 2 && data.tipo.size() <= 40
-        && data.descripcion is string && data.descripcion.size() >= 2 && data.descripcion.size() <= 400
+        && data.descripcion is string && data.descripcion.size() <= 400
         && data.isFixed is bool
         && data.timestamp is timestamp
         && data.confirmations is int && data.confirmations >= 0

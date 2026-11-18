@@ -877,14 +877,13 @@
             <span>👑 Publicar como Ubicación Fija Oficial (no expira)</span>
           </label>
 
-          <label class="form-label" for="reportDesc">2. Descripción corta *</label>
+          <label class="form-label" for="reportDesc">2. Indicación o referencia rápida (opcional)</label>
           <textarea
             id="reportDesc"
             class="text-input"
             rows="2"
-            required
-            maxlength="240"
-            placeholder="Ej. Carrera 27 con Calle 36, carril derecho bloqueado..."
+            maxlength="400"
+            placeholder="Indicación o referencia rápida (ej: Por la Puerta del Sol, frente al colegio...)"
           ></textarea>
 
           <span class="form-label">3. Foto o video (Cámara / Galería)</span>
@@ -970,6 +969,9 @@
               class="text-input"
               required
               autocomplete="email"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
               placeholder="conductor@correo.com"
             />
 
@@ -1496,7 +1498,8 @@
 
         const tipoTexto = rep.tipo || rep.type || 'Novedad';
         const meta = getTipoMeta(tipoTexto);
-        const descripcionTexto = rep.descripcion || rep.description || 'Novedad reportada en Bucaramanga.';
+        const rawDescText = String(rep.descripcion || rep.description || '').trim();
+        const descripcionTexto = rawDescText || 'Sin referencia adicional (ver ubicación en el mapa).';
         const fotoUrl = rep.urlFoto || rep.mediaUrl || rep.mediaDataUrl || null;
         const timeMs = extractTimestampMs(rep);
         const isPending = Boolean(rep.isPending);
@@ -1614,18 +1617,26 @@
     }
 
     function mapFirebaseAuthError(err) {
-      const code = err && err.code ? err.code : '';
+      const code = err && err.code ? String(err.code) : '';
+      const rawMessage = err && err.message ? String(err.message) : '';
       if (code === 'auth/email-already-in-use') return 'Este correo ya está registrado. Cambia a "Iniciar Sesión".';
       if (code === 'auth/invalid-email') return 'Ingresa un correo electrónico válido.';
       if (code === 'auth/weak-password') return 'La contraseña debe tener al menos 6 caracteres.';
+      if (code === 'auth/missing-password') return 'Ingresa tu contraseña para continuar.';
+      if (code === 'auth/user-disabled') return 'Esta cuenta está deshabilitada. Contacta al administrador.';
       if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
         return 'Correo o contraseña incorrectos.';
       }
       if (code === 'auth/too-many-requests') return 'Demasiados intentos. Espera un momento antes de volver a intentar.';
-      if (code === 'auth/operation-not-allowed') {
-        return 'Habilita Correo/Contraseña en Firebase Console -> Authentication -> Sign-in method.';
+      if (code === 'auth/network-request-failed') return 'Error de red al conectar con Firebase. Verifica tu señal e inténtalo de nuevo.';
+      if (code === 'auth/unauthorized-domain') return 'Dominio no autorizado en Firebase Auth. Agrégalo en Authentication -> Settings -> Authorized domains.';
+      if (code === 'auth/invalid-api-key') return 'La API Key de Firebase no es válida para este proyecto.';
+      if (code === 'auth/operation-not-allowed' || rawMessage.includes('PASSWORD_LOGIN_DISABLED')) {
+        return 'Falta activar Correo/Contraseña en Firebase Console -> Authentication -> Sign-in method.';
       }
-      return 'No se pudo completar el acceso. Verifica tu conexión e inténtalo de nuevo.';
+      return code
+        ? `No se pudo completar el acceso (${code}). Verifica tu conexión e inténtalo de nuevo.`
+        : 'No se pudo completar el acceso. Verifica tu conexión e inténtalo de nuevo.';
     }
 
     function openAuthModal(defaultMode = 'login') {
@@ -1698,8 +1709,13 @@
       }
     });
 
-    function ensureAuthenticated() {
-      if (auth.currentUser) return Promise.resolve(auth.currentUser);
+    async function ensureAuthenticated() {
+      if (typeof auth.authStateReady === 'function') {
+        try {
+          await auth.authStateReady();
+        } catch (e) {}
+      }
+      if (auth.currentUser) return auth.currentUser;
       openAuthModal('login');
       showToast('Inicia sesión o regístrate con tu correo para continuar.');
       return new Promise((resolve, reject) => {
@@ -2506,7 +2522,7 @@
               lat: Number(item.lat),
               lng: Number(item.lng),
               tipo: String(item.tipo || 'Retén').slice(0, 40),
-              descripcion: String(item.descripcion || 'Novedad vial').trim().slice(0, 400),
+              descripcion: String(item.descripcion || '').trim().slice(0, 400),
               isFixed: canFix && Boolean(item.isFixed),
               timestamp: serverTimestamp(),
               urlFoto,
@@ -2541,10 +2557,6 @@
     async function guardarReporteEnFirestore(e) {
       e.preventDefault();
       const rawDesc = document.getElementById('reportDesc').value.trim();
-      if (rawDesc.length < 2) {
-        showToast('Escribe al menos 2 caracteres para describir la novedad.');
-        return;
-      }
       const descripcion = rawDesc.slice(0, 400);
       const wantsFixed = userRole === 'admin' && document.getElementById('chkIsFixed').checked;
 
