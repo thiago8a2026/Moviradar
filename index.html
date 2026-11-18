@@ -1001,7 +1001,7 @@
         </div>
 
         <div id="authSignedOutView">
-          <button type="button" class="btn-google-auth" id="btnGoogleQuickLogin">
+          <button type="button" class="btn-google-auth" id="googleLoginBtn">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
               <path fill="#34A853" d="M12 24c3.3 0 6.08-1.09 8.11-2.96l-3.88-3.05c-1.09.73-2.48 1.16-4.23 1.16-3.25 0-6-2.19-6.98-5.15H1.01v3.14C3.03 21.15 7.21 24 12 24Z"/>
@@ -1115,7 +1115,7 @@
 
     ensureLeafletAndStart(async function initMoviRadarApp() {
     // =========================================================================
-    // 1. CONFIGURACIÓN OFICIAL DE FIREBASE MOVIRADAR (SDK MODULAR v10.8.0)
+    // 1. CONFIGURACIÓN OFICIAL DE FIREBASE MOVIRADAR (SDK MODULAR v10.7.1)
     // =========================================================================
     const [
       { initializeApp },
@@ -1145,10 +1145,10 @@
         onAuthStateChanged
       }
     ] = await Promise.all([
-      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
-      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js'),
-      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js')
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js')
     ]);
 
     const firebaseConfig = {
@@ -1173,6 +1173,7 @@
       db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
     }
     const auth = getAuth(app);
+    auth.languageCode = 'es';
     const storage = getStorage(app);
 
     const OperationType = {
@@ -1645,7 +1646,7 @@
     const authErrorMsg = document.getElementById('authErrorMsg');
     const authUserEmailLabel = document.getElementById('authUserEmailLabel');
     const btnSignOut = document.getElementById('btnSignOut');
-    const btnGoogleQuickLogin = document.getElementById('btnGoogleQuickLogin');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
     const googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
 
@@ -1693,7 +1694,9 @@
       }
       if (code === 'auth/too-many-requests') return 'Demasiados intentos. Espera un momento antes de volver a intentar.';
       if (code === 'auth/network-request-failed') return 'Error de red al conectar con Firebase. Verifica tu señal e inténtalo de nuevo.';
-      if (code === 'auth/unauthorized-domain') return 'Dominio no autorizado en Firebase Auth. Agrégalo en Authentication -> Settings -> Authorized domains.';
+      if (code === 'auth/unauthorized-domain') {
+        return `El dominio "${window.location.hostname}" no está autorizado en Firebase Auth. Agrégalo en Authentication -> Settings -> Authorized domains.`;
+      }
       if (code === 'auth/invalid-api-key') return 'La API Key de Firebase no es válida para este proyecto.';
       if (code === 'auth/popup-closed-by-user') return 'Cerraste la ventana de Google antes de terminar el acceso.';
       if (code === 'auth/popup-blocked') return 'El navegador bloqueó la ventana emergente de Google. Permite pop-ups o usa tu correo.';
@@ -1723,9 +1726,6 @@
         authSignedInView.style.display = 'none';
       }
       authModal.classList.add('open');
-      if (!user) {
-        setTimeout(() => authEmailInput.focus(), 100);
-      }
     }
 
     function closeAuthModal(cancelPending = true) {
@@ -1834,10 +1834,10 @@
       }
     });
 
-    btnGoogleQuickLogin.addEventListener('click', async () => {
+    googleLoginBtn.addEventListener('click', async () => {
       clearAuthError();
-      const labelSpan = btnGoogleQuickLogin.querySelector('span');
-      btnGoogleQuickLogin.disabled = true;
+      const labelSpan = googleLoginBtn.querySelector('span');
+      googleLoginBtn.disabled = true;
       if (labelSpan) labelSpan.textContent = 'Abriendo Google...';
 
       try {
@@ -1849,7 +1849,7 @@
         console.error('Error en acceso rápido con Google:', err);
         showAuthError(mapFirebaseAuthError(err));
       } finally {
-        btnGoogleQuickLogin.disabled = false;
+        googleLoginBtn.disabled = false;
         if (labelSpan) labelSpan.textContent = 'Continuar con Google';
       }
     });
