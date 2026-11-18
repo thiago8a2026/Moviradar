@@ -111,6 +111,37 @@
         }
       },
       "required": ["voteType", "userId", "createdAt"]
+    },
+    "SugerenciaBuzon": {
+      "title": "Sugerencia del Buzón MoviRadar",
+      "description": "Comentario, consejo, reporte de fallo o idea enviada por un conductor al Buzón de Sugerencias.",
+      "type": "object",
+      "properties": {
+        "mensaje": {
+          "type": "string",
+          "description": "Texto de la sugerencia o consejo escrito por el usuario.",
+          "minLength": 3,
+          "maxLength": 1000
+        },
+        "usuario": {
+          "type": "string",
+          "description": "Correo electrónico del usuario autenticado o 'Anónimo'.",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID de Firebase Auth o 'anonimo' si envió sin sesión iniciada.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo asignada por el servidor de Firestore."
+        }
+      },
+      "required": ["mensaje", "usuario", "authorId", "timestamp"]
     }
   },
   "firestore": {
@@ -121,6 +152,10 @@
     "/reportes/{reportId}/votos/{userId}": {
       "schema": { "$ref": "#/entities/VotoReporte" },
       "description": "Subcolección anti-spam con un documento único por usuario votante."
+    },
+    "/buzon/{sugerenciaId}": {
+      "schema": { "$ref": "#/entities/SugerenciaBuzon" },
+      "description": "Buzón de sugerencias, consejos y mejoras enviadas por los conductores."
     },
     "/admins/{adminId}": {
       "schema": { "$ref": "#/entities/AdminUser" },

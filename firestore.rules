@@ -60,6 +60,15 @@ service cloud.firestore {
         && data.createdAt is timestamp;
     }
 
+    function isValidSugerencia(data) {
+      return data.keys().hasAll(['mensaje', 'usuario', 'authorId', 'timestamp'])
+        && data.keys().hasOnly(['mensaje', 'usuario', 'authorId', 'timestamp'])
+        && data.mensaje is string && data.mensaje.size() >= 3 && data.mensaje.size() <= 1000
+        && data.usuario is string && data.usuario.size() >= 3 && data.usuario.size() <= 200
+        && data.authorId is string && isValidId(data.authorId)
+        && data.timestamp is timestamp;
+    }
+
     match /reportes/{reportId} {
       // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
       allow get: if isValidId(reportId);
@@ -127,6 +136,18 @@ service cloud.firestore {
           && incoming().userId == request.auth.uid
           && incoming().createdAt == request.time;
       }
+    }
+
+    match /buzon/{sugerenciaId} {
+      allow get, list: if isAdmin();
+      allow create: if isValidId(sugerenciaId)
+        && isValidSugerencia(incoming())
+        && incoming().timestamp == request.time
+        && (
+          (request.auth == null && incoming().authorId == 'anonimo' && incoming().usuario == 'Anónimo') ||
+          (isSignedIn() && incoming().authorId == request.auth.uid)
+        );
+      allow update, delete: if isAdmin();
     }
 
     match /admins/{adminId} {

@@ -501,6 +501,50 @@
       text-transform: uppercase;
     }
 
+    .map-btn.buzon-btn {
+      border-color: rgba(245, 158, 11, 0.65);
+      background: rgba(245, 158, 11, 0.14);
+      color: #fcd34d;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 16px;
+      line-height: 1;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.22);
+    }
+
+    .suggestion-intro {
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .suggestion-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .suggestion-sender-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      color: #e2e8f0;
+      font-weight: 600;
+      max-width: 72%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     /* Pin central fijo para colocación manual de reportes en el mapa */
     .manual-pin-overlay {
       position: fixed;
@@ -1546,6 +1590,9 @@
       <button type="button" class="map-btn sonar-on" id="btnToggleSonarAudio" title="Activar o silenciar sonido de alerta Sónar">
         <span>🔊</span><span class="sonar-btn-sub">Sónar</span>
       </button>
+      <button type="button" class="map-btn buzon-btn" id="btnOpenSuggestionBox" title="Buzón de Sugerencias y Consejos">
+        <span>📮</span><span class="sonar-btn-sub">Buzón</span>
+      </button>
     </div>
 
     <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos y botón "+ Reportar Novedad" -->
@@ -1714,6 +1761,43 @@
         </form>
 
         <div class="points-list" id="pointsList"></div>
+      </div>
+    </div>
+
+    <!-- Modal flotante de Buzón de Sugerencias - MoviRadar -->
+    <div class="modal-backdrop" id="suggestionModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>⭐ Buzón de Sugerencias - MoviRadar</h2>
+          <button type="button" class="btn-close" id="btnCloseSuggestionModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <p class="suggestion-intro">
+          ¿Tienes ideas, consejos o encontraste algún fallo? Escríbenos para seguir mejorando MoviRadar en Bucaramanga.
+        </p>
+
+        <form id="suggestionForm">
+          <label class="form-label" for="suggestionText">Tu sugerencia, consejo o reporte de fallo *</label>
+          <textarea
+            id="suggestionText"
+            class="text-input"
+            rows="4"
+            minlength="3"
+            maxlength="1000"
+            required
+            style="margin-bottom:8px;"
+            placeholder="Ej: Me gustaría que agregaran alerta en la glorieta del Estadio, o reporto un detalle con..."
+          ></textarea>
+
+          <div class="suggestion-meta-row">
+            <span class="suggestion-sender-pill" id="suggestionSenderBadge">👤 Enviando como: Anónimo</span>
+            <span id="suggestionCharCount">0 / 1000</span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnSubmitSuggestion">
+            Enviar Sugerencia
+          </button>
+        </form>
       </div>
     </div>
 
@@ -4856,6 +4940,108 @@
     startFirestoreListener();
     if (navigator.onLine) {
       sincronizarReportesPendientes();
+    }
+
+    // =========================================================================
+    // 11. BUZÓN DE SUGERENCIAS Y CONSEJOS (COLECCIÓN FIRESTORE 'buzon')
+    // =========================================================================
+    const SUGGESTIONS_COLLECTION = 'buzon';
+    const btnOpenSuggestionBox = document.getElementById('btnOpenSuggestionBox');
+    const suggestionModal = document.getElementById('suggestionModal');
+    const btnCloseSuggestionModal = document.getElementById('btnCloseSuggestionModal');
+    const suggestionForm = document.getElementById('suggestionForm');
+    const suggestionText = document.getElementById('suggestionText');
+    const suggestionSenderBadge = document.getElementById('suggestionSenderBadge');
+    const suggestionCharCount = document.getElementById('suggestionCharCount');
+    const btnSubmitSuggestion = document.getElementById('btnSubmitSuggestion');
+
+    function updateSuggestionSenderUI() {
+      const user = auth.currentUser;
+      const senderName = user && user.email ? user.email : 'Anónimo';
+      if (suggestionSenderBadge) {
+        suggestionSenderBadge.textContent = `👤 Enviando como: ${senderName}`;
+      }
+      if (suggestionCharCount && suggestionText) {
+        suggestionCharCount.textContent = `${suggestionText.value.length} / 1000`;
+      }
+    }
+
+    if (btnOpenSuggestionBox && suggestionModal) {
+      btnOpenSuggestionBox.addEventListener('click', () => {
+        updateSuggestionSenderUI();
+        suggestionModal.classList.add('open');
+        setTimeout(() => suggestionText && suggestionText.focus(), 120);
+      });
+    }
+
+    if (btnCloseSuggestionModal && suggestionModal) {
+      btnCloseSuggestionModal.addEventListener('click', () => {
+        suggestionModal.classList.remove('open');
+      });
+      suggestionModal.addEventListener('click', (e) => {
+        if (e.target === suggestionModal) {
+          suggestionModal.classList.remove('open');
+        }
+      });
+    }
+
+    if (suggestionText && suggestionCharCount) {
+      suggestionText.addEventListener('input', () => {
+        suggestionCharCount.textContent = `${suggestionText.value.length} / 1000`;
+      });
+    }
+
+    if (suggestionForm) {
+      suggestionForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const mensaje = suggestionText.value.trim().slice(0, 1000);
+        if (mensaje.length < 3) {
+          showToast('Escribe al menos 3 caracteres en tu sugerencia.');
+          suggestionText.focus();
+          return;
+        }
+        if (!navigator.onLine) {
+          showToast('Sin internet. Conéctate un momento para enviar tu sugerencia al buzón.');
+          return;
+        }
+
+        const currentUser = auth.currentUser;
+        const usuario = currentUser && currentUser.email ? currentUser.email.slice(0, 200) : 'Anónimo';
+        const authorId = currentUser && currentUser.uid ? currentUser.uid : 'anonimo';
+
+        btnSubmitSuggestion.disabled = true;
+        btnSubmitSuggestion.textContent = 'Enviando sugerencia...';
+
+        try {
+          await withTimeout(
+            addDoc(collection(db, SUGGESTIONS_COLLECTION), {
+              mensaje,
+              usuario,
+              authorId,
+              timestamp: serverTimestamp()
+            }),
+            15000
+          );
+
+          suggestionForm.reset();
+          updateSuggestionSenderUI();
+          suggestionModal.classList.remove('open');
+          showToast('¡Gracias por tu consejo, lo tendremos en cuenta!');
+        } catch (err) {
+          console.error('Error guardando sugerencia en Firestore:', err);
+          if (err && err.code === 'permission-denied') {
+            showToast('No se pudo guardar la sugerencia por permisos de Firestore.');
+            handleFirestoreError(err, OperationType.CREATE, SUGGESTIONS_COLLECTION);
+          } else if (err && err.message === 'NETWORK_TIMEOUT') {
+            showToast('La conexión tardó demasiado. Inténtalo nuevamente.');
+          } else {
+            showToast('No se pudo enviar tu sugerencia. Verifica tu conexión e inténtalo de nuevo.');
+          }
+        } finally {
+          btnSubmitSuggestion.disabled = false;
+          btnSubmitSuggestion.textContent = 'Enviar Sugerencia';
+        }
+      });
     }
     });
   </script>
