@@ -173,8 +173,86 @@
       white-space: nowrap;
     }
 
-    .role-btn, .auth-btn {
+    .role-btn, .auth-btn, .count-chip {
       cursor: pointer;
+    }
+
+    .count-chip {
+      border-color: rgba(6, 182, 212, 0.55);
+      color: #67e8f9;
+      transition: transform 0.12s ease, background-color 0.15s ease;
+    }
+
+    .count-chip:active {
+      transform: scale(0.95);
+    }
+
+    .alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 62dvh;
+      overflow-y: auto;
+    }
+
+    .alert-list-item {
+      width: 100%;
+      text-align: left;
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      border-radius: 14px;
+      padding: 11px 12px;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .alert-list-item:active {
+      transform: scale(0.98);
+    }
+
+    .alert-list-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .alert-list-body {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .alert-list-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .alert-list-time {
+      font-size: 11px;
+      font-weight: 700;
+      color: #34d399;
+      white-space: nowrap;
+    }
+
+    .alert-list-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      line-height: 1.35;
     }
 
     .auth-btn.signed-in {
@@ -444,12 +522,19 @@
     .quick-btn.whatsapp { border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
     .quick-btn.savept { border-color: rgba(245, 158, 11, 0.45); color: #fcd34d; }
 
-    /* Botón flotante y banner del Asistente de Ruta */
-    .btn-route-float {
+    /* Botones flotantes y banner del Asistente de Ruta */
+    .route-float-group {
       position: fixed;
       top: 128px;
       left: 12px;
       z-index: 900;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: calc(100vw - 74px);
+    }
+
+    .btn-route-float {
       min-height: 42px;
       padding: 8px 12px;
       border-radius: 12px;
@@ -465,16 +550,49 @@
       gap: 6px;
       cursor: pointer;
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+    }
+
+    .btn-route-float.compact {
+      padding: 8px 10px;
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
     }
 
     .btn-route-float.active {
-      border-color: rgba(16, 185, 129, 0.75);
-      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.8);
+      background: rgba(16, 185, 129, 0.2);
       color: #6ee7b7;
     }
 
     .btn-route-float:active {
       transform: scale(0.96);
+    }
+
+    .map-pick-banner {
+      position: fixed;
+      top: 74px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1500;
+      width: calc(100% - 24px);
+      max-width: 440px;
+      background: rgba(15, 23, 42, 0.97);
+      border: 1.5px solid #10b981;
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+      font-size: 12px;
+      font-weight: 700;
+      color: #a7f3d0;
+    }
+
+    .map-pick-banner.visible {
+      display: flex;
     }
 
     .route-alert-banner {
@@ -490,7 +608,7 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
       font-size: 12px;
       line-height: 1.35;
@@ -501,8 +619,8 @@
     }
 
     .route-alert-banner.danger {
-      border-color: rgba(239, 68, 68, 0.8);
-      background: rgba(69, 10, 10, 0.94);
+      border-color: rgba(239, 68, 68, 0.85);
+      background: rgba(69, 10, 10, 0.95);
       color: #fecaca;
     }
 
@@ -510,6 +628,21 @@
       border-color: rgba(16, 185, 129, 0.7);
       background: rgba(6, 78, 59, 0.92);
       color: #a7f3d0;
+    }
+
+    .route-alt-pill {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      border-radius: 8px;
+      border: 1px solid rgba(16, 185, 129, 0.7);
+      background: rgba(16, 185, 129, 0.22);
+      color: #6ee7b7;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .route-banner-close {
@@ -530,20 +663,23 @@
       cursor: pointer;
     }
 
-    .report-step-details {
-      transition: opacity 0.2s ease;
+    .dest-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
     }
 
-    .report-step-details.locked {
-      opacity: 0.42;
-      pointer-events: none;
-    }
-
-    .step-gate-hint {
+    .dest-manage-toggle {
+      padding: 5px 10px;
+      border-radius: 9px;
+      border: 1px solid rgba(16, 185, 129, 0.55);
+      background: rgba(16, 185, 129, 0.14);
+      color: #6ee7b7;
       font-size: 11px;
-      color: #fbbf24;
-      margin: -6px 0 12px;
-      font-weight: 600;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .dest-quick-grid {
@@ -564,6 +700,16 @@
       font-weight: 700;
       text-align: left;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .dest-chip-btn span.dest-chip-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .dest-chip-btn.active {
@@ -571,6 +717,123 @@
       background: rgba(6, 182, 212, 0.16);
       color: #67e8f9;
     }
+
+    .dest-manager-panel {
+      display: none;
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .dest-manager-panel.open {
+      display: block;
+    }
+
+    .dest-emoji-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dest-emoji-opt {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dest-emoji-opt.active {
+      border-color: var(--accent);
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .dest-helper-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .dest-helper-btn {
+      min-height: 38px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-light);
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .dest-search-results {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .dest-search-item {
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: #e2e8f0;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .dest-crud-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    .dest-crud-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      background: var(--surface);
+      border: 1px solid var(--surface-light);
+    }
+
+    .dest-crud-actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .dest-mini-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 7px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-dark);
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .dest-mini-btn.go { border-color: rgba(6, 182, 212, 0.55); color: #67e8f9; }
+    .dest-mini-btn.del { border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; }
 
     .route-status-card {
       background: var(--bg-dark);
@@ -586,6 +849,72 @@
 
     .route-status-card.visible {
       display: block;
+    }
+
+    /* Efecto Visual de Radar MoviRadar sobre ruta activa */
+    .moviradar-route-flow {
+      stroke-dasharray: 12, 10;
+      animation: moviradarRouteFlow 1.1s linear infinite;
+    }
+
+    @keyframes moviradarRouteFlow {
+      to {
+        stroke-dashoffset: -44;
+      }
+    }
+
+    .moviradar-radar-sweep {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .moviradar-radar-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #22d3ee;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.38) 0%, rgba(6, 182, 212, 0) 72%);
+      animation: moviradarPing 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .moviradar-radar-sweep.danger .moviradar-radar-ring {
+      border-color: #f87171;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.42) 0%, rgba(239, 68, 68, 0) 72%);
+    }
+
+    .moviradar-radar-core {
+      position: relative;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 12px #22d3ee, 0 0 4px #10b981;
+    }
+
+    .moviradar-radar-sweep.danger .moviradar-radar-core {
+      background: #ef4444;
+      box-shadow: 0 0 14px #f87171;
+    }
+
+    .moviradar-alert-beacon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(239, 68, 68, 0.9);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.26) 0%, rgba(239, 68, 68, 0) 70%);
+      animation: moviradarPing 1.4s ease-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes moviradarPing {
+      0% { transform: scale(0.55); opacity: 0.95; }
+      80%, 100% { transform: scale(1.75); opacity: 0; }
     }
 
     .btn-report-main {
@@ -690,29 +1019,54 @@
     .category-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 9px;
       margin-bottom: 14px;
     }
 
     .cat-option {
-      min-height: 46px;
+      min-height: 54px;
       padding: 8px 10px;
-      border-radius: 12px;
+      border-radius: 14px;
       background: var(--bg-dark);
-      border: 1px solid var(--surface-light);
-      color: var(--text-muted);
+      border: 1.5px solid var(--surface-light);
+      color: #e2e8f0;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.15s ease, background-color 0.15s ease;
     }
 
+    .cat-option:active {
+      transform: scale(0.96);
+    }
+
+    .cat-option-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .cat-option[data-type="Retén de Tránsito"] { border-color: rgba(249, 115, 22, 0.45); }
+    .cat-option[data-type="Accidente"] { border-color: rgba(239, 68, 68, 0.45); }
+    .cat-option[data-type="Trancón / Congestión"] { border-color: rgba(245, 158, 11, 0.45); }
+    .cat-option[data-type="Vía Cerrada / Obras"] { border-color: rgba(220, 38, 38, 0.45); }
+    .cat-option[data-type="Peligro en Vía"] { border-color: rgba(234, 179, 8, 0.45); }
+    .cat-option[data-type="Policía"] { border-color: rgba(59, 130, 246, 0.45); }
+
     .cat-option.active {
-      background: rgba(16, 185, 129, 0.14);
+      background: rgba(16, 185, 129, 0.18);
       border-color: var(--accent);
       color: #ffffff;
+      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35);
     }
 
     .admin-pin-row {
@@ -977,7 +1331,9 @@
         <button type="button" class="role-btn" id="btnToggleRole" title="Cambiar rol">
           Ciudadano
         </button>
-        <div class="count-chip" id="reportCountChip">0 alertas</div>
+        <button type="button" class="count-chip" id="reportCountChip" title="Ver todas las alertas activas">
+          0 alertas ▾
+        </button>
       </div>
     </header>
 
@@ -997,10 +1353,21 @@
       </div>
     </div>
 
-    <!-- Botón flotante Asistente de Ruta (Voy para...) -->
-    <button type="button" class="btn-route-float" id="btnOpenRouteAssistant" title="Consultar alertas en tu ruta">
-      <span>🧭 Voy para...</span>
-    </button>
+    <!-- Botones flotantes Asistente de Ruta y Gestión de Destinos -->
+    <div class="route-float-group">
+      <button type="button" class="btn-route-float" id="btnOpenRouteAssistant" title="Trazar ruta real por calles y revisar alertas">
+        <span>🧭 Voy para...</span>
+      </button>
+      <button type="button" class="btn-route-float compact" id="btnQuickManageDest" title="Agregar o editar destinos frecuentes">
+        <span>+ Destino</span>
+      </button>
+    </div>
+
+    <!-- Banner cuando el usuario está eligiendo un destino en el mapa -->
+    <div class="map-pick-banner" id="mapPickBanner">
+      <span>🎯 Toca cualquier calle en el mapa para fijar tu destino</span>
+      <button type="button" class="route-banner-close" id="btnCancelMapPick" title="Cancelar">✕</button>
+    </div>
 
     <!-- Controles rápidos del mapa -->
     <div class="map-controls">
@@ -1043,64 +1410,85 @@
         </div>
 
         <form id="reportForm">
-          <label class="form-label" for="reportCategorySelect">1. Selecciona el tipo de novedad *</label>
-          <select id="reportCategorySelect" class="text-input select-input" required>
-            <option value="" disabled selected>-- Elige una categoría de alerta --</option>
-            <option value="Retén de Tránsito">🚓 Retén de Tránsito</option>
-            <option value="Accidente">💥 Accidente</option>
-            <option value="Trancón / Congestión">🚗 Trancón / Congestión</option>
-            <option value="Vía Cerrada / Obras">🚧 Vía Cerrada / Obras</option>
-            <option value="Peligro en Vía">⚠️ Peligro en Vía</option>
-            <option value="Hueco">🕳️ Hueco / Daño en Vía</option>
-          </select>
-
-          <div class="step-gate-hint" id="reportCategoryGateHint">
-            ☝️ Selecciona primero una categoría para tomar la foto y enviar el reporte.
-          </div>
-
-          <div class="report-step-details locked" id="reportDetailsStep">
-            <label class="admin-pin-row" id="adminFixedRow">
-              <input type="checkbox" id="chkIsFixed" />
-              <span>👑 Publicar como Ubicación Fija Oficial (no expira)</span>
-            </label>
-
-            <label class="form-label" for="reportDesc">2. Indicación o referencia rápida (opcional)</label>
-            <textarea
-              id="reportDesc"
-              class="text-input"
-              rows="2"
-              maxlength="400"
-              placeholder="Indicación o referencia rápida (ej: Por la Puerta del Sol, frente al colegio...)"
-            ></textarea>
-
-            <span class="form-label">3. Foto de evidencia (Cámara directa)</span>
-            <label class="media-upload-box" for="reportMedia">
-              <span>📷 Tomar foto con la cámara</span>
-            </label>
-            <input
-              type="file"
-              id="reportMedia"
-              accept="image/*"
-              capture="environment"
-              style="display: none;"
-              disabled
-            />
-
-            <div class="media-preview-wrap" id="mediaPreviewWrap">
-              <img id="previewImage" class="media-preview" alt="Vista previa" />
-              <video id="previewVideo" class="media-preview" controls playsinline></video>
-              <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar foto</button>
-            </div>
-
-            <div class="gps-note" id="gpsStatusText">
-              📍 Se capturará tu ubicación GPS actual.
-            </div>
-
-            <button type="submit" class="btn-submit" id="btnSubmitReport" disabled>
-              Publicar reporte en vivo
+          <span class="form-label">1. Toca la novedad (abre cámara al instante) *</span>
+          <div class="category-grid" id="categoryGrid">
+            <button type="button" class="cat-option active" data-type="Retén de Tránsito" data-color="#f97316" data-emoji="🚧">
+              <span class="cat-option-badge" style="background:rgba(249,115,22,0.22);border:1px solid #f97316;">🚧</span>
+              <span>Retén</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Accidente" data-color="#ef4444" data-emoji="💥">
+              <span class="cat-option-badge" style="background:rgba(239,68,68,0.22);border:1px solid #ef4444;">💥</span>
+              <span>Accidente</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Trancón / Congestión" data-color="#f59e0b" data-emoji="🚗">
+              <span class="cat-option-badge" style="background:rgba(245,158,11,0.22);border:1px solid #f59e0b;">🚗</span>
+              <span>Trancón</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Vía Cerrada / Obras" data-color="#dc2626" data-emoji="⛔">
+              <span class="cat-option-badge" style="background:rgba(220,38,38,0.22);border:1px solid #dc2626;">⛔</span>
+              <span>Vía cerrada</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Peligro en Vía" data-color="#eab308" data-emoji="⚠️">
+              <span class="cat-option-badge" style="background:rgba(234,179,8,0.22);border:1px solid #eab308;">⚠️</span>
+              <span>Peligro</span>
+            </button>
+            <button type="button" class="cat-option" data-type="Policía" data-color="#3b82f6" data-emoji="👮">
+              <span class="cat-option-badge" style="background:rgba(59,130,246,0.22);border:1px solid #3b82f6;">👮</span>
+              <span>Policía</span>
             </button>
           </div>
+
+          <label class="admin-pin-row" id="adminFixedRow">
+            <input type="checkbox" id="chkIsFixed" />
+            <span>👑 Publicar como Ubicación Fija Oficial (no expira)</span>
+          </label>
+
+          <label class="form-label" for="reportDesc">2. Indicación o referencia rápida (opcional)</label>
+          <textarea
+            id="reportDesc"
+            class="text-input"
+            rows="2"
+            maxlength="400"
+            placeholder="Indicación o referencia rápida (ej: Por la Puerta del Sol, frente al colegio...)"
+          ></textarea>
+
+          <span class="form-label">3. Foto de evidencia (Cámara directa)</span>
+          <label class="media-upload-box" for="reportMedia">
+            <span>📷 Tomar foto con la cámara</span>
+          </label>
+          <input
+            type="file"
+            id="reportMedia"
+            accept="image/*"
+            capture="environment"
+            style="display: none;"
+          />
+
+          <div class="media-preview-wrap" id="mediaPreviewWrap">
+            <img id="previewImage" class="media-preview" alt="Vista previa" />
+            <video id="previewVideo" class="media-preview" controls playsinline></video>
+            <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar foto</button>
+          </div>
+
+          <div class="gps-note" id="gpsStatusText">
+            📍 Se capturará tu ubicación GPS actual.
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnSubmitReport">
+            Publicar reporte en vivo
+          </button>
         </form>
+      </div>
+    </div>
+
+    <!-- Modal Centro de Control de Alertas Activas -->
+    <div class="modal-backdrop" id="alertsCenterModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="alertsCenterTitle">📡 Centro de Alertas Activas</h2>
+          <button type="button" class="btn-close" id="btnCloseAlertsCenter" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="alerts-list" id="alertsCenterList"></div>
       </div>
     </div>
 
@@ -1238,27 +1626,97 @@
       </div>
     </div>
 
-    <!-- Modal de Asistente de Ruta (Voy para...) -->
+    <!-- Modal de Asistente de Ruta (Voy para...) con OSRM y Destinos Personalizables -->
     <div class="modal-backdrop" id="routeModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>🧭 Asistente de Ruta (Voy para...)</h2>
+          <h2>🧭 Ruta Inteligente (Voy para...)</h2>
           <button type="button" class="btn-close" id="btnCloseRouteModal" aria-label="Cerrar">✕</button>
         </div>
 
         <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;line-height:1.45;">
-          Elige tu destino en Bucaramanga y su área metropolitana para verificar si hay retenes, accidentes o novedades activas en tu trayecto.
+          Traza la ruta real por las calles y detecta retenes, accidentes o trancones activos en tu trayecto para sugerir vías alternas.
         </p>
 
-        <span class="form-label">Destinos frecuentes</span>
-        <div class="dest-quick-grid" id="destQuickGrid">
-          <button type="button" class="dest-chip-btn" data-dest-id="cacique">🛍️ C.C. Cacique</button>
-          <button type="button" class="dest-chip-btn" data-dest-id="canaveral">🏙️ Cañaveral</button>
-          <button type="button" class="dest-chip-btn" data-dest-id="centro">🏛️ Centro</button>
-          <button type="button" class="dest-chip-btn" data-dest-id="plaza_mayor">🏢 Plaza Mayor</button>
+        <div class="dest-section-head">
+          <span class="form-label" style="margin-bottom:0;">Destinos frecuentes</span>
+          <button type="button" class="dest-manage-toggle" id="btnToggleDestManager">⚙️ Editar / Agregar</button>
         </div>
 
-        <label class="form-label" for="routeDestinationSelect">O selecciona otro destino:</label>
+        <div class="dest-quick-grid" id="destQuickGrid"></div>
+
+        <div class="dest-manager-panel" id="destManagerPanel">
+          <form id="customDestForm">
+            <input type="hidden" id="customDestEditId" value="" />
+            <div class="dest-section-head" style="margin-bottom:8px;">
+              <span class="form-label" id="customDestFormTitle" style="margin-bottom:0;color:#6ee7b7;">+ Nuevo destino frecuente</span>
+              <button type="button" class="dest-mini-btn" id="btnResetDefaultDests" title="Restaurar destinos iniciales">↺ Base</button>
+            </div>
+
+            <div class="dest-emoji-row" id="destEmojiRow">
+              <button type="button" class="dest-emoji-opt active" data-emoji="📍">📍</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🏠">🏠</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🏢">🏢</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🛍️">🛍️</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🚕">🚕</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🚌">🚌</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🏥">🏥</button>
+              <button type="button" class="dest-emoji-opt" data-emoji="🎓">🎓</button>
+            </div>
+
+            <label class="form-label" for="customDestName">Nombre del destino *</label>
+            <input
+              type="text"
+              id="customDestName"
+              class="text-input"
+              maxlength="42"
+              required
+              placeholder="Ej. Casa, Oficina Cabecera, Aeropuerto..."
+            />
+
+            <label class="form-label" for="customDestSearchInput">Buscar lugar en Bucaramanga / AMB (opcional)</label>
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <input
+                type="text"
+                id="customDestSearchInput"
+                class="text-input"
+                style="margin-bottom:0;flex:1;"
+                placeholder="Ej. Parque San Pío, Carrera 33, Estadio..."
+              />
+              <button type="button" class="dest-helper-btn" id="btnSearchDestPlace" style="white-space:nowrap;padding:0 12px;">🔎 Buscar</button>
+            </div>
+            <div class="dest-search-results" id="customDestSearchResults"></div>
+
+            <div class="dest-helper-row">
+              <button type="button" class="dest-helper-btn" id="btnFillDestGps">📍 Usar mi GPS</button>
+              <button type="button" class="dest-helper-btn" id="btnPickDestOnMap">🗺️ Tocar en el mapa</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <label class="form-label" for="customDestLat">Latitud *</label>
+                <input type="number" step="any" id="customDestLat" class="text-input" required placeholder="7.1193" />
+              </div>
+              <div>
+                <label class="form-label" for="customDestLng">Longitud *</label>
+                <input type="number" step="any" id="customDestLng" class="text-input" required placeholder="-73.1227" />
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+              <button type="submit" class="btn-submit" id="btnSaveCustomDest" style="flex:1;min-height:42px;">
+                Guardar destino
+              </button>
+              <button type="button" class="dest-helper-btn" id="btnCancelCustomDestEdit" style="display:none;padding:0 12px;">
+                Cancelar
+              </button>
+            </div>
+          </form>
+
+          <div class="dest-crud-list" id="customDestCrudList"></div>
+        </div>
+
+        <label class="form-label" for="routeDestinationSelect">Todos los destinos y puntos guardados:</label>
         <select id="routeDestinationSelect" class="text-input select-input">
           <option value="">-- Seleccionar destino --</option>
         </select>
@@ -1267,7 +1725,7 @@
 
         <div style="display:flex;gap:8px;">
           <button type="button" class="btn-submit" id="btnCheckRouteNow" style="flex:1;">
-            Verificar alertas en ruta
+            Trazar ruta por calles
           </button>
           <button type="button" class="btn-logout" id="btnCancelRoute" style="width:auto;padding:0 14px;display:none;">
             Limpiar
@@ -1438,6 +1896,7 @@
       CACHED_REPORTS: 'moviradar_cached_reports_v1',
       PENDING_REPORTS: 'moviradar_pending_reports_v1',
       FREQUENT_POINTS: 'moviradar_frequent_points_v1',
+      CUSTOM_DESTINATIONS: 'moviradar_custom_destinations_v1',
       USER_ROLE: 'moviradar_user_role_v1'
     };
 
@@ -1577,6 +2036,13 @@
     let isSyncingPending = false;
     let firestoreConnected = false;
     let activeRouteDestination = null;
+    let activeRouteCandidates = [];
+    let selectedRouteCandidateIdx = 0;
+    let activeRouteFetchOrigin = null;
+    let activeRouteFetchAt = 0;
+    let activeRouteRequestSeq = 0;
+    let radarSweepTimerId = null;
+    let radarSweepMarker = null;
     let lastRouteAlertSignature = '';
 
     // =========================================================================
@@ -1833,10 +2299,95 @@
       });
     }
 
+    const alertsCenterModal = document.getElementById('alertsCenterModal');
+    const alertsCenterList = document.getElementById('alertsCenterList');
+    const alertsCenterTitle = document.getElementById('alertsCenterTitle');
+    const reportCountChipBtn = document.getElementById('reportCountChip');
+    const btnCloseAlertsCenter = document.getElementById('btnCloseAlertsCenter');
+    let lastRenderedReports = [];
+
+    function focusAlertOnMap(rep) {
+      const lat = Number(rep.lat);
+      const lng = Number(rep.lng);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+      alertsCenterModal.classList.remove('open');
+      isFollowingUser = false;
+
+      if (map.getZoom() < 15) {
+        map.setView([lat, lng], 16, { animate: false });
+      }
+      map.panTo([lat, lng], { animate: true, duration: 0.45 });
+
+      setTimeout(() => {
+        markersLayer.eachLayer((layer) => {
+          if (layer._reportId === rep.id) {
+            layer.openPopup();
+          }
+        });
+      }, 280);
+    }
+
+    function renderAlertsCenterList(reportsList) {
+      if (!alertsCenterList) return;
+      const list = Array.isArray(reportsList) ? reportsList : [];
+      if (alertsCenterTitle) {
+        alertsCenterTitle.textContent = `📡 Centro de Alertas (${list.length})`;
+      }
+      alertsCenterList.innerHTML = '';
+
+      if (list.length === 0) {
+        alertsCenterList.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;padding:18px 8px;">No hay alertas activas en este momento en Bucaramanga.</div>';
+        return;
+      }
+
+      list.forEach((rep) => {
+        const lat = Number(rep.lat);
+        const lng = Number(rep.lng);
+        if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+        const meta = getTipoMeta(rep.tipo || rep.type || 'Novedad');
+        const timeMs = extractTimestampMs(rep);
+        const rawDesc = String(rep.descripcion || rep.description || '').trim();
+        const isFixed = Boolean(rep.isFixed);
+        const isPending = Boolean(rep.isPending);
+        const badgeBg = isFixed ? 'linear-gradient(135deg,#fcd34d,#d97706)' : meta.color;
+        const prefix = isFixed ? '👑 ' : isPending ? '⏳ ' : '';
+
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'alert-list-item';
+        itemBtn.innerHTML = `
+          <div class="alert-list-icon" style="background:${escapeHtml(badgeBg)};">${escapeHtml(meta.emoji)}</div>
+          <div class="alert-list-body">
+            <div class="alert-list-title">
+              <span>${prefix}${escapeHtml(meta.label)}</span>
+              <span class="alert-list-time">🕒 ${escapeHtml(formatTimeLabel(timeMs))}</span>
+            </div>
+            <div class="alert-list-meta">
+              📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}${rawDesc ? ` · ${escapeHtml(rawDesc)}` : ''}
+            </div>
+          </div>
+        `;
+        itemBtn.addEventListener('click', () => focusAlertOnMap(rep));
+        alertsCenterList.appendChild(itemBtn);
+      });
+    }
+
+    reportCountChipBtn.addEventListener('click', () => {
+      renderAlertsCenterList(lastRenderedReports);
+      alertsCenterModal.classList.add('open');
+    });
+    btnCloseAlertsCenter.addEventListener('click', () => alertsCenterModal.classList.remove('open'));
+    alertsCenterModal.addEventListener('click', (e) => {
+      if (e.target === alertsCenterModal) alertsCenterModal.classList.remove('open');
+    });
+
     function renderReports(reportsList) {
       markersLayer.clearLayers();
+      lastRenderedReports = Array.isArray(reportsList) ? reportsList : [];
 
-      reportsList.forEach((rep) => {
+      lastRenderedReports.forEach((rep) => {
         const lat = Number(rep.lat);
         const lng = Number(rep.lng);
         if (Number.isNaN(lat) || Number.isNaN(lng)) return;
@@ -1898,8 +2449,11 @@
         markersLayer.addLayer(marker);
       });
 
-      document.getElementById('reportCountChip').textContent =
-        `${reportsList.length} ${reportsList.length === 1 ? 'alerta' : 'alertas'}`;
+      reportCountChipBtn.textContent =
+        `${lastRenderedReports.length} ${lastRenderedReports.length === 1 ? 'alerta' : 'alertas'} ▾`;
+      if (alertsCenterModal && alertsCenterModal.classList.contains('open')) {
+        renderAlertsCenterList(lastRenderedReports);
+      }
     }
 
     function renderCombinedReports(serverReports) {
@@ -2228,7 +2782,7 @@
           renderCombinedReports(activeReports);
           updateNetworkAndSyncStatus();
           if (typeof evaluarAlertasEnRutaActual === 'function' && activeRouteDestination) {
-            evaluarAlertasEnRutaActual(false);
+            evaluarAlertasEnRutaActual(false, false);
           }
 
           if (navigator.onLine && auth.currentUser && loadPendingReports().length > 0) {
@@ -2469,7 +3023,7 @@
       }
 
       if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
-        evaluarAlertasEnRutaActual(false);
+        evaluarAlertasEnRutaActual(false, false);
       }
     }
 
@@ -2672,29 +3226,24 @@
     const btnClearMedia = document.getElementById('btnClearMedia');
     const btnSubmit = document.getElementById('btnSubmitReport');
 
-    const reportCategorySelect = document.getElementById('reportCategorySelect');
-    const reportDetailsStep = document.getElementById('reportDetailsStep');
-    const reportCategoryGateHint = document.getElementById('reportCategoryGateHint');
-
-    let selectedCategory = { type: '' };
+    let selectedCategory = { type: 'Retén de Tránsito', color: '#f97316', emoji: '🚧' };
     let pendingBlob = null;
     let pendingImageDataUrl = null;
     let pendingMediaType = null;
     let pendingFileName = null;
     let previewObjectUrl = null;
 
-    function syncReportCategoryGate() {
-      const chosenType = reportCategorySelect ? reportCategorySelect.value.trim() : '';
-      selectedCategory = { type: chosenType };
-      const unlocked = chosenType.length > 0;
-      if (reportDetailsStep) {
-        reportDetailsStep.classList.toggle('locked', !unlocked);
+    function resetCategoryToDefault() {
+      const catButtons = document.querySelectorAll('.cat-option');
+      catButtons.forEach((b, idx) => b.classList.toggle('active', idx === 0));
+      if (catButtons.length > 0) {
+        const first = catButtons[0];
+        selectedCategory = {
+          type: first.dataset.type,
+          color: first.dataset.color,
+          emoji: first.dataset.emoji
+        };
       }
-      if (reportCategoryGateHint) {
-        reportCategoryGateHint.style.display = unlocked ? 'none' : 'block';
-      }
-      if (mediaInput) mediaInput.disabled = !unlocked;
-      if (btnSubmit) btnSubmit.disabled = !unlocked;
     }
 
     function resetMediaState() {
@@ -2716,13 +3265,9 @@
 
     document.getElementById('btnOpenReport').addEventListener('click', () => {
       reportForm.reset();
-      if (reportCategorySelect) reportCategorySelect.value = '';
+      resetCategoryToDefault();
       resetMediaState();
-      syncReportCategoryGate();
       modal.classList.add('open');
-      setTimeout(() => {
-        if (reportCategorySelect) reportCategorySelect.focus();
-      }, 100);
     });
     document.getElementById('btnCloseModal').addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', (e) => {
@@ -2730,32 +3275,98 @@
     });
     btnClearMedia.addEventListener('click', resetMediaState);
 
-    if (reportCategorySelect) {
-      reportCategorySelect.addEventListener('change', syncReportCategoryGate);
-    }
-    syncReportCategoryGate();
+    document.querySelectorAll('.cat-option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-option').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCategory = {
+          type: btn.dataset.type,
+          color: btn.dataset.color,
+          emoji: btn.dataset.emoji
+        };
+        mediaInput.value = '';
+        mediaInput.click();
+      });
+    });
 
     // =========================================================================
-    // 10. ASISTENTE DE RUTA ("VOY PARA...") CON DETECCIÓN DE ALERTAS EN TRAYECTO
+    // 10. RUTA INTELIGENTE POR CALLES (OSRM), EFECTO RADAR Y DESTINOS EDITABLES
     // =========================================================================
-    const DESTINOS_COMUNES = [
-      { id: 'cacique', name: 'Centro Comercial Cacique', lat: 7.0997, lng: -73.1072 },
-      { id: 'canaveral', name: 'Cañaveral', lat: 7.0684, lng: -73.1045 },
-      { id: 'centro', name: 'Centro', lat: 7.1193, lng: -73.1227 },
-      { id: 'plaza_mayor', name: 'Plaza Mayor', lat: 7.1103, lng: -73.1229 },
-      { id: 'cabecera', name: 'Cabecera del Llano', lat: 7.1173, lng: -73.1102 },
-      { id: 'terminal', name: 'Terminal de Transportes', lat: 7.1059, lng: -73.1496 },
-      { id: 'provenza', name: 'Provenza', lat: 7.0908, lng: -73.1189 },
-      { id: 'floridablanca', name: 'Floridablanca (Parque)', lat: 7.0622, lng: -73.0864 },
-      { id: 'giron', name: 'Girón (Parque Principal)', lat: 7.0681, lng: -73.1691 },
-      { id: 'piedecuesta', name: 'Piedecuesta (Centro)', lat: 6.9896, lng: -73.0499 }
+    const DEFAULT_CUSTOM_DESTINATIONS = [
+      { id: 'terminal', emoji: '🚌', name: 'Terminal de Transportes', lat: 7.1059, lng: -73.1496 },
+      { id: 'cacique', emoji: '🛍️', name: 'C.C. Cacique', lat: 7.0997, lng: -73.1072 },
+      { id: 'centro', emoji: '🏛️', name: 'Centro', lat: 7.1193, lng: -73.1227 },
+      { id: 'puerta_del_sol', emoji: '☀️', name: 'Puerta del Sol', lat: 7.1086, lng: -73.1223 },
+      { id: 'canaveral', emoji: '🏙️', name: 'Cañaveral', lat: 7.0684, lng: -73.1045 },
+      { id: 'cabecera', emoji: '🏢', name: 'Cabecera del Llano', lat: 7.1173, lng: -73.1102 },
+      { id: 'plaza_mayor', emoji: '🏬', name: 'Plaza Mayor', lat: 7.1103, lng: -73.1229 },
+      { id: 'provenza', emoji: '🛣️', name: 'Provenza', lat: 7.0908, lng: -73.1189 }
     ];
 
-    const ROUTE_CORRIDOR_METERS = 650;
+    function loadCustomDestinations() {
+      const saved = safeReadJson(STORAGE_KEYS.CUSTOM_DESTINATIONS, null);
+      if (Array.isArray(saved)) {
+        return saved.filter(
+          (d) =>
+            d &&
+            typeof d.name === 'string' &&
+            typeof Number(d.lat) === 'number' &&
+            !Number.isNaN(Number(d.lat)) &&
+            typeof Number(d.lng) === 'number' &&
+            !Number.isNaN(Number(d.lng))
+        ).map((d) => ({
+          id: String(d.id || `dest_${Date.now()}`),
+          emoji: String(d.emoji || '📍'),
+          name: String(d.name).trim(),
+          lat: Number(d.lat),
+          lng: Number(d.lng)
+        }));
+      }
+      const seeded = DEFAULT_CUSTOM_DESTINATIONS.map((d) => ({ ...d }));
+      saveCustomDestinations(seeded);
+      return seeded;
+    }
+
+    function saveCustomDestinations(list) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.CUSTOM_DESTINATIONS, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    let customDestinations = loadCustomDestinations();
+    let isPickingDestOnMap = false;
+    let selectedDestEmoji = '📍';
+
+    const STREET_ROUTE_CORRIDOR_METERS = 165;
+    const FALLBACK_ROUTE_CORRIDOR_METERS = 480;
+    const OSRM_RECALC_DISTANCE_METERS = 160;
+    const OSRM_RECALC_MIN_MS = 12000;
+
     const routeLayer = L.layerGroup().addTo(map);
     const routeModal = document.getElementById('routeModal');
     const btnOpenRouteAssistant = document.getElementById('btnOpenRouteAssistant');
+    const btnQuickManageDest = document.getElementById('btnQuickManageDest');
     const btnCloseRouteModal = document.getElementById('btnCloseRouteModal');
+    const destQuickGrid = document.getElementById('destQuickGrid');
+    const destManagerPanel = document.getElementById('destManagerPanel');
+    const btnToggleDestManager = document.getElementById('btnToggleDestManager');
+    const customDestForm = document.getElementById('customDestForm');
+    const customDestEditId = document.getElementById('customDestEditId');
+    const customDestFormTitle = document.getElementById('customDestFormTitle');
+    const customDestNameInput = document.getElementById('customDestName');
+    const customDestLatInput = document.getElementById('customDestLat');
+    const customDestLngInput = document.getElementById('customDestLng');
+    const customDestSearchInput = document.getElementById('customDestSearchInput');
+    const btnSearchDestPlace = document.getElementById('btnSearchDestPlace');
+    const customDestSearchResults = document.getElementById('customDestSearchResults');
+    const btnFillDestGps = document.getElementById('btnFillDestGps');
+    const btnPickDestOnMap = document.getElementById('btnPickDestOnMap');
+    const btnSaveCustomDest = document.getElementById('btnSaveCustomDest');
+    const btnCancelCustomDestEdit = document.getElementById('btnCancelCustomDestEdit');
+    const btnResetDefaultDests = document.getElementById('btnResetDefaultDests');
+    const customDestCrudList = document.getElementById('customDestCrudList');
+    const mapPickBanner = document.getElementById('mapPickBanner');
+    const btnCancelMapPick = document.getElementById('btnCancelMapPick');
     const routeDestinationSelect = document.getElementById('routeDestinationSelect');
     const routeStatusCard = document.getElementById('routeStatusCard');
     const btnCheckRouteNow = document.getElementById('btnCheckRouteNow');
@@ -2764,21 +3375,127 @@
     const routeAlertBannerText = document.getElementById('routeAlertBannerText');
     const btnClearRouteBanner = document.getElementById('btnClearRouteBanner');
 
+    function setDestEmoji(emoji) {
+      selectedDestEmoji = emoji || '📍';
+      document.querySelectorAll('.dest-emoji-opt').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.emoji === selectedDestEmoji);
+      });
+    }
+
+    document.querySelectorAll('.dest-emoji-opt').forEach((btn) => {
+      btn.addEventListener('click', () => setDestEmoji(btn.dataset.emoji));
+    });
+
+    function resetCustomDestForm() {
+      customDestEditId.value = '';
+      customDestFormTitle.textContent = '+ Nuevo destino frecuente';
+      btnSaveCustomDest.textContent = 'Guardar destino';
+      btnCancelCustomDestEdit.style.display = 'none';
+      customDestNameInput.value = '';
+      customDestLatInput.value = '';
+      customDestLngInput.value = '';
+      customDestSearchInput.value = '';
+      customDestSearchResults.innerHTML = '';
+      setDestEmoji('📍');
+    }
+
+    function renderDestQuickChips() {
+      if (!destQuickGrid) return;
+      destQuickGrid.innerHTML = '';
+
+      if (customDestinations.length === 0) {
+        destQuickGrid.innerHTML = '<div style="grid-column:span 2;font-size:12px;color:#94a3b8;padding:6px 2px;">Sin destinos frecuentes. Agrega uno abajo o restaura los iniciales.</div>';
+        return;
+      }
+
+      customDestinations.forEach((d) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'dest-chip-btn';
+        if (activeRouteDestination && activeRouteDestination.id === d.id) {
+          chip.classList.add('active');
+        }
+        chip.dataset.destId = d.id;
+        chip.innerHTML = `<span>${escapeHtml(d.emoji || '📍')}</span><span class="dest-chip-label">${escapeHtml(d.name)}</span>`;
+        chip.addEventListener('click', () => activarRutaHacia(d.id));
+        destQuickGrid.appendChild(chip);
+      });
+    }
+
+    function renderCustomDestCrudList() {
+      if (!customDestCrudList) return;
+      customDestCrudList.innerHTML = '';
+
+      if (customDestinations.length === 0) {
+        customDestCrudList.innerHTML = '<div style="font-size:11px;color:#94a3b8;text-align:center;padding:8px;">No hay destinos guardados.</div>';
+        return;
+      }
+
+      customDestinations.forEach((d) => {
+        const item = document.createElement('div');
+        item.className = 'dest-crud-item';
+        item.innerHTML = `
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:12px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${escapeHtml(d.emoji || '📍')} ${escapeHtml(d.name)}
+            </div>
+            <div style="font-size:10px;color:#94a3b8;">${Number(d.lat).toFixed(4)}, ${Number(d.lng).toFixed(4)}</div>
+          </div>
+          <div class="dest-crud-actions">
+            <button type="button" class="dest-mini-btn go" title="Trazar ruta hacia este destino">🧭 Ir</button>
+            <button type="button" class="dest-mini-btn edit" title="Editar destino">✏️</button>
+            <button type="button" class="dest-mini-btn del" title="Eliminar destino">🗑️</button>
+          </div>
+        `;
+
+        item.querySelector('.go').addEventListener('click', () => activarRutaHacia(d.id));
+        item.querySelector('.edit').addEventListener('click', () => {
+          customDestEditId.value = d.id;
+          customDestFormTitle.textContent = `✏️ Editando: ${d.name}`;
+          btnSaveCustomDest.textContent = 'Actualizar destino';
+          btnCancelCustomDestEdit.style.display = 'block';
+          customDestNameInput.value = d.name;
+          customDestLatInput.value = Number(d.lat).toFixed(6);
+          customDestLngInput.value = Number(d.lng).toFixed(6);
+          setDestEmoji(d.emoji || '📍');
+          destManagerPanel.classList.add('open');
+          customDestNameInput.focus();
+        });
+        item.querySelector('.del').addEventListener('click', () => {
+          customDestinations = customDestinations.filter((x) => x.id !== d.id);
+          saveCustomDestinations(customDestinations);
+          if (activeRouteDestination && activeRouteDestination.id === d.id) {
+            limpiarRutaActiva();
+          }
+          if (customDestEditId.value === d.id) {
+            resetCustomDestForm();
+          }
+          poblarDestinosRuta();
+          showToast(`Destino "${d.name}" eliminado.`);
+        });
+
+        customDestCrudList.appendChild(item);
+      });
+    }
+
     function poblarDestinosRuta() {
+      renderDestQuickChips();
+      renderCustomDestCrudList();
       if (!routeDestinationSelect) return;
-      const previousVal = routeDestinationSelect.value;
+
+      const previousVal = activeRouteDestination ? activeRouteDestination.id : routeDestinationSelect.value;
       routeDestinationSelect.innerHTML = '<option value="">-- Seleccionar destino --</option>';
 
-      DESTINOS_COMUNES.forEach((d) => {
+      customDestinations.forEach((d) => {
         const opt = document.createElement('option');
         opt.value = d.id;
-        opt.textContent = `📍 ${d.name}`;
+        opt.textContent = `${d.emoji || '📍'} ${d.name}`;
         routeDestinationSelect.appendChild(opt);
       });
 
       if (Array.isArray(frequentPoints) && frequentPoints.length > 0) {
         const grp = document.createElement('optgroup');
-        grp.label = '⭐ Mis puntos guardados';
+        grp.label = '⭐ Mis puntos frecuentes';
         frequentPoints.forEach((pt) => {
           const opt = document.createElement('option');
           opt.value = `fav:${pt.id}`;
@@ -2795,38 +3512,341 @@
       if (destId.startsWith('fav:')) {
         const favId = destId.slice(4);
         const found = frequentPoints.find((p) => p.id === favId);
-        return found ? { id: destId, name: found.name, lat: Number(found.lat), lng: Number(found.lng) } : null;
+        return found ? { id: destId, emoji: '⭐', name: found.name, lat: Number(found.lat), lng: Number(found.lng) } : null;
       }
-      return DESTINOS_COMUNES.find((d) => d.id === destId) || null;
+      return customDestinations.find((d) => d.id === destId) || null;
     }
+
+    function toggleDestManagerPanel(forceOpen) {
+      if (!destManagerPanel) return;
+      const shouldOpen = typeof forceOpen === 'boolean'
+        ? forceOpen
+        : !destManagerPanel.classList.contains('open');
+      destManagerPanel.classList.toggle('open', shouldOpen);
+      btnToggleDestManager.textContent = shouldOpen ? '✕ Ocultar editor' : '⚙️ Editar / Agregar';
+    }
+
+    btnToggleDestManager.addEventListener('click', () => toggleDestManagerPanel());
+    btnCancelCustomDestEdit.addEventListener('click', resetCustomDestForm);
+
+    btnResetDefaultDests.addEventListener('click', () => {
+      customDestinations = DEFAULT_CUSTOM_DESTINATIONS.map((d) => ({ ...d }));
+      saveCustomDestinations(customDestinations);
+      resetCustomDestForm();
+      poblarDestinosRuta();
+      showToast('Destinos iniciales de Bucaramanga restaurados.');
+    });
+
+    btnFillDestGps.addEventListener('click', async () => {
+      const coords = await getReportCoordinates();
+      customDestLatInput.value = Number(coords.lat).toFixed(6);
+      customDestLngInput.value = Number(coords.lng).toFixed(6);
+      showToast('Coordenadas de tu GPS cargadas en el destino.');
+    });
+
+    btnPickDestOnMap.addEventListener('click', () => {
+      isPickingDestOnMap = true;
+      routeModal.classList.remove('open');
+      mapPickBanner.classList.add('visible');
+      map.getContainer().style.cursor = 'crosshair';
+    });
+
+    btnCancelMapPick.addEventListener('click', () => {
+      isPickingDestOnMap = false;
+      mapPickBanner.classList.remove('visible');
+      map.getContainer().style.cursor = '';
+      routeModal.classList.add('open');
+    });
+
+    map.on('click', (e) => {
+      if (!isPickingDestOnMap || !e || !e.latlng) return;
+      isPickingDestOnMap = false;
+      mapPickBanner.classList.remove('visible');
+      map.getContainer().style.cursor = '';
+      customDestLatInput.value = e.latlng.lat.toFixed(6);
+      customDestLngInput.value = e.latlng.lng.toFixed(6);
+      poblarDestinosRuta();
+      toggleDestManagerPanel(true);
+      routeModal.classList.add('open');
+      if (!customDestNameInput.value.trim()) {
+        customDestNameInput.focus();
+      }
+      showToast('Ubicación capturada desde el mapa. Ponle un nombre y guarda.');
+    });
+
+    btnSearchDestPlace.addEventListener('click', async () => {
+      const q = customDestSearchInput.value.trim();
+      if (q.length < 3) {
+        showToast('Escribe al menos 3 letras para buscar un lugar.');
+        return;
+      }
+      btnSearchDestPlace.disabled = true;
+      btnSearchDestPlace.textContent = '...';
+      customDestSearchResults.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Buscando en Bucaramanga y AMB...</div>';
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=4&countrycodes=co&bounded=0&viewbox=-73.24,7.22,-73.01,6.95&q=${encodeURIComponent(q + ', Santander, Colombia')}`;
+        const res = await fetch(url, { headers: { Accept: 'application/json' } });
+        const data = await res.json();
+        customDestSearchResults.innerHTML = '';
+        if (!Array.isArray(data) || data.length === 0) {
+          customDestSearchResults.innerHTML = '<div style="font-size:11px;color:#fca5a5;">Sin resultados exactos. Intenta "Tocar en el mapa".</div>';
+          return;
+        }
+        data.forEach((place) => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'dest-search-item';
+          const shortTitle = String(place.display_name || '').split(',').slice(0, 3).join(', ');
+          item.textContent = `📍 ${shortTitle}`;
+          item.addEventListener('click', () => {
+            customDestLatInput.value = Number(place.lat).toFixed(6);
+            customDestLngInput.value = Number(place.lon).toFixed(6);
+            if (!customDestNameInput.value.trim()) {
+              customDestNameInput.value = String(place.name || shortTitle.split(',')[0]).slice(0, 40);
+            }
+            customDestSearchResults.innerHTML = '';
+            showToast('Lugar seleccionado. Presiona "Guardar destino".');
+          });
+          customDestSearchResults.appendChild(item);
+        });
+      } catch (err) {
+        customDestSearchResults.innerHTML = '<div style="font-size:11px;color:#fca5a5;">No se pudo buscar sin conexión. Usa GPS o toca en el mapa.</div>';
+      } finally {
+        btnSearchDestPlace.disabled = false;
+        btnSearchDestPlace.textContent = '🔎 Buscar';
+      }
+    });
+
+    customDestForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = customDestNameInput.value.trim().slice(0, 42);
+      const lat = Number(customDestLatInput.value);
+      const lng = Number(customDestLngInput.value);
+
+      if (!name || Number.isNaN(lat) || Number.isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        showToast('Ingresa un nombre válido y coordenadas correctas.');
+        return;
+      }
+
+      const editId = customDestEditId.value.trim();
+      if (editId) {
+        customDestinations = customDestinations.map((d) =>
+          d.id === editId ? { ...d, emoji: selectedDestEmoji, name, lat, lng } : d
+        );
+        if (activeRouteDestination && activeRouteDestination.id === editId) {
+          activeRouteDestination = { ...activeRouteDestination, emoji: selectedDestEmoji, name, lat, lng };
+          activeRouteCandidates = [];
+          evaluarAlertasEnRutaActual(true, true);
+        }
+        showToast(`Destino "${name}" actualizado.`);
+      } else {
+        const newDest = {
+          id: `dest_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+          emoji: selectedDestEmoji,
+          name,
+          lat,
+          lng
+        };
+        customDestinations.unshift(newDest);
+        showToast(`Destino "${name}" agregado a tus frecuentes.`);
+      }
+
+      saveCustomDestinations(customDestinations);
+      resetCustomDestForm();
+      poblarDestinosRuta();
+    });
 
     function distanciaPuntoASegmentoMetros(pLat, pLng, aLat, aLng, bLat, bLng) {
       const refLatRad = ((aLat + bLat) / 2) * (Math.PI / 180);
       const metersPerDegLat = 111320;
       const metersPerDegLng = 111320 * Math.cos(refLatRad);
 
-      const ax = 0;
-      const ay = 0;
       const bx = (bLng - aLng) * metersPerDegLng;
       const by = (bLat - aLat) * metersPerDegLat;
       const px = (pLng - aLng) * metersPerDegLng;
       const py = (pLat - aLat) * metersPerDegLat;
 
-      const dx = bx - ax;
-      const dy = by - ay;
-      const lenSq = dx * dx + dy * dy;
+      const lenSq = bx * bx + by * by;
       if (lenSq < 1) {
         return Math.hypot(px, py);
       }
-      const t = Math.max(0, Math.min(1, (px * dx + py * dy) / lenSq));
-      const projX = ax + t * dx;
-      const projY = ay + t * dy;
-      return Math.hypot(px - projX, py - projY);
+      const t = Math.max(0, Math.min(1, (px * bx + py * by) / lenSq));
+      return Math.hypot(px - t * bx, py - t * by);
+    }
+
+    function calcularMetricasPolilinea(coords) {
+      const cumDist = [0];
+      let total = 0;
+      for (let i = 1; i < coords.length; i += 1) {
+        total += calcularDistanciaMetros(coords[i - 1][0], coords[i - 1][1], coords[i][0], coords[i][1]);
+        cumDist.push(total);
+      }
+      return { cumDist, totalDist: total };
+    }
+
+    function evaluarPolilineaContraAlertas(coords, allActiveAlerts, corridorMeters) {
+      if (!Array.isArray(coords) || coords.length < 2) return [];
+      const { cumDist } = calcularMetricasPolilinea(coords);
+      const matches = [];
+
+      allActiveAlerts.forEach((rep) => {
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
+        if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
+
+        let minCorridorDist = Infinity;
+        let nearestVertexIdx = 0;
+
+        for (let i = 0; i < coords.length - 1; i += 1) {
+          const d = distanciaPuntoASegmentoMetros(
+            rLat, rLng,
+            coords[i][0], coords[i][1],
+            coords[i + 1][0], coords[i + 1][1]
+          );
+          if (d < minCorridorDist) {
+            minCorridorDist = d;
+            nearestVertexIdx = i;
+          }
+        }
+
+        if (minCorridorDist <= corridorMeters) {
+          matches.push({
+            rep,
+            corridorDist: minCorridorDist,
+            distAlongRoute: cumDist[nearestVertexIdx] || calcularDistanciaMetros(coords[0][0], coords[0][1], rLat, rLng)
+          });
+        }
+      });
+
+      matches.sort((a, b) => a.distAlongRoute - b.distAlongRoute);
+      return matches;
+    }
+
+    function sugerirViasAlternas(dest, alertsOnRoute) {
+      const sample = alertsOnRoute[0] && alertsOnRoute[0].rep ? alertsOnRoute[0].rep : dest;
+      const lat = Number(sample.lat);
+      const lng = Number(sample.lng);
+      const destNameLower = String(dest.name || '').toLowerCase();
+
+      if (destNameLower.includes('gir') || lng < -73.14) {
+        return 'Vías alternas: Autopista Floridablanca, Vía Palenque - Café Madrid o Anillo Vial según sentido.';
+      }
+      if (destNameLower.includes('cañaveral') || destNameLower.includes('florida') || lat < 7.088) {
+        return 'Vías alternas: Carrera 33, Vía Antigua a Floridablanca o Transversal Oriental.';
+      }
+      if (lat >= 7.095 && lat <= 7.128 && lng >= -73.132) {
+        return 'Vías alternas: Carrera 33, Carrera 27, Avenida Quebradaseca o vías secundarias paralelas.';
+      }
+      return 'Vías alternas: Carrera 33, Carrera 27, Calle 45 o vías secundarias cercanas.';
+    }
+
+    function detenerAnimacionRadar() {
+      if (radarSweepTimerId !== null) {
+        clearInterval(radarSweepTimerId);
+        radarSweepTimerId = null;
+      }
+      radarSweepMarker = null;
+    }
+
+    function iniciarAnimacionRadarEnRuta(coords, hasDanger) {
+      detenerAnimacionRadar();
+      if (!Array.isArray(coords) || coords.length < 2) return;
+
+      const { cumDist, totalDist } = calcularMetricasPolilinea(coords);
+      if (totalDist < 15) return;
+
+      const sweepIcon = L.divIcon({
+        className: 'custom-radar-sweep',
+        html: `<div class="moviradar-radar-sweep${hasDanger ? ' danger' : ''}">
+          <div class="moviradar-radar-ring"></div>
+          <div class="moviradar-radar-core"></div>
+        </div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
+      });
+
+      radarSweepMarker = L.marker(coords[0], {
+        icon: sweepIcon,
+        interactive: false,
+        zIndexOffset: 900
+      }).addTo(routeLayer);
+
+      let progress = 0;
+      const STEP = 0.014;
+      radarSweepTimerId = setInterval(() => {
+        if (!radarSweepMarker || !activeRouteDestination) {
+          detenerAnimacionRadar();
+          return;
+        }
+        progress += STEP;
+        if (progress > 1) progress = 0;
+
+        const targetDist = progress * totalDist;
+        let segIdx = 0;
+        while (segIdx < cumDist.length - 2 && cumDist[segIdx + 1] < targetDist) {
+          segIdx += 1;
+        }
+        const segStartDist = cumDist[segIdx];
+        const segEndDist = cumDist[segIdx + 1];
+        const segSpan = Math.max(segEndDist - segStartDist, 0.001);
+        const frac = Math.max(0, Math.min(1, (targetDist - segStartDist) / segSpan));
+
+        const p1 = coords[segIdx];
+        const p2 = coords[segIdx + 1];
+        const interpLat = p1[0] + (p2[0] - p1[0]) * frac;
+        const interpLng = p1[1] + (p2[1] - p1[1]) * frac;
+        radarSweepMarker.setLatLng([interpLat, interpLng]);
+      }, 65);
+    }
+
+    async function fetchOsrmStreetRoutes(origLat, origLng, destLat, destLng) {
+      const endpoints = [
+        `https://routing.openstreetmap.de/routed-car/route/v1/driving/${origLng},${origLat};${destLng},${destLat}?overview=full&geometries=geojson&alternatives=true&steps=false`,
+        `https://router.project-osrm.org/route/v1/driving/${origLng},${origLat};${destLng},${destLat}?overview=full&geometries=geojson&alternatives=true&steps=false`
+      ];
+
+      for (const url of endpoints) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        try {
+          const res = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data && data.code === 'Ok' && Array.isArray(data.routes) && data.routes.length > 0) {
+            const parsed = data.routes
+              .filter((r) => r.geometry && Array.isArray(r.geometry.coordinates) && r.geometry.coordinates.length >= 2)
+              .map((r) => ({
+                coords: r.geometry.coordinates.map(([lng, lat]) => [Number(lat), Number(lng)]),
+                distanceMeters: Number(r.distance || 0),
+                durationSeconds: Number(r.duration || 0),
+                isFallback: false
+              }));
+            if (parsed.length > 0) return parsed;
+          }
+        } catch (err) {
+          clearTimeout(timeoutId);
+        }
+      }
+
+      const directMeters = calcularDistanciaMetros(origLat, origLng, destLat, destLng);
+      return [{
+        coords: [[origLat, origLng], [destLat, destLng]],
+        distanceMeters: directMeters,
+        durationSeconds: Math.round((directMeters / 1000) * 150),
+        isFallback: true
+      }];
     }
 
     function limpiarRutaActiva() {
       activeRouteDestination = null;
+      activeRouteCandidates = [];
+      selectedRouteCandidateIdx = 0;
+      activeRouteFetchOrigin = null;
+      activeRouteFetchAt = 0;
+      activeRouteRequestSeq += 1;
       lastRouteAlertSignature = '';
+      detenerAnimacionRadar();
       routeLayer.clearLayers();
       routeAlertBanner.classList.remove('visible', 'danger', 'clear');
       routeAlertBannerText.textContent = '';
@@ -2835,100 +3855,186 @@
       routeStatusCard.innerHTML = '';
       btnCancelRoute.style.display = 'none';
       if (routeDestinationSelect) routeDestinationSelect.value = '';
-      document.querySelectorAll('.dest-chip-btn').forEach((b) => b.classList.remove('active'));
+      renderDestQuickChips();
     }
 
-    function evaluarAlertasEnRutaActual(shouldFitBounds = false) {
-      if (!activeRouteDestination) return;
-      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
-      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
-      const dest = activeRouteDestination;
+    function renderizarRutaActivaYEvaluar(shouldFitBounds = false) {
+      if (!activeRouteDestination || activeRouteCandidates.length === 0) return;
 
+      const dest = activeRouteDestination;
+      if (selectedRouteCandidateIdx >= activeRouteCandidates.length) {
+        selectedRouteCandidateIdx = 0;
+      }
+      const chosenRoute = activeRouteCandidates[selectedRouteCandidateIdx];
+      const coords = chosenRoute.coords;
+
+      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
+      const allActiveAlerts = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+      const corridorRadius = chosenRoute.isFallback ? FALLBACK_ROUTE_CORRIDOR_METERS : STREET_ROUTE_CORRIDOR_METERS;
+
+      const evaluatedCandidates = activeRouteCandidates.map((cand) => ({
+        cand,
+        alerts: evaluarPolilineaContraAlertas(
+          cand.coords,
+          allActiveAlerts,
+          cand.isFallback ? FALLBACK_ROUTE_CORRIDOR_METERS : STREET_ROUTE_CORRIDOR_METERS
+        )
+      }));
+
+      const alertsOnRoute = evaluatedCandidates[selectedRouteCandidateIdx].alerts;
+      const cleanerAltIdx = evaluatedCandidates.findIndex(
+        (item, idx) => idx !== selectedRouteCandidateIdx && item.alerts.length < alertsOnRoute.length
+      );
+
+      detenerAnimacionRadar();
       routeLayer.clearLayers();
-      const routeCoords = [[origLat, origLng], [dest.lat, dest.lng]];
-      L.polyline(routeCoords, {
-        color: '#06b6d4',
-        weight: 5,
-        opacity: 0.85,
-        dashArray: '10, 8'
+
+      // Si existe una ruta alterna con menos alertas, mostrarla sutilmente en verde discontinuo
+      if (cleanerAltIdx !== -1 && alertsOnRoute.length > 0) {
+        L.polyline(activeRouteCandidates[cleanerAltIdx].coords, {
+          color: '#10b981',
+          weight: 5,
+          opacity: 0.55,
+          dashArray: '8, 10'
+        }).addTo(routeLayer);
+      }
+
+      const mainColor = alertsOnRoute.length > 0 ? '#f97316' : '#06b6d4';
+      // Halo exterior de radar sobre las calles reales
+      L.polyline(coords, {
+        color: mainColor,
+        weight: 11,
+        opacity: 0.24,
+        lineCap: 'round',
+        lineJoin: 'round'
       }).addTo(routeLayer);
 
+      // Trazado principal animado siguiendo calles y avenidas
+      L.polyline(coords, {
+        color: alertsOnRoute.length > 0 ? '#fb923c' : '#22d3ee',
+        weight: 4.5,
+        opacity: 0.95,
+        className: 'moviradar-route-flow',
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(routeLayer);
+
+      // Anillos de alerta en los puntos críticos que intersectan la ruta
+      alertsOnRoute.forEach(({ rep }) => {
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
+        if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
+        L.marker([rLat, rLng], {
+          interactive: false,
+          zIndexOffset: 350,
+          icon: L.divIcon({
+            className: 'custom-alert-beacon',
+            html: '<div class="moviradar-alert-beacon"></div>',
+            iconSize: [48, 48],
+            iconAnchor: [24, 24]
+          })
+        }).addTo(routeLayer);
+      });
+
+      // Marcador destino
       L.marker([dest.lat, dest.lng], {
         zIndexOffset: 650,
         icon: L.divIcon({
           className: 'custom-dest-pin',
-          html: `<div style="padding:4px 8px;border-radius:10px;background:#020617;border:2px solid #06b6d4;color:#67e8f9;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.5);">🏁 ${escapeHtml(dest.name)}</div>`,
-          iconSize: [120, 28],
-          iconAnchor: [60, 14]
+          html: `<div style="padding:4px 9px;border-radius:10px;background:#020617;border:2px solid #06b6d4;color:#67e8f9;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.55);">${escapeHtml(dest.emoji || '🏁')} ${escapeHtml(dest.name)}</div>`,
+          iconSize: [130, 28],
+          iconAnchor: [65, 14]
         })
       }).addTo(routeLayer);
 
+      // Marcador animado de barrido radar sobre el trazado real
+      iniciarAnimacionRadarEnRuta(coords, alertsOnRoute.length > 0);
+
       if (shouldFitBounds) {
         isFollowingUser = false;
-        map.fitBounds(L.latLngBounds(routeCoords), { padding: [70, 70], maxZoom: 15 });
+        map.fitBounds(L.latLngBounds(coords), { padding: [65, 65], maxZoom: 15 });
       }
 
-      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
-      const allActiveAlerts = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+      const routeKm = (chosenRoute.distanceMeters / 1000).toFixed(1);
+      const routeMin = Math.max(1, Math.round(chosenRoute.durationSeconds / 60));
+      const modeTag = chosenRoute.isFallback ? 'Trayecto estimado (sin conexión)' : `Ruta por calles · ~${routeMin} min`;
 
-      const alertsOnRoute = [];
-      allActiveAlerts.forEach((rep) => {
-        const rLat = Number(rep.lat);
-        const rLng = Number(rep.lng);
-        if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
-        const corridorDist = distanciaPuntoASegmentoMetros(rLat, rLng, origLat, origLng, dest.lat, dest.lng);
-        if (corridorDist <= ROUTE_CORRIDOR_METERS) {
-          const distFromOrigin = calcularDistanciaMetros(origLat, origLng, rLat, rLng);
-          alertsOnRoute.push({ rep, distFromOrigin, corridorDist });
-        }
-      });
-
-      alertsOnRoute.sort((a, b) => a.distFromOrigin - b.distFromOrigin);
-
-      const totalRouteKm = (calcularDistanciaMetros(origLat, origLng, dest.lat, dest.lng) / 1000).toFixed(1);
       btnOpenRouteAssistant.classList.add('active');
       btnCancelRoute.style.display = 'block';
 
       if (alertsOnRoute.length > 0) {
         const first = alertsOnRoute[0].rep;
         const firstCat = getTipoMeta(first.tipo || first.type || 'Novedad').label;
+        const firstKm = (alertsOnRoute[0].distAlongRoute / 1000).toFixed(1);
         const extraLabel = alertsOnRoute.length > 1 ? ` (+${alertsOnRoute.length - 1} más)` : '';
-        const warningText = `¡Atención! Hay un reporte de ${firstCat} en tu ruta hacia ${dest.name}${extraLabel}`;
+        const warningText = `¡Alerta en tu calle! ${firstCat} a ${firstKm} km rumbo a ${dest.name}${extraLabel}`;
+        const altSuggestion = sugerirViasAlternas(dest, alertsOnRoute);
 
         routeAlertBanner.classList.remove('clear');
         routeAlertBanner.classList.add('visible', 'danger');
-        routeAlertBannerText.textContent = `⚠️ ${warningText} (${totalRouteKm} km)`;
+        routeAlertBannerText.innerHTML = `
+          <div>⚠️ ${escapeHtml(warningText)} (${routeKm} km · ~${routeMin} min)</div>
+          <div style="font-size:11px;font-weight:600;opacity:0.95;margin-top:2px;">${escapeHtml(altSuggestion)}</div>
+          ${cleanerAltIdx !== -1 ? `<button type="button" class="route-alt-pill" id="btnSwitchAltRouteBanner">🔀 Cambiar a ruta alterna (${evaluatedCandidates[cleanerAltIdx].alerts.length} alertas)</button>` : ''}
+        `;
 
-        const alertListHtml = alertsOnRoute.slice(0, 4).map(({ rep, distFromOrigin }) => {
+        const switchBannerBtn = document.getElementById('btnSwitchAltRouteBanner');
+        if (switchBannerBtn) {
+          switchBannerBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            selectedRouteCandidateIdx = cleanerAltIdx;
+            renderizarRutaActivaYEvaluar(true);
+            showToast('🔀 Cambiado a la ruta alterna sugerida.');
+          });
+        }
+
+        const alertListHtml = alertsOnRoute.slice(0, 4).map(({ rep, distAlongRoute, corridorDist }) => {
           const meta = getTipoMeta(rep.tipo || rep.type);
-          const kmAway = (distFromOrigin / 1000).toFixed(1);
+          const kmAway = (distAlongRoute / 1000).toFixed(1);
           const desc = String(rep.descripcion || '').trim();
           return `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #334155;">
-            <strong>${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</strong> · a ${kmAway} km
+            <strong>${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</strong> · a ${kmAway} km (a ${Math.round(corridorDist)} m de la vía)
             ${desc ? `<div style="color:#94a3b8;font-size:11px;">${escapeHtml(desc)}</div>` : ''}
           </div>`;
         }).join('');
 
-        routeStatusCard.innerHTML = `<div style="color:#fca5a5;font-weight:800;">⚠️ ${escapeHtml(warningText)}</div>
-          <div style="font-size:11px;color:#94a3b8;margin-top:3px;">Distancia estimada: ${totalRouteKm} km · ${alertsOnRoute.length} alerta(s) en la trayectoria</div>
-          ${alertListHtml}`;
+        routeStatusCard.innerHTML = `
+          <div style="color:#fca5a5;font-weight:800;">⚠️ ${escapeHtml(warningText)}</div>
+          <div style="font-size:11px;color:#cbd5e1;margin-top:3px;">${escapeHtml(modeTag)} · ${routeKm} km · ${alertsOnRoute.length} novedad(es) sobre el trazado (radio ${corridorRadius}m)</div>
+          <div style="font-size:11px;color:#fcd34d;margin-top:4px;font-weight:700;">💡 ${escapeHtml(altSuggestion)}</div>
+          ${cleanerAltIdx !== -1 ? `<button type="button" class="route-alt-pill" id="btnSwitchAltRouteCard">🔀 Usar ruta alterna despejada</button>` : ''}
+          ${alertListHtml}
+        `;
         routeStatusCard.classList.add('visible');
 
-        const signature = `${dest.id}:${alertsOnRoute.map((a) => a.rep.id).join(',')}`;
+        const switchCardBtn = document.getElementById('btnSwitchAltRouteCard');
+        if (switchCardBtn) {
+          switchCardBtn.addEventListener('click', () => {
+            selectedRouteCandidateIdx = cleanerAltIdx;
+            renderizarRutaActivaYEvaluar(true);
+            routeModal.classList.remove('open');
+            showToast('🔀 Cambiado a la ruta alterna sugerida.');
+          });
+        }
+
+        const signature = `${dest.id}:r${selectedRouteCandidateIdx}:${alertsOnRoute.map((a) => a.rep.id).join(',')}`;
         if (shouldFitBounds || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
           showToast(`⚠️ ${warningText}`);
         }
       } else {
-        const clearText = `✅ Ruta despejada hacia ${dest.name} (${totalRouteKm} km): sin alertas activas en el trayecto.`;
+        const clearText = `✅ Ruta despejada hacia ${dest.name} (${routeKm} km · ~${routeMin} min)`;
         routeAlertBanner.classList.remove('danger');
         routeAlertBanner.classList.add('visible', 'clear');
-        routeAlertBannerText.textContent = clearText;
+        routeAlertBannerText.innerHTML = `<div>${escapeHtml(clearText)}</div><div style="font-size:11px;font-weight:600;opacity:0.9;">Radar activo sobre el trazado real de calles</div>`;
 
-        routeStatusCard.innerHTML = `<div style="color:#6ee7b7;font-weight:800;">${escapeHtml(clearText)}</div>`;
+        routeStatusCard.innerHTML = `
+          <div style="color:#6ee7b7;font-weight:800;">${escapeHtml(clearText)}</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:3px;">${escapeHtml(modeTag)} · Sin alertas en tu camino.</div>
+        `;
         routeStatusCard.classList.add('visible');
 
-        const signature = `${dest.id}:clear`;
+        const signature = `${dest.id}:r${selectedRouteCandidateIdx}:clear`;
         if (shouldFitBounds || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
           showToast(clearText);
@@ -2936,35 +4042,79 @@
       }
     }
 
+    async function evaluarAlertasEnRutaActual(shouldFitBounds = false, forceRecalculate = false) {
+      if (!activeRouteDestination) return;
+      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
+      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
+      const dest = activeRouteDestination;
+
+      const movedSinceFetch = activeRouteFetchOrigin
+        ? calcularDistanciaMetros(activeRouteFetchOrigin.lat, activeRouteFetchOrigin.lng, origLat, origLng)
+        : Infinity;
+      const needsFetch =
+        forceRecalculate ||
+        activeRouteCandidates.length === 0 ||
+        (movedSinceFetch >= OSRM_RECALC_DISTANCE_METERS && Date.now() - activeRouteFetchAt >= OSRM_RECALC_MIN_MS);
+
+      if (!needsFetch) {
+        renderizarRutaActivaYEvaluar(shouldFitBounds);
+        return;
+      }
+
+      const reqId = ++activeRouteRequestSeq;
+      if (forceRecalculate || activeRouteCandidates.length === 0) {
+        routeAlertBanner.classList.remove('danger', 'clear');
+        routeAlertBanner.classList.add('visible');
+        routeAlertBannerText.textContent = `📡 Calculando ruta real por calles hacia ${dest.name}...`;
+      }
+
+      const routes = await fetchOsrmStreetRoutes(origLat, origLng, dest.lat, dest.lng);
+      if (reqId !== activeRouteRequestSeq || !activeRouteDestination) return;
+
+      activeRouteCandidates = routes;
+      if (forceRecalculate) {
+        selectedRouteCandidateIdx = 0;
+      }
+      activeRouteFetchOrigin = { lat: origLat, lng: origLng };
+      activeRouteFetchAt = Date.now();
+      renderizarRutaActivaYEvaluar(shouldFitBounds);
+    }
+
     function activarRutaHacia(destId) {
       const dest = resolveDestinoById(destId);
       if (!dest) {
-        showToast('Selecciona un destino válido para revisar la ruta.');
+        showToast('Selecciona un destino válido para trazar la ruta.');
         return;
       }
       activeRouteDestination = dest;
+      activeRouteCandidates = [];
+      selectedRouteCandidateIdx = 0;
       if (routeDestinationSelect) routeDestinationSelect.value = dest.id;
-      document.querySelectorAll('.dest-chip-btn').forEach((b) => {
-        b.classList.toggle('active', b.dataset.destId === dest.id);
-      });
-      evaluarAlertasEnRutaActual(true);
+      renderDestQuickChips();
       routeModal.classList.remove('open');
+      evaluarAlertasEnRutaActual(true, true);
     }
 
     btnOpenRouteAssistant.addEventListener('click', () => {
       poblarDestinosRuta();
+      toggleDestManagerPanel(false);
       if (activeRouteDestination) {
-        evaluarAlertasEnRutaActual(false);
+        renderizarRutaActivaYEvaluar(false);
       }
       routeModal.classList.add('open');
     });
+
+    btnQuickManageDest.addEventListener('click', () => {
+      poblarDestinosRuta();
+      resetCustomDestForm();
+      toggleDestManagerPanel(true);
+      routeModal.classList.add('open');
+      setTimeout(() => customDestNameInput.focus(), 120);
+    });
+
     btnCloseRouteModal.addEventListener('click', () => routeModal.classList.remove('open'));
     routeModal.addEventListener('click', (e) => {
       if (e.target === routeModal) routeModal.classList.remove('open');
-    });
-
-    document.querySelectorAll('.dest-chip-btn').forEach((chip) => {
-      chip.addEventListener('click', () => activarRutaHacia(chip.dataset.destId));
     });
 
     routeDestinationSelect.addEventListener('change', () => {
@@ -2997,6 +4147,8 @@
       poblarDestinosRuta();
       routeModal.classList.add('open');
     });
+
+    poblarDestinosRuta();
 
     function comprimirImagenACanvasBase64(file, maxWidth = 800, quality = 0.7) {
       return new Promise((resolve, reject) => {
@@ -3227,13 +4379,10 @@
 
     async function guardarReporteEnFirestore(e) {
       e.preventDefault();
-      const chosenType = (reportCategorySelect && reportCategorySelect.value ? reportCategorySelect.value.trim() : '') || selectedCategory.type;
-      if (!chosenType) {
-        showToast('Selecciona primero el tipo de novedad en la lista desplegable.');
-        if (reportCategorySelect) reportCategorySelect.focus();
+      if (!selectedCategory || !selectedCategory.type) {
+        showToast('Toca una categoría visual para el reporte.');
         return;
       }
-      selectedCategory = { type: chosenType };
       const rawDesc = document.getElementById('reportDesc').value.trim();
       const descripcion = rawDesc.slice(0, 400);
       const wantsFixed = userRole === 'admin' && document.getElementById('chkIsFixed').checked;
