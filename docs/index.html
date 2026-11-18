@@ -1604,25 +1604,27 @@
     }
 
     // =========================================================================
-    // 7. GEOLOCALIZACIÓN GPS CON AUTO-RECONEXIÓN (WATCHDOG CADA 3s / >6s)
+    // 7. MOTOR DE RASTREO GPS POR SONDEO ACTIVO AUTÓNOMO (CERO WATCHPOSITION)
     // =========================================================================
-    let gpsWatchId = null;
-    let gpsWatchdogIntervalId = null;
+    const GPS_POLL_INTERVAL_MS = 3500;
+    const GPS_POLL_STUCK_MS = 8500;
+    const GPS_POLL_OPTIONS = {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 8000
+    };
+
+    let gpsPollingIntervalId = null;
+    let gpsPollInFlight = false;
+    let gpsPollStartedAt = 0;
     let lastGpsSuccessAt = 0;
-    let lastGpsLifecycleAt = 0;
-    let previousLiveFix = null;
+    let previousGpsFix = null;
+    let currentLat = initialCachedGps ? initialCachedGps.lat : BUCARAMANGA_DEFAULT.lat;
+    let currentLng = initialCachedGps ? initialCachedGps.lng : BUCARAMANGA_DEFAULT.lng;
+    let currentSpeedKmh = 0;
     let gpsPermissionDenied = false;
     let isFollowingUser = true;
     let hasUsedDefaultFallback = false;
-
-    const GPS_STRICT_OPTIONS = {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 15000
-    };
-
-    const GPS_WATCHDOG_CHECK_MS = 3000;
-    const GPS_STALE_LIMIT_MS = 6000;
 
     map.on('dragstart', () => {
       isFollowingUser = false;
@@ -1683,13 +1685,13 @@
         } else if (isCached) {
           gpsNote.textContent = `📌 Última posición GPS guardada (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
         } else {
-          gpsNote.textContent = `🔵 GPS en tiempo real activo (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+          gpsNote.textContent = `🔵 Sondeo GPS activo (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
         }
       }
     }
 
     if (initialCachedGps) {
-      updateUserPositionOnMap(initialCachedGps.lat, initialCachedGps.lng, 'cached');
+      updateUserPositionOnMap(initialCachedGps.lat, initialCachedGps.lng, 'cached', 0);
     }
 
     function aplicarPorDefectoUnaSolaVez(centrarMapa = false) {
@@ -1697,32 +1699,24 @@
         return;
       }
       hasUsedDefaultFallback = true;
-      updateUserPositionOnMap(BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng, 'default', 0);
+      currentLat = BUCARAMANGA_DEFAULT.lat;
+      currentLng = BUCARAMANGA_DEFAULT.lng;
+      currentSpeedKmh = 0;
+      updateUserPositionOnMap(currentLat, currentLng, 'default', 0);
       if (centrarMapa) {
-        map.setView([BUCARAMANGA_DEFAULT.lat, BUCARAMANGA_DEFAULT.lng], INITIAL_ZOOM);
+        map.setView([currentLat, currentLng], INITIAL_ZOOM);
       }
     }
 
-    function detenerSuscripcionWatchGps() {
-      if (gpsWatchId !== null && navigator.geolocation) {
-        try {
-          navigator.geolocation.clearWatch(gpsWatchId);
-        } catch (e) {}
+    function detenerSondeoGps() {
+      if (gpsPollingIntervalId !== null) {
+        clearInterval(gpsPollingIntervalId);
+        gpsPollingIntervalId = null;
       }
-      gpsWatchId = null;
+      gpsPollInFlight = false;
     }
 
-    function manejarErrorPermisoDenegadoGps() {
-      gpsPermissionDenied = true;
-      detenerSuscripcionWatchGps();
-      if (gpsWatchdogIntervalId !== null) {
-        clearInterval(gpsWatchdogIntervalId);
-        gpsWatchdogIntervalId = null;
-      }
-      aplicarPorDefectoUnaSolaVez(false);
-    }
-
-    function manejarCoordenadasGpsReales(pos, forceCenter = false) {
+    function procesarLecturaSondeoGps(pos, forceCenter = false) {
       if (!pos || !pos.coords) return;
       const lat = Number(pos.coords.latitude);
       const lng = Number(pos.coords.longitude);
@@ -1731,128 +1725,125 @@
       const nowMs = Date.now();
       const firstLiveFix = !hasReceivedLiveGps;
 
-      // Bandera/marca de tiempo de la última coordenada válida recibida
+      // Calcular distancia real recorrida y velocidad km/h basada en posición y tiempo
+      let speedKmh = 0;
+      if (previousGpsFix) {
+        const dtSec = Math.max((nowMs - previousGpsFix.timestamp) / 1000, 0.5);
+        const distMeters = calcularDistanciaMetros(previousGpsFix.lat, previousGpsFix.lng, lat, lng);
+
+        if (distMeters >= 2.5) {
+          const calcKmh = (distMeters / dtSec) * 3.6;
+          if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed > 0) {
+            speedKmh = pos.coords.speed * 3.6;
+          } else {
+            speedKmh = calcKmh <= 180 ? calcKmh : 0;
+          }
+        } else if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0.5) {
+          speedKmh = pos.coords.speed * 3.6;
+        }
+      } else if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0) {
+        speedKmh = pos.coords.speed * 3.6;
+      }
+
+      currentLat = lat;
+      currentLng = lng;
+      currentSpeedKmh = Math.max(0, Math.min(180, speedKmh));
+      previousGpsFix = { lat, lng, timestamp: nowMs };
+
       lastGpsSuccessAt = nowMs;
-      lastGpsLifecycleAt = nowMs;
       hasReceivedLiveGps = true;
       hasKnownRealGps = true;
       gpsPermissionDenied = false;
 
-      // Velocidad real en km/h para el HUD (nativa del chip GPS o estimada por desplazamiento)
-      let speedKmh = 0;
-      if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0) {
-        speedKmh = pos.coords.speed * 3.6;
-      } else if (previousLiveFix && nowMs - previousLiveFix.timestamp >= 1000) {
-        const dtSec = (nowMs - previousLiveFix.timestamp) / 1000;
-        const distM = calcularDistanciaMetros(previousLiveFix.lat, previousLiveFix.lng, lat, lng);
-        const calcKmh = distM >= 2 ? (distM / dtSec) * 3.6 : 0;
-        speedKmh = calcKmh <= 180 ? calcKmh : 0;
-      }
-      previousLiveFix = { lat, lng, timestamp: nowMs };
-
-      saveCachedGps(lat, lng);
-      updateUserPositionOnMap(lat, lng, 'live', speedKmh);
+      saveCachedGps(currentLat, currentLng);
+      updateUserPositionOnMap(currentLat, currentLng, 'live', currentSpeedKmh);
 
       if (firstLiveFix || forceCenter) {
         isFollowingUser = true;
-        map.setView([lat, lng], Math.max(map.getZoom(), 16), { animate: true });
+        map.setView([currentLat, currentLng], Math.max(map.getZoom(), 16), { animate: true });
       } else if (isFollowingUser) {
-        map.panTo([lat, lng], { animate: true, duration: 0.35, noMoveStart: true });
+        map.panTo([currentLat, currentLng], { animate: true, duration: 0.35, noMoveStart: true });
       }
     }
 
-    function destruirYReiniciarGps(forceCenter = false) {
+    function ejecutarSondeoGps(forceCenter = false) {
       if (!navigator.geolocation) {
+        detenerSondeoGps();
         aplicarPorDefectoUnaSolaVez(true);
         return;
       }
       if (gpsPermissionDenied) return;
 
-      // 1. Destruir por completo el watchPosition congelado y limpiar la variable
-      detenerSuscripcionWatchGps();
-      lastGpsLifecycleAt = Date.now();
+      // Auto-desbloqueo si una petición anterior quedó colgada por corte de red
+      if (gpsPollInFlight) {
+        if (Date.now() - gpsPollStartedAt < GPS_POLL_STUCK_MS) {
+          return;
+        }
+        gpsPollInFlight = false;
+      }
 
-      // 2. Disparar lectura única directa para despertar el chip GNSS del celular
+      gpsPollInFlight = true;
+      gpsPollStartedAt = Date.now();
+
       try {
         navigator.geolocation.getCurrentPosition(
-          (pos) => manejarCoordenadasGpsReales(pos, forceCenter),
+          (pos) => {
+            gpsPollInFlight = false;
+            procesarLecturaSondeoGps(pos, forceCenter);
+          },
           (err) => {
+            gpsPollInFlight = false;
             if (err && err.code === err.PERMISSION_DENIED) {
-              manejarErrorPermisoDenegadoGps();
+              gpsPermissionDenied = true;
+              detenerSondeoGps();
+              aplicarPorDefectoUnaSolaVez(false);
             } else {
+              // Si hay micro-corte o timeout, conserva la posición actual y espera el siguiente ciclo
               aplicarPorDefectoUnaSolaVez(false);
             }
           },
-          GPS_STRICT_OPTIONS
+          GPS_POLL_OPTIONS
         );
       } catch (e) {
-        aplicarPorDefectoUnaSolaVez(false);
-      }
-
-      // 3. Crear una nueva suscripción limpia de watchPosition desde cero
-      try {
-        gpsWatchId = navigator.geolocation.watchPosition(
-          (pos) => manejarCoordenadasGpsReales(pos, false),
-          (error) => {
-            if (error && error.code === error.PERMISSION_DENIED) {
-              manejarErrorPermisoDenegadoGps();
-            } else {
-              aplicarPorDefectoUnaSolaVez(false);
-            }
-          },
-          GPS_STRICT_OPTIONS
-        );
-      } catch (e) {
-        gpsWatchId = null;
+        gpsPollInFlight = false;
         aplicarPorDefectoUnaSolaVez(false);
       }
     }
 
-    function iniciarWatchdogAutoReconexionGps() {
-      if (gpsWatchdogIntervalId !== null) {
-        clearInterval(gpsWatchdogIntervalId);
-        gpsWatchdogIntervalId = null;
-      }
+    function asegurarBucleSondeoGps() {
+      if (!navigator.geolocation || gpsPermissionDenied) return;
+      if (gpsPollingIntervalId !== null) return;
 
-      // Watchdog cada 3 segundos: si pasan > 6 segundos sin nueva coordenada, destruye y reinicia el GPS
-      gpsWatchdogIntervalId = setInterval(() => {
-        if (document.hidden || gpsPermissionDenied || !navigator.geolocation) return;
-
-        const ultimaReferencia = Math.max(lastGpsSuccessAt, lastGpsLifecycleAt);
-        const tiempoSinSenalMs = Date.now() - ultimaReferencia;
-
-        if (gpsWatchId === null || tiempoSinSenalMs > GPS_STALE_LIMIT_MS) {
-          destruirYReiniciarGps(false);
+      gpsPollingIntervalId = setInterval(() => {
+        if (!document.hidden && !gpsPermissionDenied) {
+          ejecutarSondeoGps(false);
         }
-      }, GPS_WATCHDOG_CHECK_MS);
+      }, GPS_POLL_INTERVAL_MS);
     }
 
-    function iniciarSeguimientoGpsEnTiempoReal(forceCenterOnFirstFix = false) {
+    function iniciarMotorSondeoGps(forceCenter = false) {
       if (!navigator.geolocation) {
         aplicarPorDefectoUnaSolaVez(true);
         return;
       }
       gpsPermissionDenied = false;
-      destruirYReiniciarGps(forceCenterOnFirstFix);
-      iniciarWatchdogAutoReconexionGps();
+      detenerSondeoGps();
+      ejecutarSondeoGps(forceCenter);
+      asegurarBucleSondeoGps();
     }
 
-    function reanudarGpsAlVolverPrimerPlano() {
+    function reanudarSondeoEnPrimerPlano() {
       if (document.hidden || gpsPermissionDenied) return;
-      const ultimaReferencia = Math.max(lastGpsSuccessAt, lastGpsLifecycleAt);
-      if (gpsWatchId === null || Date.now() - ultimaReferencia > GPS_STALE_LIMIT_MS) {
-        destruirYReiniciarGps(false);
-      }
-      if (gpsWatchdogIntervalId === null) {
-        iniciarWatchdogAutoReconexionGps();
-      }
+      gpsPollInFlight = false;
+      ejecutarSondeoGps(false);
+      asegurarBucleSondeoGps();
     }
 
-    document.addEventListener('visibilitychange', reanudarGpsAlVolverPrimerPlano);
-    window.addEventListener('pageshow', reanudarGpsAlVolverPrimerPlano);
-    window.addEventListener('focus', reanudarGpsAlVolverPrimerPlano);
+    document.addEventListener('visibilitychange', reanudarSondeoEnPrimerPlano);
+    window.addEventListener('pageshow', reanudarSondeoEnPrimerPlano);
+    window.addEventListener('focus', reanudarSondeoEnPrimerPlano);
 
-    iniciarSeguimientoGpsEnTiempoReal(false);
+    iniciarMotorSondeoGps(false);
 
     document.getElementById('btnZoomIn').addEventListener('click', () => map.zoomIn());
     document.getElementById('btnZoomOut').addEventListener('click', () => map.zoomOut());
@@ -1866,10 +1857,12 @@
             ? 'Centrado en tu ubicación GPS en tiempo real.'
             : 'Centrado en tu última ubicación GPS conocida.'
         );
-        iniciarSeguimientoGpsEnTiempoReal(true);
+        gpsPollInFlight = false;
+        iniciarMotorSondeoGps(true);
       } else {
         hasUsedDefaultFallback = false;
-        iniciarSeguimientoGpsEnTiempoReal(true);
+        gpsPollInFlight = false;
+        iniciarMotorSondeoGps(true);
         showToast('Buscando tu ubicación GPS en vivo...');
       }
     });
@@ -2081,11 +2074,11 @@
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (pos) => {
-              manejarCoordenadasGpsReales(pos, false);
+              procesarLecturaSondeoGps(pos, false);
               resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, simulated: false });
             },
             () => resolve({ lat: BUCARAMANGA_DEFAULT.lat, lng: BUCARAMANGA_DEFAULT.lng, simulated: true }),
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 6000 }
+            GPS_POLL_OPTIONS
           );
           return;
         }
@@ -2329,6 +2322,11 @@
       updateNetworkAndSyncStatus();
       showToast('Señal recuperada. Sincronizando reportes con Firestore...');
       sincronizarReportesPendientes();
+      if (!gpsPermissionDenied) {
+        gpsPollInFlight = false;
+        ejecutarSondeoGps(false);
+        asegurarBucleSondeoGps();
+      }
     });
 
     setInterval(() => {
