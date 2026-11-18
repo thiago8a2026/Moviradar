@@ -23,14 +23,10 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isVerifiedUser() {
-      return isSignedIn() && request.auth.token.email_verified == true;
-    }
-
     function isAdmin() {
-      return isVerifiedUser() && (
+      return isSignedIn() && (
         exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        request.auth.token.email == 'faoj2013@gmail.com'
+        (request.auth.token.email == 'faoj2013@gmail.com' && request.auth.token.email_verified == true)
       );
     }
 
@@ -61,7 +57,7 @@ service cloud.firestore {
       allow get: if isValidId(reportId);
       allow list: if request.query.limit != null && request.query.limit <= 200;
 
-      allow create: if isVerifiedUser()
+      allow create: if isSignedIn()
         && isValidId(reportId)
         && isValidReporte(incoming())
         && incoming().authorId == request.auth.uid
@@ -70,7 +66,7 @@ service cloud.firestore {
         && incoming().denials == 0
         && (incoming().isFixed == false || isAdmin());
 
-      allow update: if isVerifiedUser()
+      allow update: if isSignedIn()
         && isValidId(reportId)
         && isValidReporte(incoming())
         && incoming().authorId == existing().authorId
@@ -94,13 +90,13 @@ service cloud.firestore {
           )
         );
 
-      allow delete: if isVerifiedUser()
+      allow delete: if isSignedIn()
         && isValidId(reportId)
         && (existing().authorId == request.auth.uid || isAdmin());
     }
 
     match /admins/{adminId} {
-      allow get: if isVerifiedUser() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
       allow list: if isAdmin();
       allow create, update, delete: if isAdmin()
         && isValidId(adminId)

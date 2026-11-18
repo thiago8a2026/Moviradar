@@ -181,6 +181,72 @@
       border-color: rgba(16, 185, 129, 0.6);
       background: rgba(16, 185, 129, 0.14);
       color: #6ee7b7;
+      max-width: 145px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .auth-tab {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 9px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      border-color: var(--accent);
+      background: rgba(16, 185, 129, 0.16);
+      color: #6ee7b7;
+    }
+
+    .auth-error {
+      display: none;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 9px 11px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .auth-error.visible {
+      display: block;
+    }
+
+    .auth-account-box {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .btn-logout {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(239, 68, 68, 0.55);
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.14);
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .role-btn.admin {
@@ -716,7 +782,7 @@
       </div>
 
       <div class="header-actions">
-        <button type="button" class="auth-btn" id="btnGoogleAuth" title="Iniciar sesión con Google para reportar y votar">
+        <button type="button" class="auth-btn" id="btnAuth" title="Iniciar sesión o registrarse con correo electrónico">
           Entrar
         </button>
         <button type="button" class="role-btn" id="btnToggleRole" title="Cambiar rol">
@@ -879,6 +945,62 @@
         <div class="points-list" id="pointsList"></div>
       </div>
     </div>
+
+    <!-- Modal de Acceso / Registro con Correo y Contraseña (Firebase Auth) -->
+    <div class="modal-backdrop" id="authModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="authModalTitle">Acceso a MoviRadar</h2>
+          <button type="button" class="btn-close" id="btnCloseAuthModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div id="authSignedOutView">
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tabLoginMode">Iniciar Sesión</button>
+            <button type="button" class="auth-tab" id="tabRegisterMode">Registrarse por primera vez</button>
+          </div>
+
+          <div class="auth-error" id="authErrorMsg"></div>
+
+          <form id="authForm">
+            <label class="form-label" for="authEmail">Correo electrónico *</label>
+            <input
+              type="email"
+              id="authEmail"
+              class="text-input"
+              required
+              autocomplete="email"
+              placeholder="conductor@correo.com"
+            />
+
+            <label class="form-label" for="authPassword">Contraseña * (mínimo 6 caracteres)</label>
+            <input
+              type="password"
+              id="authPassword"
+              class="text-input"
+              required
+              minlength="6"
+              autocomplete="current-password"
+              placeholder="••••••••"
+            />
+
+            <button type="submit" class="btn-submit" id="btnAuthSubmit">
+              Iniciar Sesión
+            </button>
+          </form>
+        </div>
+
+        <div id="authSignedInView" style="display:none;">
+          <div class="auth-account-box">
+            <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">Sesión activa en MoviRadar</div>
+            <div id="authUserEmailLabel" style="font-weight:800;color:#6ee7b7;word-break:break-all;"></div>
+          </div>
+          <button type="button" class="btn-logout" id="btnSignOut">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Leaflet JS (Gratuito vía CDN, con respaldo automático multi-CDN) -->
@@ -952,7 +1074,13 @@
         increment
       },
       { getStorage, ref, uploadBytesResumable, getDownloadURL },
-      { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+      {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged
+      }
     ] = await Promise.all([
       import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js'),
       import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
@@ -983,7 +1111,6 @@
     }
     const auth = getAuth(app);
     const storage = getStorage(app);
-    const googleProvider = new GoogleAuthProvider();
 
     const OperationType = {
       CREATE: 'create',
@@ -1439,59 +1566,198 @@
     renderCombinedReports(lastServerReports);
     updateNetworkAndSyncStatus();
 
-    const btnGoogleAuth = document.getElementById('btnGoogleAuth');
+    const btnAuth = document.getElementById('btnAuth');
+    const authModal = document.getElementById('authModal');
+    const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
+    const authSignedOutView = document.getElementById('authSignedOutView');
+    const authSignedInView = document.getElementById('authSignedInView');
+    const authModalTitle = document.getElementById('authModalTitle');
+    const tabLoginMode = document.getElementById('tabLoginMode');
+    const tabRegisterMode = document.getElementById('tabRegisterMode');
+    const authForm = document.getElementById('authForm');
+    const authEmailInput = document.getElementById('authEmail');
+    const authPasswordInput = document.getElementById('authPassword');
+    const btnAuthSubmit = document.getElementById('btnAuthSubmit');
+    const authErrorMsg = document.getElementById('authErrorMsg');
+    const authUserEmailLabel = document.getElementById('authUserEmailLabel');
+    const btnSignOut = document.getElementById('btnSignOut');
+
+    let authMode = 'login';
+    let pendingAuthResolvers = [];
+
+    function clearAuthError() {
+      if (!authErrorMsg) return;
+      authErrorMsg.textContent = '';
+      authErrorMsg.classList.remove('visible');
+    }
+
+    function showAuthError(message) {
+      if (!authErrorMsg) return;
+      authErrorMsg.textContent = message;
+      authErrorMsg.classList.add('visible');
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode === 'register' ? 'register' : 'login';
+      clearAuthError();
+      if (authMode === 'register') {
+        tabRegisterMode.classList.add('active');
+        tabLoginMode.classList.remove('active');
+        btnAuthSubmit.textContent = 'Crear cuenta';
+        authPasswordInput.setAttribute('autocomplete', 'new-password');
+      } else {
+        tabLoginMode.classList.add('active');
+        tabRegisterMode.classList.remove('active');
+        btnAuthSubmit.textContent = 'Iniciar Sesión';
+        authPasswordInput.setAttribute('autocomplete', 'current-password');
+      }
+    }
+
+    function mapFirebaseAuthError(err) {
+      const code = err && err.code ? err.code : '';
+      if (code === 'auth/email-already-in-use') return 'Este correo ya está registrado. Cambia a "Iniciar Sesión".';
+      if (code === 'auth/invalid-email') return 'Ingresa un correo electrónico válido.';
+      if (code === 'auth/weak-password') return 'La contraseña debe tener al menos 6 caracteres.';
+      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+        return 'Correo o contraseña incorrectos.';
+      }
+      if (code === 'auth/too-many-requests') return 'Demasiados intentos. Espera un momento antes de volver a intentar.';
+      if (code === 'auth/operation-not-allowed') {
+        return 'Habilita Correo/Contraseña en Firebase Console -> Authentication -> Sign-in method.';
+      }
+      return 'No se pudo completar el acceso. Verifica tu conexión e inténtalo de nuevo.';
+    }
+
+    function openAuthModal(defaultMode = 'login') {
+      setAuthMode(defaultMode);
+      const user = auth.currentUser;
+      if (user) {
+        authModalTitle.textContent = 'Cuenta MoviRadar';
+        authSignedOutView.style.display = 'none';
+        authSignedInView.style.display = 'block';
+        authUserEmailLabel.textContent = user.email || 'Usuario conectado';
+      } else {
+        authModalTitle.textContent = 'Acceso a MoviRadar';
+        authSignedOutView.style.display = 'block';
+        authSignedInView.style.display = 'none';
+      }
+      authModal.classList.add('open');
+      if (!user) {
+        setTimeout(() => authEmailInput.focus(), 100);
+      }
+    }
+
+    function closeAuthModal(cancelPending = true) {
+      authModal.classList.remove('open');
+      clearAuthError();
+      if (cancelPending && !auth.currentUser && pendingAuthResolvers.length > 0) {
+        const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
+        waiters.forEach((w) => w.reject(new Error('AUTH_CANCELLED')));
+      }
+    }
 
     function updateAuthUI(user) {
-      if (!btnGoogleAuth) return;
-      if (user) {
-        const firstName = (user.displayName || user.email || 'Cuenta').split(' ')[0].slice(0, 12);
-        btnGoogleAuth.textContent = `✓ ${firstName}`;
-        btnGoogleAuth.classList.add('signed-in');
-        btnGoogleAuth.title = `Conectado como ${user.email || 'Usuario'} (clic para cerrar sesión)`;
+      if (!btnAuth) return;
+      if (user && user.email) {
+        const alias = user.email.split('@')[0].slice(0, 12);
+        btnAuth.textContent = `✓ ${alias}`;
+        btnAuth.classList.add('signed-in');
+        btnAuth.title = `Conectado como ${user.email} (clic para ver cuenta o cerrar sesión)`;
+      } else if (user) {
+        btnAuth.textContent = '✓ Cuenta';
+        btnAuth.classList.add('signed-in');
+        btnAuth.title = 'Sesión activa (clic para ver cuenta o cerrar sesión)';
       } else {
-        btnGoogleAuth.textContent = 'Entrar';
-        btnGoogleAuth.classList.remove('signed-in');
-        btnGoogleAuth.title = 'Iniciar sesión con Google para reportar y votar';
+        btnAuth.textContent = 'Entrar';
+        btnAuth.classList.remove('signed-in');
+        btnAuth.title = 'Iniciar sesión o registrarse con correo y contraseña';
       }
     }
 
     onAuthStateChanged(auth, (user) => {
       updateAuthUI(user);
-      if (user && user.email === 'faoj2013@gmail.com' && userRole !== 'admin') {
-        userRole = 'admin';
-        try {
-          localStorage.setItem(STORAGE_KEYS.USER_ROLE, userRole);
-        } catch (e) {}
-        applyRoleUI();
-        renderCombinedReports(lastServerReports);
-      }
-      if (user && navigator.onLine && loadPendingReports().length > 0) {
-        sincronizarReportesPendientes();
+      if (user) {
+        if (authModal.classList.contains('open')) {
+          closeAuthModal(false);
+        }
+        if (pendingAuthResolvers.length > 0) {
+          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
+          waiters.forEach((w) => w.resolve(user));
+        }
+        if (user.email === 'faoj2013@gmail.com' && user.emailVerified && userRole !== 'admin') {
+          userRole = 'admin';
+          try {
+            localStorage.setItem(STORAGE_KEYS.USER_ROLE, userRole);
+          } catch (e) {}
+          applyRoleUI();
+          renderCombinedReports(lastServerReports);
+        }
+        if (navigator.onLine && loadPendingReports().length > 0) {
+          sincronizarReportesPendientes();
+        }
       }
     });
 
-    async function ensureAuthenticated() {
-      if (auth.currentUser) return auth.currentUser;
-      const result = await signInWithPopup(auth, googleProvider);
-      return result.user;
-    }
-
-    if (btnGoogleAuth) {
-      btnGoogleAuth.addEventListener('click', async () => {
-        if (auth.currentUser) {
-          await signOut(auth);
-          showToast('Sesión cerrada.');
-          return;
-        }
-        try {
-          await signInWithPopup(auth, googleProvider);
-          showToast('Sesión iniciada con Google.');
-        } catch (err) {
-          console.error('Error iniciando sesión con Google:', err);
-          showToast('No se pudo iniciar sesión con Google.');
-        }
+    function ensureAuthenticated() {
+      if (auth.currentUser) return Promise.resolve(auth.currentUser);
+      openAuthModal('login');
+      showToast('Inicia sesión o regístrate con tu correo para continuar.');
+      return new Promise((resolve, reject) => {
+        pendingAuthResolvers.push({ resolve, reject });
       });
     }
+
+    tabLoginMode.addEventListener('click', () => setAuthMode('login'));
+    tabRegisterMode.addEventListener('click', () => setAuthMode('register'));
+    btnAuth.addEventListener('click', () => openAuthModal('login'));
+    btnCloseAuthModal.addEventListener('click', () => closeAuthModal(true));
+    authModal.addEventListener('click', (e) => {
+      if (e.target === authModal) closeAuthModal(true);
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAuthError();
+      const email = authEmailInput.value.trim();
+      const password = authPasswordInput.value;
+
+      if (!email || password.length < 6) {
+        showAuthError('Ingresa un correo válido y una contraseña de al menos 6 caracteres.');
+        return;
+      }
+
+      btnAuthSubmit.disabled = true;
+      btnAuthSubmit.textContent = authMode === 'register' ? 'Creando cuenta...' : 'Ingresando...';
+
+      try {
+        if (authMode === 'register') {
+          await createUserWithEmailAndPassword(auth, email, password);
+          showToast('¡Cuenta creada y sesión iniciada!');
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+          showToast('¡Sesión iniciada correctamente!');
+        }
+        authForm.reset();
+        closeAuthModal(false);
+      } catch (err) {
+        console.error('Error en Firebase Auth:', err);
+        showAuthError(mapFirebaseAuthError(err));
+      } finally {
+        btnAuthSubmit.disabled = false;
+        btnAuthSubmit.textContent = authMode === 'register' ? 'Crear cuenta' : 'Iniciar Sesión';
+      }
+    });
+
+    btnSignOut.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        closeAuthModal(false);
+        showToast('Sesión cerrada.');
+      } catch (err) {
+        console.error('Error al cerrar sesión:', err);
+        showToast('No se pudo cerrar la sesión.');
+      }
+    });
 
     window.voteReport = async function(reportId, voteType) {
       if (!reportId) return;
@@ -1515,8 +1781,8 @@
             : 'Reportaste que la vía ya está despejada.'
         );
       } catch (err) {
-        if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
-          showToast('Inicia sesión con Google para confirmar reportes.');
+        if (err && err.message === 'AUTH_CANCELLED') {
+          showToast('Inicia sesión con tu correo para votar reportes.');
           return;
         }
         showToast('No se pudo actualizar el voto.');
@@ -1532,8 +1798,8 @@
         await deleteDoc(doc(db, COLLECTION_NAME, reportId));
         showToast('Alerta retirada por el Administrador.');
       } catch (err) {
-        if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
-          showToast('Inicia sesión con Google para retirar reportes.');
+        if (err && err.message === 'AUTH_CANCELLED') {
+          showToast('Inicia sesión con tu correo para retirar reportes.');
           return;
         }
         showToast('Solo el autor o el Administrador pueden retirar este reporte.');
@@ -2225,7 +2491,7 @@
 
       try {
         const currentUser = auth.currentUser;
-        const canFix = Boolean(currentUser.email === 'faoj2013@gmail.com');
+        const canFix = Boolean(currentUser.email === 'faoj2013@gmail.com' && currentUser.emailVerified);
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
 
@@ -2295,7 +2561,7 @@
 
         btnSubmit.textContent = 'Verificando cuenta...';
         const user = await ensureAuthenticated();
-        const isFixed = wantsFixed && user.email === 'faoj2013@gmail.com';
+        const isFixed = wantsFixed && user.email === 'faoj2013@gmail.com' && user.emailVerified;
 
         let urlFoto = null;
         if (pendingBlob && pendingFileName) {
@@ -2344,8 +2610,8 @@
             : '¡Reporte publicado en vivo con tu GPS!'
         );
       } catch (err) {
-        if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
-          showToast('Inicia sesión con Google para publicar el reporte.');
+        if (err && err.message === 'AUTH_CANCELLED') {
+          showToast('Inicia sesión con tu correo para publicar el reporte.');
           return;
         }
         console.error('Error publicando reporte en Firebase:', err);
