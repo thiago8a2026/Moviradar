@@ -1604,10 +1604,14 @@
     }
 
     // =========================================================================
-    // 7. MOTOR DE RASTREO GPS POR SONDEO ACTIVO AUTÓNOMO (CERO WATCHPOSITION)
+    // 7. MOTOR DE RASTREO GPS POR SONDEO ACTIVO + FILTRO QUIRÚRGICO ANTI-REBOTES
     // =========================================================================
     const GPS_POLL_INTERVAL_MS = 3500;
     const GPS_POLL_STUCK_MS = 8500;
+    const MAX_GPS_ACCURACY_METERS = 25;
+    const MAX_PLAUSIBLE_SPEED_KMH = 140;
+    const MAX_INSTANT_JUMP_METERS = 120;
+    const STATIONARY_DEADBAND_METERS = 2.5;
     const GPS_POLL_OPTIONS = {
       enableHighAccuracy: true,
       maximumAge: 0,
@@ -1619,6 +1623,7 @@
     let gpsPollStartedAt = 0;
     let lastGpsSuccessAt = 0;
     let previousGpsFix = null;
+    let consecutiveJumpCount = 0;
     let currentLat = initialCachedGps ? initialCachedGps.lat : BUCARAMANGA_DEFAULT.lat;
     let currentLng = initialCachedGps ? initialCachedGps.lng : BUCARAMANGA_DEFAULT.lng;
     let currentSpeedKmh = 0;
@@ -1642,7 +1647,7 @@
       return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    function updateUserPositionOnMap(lat, lng, mode = 'live', speedKmh = null) {
+    function updateUserPositionOnMap(lat, lng, mode = 'live', speedKmh = null, accuracyMeters = null) {
       const isDefault = mode === 'default';
       const isCached = mode === 'cached';
       latestGps = { lat, lng, isDefault, isCached };
@@ -1685,7 +1690,10 @@
         } else if (isCached) {
           gpsNote.textContent = `📌 Última posición GPS guardada (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
         } else {
-          gpsNote.textContent = `🔵 Sondeo GPS activo (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+          const accLabel = typeof accuracyMeters === 'number' && !Number.isNaN(accuracyMeters)
+            ? ` · ±${Math.round(accuracyMeters)}m`
+            : '';
+          gpsNote.textContent = `🔵 GPS preciso activo (${lat.toFixed(5)}, ${lng.toFixed(5)}${accLabel}).`;
         }
       }
     }
@@ -1722,33 +1730,78 @@
       const lng = Number(pos.coords.longitude);
       if (Number.isNaN(lat) || Number.isNaN(lng)) return;
 
+      // 1. Umbral máximo de error (Accuracy Filter): descartar lecturas > 25m
+      const rawAccuracy = pos.coords.accuracy;
+      if (typeof rawAccuracy === 'number' && !Number.isNaN(rawAccuracy) && rawAccuracy > MAX_GPS_ACCURACY_METERS) {
+        const gpsNote = document.getElementById('gpsStatusText');
+        if (gpsNote && hasKnownRealGps) {
+          gpsNote.textContent = `🔵 GPS estable (rebote ±${Math.round(rawAccuracy)}m descartado)`;
+        }
+        return;
+      }
+
+      const accuracy = typeof rawAccuracy === 'number' && !Number.isNaN(rawAccuracy) && rawAccuracy > 0
+        ? rawAccuracy
+        : 15;
       const nowMs = Date.now();
       const firstLiveFix = !hasReceivedLiveGps;
 
-      // Calcular distancia real recorrida y velocidad km/h basada en posición y tiempo
+      let finalLat = lat;
+      let finalLng = lng;
       let speedKmh = 0;
+
+      // 2. Filtro de salto anómalo (Jump Suppression) + promedio ponderado por precisión
       if (previousGpsFix) {
         const dtSec = Math.max((nowMs - previousGpsFix.timestamp) / 1000, 0.5);
-        const distMeters = calcularDistanciaMetros(previousGpsFix.lat, previousGpsFix.lng, lat, lng);
+        const rawDistMeters = calcularDistanciaMetros(previousGpsFix.lat, previousGpsFix.lng, lat, lng);
+        const impliedSpeedKmh = (rawDistMeters / dtSec) * 3.6;
 
-        if (distMeters >= 2.5) {
-          const calcKmh = (distMeters / dtSec) * 3.6;
+        const isAnomalousJump =
+          impliedSpeedKmh > MAX_PLAUSIBLE_SPEED_KMH ||
+          (dtSec <= 6 && rawDistMeters > MAX_INSTANT_JUMP_METERS);
+
+        if (isAnomalousJump) {
+          consecutiveJumpCount += 1;
+          // Descartar saltos falsos hacia vías paralelas (ej. Anillo Vial); solo reanclar tras 3 confirmaciones
+          if (consecutiveJumpCount < 3) {
+            return;
+          }
+          finalLat = previousGpsFix.lat * 0.55 + lat * 0.45;
+          finalLng = previousGpsFix.lng * 0.55 + lng * 0.45;
+          consecutiveJumpCount = 0;
+        } else {
+          consecutiveJumpCount = 0;
+          if (rawDistMeters < STATIONARY_DEADBAND_METERS) {
+            // Suavizado fuerte en reposo para evitar vibración del punto azul en semáforos
+            finalLat = previousGpsFix.lat * 0.8 + lat * 0.2;
+            finalLng = previousGpsFix.lng * 0.8 + lng * 0.2;
+          } else {
+            // Promedio ponderado según la precisión del sensor GPS
+            const weightNew = accuracy <= 8 ? 0.85 : accuracy <= 15 ? 0.72 : 0.58;
+            finalLat = previousGpsFix.lat * (1 - weightNew) + lat * weightNew;
+            finalLng = previousGpsFix.lng * (1 - weightNew) + lng * weightNew;
+          }
+        }
+
+        const smoothedDistMeters = calcularDistanciaMetros(previousGpsFix.lat, previousGpsFix.lng, finalLat, finalLng);
+        if (smoothedDistMeters >= STATIONARY_DEADBAND_METERS) {
+          const calcKmh = (smoothedDistMeters / dtSec) * 3.6;
           if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed > 0) {
             speedKmh = pos.coords.speed * 3.6;
           } else {
-            speedKmh = calcKmh <= 180 ? calcKmh : 0;
+            speedKmh = calcKmh <= MAX_PLAUSIBLE_SPEED_KMH ? calcKmh : 0;
           }
-        } else if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0.5) {
+        } else if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0.6) {
           speedKmh = pos.coords.speed * 3.6;
         }
       } else if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed) && pos.coords.speed >= 0) {
         speedKmh = pos.coords.speed * 3.6;
       }
 
-      currentLat = lat;
-      currentLng = lng;
-      currentSpeedKmh = Math.max(0, Math.min(180, speedKmh));
-      previousGpsFix = { lat, lng, timestamp: nowMs };
+      currentLat = finalLat;
+      currentLng = finalLng;
+      currentSpeedKmh = Math.max(0, Math.min(MAX_PLAUSIBLE_SPEED_KMH, speedKmh));
+      previousGpsFix = { lat: finalLat, lng: finalLng, timestamp: nowMs, accuracy };
 
       lastGpsSuccessAt = nowMs;
       hasReceivedLiveGps = true;
@@ -1756,7 +1809,7 @@
       gpsPermissionDenied = false;
 
       saveCachedGps(currentLat, currentLng);
-      updateUserPositionOnMap(currentLat, currentLng, 'live', currentSpeedKmh);
+      updateUserPositionOnMap(currentLat, currentLng, 'live', currentSpeedKmh, accuracy);
 
       if (firstLiveFix || forceCenter) {
         isFollowingUser = true;
