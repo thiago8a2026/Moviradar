@@ -88,11 +88,39 @@
       },
       "required": ["email", "role"]
     }
+    "VotoReporte": {
+      "title": "Voto Único de Reporte MoviRadar",
+      "description": "Registro único por usuario autenticado para validar o desmentir un reporte vial sin duplicados.",
+      "type": "object",
+      "properties": {
+        "voteType": {
+          "type": "string",
+          "enum": ["confirm", "deny"],
+          "description": "Tipo de voto emitido por el conductor."
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID del usuario autenticado que emitió el voto.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo del servidor al registrar el voto."
+        }
+      },
+      "required": ["voteType", "userId", "createdAt"]
+    }
   },
   "firestore": {
     "/reportes/{reportId}": {
       "schema": { "$ref": "#/entities/Reporte" },
       "description": "Colección principal en tiempo real de reportes viales en Bucaramanga."
+    },
+    "/reportes/{reportId}/votos/{userId}": {
+      "schema": { "$ref": "#/entities/VotoReporte" },
+      "description": "Subcolección anti-spam con un documento único por usuario votante."
     },
     "/admins/{adminId}": {
       "schema": { "$ref": "#/entities/AdminUser" },

@@ -473,6 +473,166 @@
       transform: scale(0.94);
     }
 
+    .map-btn.sonar-on {
+      border-color: rgba(6, 182, 212, 0.72);
+      background: rgba(6, 182, 212, 0.16);
+      color: #67e8f9;
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.25);
+      flex-direction: column;
+      gap: 1px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .map-btn.sonar-muted {
+      border-color: rgba(239, 68, 68, 0.55);
+      background: rgba(15, 23, 42, 0.94);
+      color: #fca5a5;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .sonar-btn-sub {
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    /* Pin central fijo para colocación manual de reportes en el mapa */
+    .manual-pin-overlay {
+      position: fixed;
+      top: 62px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 950;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .manual-pin-overlay.visible {
+      display: flex;
+    }
+
+    .manual-pin-target {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .manual-pin-crosshair {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #10b981;
+      background: rgba(16, 185, 129, 0.14);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.55);
+      position: relative;
+    }
+
+    .manual-pin-crosshair::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22d3ee;
+      transform: translate(-50%, -50%);
+    }
+
+    .manual-pin-head {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #020617;
+      border: 2px solid #ffffff;
+      border-radius: 14px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+    }
+
+    .manual-pin-head::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #ffffff;
+    }
+
+    .manual-pin-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 12px;
+      right: 12px;
+      max-width: 460px;
+      margin: 0 auto;
+      z-index: 1050;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(16, 185, 129, 0.65);
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .manual-pin-bar.visible {
+      display: flex;
+    }
+
+    .manual-pin-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .report-location-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .loc-mode-btn {
+      min-height: 40px;
+      border-radius: 11px;
+      border: 1px solid var(--surface-light);
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 8px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .loc-mode-btn.active {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.16);
+      color: #67e8f9;
+    }
+
     /* Panel inferior flotante: acciones rápidas + botón principal */
     .bottom-panel {
       position: fixed;
@@ -1283,6 +1443,29 @@
     .popup-vote-btn:active {
       transform: scale(0.96);
     }
+    .popup-vote-btn:disabled {
+      opacity: 0.56;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .popup-vote-btn.voted {
+      opacity: 1;
+      border-color: rgba(16, 185, 129, 0.85);
+      background: rgba(16, 185, 129, 0.22);
+      color: #6ee7b7;
+    }
+    .popup-vote-btn.voted-deny {
+      opacity: 1;
+      border-color: rgba(245, 158, 11, 0.85);
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+    }
+    .popup-voted-note {
+      margin-top: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #34d399;
+    }
   </style>
 </head>
 <body>
@@ -1335,12 +1518,34 @@
       <button type="button" class="route-banner-close" id="btnCancelMapPick" title="Cancelar">✕</button>
     </div>
 
+    <!-- Overlay y barra de colocación manual del pin para reportes -->
+    <div class="manual-pin-overlay" id="manualPinOverlay">
+      <div class="manual-pin-target">
+        <div class="manual-pin-head">📌 Ubicar aquí</div>
+        <div class="manual-pin-crosshair"></div>
+      </div>
+    </div>
+
+    <div class="manual-pin-bar" id="manualPinBar">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-size:12px;font-weight:800;color:#f8fafc;">🗺️ Mueve el mapa hasta la ubicación exacta</span>
+        <span id="manualPinCoordsLabel" style="font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#67e8f9;">7.1193, -73.1227</span>
+      </div>
+      <div class="manual-pin-actions">
+        <button type="button" class="btn-submit" id="btnConfirmManualPin" style="min-height:42px;font-size:13px;">✅ Confirmar este punto</button>
+        <button type="button" class="btn-close" id="btnCancelManualPin" style="width:auto;padding:0 14px;height:42px;font-size:12px;font-weight:700;">Cancelar</button>
+      </div>
+    </div>
+
     <!-- Controles rápidos del mapa -->
     <div class="map-controls">
       <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
       <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
       <button type="button" class="map-btn" id="btnLocateMe" title="Centrar mi ubicación GPS">🎯</button>
       <button type="button" class="map-btn" id="btnOpenPoints" title="Puntos frecuentes guardados">⭐</button>
+      <button type="button" class="map-btn sonar-on" id="btnToggleSonarAudio" title="Activar o silenciar sonido de alerta Sónar">
+        <span>🔊</span><span class="sonar-btn-sub">Sónar</span>
+      </button>
     </div>
 
     <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos y botón "+ Reportar Novedad" -->
@@ -1412,7 +1617,16 @@
             <span>👑 Publicar como Ubicación Fija Oficial (no expira)</span>
           </label>
 
-          <label class="form-label" for="reportDesc">2. Indicación o referencia rápida (opcional)</label>
+          <span class="form-label">2. Ubicación del reporte</span>
+          <div class="report-location-toggle">
+            <button type="button" class="loc-mode-btn active" id="btnModeGpsReport">📍 Usar mi GPS actual</button>
+            <button type="button" class="loc-mode-btn" id="btnModeManualPin">🗺️ Ubicar en el mapa manualmente</button>
+          </div>
+          <div class="gps-note" id="gpsStatusText">
+            📍 Se capturará tu ubicación GPS actual.
+          </div>
+
+          <label class="form-label" for="reportDesc">3. Indicación o referencia rápida (opcional)</label>
           <textarea
             id="reportDesc"
             class="text-input"
@@ -1421,7 +1635,7 @@
             placeholder="Indicación o referencia rápida (ej: Por la Puerta del Sol, frente al colegio...)"
           ></textarea>
 
-          <span class="form-label">3. Foto de evidencia (Cámara directa)</span>
+          <span class="form-label">4. Foto de evidencia (Cámara directa)</span>
           <label class="media-upload-box" for="reportMedia">
             <span>📷 Tomar foto con la cámara</span>
           </label>
@@ -1437,10 +1651,6 @@
             <img id="previewImage" class="media-preview" alt="Vista previa" />
             <video id="previewVideo" class="media-preview" controls playsinline></video>
             <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar foto</button>
-          </div>
-
-          <div class="gps-note" id="gpsStatusText">
-            📍 Se capturará tu ubicación GPS actual.
           </div>
 
           <button type="submit" class="btn-submit" id="btnSubmitReport">
@@ -1765,8 +1975,10 @@
         collection,
         doc,
         addDoc,
+        getDoc,
         updateDoc,
         deleteDoc,
+        writeBatch,
         query,
         limit,
         onSnapshot,
@@ -1866,7 +2078,9 @@
       PENDING_REPORTS: 'moviradar_pending_reports_v1',
       FREQUENT_POINTS: 'moviradar_frequent_points_v1',
       CUSTOM_DESTINATIONS: 'moviradar_custom_destinations_v1',
-      USER_ROLE: 'moviradar_user_role_v1'
+      USER_ROLE: 'moviradar_user_role_v1',
+      SONAR_AUDIO: 'moviradar_sonar_audio_v1',
+      USER_VOTES: 'moviradar_user_votes_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -2346,6 +2560,12 @@
     });
 
     function renderReports(reportsList) {
+      let openPopupReportId = null;
+      markersLayer.eachLayer((layer) => {
+        if (layer.isPopupOpen && layer.isPopupOpen() && layer._reportId) {
+          openPopupReportId = layer._reportId;
+        }
+      });
       markersLayer.clearLayers();
       lastRenderedReports = Array.isArray(reportsList) ? reportsList : [];
 
@@ -2381,6 +2601,15 @@
 
         const confirmations = Number(rep.confirmations || 1);
         const denials = Number(rep.denials || 0);
+        const existingVote = !isPending ? getUserVoteForReport(rep.id) : null;
+        const voteDisabledAttr = existingVote ? 'disabled' : '';
+        const confirmCls = existingVote === 'confirm' ? 'popup-vote-btn voted' : 'popup-vote-btn';
+        const denyCls = existingVote === 'deny' ? 'popup-vote-btn voted-deny' : 'popup-vote-btn';
+        const confirmLabel = existingVote === 'confirm' ? `✓ Sigue (${confirmations})` : `👍 Sigue (${confirmations})`;
+        const denyLabel = existingVote === 'deny' ? `✓ Ya pasó (${denials})` : `✅ Ya pasó (${denials})`;
+        const votedHint = existingVote
+          ? `<div class="popup-voted-note">✓ Ya registraste tu voto en este reporte</div>`
+          : '';
         const adminDeleteBtn = userRole === 'admin' && !isPending
           ? `<button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Retirar</button>`
           : '';
@@ -2388,10 +2617,10 @@
         const actionsHtml = isPending
           ? `<div class="popup-meta" style="color:#fbbf24;font-weight:700;margin-top:8px;">⏳ Guardado sin internet · Se subirá a Firestore al recuperar señal</div>`
           : `<div class="popup-actions">
-              <button type="button" class="popup-vote-btn" onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">👍 Sigue (${confirmations})</button>
-              <button type="button" class="popup-vote-btn" onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">✅ Ya pasó (${denials})</button>
+              <button type="button" class="${confirmCls}" ${voteDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">${confirmLabel}</button>
+              <button type="button" class="${denyCls}" ${voteDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">${denyLabel}</button>
               ${adminDeleteBtn}
-            </div>`;
+            </div>${votedHint}`;
 
         const badgeColor = isFixed ? '#d97706' : meta.color;
         const badgePrefix = isFixed ? '👑 Fija · ' : '';
@@ -2408,6 +2637,11 @@
           </div>
         `);
         marker._reportId = rep.id;
+        if (!isPending) {
+          marker.on('popupopen', () => {
+            syncRemoteVoteStateForReport(rep.id);
+          });
+        }
         markersLayer.addLayer(marker);
       });
 
@@ -2415,6 +2649,15 @@
         `${lastRenderedReports.length} ${lastRenderedReports.length === 1 ? 'alerta' : 'alertas'} ▾`;
       if (alertsCenterModal && alertsCenterModal.classList.contains('open')) {
         renderAlertsCenterList(lastRenderedReports);
+      }
+      const manualOverlayEl = document.getElementById('manualPinOverlay');
+      const isPickingManual = manualOverlayEl && manualOverlayEl.classList.contains('visible');
+      if (openPopupReportId && !isPickingManual) {
+        markersLayer.eachLayer((layer) => {
+          if (layer._reportId === openPopupReportId) {
+            layer.openPopup();
+          }
+        });
       }
     }
 
@@ -2556,6 +2799,7 @@
 
     onAuthStateChanged(auth, (user) => {
       updateAuthUI(user);
+      renderCombinedReports(lastServerReports);
       if (user) {
         if (authModal.classList.contains('open')) {
           closeAuthModal(false);
@@ -2656,30 +2900,114 @@
       }
     });
 
+    function getVoteStorageUid() {
+      return auth.currentUser && auth.currentUser.uid ? auth.currentUser.uid : null;
+    }
+
+    function loadAllUserVotesMap() {
+      const parsed = safeReadJson(STORAGE_KEYS.USER_VOTES, {});
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    }
+
+    function getUserVoteForReport(reportId, explicitUid = null) {
+      const uid = explicitUid || getVoteStorageUid();
+      if (!uid || !reportId) return null;
+      const allVotes = loadAllUserVotesMap();
+      const userMap = allVotes[uid];
+      if (!userMap || typeof userMap !== 'object') return null;
+      const v = userMap[reportId];
+      return v === 'confirm' || v === 'deny' ? v : null;
+    }
+
+    function recordUserVote(reportId, voteType, explicitUid = null) {
+      const uid = explicitUid || getVoteStorageUid();
+      if (!uid || !reportId) return;
+      const allVotes = loadAllUserVotesMap();
+      if (!allVotes[uid] || typeof allVotes[uid] !== 'object') {
+        allVotes[uid] = {};
+      }
+      allVotes[uid][reportId] = voteType;
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER_VOTES, JSON.stringify(allVotes));
+      } catch (e) {}
+    }
+
+    async function syncRemoteVoteStateForReport(reportId) {
+      const user = auth.currentUser;
+      if (!user || !reportId || !navigator.onLine) return;
+      if (getUserVoteForReport(reportId, user.uid)) return;
+      try {
+        const voteSnap = await getDoc(doc(db, COLLECTION_NAME, reportId, 'votos', user.uid));
+        if (voteSnap.exists()) {
+          const data = voteSnap.data();
+          const vType = data && data.voteType === 'deny' ? 'deny' : 'confirm';
+          recordUserVote(reportId, vType, user.uid);
+          renderCombinedReports(lastServerReports);
+          markersLayer.eachLayer((layer) => {
+            if (layer._reportId === reportId) layer.openPopup();
+          });
+        }
+      } catch (e) {}
+    }
+
     window.voteReport = async function(reportId, voteType) {
-      if (!reportId) return;
+      if (!reportId || (voteType !== 'confirm' && voteType !== 'deny')) return;
       if (!navigator.onLine) {
         showToast('Sin internet. Los votos requieren conexión activa.');
         return;
       }
       const path = `${COLLECTION_NAME}/${reportId}`;
       try {
-        await ensureAuthenticated();
-        const docRef = doc(db, COLLECTION_NAME, reportId);
-        await updateDoc(
-          docRef,
+        const user = await ensureAuthenticated();
+        if (getUserVoteForReport(reportId, user.uid)) {
+          renderCombinedReports(lastServerReports);
+          showToast('Ya registraste tu voto en este reporte (1 voto por usuario).');
+          return;
+        }
+
+        const reportRef = doc(db, COLLECTION_NAME, reportId);
+        const voteRef = doc(db, COLLECTION_NAME, reportId, 'votos', user.uid);
+        const existingVoteSnap = await withTimeout(getDoc(voteRef), 10000);
+        if (existingVoteSnap.exists()) {
+          const prevData = existingVoteSnap.data();
+          const prevType = prevData && prevData.voteType === 'deny' ? 'deny' : 'confirm';
+          recordUserVote(reportId, prevType, user.uid);
+          renderCombinedReports(lastServerReports);
+          showToast('Ya habías votado en este reporte.');
+          return;
+        }
+
+        const batch = writeBatch(db);
+        batch.set(voteRef, {
+          voteType,
+          userId: user.uid,
+          createdAt: serverTimestamp()
+        });
+        batch.update(
+          reportRef,
           voteType === 'confirm'
             ? { confirmations: increment(1) }
             : { denials: increment(1) }
         );
+        await withTimeout(batch.commit(), 15000);
+
+        recordUserVote(reportId, voteType, user.uid);
+        renderCombinedReports(lastServerReports);
         showToast(
           voteType === 'confirm'
-            ? 'Confirmaste que la novedad sigue activa.'
-            : 'Reportaste que la vía ya está despejada.'
+            ? '✓ Confirmaste que la novedad sigue activa.'
+            : '✓ Reportaste que la vía ya está despejada.'
         );
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') {
           showToast('Inicia sesión con tu correo para votar reportes.');
+          return;
+        }
+        if (err && (err.code === 'already-exists' || err.code === 'permission-denied')) {
+          const uid = getVoteStorageUid();
+          if (uid) recordUserVote(reportId, voteType, uid);
+          renderCombinedReports(lastServerReports);
+          showToast('Solo se permite un voto por usuario en cada reporte.');
           return;
         }
         showToast('No se pudo actualizar el voto.');
@@ -2743,8 +3071,10 @@
 
           renderCombinedReports(activeReports);
           updateNetworkAndSyncStatus();
-          if (typeof evaluarAlertasEnRutaActual === 'function' && activeRouteDestination) {
+          if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
             evaluarAlertasEnRutaActual(false);
+          } else if (typeof evaluarRadarProximidadCercana === 'function') {
+            evaluarRadarProximidadCercana();
           }
 
           if (navigator.onLine && auth.currentUser && loadPendingReports().length > 0) {
@@ -2977,15 +3307,19 @@
       saveCachedGps(currentLat, currentLng);
       updateUserPositionOnMap(currentLat, currentLng, 'live', currentSpeedKmh, accuracy);
 
-      if (firstLiveFix || forceCenter) {
-        isFollowingUser = true;
-        map.setView([currentLat, currentLng], Math.max(map.getZoom(), 16), { animate: true });
-      } else if (isFollowingUser) {
-        map.panTo([currentLat, currentLng], { animate: true, duration: 0.35, noMoveStart: true });
+      if (!isPickingReportPin) {
+        if (firstLiveFix || forceCenter) {
+          isFollowingUser = true;
+          map.setView([currentLat, currentLng], Math.max(map.getZoom(), 16), { animate: true });
+        } else if (isFollowingUser) {
+          map.panTo([currentLat, currentLng], { animate: true, duration: 0.35, noMoveStart: true });
+        }
       }
 
       if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
         evaluarAlertasEnRutaActual(false);
+      } else if (typeof evaluarRadarProximidadCercana === 'function') {
+        evaluarRadarProximidadCercana();
       }
     }
 
@@ -3183,6 +3517,14 @@
     const previewVideo = document.getElementById('previewVideo');
     const btnClearMedia = document.getElementById('btnClearMedia');
     const btnSubmit = document.getElementById('btnSubmitReport');
+    const btnModeGpsReport = document.getElementById('btnModeGpsReport');
+    const btnModeManualPin = document.getElementById('btnModeManualPin');
+    const gpsStatusText = document.getElementById('gpsStatusText');
+    const manualPinOverlay = document.getElementById('manualPinOverlay');
+    const manualPinBar = document.getElementById('manualPinBar');
+    const manualPinCoordsLabel = document.getElementById('manualPinCoordsLabel');
+    const btnConfirmManualPin = document.getElementById('btnConfirmManualPin');
+    const btnCancelManualPin = document.getElementById('btnCancelManualPin');
 
     let selectedCategory = { type: 'Retén de Tránsito', color: '#f97316', emoji: '🚧' };
     let pendingBlob = null;
@@ -3190,6 +3532,74 @@
     let pendingMediaType = null;
     let pendingFileName = null;
     let previewObjectUrl = null;
+    let manualReportCoords = null;
+    let isPickingReportPin = false;
+
+    const bottomPanelEl = document.querySelector('.bottom-panel');
+
+    function updateReportLocationUI() {
+      if (manualReportCoords) {
+        btnModeGpsReport.classList.remove('active');
+        btnModeManualPin.classList.add('active');
+        gpsStatusText.textContent = `📌 Pin manual fijado en mapa (${manualReportCoords.lat.toFixed(5)}, ${manualReportCoords.lng.toFixed(5)}).`;
+        gpsStatusText.style.color = '#67e8f9';
+      } else {
+        btnModeGpsReport.classList.add('active');
+        btnModeManualPin.classList.remove('active');
+        gpsStatusText.textContent = '📍 Se capturará tu ubicación GPS actual.';
+        gpsStatusText.style.color = '';
+      }
+    }
+
+    function updateManualPinCenterDisplay() {
+      if (!isPickingReportPin || !manualPinCoordsLabel) return;
+      const center = map.getCenter();
+      manualPinCoordsLabel.textContent = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
+    }
+
+    function openManualPinPicker() {
+      isPickingReportPin = true;
+      isFollowingUser = false;
+      modal.classList.remove('open');
+      if (bottomPanelEl) bottomPanelEl.style.display = 'none';
+      if (manualReportCoords) {
+        map.setView([manualReportCoords.lat, manualReportCoords.lng], Math.max(map.getZoom(), 16), { animate: false });
+      }
+      manualPinOverlay.classList.add('visible');
+      manualPinBar.classList.add('visible');
+      updateManualPinCenterDisplay();
+      showToast('Mueve o haz zoom en el mapa para ubicar el pin donde ocurrió la novedad.');
+    }
+
+    function closeManualPinPicker(confirmPoint = false) {
+      if (confirmPoint) {
+        const center = map.getCenter();
+        manualReportCoords = {
+          lat: Number(center.lat.toFixed(6)),
+          lng: Number(center.lng.toFixed(6)),
+          isManual: true
+        };
+      }
+      isPickingReportPin = false;
+      manualPinOverlay.classList.remove('visible');
+      manualPinBar.classList.remove('visible');
+      if (bottomPanelEl) bottomPanelEl.style.display = '';
+      updateReportLocationUI();
+      modal.classList.add('open');
+      if (confirmPoint) {
+        showToast('📌 Ubicación manual fijada para tu reporte.');
+      }
+    }
+
+    map.on('move', updateManualPinCenterDisplay);
+    btnModeGpsReport.addEventListener('click', () => {
+      manualReportCoords = null;
+      updateReportLocationUI();
+      showToast('Se usará tu ubicación GPS en tiempo real.');
+    });
+    btnModeManualPin.addEventListener('click', openManualPinPicker);
+    btnConfirmManualPin.addEventListener('click', () => closeManualPinPicker(true));
+    btnCancelManualPin.addEventListener('click', () => closeManualPinPicker(false));
 
     function resetCategoryToDefault() {
       const catButtons = document.querySelectorAll('.cat-option');
@@ -3225,6 +3635,8 @@
       reportForm.reset();
       resetCategoryToDefault();
       resetMediaState();
+      manualReportCoords = null;
+      updateReportLocationUI();
       modal.classList.add('open');
     });
     document.getElementById('btnCloseModal').addEventListener('click', () => modal.classList.remove('open'));
@@ -3298,6 +3710,155 @@
     const PROXIMITY_USER_RADIUS_METERS = 550;
     const PROXIMITY_CORRIDOR_METERS = 700;
     const PROXIMITY_DEST_RADIUS_METERS = 1050;
+
+    // Sintetizador Web Audio API para el sonido de Sónar de Submarino
+    const btnToggleSonarAudio = document.getElementById('btnToggleSonarAudio');
+    let sonarAudioCtx = null;
+    let isSonarAudioEnabled = safeReadJson(STORAGE_KEYS.SONAR_AUDIO, true) !== false;
+    let lastSonarPingAt = 0;
+    let lastNearbySonarSignature = '';
+
+    function ensureSonarAudioContext() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!sonarAudioCtx) {
+        sonarAudioCtx = new AudioCtx();
+      }
+      return sonarAudioCtx;
+    }
+
+    document.addEventListener('pointerdown', () => {
+      if (isSonarAudioEnabled) {
+        const ctx = ensureSonarAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+      }
+    }, { passive: true });
+
+    function updateSonarAudioButtonUI() {
+      if (!btnToggleSonarAudio) return;
+      if (isSonarAudioEnabled) {
+        btnToggleSonarAudio.innerHTML = '<span>🔊</span><span class="sonar-btn-sub">Sónar</span>';
+        btnToggleSonarAudio.classList.add('sonar-on');
+        btnToggleSonarAudio.classList.remove('sonar-muted');
+        btnToggleSonarAudio.title = 'Audio Sónar activo (toca para silenciar)';
+      } else {
+        btnToggleSonarAudio.innerHTML = '<span>🔇</span><span class="sonar-btn-sub">Mute</span>';
+        btnToggleSonarAudio.classList.remove('sonar-on');
+        btnToggleSonarAudio.classList.add('sonar-muted');
+        btnToggleSonarAudio.title = 'Audio Sónar silenciado (toca para activar)';
+      }
+    }
+
+    function scheduleSonarOscillators(ctx) {
+      const start = ctx.currentTime + 0.015;
+      const triggerTone = (delaySec, baseFreq, peakGain, durationSec) => {
+        const oscMain = ctx.createOscillator();
+        const oscHarmonic = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        const harmGain = ctx.createGain();
+
+        oscMain.type = 'sine';
+        oscMain.frequency.setValueAtTime(baseFreq, start + delaySec);
+        oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.965, start + delaySec + durationSec);
+
+        oscHarmonic.type = 'triangle';
+        oscHarmonic.frequency.setValueAtTime(baseFreq * 2.02, start + delaySec);
+        oscHarmonic.frequency.exponentialRampToValueAtTime(baseFreq * 1.95, start + delaySec + durationSec * 0.55);
+
+        gainNode.gain.setValueAtTime(0.0001, start + delaySec);
+        gainNode.gain.linearRampToValueAtTime(peakGain, start + delaySec + 0.012);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, start + delaySec + durationSec);
+
+        harmGain.gain.setValueAtTime(0.0001, start + delaySec);
+        harmGain.gain.linearRampToValueAtTime(peakGain * 0.25, start + delaySec + 0.01);
+        harmGain.gain.exponentialRampToValueAtTime(0.0001, start + delaySec + durationSec * 0.48);
+
+        oscMain.connect(gainNode);
+        oscHarmonic.connect(harmGain);
+        harmGain.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscMain.start(start + delaySec);
+        oscHarmonic.start(start + delaySec);
+        oscMain.stop(start + delaySec + durationSec + 0.05);
+        oscHarmonic.stop(start + delaySec + durationSec + 0.05);
+      };
+
+      // Ping metálico resonante de sónar de submarino + eco sutil
+      triggerTone(0, 1318, 0.28, 1.2);
+      triggerTone(0.33, 1295, 0.09, 0.85);
+    }
+
+    function playSubmarineSonarPing(forcePreview = false) {
+      if (!forcePreview && !isSonarAudioEnabled) return;
+      const nowMs = Date.now();
+      if (!forcePreview && nowMs - lastSonarPingAt < 2400) return;
+
+      const ctx = ensureSonarAudioContext();
+      if (!ctx) return;
+      lastSonarPingAt = nowMs;
+
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+          .then(() => scheduleSonarOscillators(ctx))
+          .catch(() => {});
+      } else {
+        scheduleSonarOscillators(ctx);
+      }
+    }
+
+    function evaluarRadarProximidadCercana() {
+      if (activeRouteDestination || !hasKnownRealGps) return;
+      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
+      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
+      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
+      const allActiveAlerts = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+
+      const nearbyHits = [];
+      allActiveAlerts.forEach((rep) => {
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
+        if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
+        const dist = calcularDistanciaMetros(origLat, origLng, rLat, rLng);
+        if (dist <= PROXIMITY_USER_RADIUS_METERS) {
+          nearbyHits.push({ rep, dist });
+        }
+      });
+
+      if (nearbyHits.length === 0) {
+        lastNearbySonarSignature = '';
+        return;
+      }
+
+      nearbyHits.sort((a, b) => a.dist - b.dist);
+      const sig = nearbyHits.map((h) => h.rep.id).join(',');
+      if (sig !== lastNearbySonarSignature) {
+        lastNearbySonarSignature = sig;
+        const closest = nearbyHits[0];
+        const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
+        playSubmarineSonarPing(false);
+        showToast(`📡 Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`);
+      }
+    }
+
+    if (btnToggleSonarAudio) {
+      updateSonarAudioButtonUI();
+      btnToggleSonarAudio.addEventListener('click', () => {
+        isSonarAudioEnabled = !isSonarAudioEnabled;
+        try {
+          localStorage.setItem(STORAGE_KEYS.SONAR_AUDIO, JSON.stringify(isSonarAudioEnabled));
+        } catch (e) {}
+        updateSonarAudioButtonUI();
+        if (isSonarAudioEnabled) {
+          playSubmarineSonarPing(true);
+          showToast('🔊 Sonido de alerta Sónar activado.');
+        } else {
+          showToast('🔇 Sonido de alerta Sónar silenciado.');
+        }
+      });
+    }
 
     const routeLayer = L.layerGroup().addTo(map);
     const routeModal = document.getElementById('routeModal');
@@ -3516,6 +4077,10 @@
     });
 
     map.on('click', (e) => {
+      if (isPickingReportPin && e && e.latlng) {
+        map.panTo(e.latlng, { animate: true });
+        return;
+      }
       if (!isPickingDestOnMap || !e || !e.latlng) return;
       isPickingDestOnMap = false;
       mapPickBanner.classList.remove('visible');
@@ -3828,6 +4393,7 @@
         const signature = `${dest.id}:${alertsInProximity.map((a) => a.rep.id).join(',')}`;
         if (shouldCenter || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
+          playSubmarineSonarPing(false);
           showToast(`⚠️ ${warningText}`);
         }
       } else {
@@ -4158,14 +4724,18 @@
       const wantsFixed = userRole === 'admin' && document.getElementById('chkIsFixed').checked;
 
       btnSubmit.disabled = true;
-      btnSubmit.textContent = 'Obteniendo ubicación GPS...';
+      btnSubmit.textContent = manualReportCoords ? 'Fijando ubicación manual...' : 'Obteniendo ubicación GPS...';
 
       let coords = null;
       try {
-        coords = await getReportCoordinates();
+        coords = manualReportCoords
+          ? { lat: manualReportCoords.lat, lng: manualReportCoords.lng, simulated: false, isManual: true }
+          : await getReportCoordinates();
 
         if (!navigator.onLine) {
           await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingImageDataUrl, pendingMediaType, pendingFileName);
+          manualReportCoords = null;
+          updateReportLocationUI();
           return;
         }
 
@@ -4205,10 +4775,14 @@
 
         reportForm.reset();
         resetMediaState();
+        manualReportCoords = null;
+        updateReportLocationUI();
         modal.classList.remove('open');
 
         showToast(
-          coords.simulated
+          coords.isManual
+            ? '¡Reporte publicado en el punto exacto del mapa!'
+            : coords.simulated
             ? '¡Reporte publicado en Firebase (zona Bucaramanga)!'
             : '¡Reporte publicado en vivo en Firestore!'
         );

@@ -52,6 +52,14 @@ service cloud.firestore {
         && (!('mediaType' in data) || data.mediaType == null || data.mediaType == 'image' || data.mediaType == 'video');
     }
 
+    function isValidVoto(data) {
+      return data.keys().hasAll(['voteType', 'userId', 'createdAt'])
+        && data.keys().hasOnly(['voteType', 'userId', 'createdAt'])
+        && (data.voteType == 'confirm' || data.voteType == 'deny')
+        && data.userId is string && isValidId(data.userId)
+        && data.createdAt is timestamp;
+    }
+
     match /reportes/{reportId} {
       // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
       allow get: if isValidId(reportId);
@@ -74,14 +82,21 @@ service cloud.firestore {
         && incoming().lat == existing().lat
         && incoming().lng == existing().lng
         && (
-          isAdmin() ||
+          (
+            isAdmin()
+            && !incoming().diff(existing()).affectedKeys().hasAny(['confirmations', 'denials'])
+          ) ||
           (
             incoming().diff(existing()).affectedKeys().hasOnly(['confirmations'])
             && incoming().confirmations == existing().confirmations + 1
+            && !exists(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
+            && existsAfter(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
           ) ||
           (
             incoming().diff(existing()).affectedKeys().hasOnly(['denials'])
             && incoming().denials == existing().denials + 1
+            && !exists(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
+            && existsAfter(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
           ) ||
           (
             existing().authorId == request.auth.uid
@@ -93,6 +108,25 @@ service cloud.firestore {
       allow delete: if isSignedIn()
         && isValidId(reportId)
         && (existing().authorId == request.auth.uid || isAdmin());
+
+      match /votos/{userId} {
+        allow get: if isSignedIn()
+          && isValidId(reportId)
+          && isValidId(userId)
+          && request.auth.uid == userId;
+
+        allow list, update, delete: if false;
+
+        allow create: if isSignedIn()
+          && isValidId(reportId)
+          && isValidId(userId)
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/reportes/$(reportId))
+          && !exists(/databases/$(database)/documents/reportes/$(reportId)/votos/$(userId))
+          && isValidVoto(incoming())
+          && incoming().userId == request.auth.uid
+          && incoming().createdAt == request.time;
+      }
     }
 
     match /admins/{adminId} {
