@@ -36,8 +36,8 @@
         },
         "urlFoto": {
           "type": "string",
-          "description": "URL opcional de foto o video en Firebase Storage.",
-          "maxLength": 1024
+          "description": "URL o imagen JPEG comprimida en Base64 opcional almacenada en Firestore.",
+          "maxLength": 450000
         },
         "mediaType": {
           "type": "string",

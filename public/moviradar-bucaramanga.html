@@ -933,14 +933,14 @@
             placeholder="Indicación o referencia rápida (ej: Por la Puerta del Sol, frente al colegio...)"
           ></textarea>
 
-          <span class="form-label">3. Foto o video (Cámara / Galería)</span>
+          <span class="form-label">3. Foto de evidencia (Cámara directa)</span>
           <label class="media-upload-box" for="reportMedia">
-            <span>📷 Tomar foto o grabar video corto</span>
+            <span>📷 Tomar foto con la cámara</span>
           </label>
           <input
             type="file"
             id="reportMedia"
-            accept="image/*,video/*"
+            accept="image/*"
             capture="environment"
             style="display: none;"
           />
@@ -948,7 +948,7 @@
           <div class="media-preview-wrap" id="mediaPreviewWrap">
             <img id="previewImage" class="media-preview" alt="Vista previa" />
             <video id="previewVideo" class="media-preview" controls playsinline></video>
-            <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar archivo</button>
+            <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar foto</button>
           </div>
 
           <div class="gps-note" id="gpsStatusText">
@@ -1060,6 +1060,39 @@
             Cerrar sesión
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal de PIN secreto para Acceso Administrador -->
+    <div class="modal-backdrop" id="adminPinModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>🔐 Acceso Administrador</h2>
+          <button type="button" class="btn-close" id="btnCloseAdminPinModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;line-height:1.45;">
+          Ingresa el PIN secreto para desbloquear funciones de administrador (crear alertas oficiales fijas y retirar reportes).
+        </p>
+
+        <div class="auth-error" id="adminPinErrorMsg"></div>
+
+        <form id="adminPinForm">
+          <label class="form-label" for="adminPinInput">PIN o Contraseña de Administrador *</label>
+          <input
+            type="password"
+            id="adminPinInput"
+            class="text-input"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+            maxlength="20"
+            placeholder="Ingresa el PIN secreto..."
+          />
+          <button type="submit" class="btn-submit" id="btnUnlockAdmin">
+            Desbloquear modo 👑 Admin
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -1272,22 +1305,30 @@
     }
 
     function saveCachedReports(reports) {
+      const serializable = reports.slice(0, 80).map((rep) => ({
+        id: rep.id,
+        lat: Number(rep.lat),
+        lng: Number(rep.lng),
+        tipo: rep.tipo || rep.type || 'Novedad',
+        descripcion: rep.descripcion || rep.description || '',
+        createdAtMs: extractTimestampMs(rep),
+        urlFoto: rep.urlFoto || rep.mediaUrl || null,
+        mediaType: rep.mediaType || null,
+        isFixed: Boolean(rep.isFixed),
+        confirmations: Number(rep.confirmations || 1),
+        denials: Number(rep.denials || 0)
+      }));
       try {
-        const serializable = reports.slice(0, 120).map((rep) => ({
-          id: rep.id,
-          lat: Number(rep.lat),
-          lng: Number(rep.lng),
-          tipo: rep.tipo || rep.type || 'Novedad',
-          descripcion: rep.descripcion || rep.description || '',
-          createdAtMs: extractTimestampMs(rep),
-          urlFoto: rep.urlFoto || rep.mediaUrl || null,
-          mediaType: rep.mediaType || null,
-          isFixed: Boolean(rep.isFixed),
-          confirmations: Number(rep.confirmations || 1),
-          denials: Number(rep.denials || 0)
-        }));
         localStorage.setItem(STORAGE_KEYS.CACHED_REPORTS, JSON.stringify(serializable));
-      } catch (e) {}
+      } catch (e) {
+        try {
+          const compact = serializable.map((item, idx) => ({
+            ...item,
+            urlFoto: idx < 10 ? item.urlFoto : (item.urlFoto && !String(item.urlFoto).startsWith('data:') ? item.urlFoto : null)
+          }));
+          localStorage.setItem(STORAGE_KEYS.CACHED_REPORTS, JSON.stringify(compact));
+        } catch (err) {}
+      }
     }
 
     function loadPendingReports() {
@@ -1357,9 +1398,20 @@
     let firestoreConnected = false;
 
     // =========================================================================
-    // 4. ROL DE USUARIO (CIUDADANO VS ADMINISTRADOR GENERAL)
+    // 4. ROL DE USUARIO CON ACCESO RESTRINGIDO POR PIN PARA ADMINISTRADOR
     // =========================================================================
-    let userRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE) === 'admin' ? 'admin' : 'citizen';
+    const ADMIN_SECRET_PIN = '1234';
+    const ADMIN_SESSION_KEY = 'moviradar_admin_session_unlocked_v1';
+    try {
+      localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
+    } catch (e) {}
+    let userRole = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true' ? 'admin' : 'citizen';
+
+    const adminPinModal = document.getElementById('adminPinModal');
+    const adminPinForm = document.getElementById('adminPinForm');
+    const adminPinInput = document.getElementById('adminPinInput');
+    const adminPinErrorMsg = document.getElementById('adminPinErrorMsg');
+    const btnCloseAdminPinModal = document.getElementById('btnCloseAdminPinModal');
 
     function applyRoleUI() {
       const btn = document.getElementById('btnToggleRole');
@@ -1381,18 +1433,59 @@
       }
     }
 
+    function openAdminPinModal() {
+      adminPinErrorMsg.textContent = '';
+      adminPinErrorMsg.classList.remove('visible');
+      adminPinInput.value = '';
+      adminPinModal.classList.add('open');
+      setTimeout(() => adminPinInput.focus(), 120);
+    }
+
+    function closeAdminPinModal() {
+      adminPinModal.classList.remove('open');
+      adminPinErrorMsg.textContent = '';
+      adminPinErrorMsg.classList.remove('visible');
+      adminPinInput.value = '';
+    }
+
     document.getElementById('btnToggleRole').addEventListener('click', () => {
-      userRole = userRole === 'admin' ? 'citizen' : 'admin';
-      try {
-        localStorage.setItem(STORAGE_KEYS.USER_ROLE, userRole);
-      } catch (e) {}
-      applyRoleUI();
-      renderCombinedReports(lastServerReports);
-      showToast(
-        userRole === 'admin'
-          ? 'Modo Administrador General: puedes fijar alertas doradas y retirar reportes.'
-          : 'Modo Ciudadano activo.'
-      );
+      if (userRole === 'admin') {
+        userRole = 'citizen';
+        try {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        } catch (e) {}
+        applyRoleUI();
+        renderCombinedReports(lastServerReports);
+        showToast('Modo Ciudadano activo.');
+        return;
+      }
+      openAdminPinModal();
+    });
+
+    btnCloseAdminPinModal.addEventListener('click', closeAdminPinModal);
+    adminPinModal.addEventListener('click', (e) => {
+      if (e.target === adminPinModal) closeAdminPinModal();
+    });
+
+    adminPinForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const enteredPin = adminPinInput.value.trim();
+      if (enteredPin === ADMIN_SECRET_PIN) {
+        userRole = 'admin';
+        try {
+          sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+        } catch (err) {}
+        closeAdminPinModal();
+        applyRoleUI();
+        renderCombinedReports(lastServerReports);
+        showToast('👑 Modo Administrador desbloqueado: puedes fijar alertas y retirar reportes.');
+      } else {
+        adminPinErrorMsg.textContent = 'PIN incorrecto. Acceso de administrador denegado.';
+        adminPinErrorMsg.classList.add('visible');
+        adminPinInput.value = '';
+        adminPinInput.focus();
+        showToast('⛔ PIN incorrecto. Acceso de administrador denegado.');
+      }
     });
     applyRoleUI();
 
@@ -1764,14 +1857,6 @@
         if (pendingAuthResolvers.length > 0) {
           const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
           waiters.forEach((w) => w.resolve(user));
-        }
-        if (user.email === 'faoj2013@gmail.com' && user.emailVerified && userRole !== 'admin') {
-          userRole = 'admin';
-          try {
-            localStorage.setItem(STORAGE_KEYS.USER_ROLE, userRole);
-          } catch (e) {}
-          applyRoleUI();
-          renderCombinedReports(lastServerReports);
         }
         if (navigator.onLine && loadPendingReports().length > 0) {
           sincronizarReportesPendientes();
@@ -2392,6 +2477,7 @@
 
     let selectedCategory = { type: 'Retén', color: '#f97316', emoji: '🚧' };
     let pendingBlob = null;
+    let pendingImageDataUrl = null;
     let pendingMediaType = null;
     let pendingFileName = null;
     let previewObjectUrl = null;
@@ -2408,6 +2494,7 @@
       previewImage.removeAttribute('src');
       previewVideo.removeAttribute('src');
       pendingBlob = null;
+      pendingImageDataUrl = null;
       pendingMediaType = null;
       pendingFileName = null;
     }
@@ -2431,57 +2518,74 @@
       });
     });
 
-    mediaInput.addEventListener('change', (e) => {
+    function comprimirImagenACanvasBase64(file, maxWidth = 800, quality = 0.7) {
+      return new Promise((resolve, reject) => {
+        const rawUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          try {
+            URL.revokeObjectURL(rawUrl);
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
+            if (!w || !h) {
+              reject(new Error('INVALID_IMAGE_DIMENSIONS'));
+              return;
+            }
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            let dataUrl = canvas.toDataURL('image/jpeg', quality);
+            if (dataUrl.length > 350000) {
+              const fallbackW = Math.min(w, 640);
+              const fallbackH = Math.round((h * fallbackW) / w);
+              canvas.width = fallbackW;
+              canvas.height = fallbackH;
+              ctx.drawImage(img, 0, 0, fallbackW, fallbackH);
+              dataUrl = canvas.toDataURL('image/jpeg', 0.55);
+            }
+            resolve(dataUrl);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(rawUrl);
+          reject(new Error('IMAGE_LOAD_ERROR'));
+        };
+        img.src = rawUrl;
+      });
+    }
+
+    mediaInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       resetMediaState();
 
-      if (file.type.startsWith('image/')) {
-        const img = new Image();
-        const rawUrl = URL.createObjectURL(file);
-        img.onload = () => {
-          URL.revokeObjectURL(rawUrl);
-          const maxW = 1080;
-          let w = img.width;
-          let h = img.height;
-          if (w > maxW) {
-            h = Math.round((h * maxW) / w);
-            w = maxW;
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      if (file.type && !file.type.startsWith('image/')) {
+        showToast('Solo se admiten fotografías en este campo.');
+        return;
+      }
 
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) return;
-              pendingBlob = blob;
-              pendingMediaType = 'image';
-              pendingFileName = `foto_${Date.now()}.jpg`;
-              previewObjectUrl = URL.createObjectURL(blob);
-              previewImage.src = previewObjectUrl;
-              previewImage.style.display = 'block';
-              mediaPreviewWrap.style.display = 'block';
-            },
-            'image/jpeg',
-            0.8
-          );
-        };
-        img.src = rawUrl;
-      } else if (file.type.startsWith('video/')) {
-        if (file.size > 25 * 1024 * 1024) {
-          showToast('El video supera los 25 MB. Graba un clip más corto.');
-          return;
-        }
-        pendingBlob = file;
-        pendingMediaType = 'video';
-        const ext = (file.name && file.name.split('.').pop()) || 'mp4';
-        pendingFileName = `video_${Date.now()}.${ext}`;
-        previewObjectUrl = URL.createObjectURL(file);
-        previewVideo.src = previewObjectUrl;
-        previewVideo.style.display = 'block';
+      try {
+        const compressedBase64 = await comprimirImagenACanvasBase64(file, 800, 0.7);
+        pendingImageDataUrl = compressedBase64;
+        pendingBlob = null;
+        pendingMediaType = 'image';
+        pendingFileName = `foto_${Date.now()}.jpg`;
+        previewImage.src = compressedBase64;
+        previewImage.style.display = 'block';
         mediaPreviewWrap.style.display = 'block';
+      } catch (err) {
+        console.error('Error comprimiendo imagen:', err);
+        showToast('No se pudo procesar la foto. Intenta tomarla nuevamente.');
       }
     });
 
@@ -2537,15 +2641,10 @@
       });
     }
 
-    async function enqueueOfflineReport(coords, descripcion, isFixed, blob, mediaType, fileName) {
-      let mediaDataUrl = null;
-      if (blob && blob.size <= 2 * 1024 * 1024) {
-        try {
-          mediaDataUrl = await blobToDataUrl(blob);
-        } catch (e) {
-          mediaDataUrl = null;
-        }
-      }
+    async function enqueueOfflineReport(coords, descripcion, isFixed, imageDataUrl, mediaType, fileName) {
+      const mediaDataUrl = imageDataUrl && String(imageDataUrl).length <= 420000
+        ? String(imageDataUrl)
+        : null;
 
       const localId = `pending_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
       const queue = loadPendingReports();
@@ -2558,7 +2657,7 @@
         isFixed,
         createdAtMs: Date.now(),
         mediaDataUrl,
-        mediaType: mediaDataUrl ? mediaType : null,
+        mediaType: mediaDataUrl ? (mediaType || 'image') : null,
         fileName: mediaDataUrl ? fileName : null,
         confirmations: 1,
         denials: 0
@@ -2580,7 +2679,7 @@
       modal.classList.remove('open');
 
       showToast(
-        blob && !savedWithMedia
+        imageDataUrl && !savedWithMedia
           ? 'Sin internet: reporte guardado sin archivo pesado; se sincronizará con Firestore.'
           : 'Sin internet: reporte guardado localmente y se enviará a Firestore al recuperar señal.'
       );
@@ -2601,10 +2700,12 @@
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
 
-          let urlFoto = null;
-          if (item.mediaDataUrl && item.fileName) {
-            const blob = await dataUrlToBlob(item.mediaDataUrl);
-            urlFoto = await withTimeout(uploadMediaToStorage(blob, item.fileName, () => {}), 20000);
+          let urlFoto = item.mediaDataUrl && String(item.mediaDataUrl).length <= 450000
+            ? String(item.mediaDataUrl)
+            : null;
+
+          if (!urlFoto && item.blobDataUrl) {
+            urlFoto = String(item.blobDataUrl).slice(0, 450000);
           }
 
           await withTimeout(
@@ -2616,12 +2717,12 @@
               isFixed: canFix && Boolean(item.isFixed),
               timestamp: serverTimestamp(),
               urlFoto,
-              mediaType: urlFoto ? item.mediaType : null,
+              mediaType: urlFoto ? (item.mediaType || 'image') : null,
               confirmations: 1,
               denials: 0,
               authorId: currentUser.uid
             }),
-            15000
+            20000
           );
 
           syncedCount += 1;
@@ -2653,11 +2754,12 @@
       btnSubmit.disabled = true;
       btnSubmit.textContent = 'Obteniendo ubicación GPS...';
 
+      let coords = null;
       try {
-        const coords = await getReportCoordinates();
+        coords = await getReportCoordinates();
 
         if (!navigator.onLine) {
-          await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingBlob, pendingMediaType, pendingFileName);
+          await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingImageDataUrl, pendingMediaType, pendingFileName);
           return;
         }
 
@@ -2665,18 +2767,11 @@
         const user = await ensureAuthenticated();
         const isFixed = wantsFixed && user.email === 'faoj2013@gmail.com' && user.emailVerified;
 
-        let urlFoto = null;
-        if (pendingBlob && pendingFileName) {
-          btnSubmit.textContent = 'Subiendo archivo 0%...';
-          urlFoto = await withTimeout(
-            uploadMediaToStorage(pendingBlob, pendingFileName, (pct) => {
-              btnSubmit.textContent = `Subiendo archivo ${pct}%...`;
-            }),
-            20000
-          );
-        }
+        const urlFoto = pendingImageDataUrl && String(pendingImageDataUrl).length <= 450000
+          ? String(pendingImageDataUrl)
+          : null;
 
-        btnSubmit.textContent = 'Guardando en Firestore...';
+        btnSubmit.textContent = urlFoto ? 'Subiendo foto y reporte a Firestore...' : 'Guardando en Firestore...';
 
         const docRef = await withTimeout(
           addDoc(collection(db, COLLECTION_NAME), {
@@ -2687,12 +2782,12 @@
             isFixed,
             timestamp: serverTimestamp(),
             urlFoto,
-            mediaType: urlFoto ? pendingMediaType : null,
+            mediaType: urlFoto ? 'image' : null,
             confirmations: 1,
             denials: 0,
             authorId: user.uid
           }),
-          12000
+          20000
         );
 
         map.flyTo([coords.lat, coords.lng], 16);
@@ -2709,22 +2804,24 @@
         showToast(
           coords.simulated
             ? '¡Reporte publicado en Firebase (zona Bucaramanga)!'
-            : '¡Reporte publicado en vivo con tu GPS!'
+            : '¡Reporte publicado en vivo en Firestore!'
         );
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') {
-          showToast('Inicia sesión con tu correo para publicar el reporte.');
+          showToast('Inicia sesión para publicar el reporte.');
           return;
         }
         console.error('Error publicando reporte en Firebase:', err);
-        if (err && err.code === 'storage/unauthorized') {
-          showToast('Sin permiso en Firebase Storage. Revisa las reglas de Storage.');
+        if (!navigator.onLine || (err && err.code === 'unavailable')) {
+          const fallbackCoords = coords || await getReportCoordinates();
+          await enqueueOfflineReport(fallbackCoords, descripcion, wantsFixed, pendingImageDataUrl, pendingMediaType, pendingFileName);
         } else if (err && err.code === 'permission-denied') {
-          showToast('Sin permiso en Firestore.');
+          showToast('Sin permiso en Firestore para publicar este reporte.');
           handleFirestoreError(err, OperationType.CREATE, COLLECTION_NAME);
+        } else if (err && err.message === 'NETWORK_TIMEOUT') {
+          showToast('La conexión tardó demasiado. Verifica tu señal e inténtalo de nuevo.');
         } else {
-          const coords = await getReportCoordinates();
-          await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingBlob, pendingMediaType, pendingFileName);
+          showToast(`No se pudo publicar el reporte (${err && err.code ? err.code : 'error de red'}).`);
         }
       } finally {
         btnSubmit.disabled = false;

@@ -48,7 +48,7 @@ service cloud.firestore {
         && data.confirmations is int && data.confirmations >= 0
         && data.denials is int && data.denials >= 0
         && data.authorId is string && isValidId(data.authorId)
-        && (!('urlFoto' in data) || data.urlFoto == null || (data.urlFoto is string && data.urlFoto.size() <= 1024))
+        && (!('urlFoto' in data) || data.urlFoto == null || (data.urlFoto is string && data.urlFoto.size() <= 450000))
         && (!('mediaType' in data) || data.mediaType == null || data.mediaType == 'image' || data.mediaType == 'video');
     }
 
