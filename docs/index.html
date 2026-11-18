@@ -630,20 +630,6 @@
       color: #a7f3d0;
     }
 
-    .route-alt-pill {
-      margin-top: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 9px;
-      border-radius: 8px;
-      border: 1px solid rgba(16, 185, 129, 0.7);
-      background: rgba(16, 185, 129, 0.22);
-      color: #6ee7b7;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
 
     .route-banner-close {
       min-width: 30px;
@@ -851,55 +837,59 @@
       display: block;
     }
 
-    /* Efecto Visual de Radar MoviRadar sobre ruta activa */
-    .moviradar-route-flow {
-      stroke-dasharray: 12, 10;
-      animation: moviradarRouteFlow 1.1s linear infinite;
-    }
-
-    @keyframes moviradarRouteFlow {
-      to {
-        stroke-dashoffset: -44;
-      }
-    }
-
-    .moviradar-radar-sweep {
+    /* Efecto Visual de Radar de Proximidad MoviRadar alrededor del conductor */
+    .moviradar-user-radar {
       position: relative;
-      width: 34px;
-      height: 34px;
+      width: 112px;
+      height: 112px;
       display: flex;
       align-items: center;
       justify-content: center;
       pointer-events: none;
     }
 
+    .moviradar-sweep-cone {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(34, 211, 238, 0.34) 0deg,
+        rgba(16, 185, 129, 0.08) 55deg,
+        rgba(34, 211, 238, 0) 95deg,
+        rgba(34, 211, 238, 0) 360deg
+      );
+      animation: moviradarSweepSpin 3.2s linear infinite;
+    }
+
+    .moviradar-user-radar.danger .moviradar-sweep-cone {
+      background: conic-gradient(
+        from 0deg,
+        rgba(248, 113, 113, 0.38) 0deg,
+        rgba(245, 158, 11, 0.1) 55deg,
+        rgba(248, 113, 113, 0) 95deg,
+        rgba(248, 113, 113, 0) 360deg
+      );
+    }
+
     .moviradar-radar-ring {
       position: absolute;
-      inset: 0;
+      inset: 14px;
       border-radius: 50%;
-      border: 2px solid #22d3ee;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.38) 0%, rgba(6, 182, 212, 0) 72%);
-      animation: moviradarPing 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+      border: 2px solid rgba(34, 211, 238, 0.85);
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(6, 182, 212, 0) 70%);
+      animation: moviradarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
 
-    .moviradar-radar-sweep.danger .moviradar-radar-ring {
-      border-color: #f87171;
-      background: radial-gradient(circle, rgba(239, 68, 68, 0.42) 0%, rgba(239, 68, 68, 0) 72%);
+    .moviradar-radar-ring.outer {
+      inset: 2px;
+      border-color: rgba(16, 185, 129, 0.45);
+      animation-delay: 0.9s;
     }
 
-    .moviradar-radar-core {
-      position: relative;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #10b981;
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 12px #22d3ee, 0 0 4px #10b981;
-    }
-
-    .moviradar-radar-sweep.danger .moviradar-radar-core {
-      background: #ef4444;
-      box-shadow: 0 0 14px #f87171;
+    .moviradar-user-radar.danger .moviradar-radar-ring {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0) 70%);
     }
 
     .moviradar-alert-beacon {
@@ -912,9 +902,14 @@
       pointer-events: none;
     }
 
+    @keyframes moviradarSweepSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     @keyframes moviradarPing {
       0% { transform: scale(0.55); opacity: 0.95; }
-      80%, 100% { transform: scale(1.75); opacity: 0; }
+      80%, 100% { transform: scale(1.65); opacity: 0; }
     }
 
     .btn-report-main {
@@ -1353,9 +1348,9 @@
       </div>
     </div>
 
-    <!-- Botones flotantes Asistente de Ruta y Gestión de Destinos -->
+    <!-- Botones flotantes Radar de Proximidad y Gestión de Destinos -->
     <div class="route-float-group">
-      <button type="button" class="btn-route-float" id="btnOpenRouteAssistant" title="Trazar ruta real por calles y revisar alertas">
+      <button type="button" class="btn-route-float" id="btnOpenRouteAssistant" title="Activar Radar de Proximidad hacia tu destino">
         <span>🧭 Voy para...</span>
       </button>
       <button type="button" class="btn-route-float compact" id="btnQuickManageDest" title="Agregar o editar destinos frecuentes">
@@ -1365,7 +1360,7 @@
 
     <!-- Banner cuando el usuario está eligiendo un destino en el mapa -->
     <div class="map-pick-banner" id="mapPickBanner">
-      <span>🎯 Toca cualquier calle en el mapa para fijar tu destino</span>
+      <span>🎯 Toca cualquier lugar en el mapa para fijar tu destino</span>
       <button type="button" class="route-banner-close" id="btnCancelMapPick" title="Cancelar">✕</button>
     </div>
 
@@ -1626,16 +1621,16 @@
       </div>
     </div>
 
-    <!-- Modal de Asistente de Ruta (Voy para...) con OSRM y Destinos Personalizables -->
+    <!-- Modal de Radar de Proximidad Inteligente (Voy para...) con Destinos Personalizables -->
     <div class="modal-backdrop" id="routeModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>🧭 Ruta Inteligente (Voy para...)</h2>
+          <h2>📡 Radar de Proximidad (Voy para...)</h2>
           <button type="button" class="btn-close" id="btnCloseRouteModal" aria-label="Cerrar">✕</button>
         </div>
 
         <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;line-height:1.45;">
-          Traza la ruta real por las calles y detecta retenes, accidentes o trancones activos en tu trayecto para sugerir vías alternas.
+          Elige tu destino para activar el escaneo radar alrededor de tu posición y recibir avisos en vivo si hay retenes, accidentes o novedades cerca de tu zona de trayecto.
         </p>
 
         <div class="dest-section-head">
@@ -1725,10 +1720,10 @@
 
         <div style="display:flex;gap:8px;">
           <button type="button" class="btn-submit" id="btnCheckRouteNow" style="flex:1;">
-            Trazar ruta por calles
+            📡 Activar radar hacia destino
           </button>
           <button type="button" class="btn-logout" id="btnCancelRoute" style="width:auto;padding:0 14px;display:none;">
-            Limpiar
+            Desactivar
           </button>
         </div>
       </div>
@@ -2036,13 +2031,6 @@
     let isSyncingPending = false;
     let firestoreConnected = false;
     let activeRouteDestination = null;
-    let activeRouteCandidates = [];
-    let selectedRouteCandidateIdx = 0;
-    let activeRouteFetchOrigin = null;
-    let activeRouteFetchAt = 0;
-    let activeRouteRequestSeq = 0;
-    let radarSweepTimerId = null;
-    let radarSweepMarker = null;
     let lastRouteAlertSignature = '';
 
     // =========================================================================
@@ -2782,7 +2770,7 @@
           renderCombinedReports(activeReports);
           updateNetworkAndSyncStatus();
           if (typeof evaluarAlertasEnRutaActual === 'function' && activeRouteDestination) {
-            evaluarAlertasEnRutaActual(false, false);
+            evaluarAlertasEnRutaActual(false);
           }
 
           if (navigator.onLine && auth.currentUser && loadPendingReports().length > 0) {
@@ -3023,7 +3011,7 @@
       }
 
       if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
-        evaluarAlertasEnRutaActual(false, false);
+        evaluarAlertasEnRutaActual(false);
       }
     }
 
@@ -3290,7 +3278,7 @@
     });
 
     // =========================================================================
-    // 10. RUTA INTELIGENTE POR CALLES (OSRM), EFECTO RADAR Y DESTINOS EDITABLES
+    // 10. RADAR DE PROXIMIDAD INTELIGENTE ("VOY PARA...") Y DESTINOS EDITABLES
     // =========================================================================
     const DEFAULT_CUSTOM_DESTINATIONS = [
       { id: 'terminal', emoji: '🚌', name: 'Terminal de Transportes', lat: 7.1059, lng: -73.1496 },
@@ -3337,10 +3325,9 @@
     let isPickingDestOnMap = false;
     let selectedDestEmoji = '📍';
 
-    const STREET_ROUTE_CORRIDOR_METERS = 165;
-    const FALLBACK_ROUTE_CORRIDOR_METERS = 480;
-    const OSRM_RECALC_DISTANCE_METERS = 160;
-    const OSRM_RECALC_MIN_MS = 12000;
+    const PROXIMITY_USER_RADIUS_METERS = 550;
+    const PROXIMITY_CORRIDOR_METERS = 700;
+    const PROXIMITY_DEST_RADIUS_METERS = 1050;
 
     const routeLayer = L.layerGroup().addTo(map);
     const routeModal = document.getElementById('routeModal');
@@ -3442,7 +3429,7 @@
             <div style="font-size:10px;color:#94a3b8;">${Number(d.lat).toFixed(4)}, ${Number(d.lng).toFixed(4)}</div>
           </div>
           <div class="dest-crud-actions">
-            <button type="button" class="dest-mini-btn go" title="Trazar ruta hacia este destino">🧭 Ir</button>
+            <button type="button" class="dest-mini-btn go" title="Activar radar hacia este destino">📡 Ir</button>
             <button type="button" class="dest-mini-btn edit" title="Editar destino">✏️</button>
             <button type="button" class="dest-mini-btn del" title="Eliminar destino">🗑️</button>
           </div>
@@ -3635,8 +3622,7 @@
         );
         if (activeRouteDestination && activeRouteDestination.id === editId) {
           activeRouteDestination = { ...activeRouteDestination, emoji: selectedDestEmoji, name, lat, lng };
-          activeRouteCandidates = [];
-          evaluarAlertasEnRutaActual(true, true);
+          evaluarAlertasEnRutaActual(true);
         }
         showToast(`Destino "${name}" actualizado.`);
       } else {
@@ -3674,179 +3660,27 @@
       return Math.hypot(px - t * bx, py - t * by);
     }
 
-    function calcularMetricasPolilinea(coords) {
-      const cumDist = [0];
-      let total = 0;
-      for (let i = 1; i < coords.length; i += 1) {
-        total += calcularDistanciaMetros(coords[i - 1][0], coords[i - 1][1], coords[i][0], coords[i][1]);
-        cumDist.push(total);
-      }
-      return { cumDist, totalDist: total };
-    }
-
-    function evaluarPolilineaContraAlertas(coords, allActiveAlerts, corridorMeters) {
-      if (!Array.isArray(coords) || coords.length < 2) return [];
-      const { cumDist } = calcularMetricasPolilinea(coords);
-      const matches = [];
-
-      allActiveAlerts.forEach((rep) => {
-        const rLat = Number(rep.lat);
-        const rLng = Number(rep.lng);
-        if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
-
-        let minCorridorDist = Infinity;
-        let nearestVertexIdx = 0;
-
-        for (let i = 0; i < coords.length - 1; i += 1) {
-          const d = distanciaPuntoASegmentoMetros(
-            rLat, rLng,
-            coords[i][0], coords[i][1],
-            coords[i + 1][0], coords[i + 1][1]
-          );
-          if (d < minCorridorDist) {
-            minCorridorDist = d;
-            nearestVertexIdx = i;
-          }
-        }
-
-        if (minCorridorDist <= corridorMeters) {
-          matches.push({
-            rep,
-            corridorDist: minCorridorDist,
-            distAlongRoute: cumDist[nearestVertexIdx] || calcularDistanciaMetros(coords[0][0], coords[0][1], rLat, rLng)
-          });
-        }
-      });
-
-      matches.sort((a, b) => a.distAlongRoute - b.distAlongRoute);
-      return matches;
-    }
-
-    function sugerirViasAlternas(dest, alertsOnRoute) {
-      const sample = alertsOnRoute[0] && alertsOnRoute[0].rep ? alertsOnRoute[0].rep : dest;
+    function sugerirViasAlternas(dest, alertsOnZone) {
+      const sample = alertsOnZone[0] && alertsOnZone[0].rep ? alertsOnZone[0].rep : dest;
       const lat = Number(sample.lat);
       const lng = Number(sample.lng);
       const destNameLower = String(dest.name || '').toLowerCase();
 
       if (destNameLower.includes('gir') || lng < -73.14) {
-        return 'Vías alternas: Autopista Floridablanca, Vía Palenque - Café Madrid o Anillo Vial según sentido.';
+        return 'Precaución: considera Autopista, Vía Palenque - Café Madrid o vías alternas.';
       }
       if (destNameLower.includes('cañaveral') || destNameLower.includes('florida') || lat < 7.088) {
-        return 'Vías alternas: Carrera 33, Vía Antigua a Floridablanca o Transversal Oriental.';
+        return 'Precaución: considera Carrera 33, Vía Antigua a Floridablanca o Transversal Oriental.';
       }
       if (lat >= 7.095 && lat <= 7.128 && lng >= -73.132) {
-        return 'Vías alternas: Carrera 33, Carrera 27, Avenida Quebradaseca o vías secundarias paralelas.';
+        return 'Precaución: considera Carrera 33, Carrera 27, Av. Quebradaseca o vías secundarias.';
       }
-      return 'Vías alternas: Carrera 33, Carrera 27, Calle 45 o vías secundarias cercanas.';
-    }
-
-    function detenerAnimacionRadar() {
-      if (radarSweepTimerId !== null) {
-        clearInterval(radarSweepTimerId);
-        radarSweepTimerId = null;
-      }
-      radarSweepMarker = null;
-    }
-
-    function iniciarAnimacionRadarEnRuta(coords, hasDanger) {
-      detenerAnimacionRadar();
-      if (!Array.isArray(coords) || coords.length < 2) return;
-
-      const { cumDist, totalDist } = calcularMetricasPolilinea(coords);
-      if (totalDist < 15) return;
-
-      const sweepIcon = L.divIcon({
-        className: 'custom-radar-sweep',
-        html: `<div class="moviradar-radar-sweep${hasDanger ? ' danger' : ''}">
-          <div class="moviradar-radar-ring"></div>
-          <div class="moviradar-radar-core"></div>
-        </div>`,
-        iconSize: [34, 34],
-        iconAnchor: [17, 17]
-      });
-
-      radarSweepMarker = L.marker(coords[0], {
-        icon: sweepIcon,
-        interactive: false,
-        zIndexOffset: 900
-      }).addTo(routeLayer);
-
-      let progress = 0;
-      const STEP = 0.014;
-      radarSweepTimerId = setInterval(() => {
-        if (!radarSweepMarker || !activeRouteDestination) {
-          detenerAnimacionRadar();
-          return;
-        }
-        progress += STEP;
-        if (progress > 1) progress = 0;
-
-        const targetDist = progress * totalDist;
-        let segIdx = 0;
-        while (segIdx < cumDist.length - 2 && cumDist[segIdx + 1] < targetDist) {
-          segIdx += 1;
-        }
-        const segStartDist = cumDist[segIdx];
-        const segEndDist = cumDist[segIdx + 1];
-        const segSpan = Math.max(segEndDist - segStartDist, 0.001);
-        const frac = Math.max(0, Math.min(1, (targetDist - segStartDist) / segSpan));
-
-        const p1 = coords[segIdx];
-        const p2 = coords[segIdx + 1];
-        const interpLat = p1[0] + (p2[0] - p1[0]) * frac;
-        const interpLng = p1[1] + (p2[1] - p1[1]) * frac;
-        radarSweepMarker.setLatLng([interpLat, interpLng]);
-      }, 65);
-    }
-
-    async function fetchOsrmStreetRoutes(origLat, origLng, destLat, destLng) {
-      const endpoints = [
-        `https://routing.openstreetmap.de/routed-car/route/v1/driving/${origLng},${origLat};${destLng},${destLat}?overview=full&geometries=geojson&alternatives=true&steps=false`,
-        `https://router.project-osrm.org/route/v1/driving/${origLng},${origLat};${destLng},${destLat}?overview=full&geometries=geojson&alternatives=true&steps=false`
-      ];
-
-      for (const url of endpoints) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
-        try {
-          const res = await fetch(url, { signal: controller.signal });
-          clearTimeout(timeoutId);
-          if (!res.ok) continue;
-          const data = await res.json();
-          if (data && data.code === 'Ok' && Array.isArray(data.routes) && data.routes.length > 0) {
-            const parsed = data.routes
-              .filter((r) => r.geometry && Array.isArray(r.geometry.coordinates) && r.geometry.coordinates.length >= 2)
-              .map((r) => ({
-                coords: r.geometry.coordinates.map(([lng, lat]) => [Number(lat), Number(lng)]),
-                distanceMeters: Number(r.distance || 0),
-                durationSeconds: Number(r.duration || 0),
-                isFallback: false
-              }));
-            if (parsed.length > 0) return parsed;
-          }
-        } catch (err) {
-          clearTimeout(timeoutId);
-        }
-      }
-
-      const directMeters = calcularDistanciaMetros(origLat, origLng, destLat, destLng);
-      return [{
-        coords: [[origLat, origLng], [destLat, destLng]],
-        distanceMeters: directMeters,
-        durationSeconds: Math.round((directMeters / 1000) * 150),
-        isFallback: true
-      }];
+      return 'Precaución: considera Carrera 33, Carrera 27 o vías secundarias paralelas.';
     }
 
     function limpiarRutaActiva() {
       activeRouteDestination = null;
-      activeRouteCandidates = [];
-      selectedRouteCandidateIdx = 0;
-      activeRouteFetchOrigin = null;
-      activeRouteFetchAt = 0;
-      activeRouteRequestSeq += 1;
       lastRouteAlertSignature = '';
-      detenerAnimacionRadar();
       routeLayer.clearLayers();
       routeAlertBanner.classList.remove('visible', 'danger', 'clear');
       routeAlertBannerText.textContent = '';
@@ -3858,72 +3692,82 @@
       renderDestQuickChips();
     }
 
-    function renderizarRutaActivaYEvaluar(shouldFitBounds = false) {
-      if (!activeRouteDestination || activeRouteCandidates.length === 0) return;
-
+    function evaluarAlertasEnRutaActual(shouldCenter = false) {
+      if (!activeRouteDestination) return;
+      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
+      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const dest = activeRouteDestination;
-      if (selectedRouteCandidateIdx >= activeRouteCandidates.length) {
-        selectedRouteCandidateIdx = 0;
-      }
-      const chosenRoute = activeRouteCandidates[selectedRouteCandidateIdx];
-      const coords = chosenRoute.coords;
 
       const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
       const allActiveAlerts = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
-      const corridorRadius = chosenRoute.isFallback ? FALLBACK_ROUTE_CORRIDOR_METERS : STREET_ROUTE_CORRIDOR_METERS;
 
-      const evaluatedCandidates = activeRouteCandidates.map((cand) => ({
-        cand,
-        alerts: evaluarPolilineaContraAlertas(
-          cand.coords,
-          allActiveAlerts,
-          cand.isFallback ? FALLBACK_ROUTE_CORRIDOR_METERS : STREET_ROUTE_CORRIDOR_METERS
-        )
-      }));
-
-      const alertsOnRoute = evaluatedCandidates[selectedRouteCandidateIdx].alerts;
-      const cleanerAltIdx = evaluatedCandidates.findIndex(
-        (item, idx) => idx !== selectedRouteCandidateIdx && item.alerts.length < alertsOnRoute.length
-      );
-
-      detenerAnimacionRadar();
-      routeLayer.clearLayers();
-
-      // Si existe una ruta alterna con menos alertas, mostrarla sutilmente en verde discontinuo
-      if (cleanerAltIdx !== -1 && alertsOnRoute.length > 0) {
-        L.polyline(activeRouteCandidates[cleanerAltIdx].coords, {
-          color: '#10b981',
-          weight: 5,
-          opacity: 0.55,
-          dashArray: '8, 10'
-        }).addTo(routeLayer);
-      }
-
-      const mainColor = alertsOnRoute.length > 0 ? '#f97316' : '#06b6d4';
-      // Halo exterior de radar sobre las calles reales
-      L.polyline(coords, {
-        color: mainColor,
-        weight: 11,
-        opacity: 0.24,
-        lineCap: 'round',
-        lineJoin: 'round'
-      }).addTo(routeLayer);
-
-      // Trazado principal animado siguiendo calles y avenidas
-      L.polyline(coords, {
-        color: alertsOnRoute.length > 0 ? '#fb923c' : '#22d3ee',
-        weight: 4.5,
-        opacity: 0.95,
-        className: 'moviradar-route-flow',
-        lineCap: 'round',
-        lineJoin: 'round'
-      }).addTo(routeLayer);
-
-      // Anillos de alerta en los puntos críticos que intersectan la ruta
-      alertsOnRoute.forEach(({ rep }) => {
+      const alertsInProximity = [];
+      allActiveAlerts.forEach((rep) => {
         const rLat = Number(rep.lat);
         const rLng = Number(rep.lng);
         if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
+
+        const distFromUser = calcularDistanciaMetros(origLat, origLng, rLat, rLng);
+        const distToDest = calcularDistanciaMetros(dest.lat, dest.lng, rLat, rLng);
+        const corridorDist = distanciaPuntoASegmentoMetros(rLat, rLng, origLat, origLng, dest.lat, dest.lng);
+
+        const isNearUser = distFromUser <= PROXIMITY_USER_RADIUS_METERS;
+        const isInZoneCorridor = corridorDist <= PROXIMITY_CORRIDOR_METERS;
+        const isNearDestination = distToDest <= PROXIMITY_DEST_RADIUS_METERS;
+
+        if (isNearUser || isInZoneCorridor || isNearDestination) {
+          alertsInProximity.push({
+            rep,
+            distFromUser,
+            distToDest,
+            corridorDist,
+            reason: isNearUser
+              ? 'cerca de tu posición'
+              : isNearDestination
+              ? `en zona de ${dest.name}`
+              : 'en tu zona de trayecto'
+          });
+        }
+      });
+
+      alertsInProximity.sort((a, b) => a.distFromUser - b.distFromUser);
+
+      // Sin líneas falsas de enrutamiento: solo Radar de Proximidad limpio alrededor del usuario + marcador de destino
+      routeLayer.clearLayers();
+      const hasAlerts = alertsInProximity.length > 0;
+      const radarAccent = hasAlerts ? '#ef4444' : '#06b6d4';
+
+      // Anillo de cobertura radar sutil alrededor de la posición del conductor
+      L.circle([origLat, origLng], {
+        radius: PROXIMITY_USER_RADIUS_METERS,
+        color: radarAccent,
+        weight: 1.5,
+        opacity: 0.45,
+        fillColor: hasAlerts ? '#ef4444' : '#10b981',
+        fillOpacity: 0.06,
+        interactive: false
+      }).addTo(routeLayer);
+
+      // Pulso y barrido visual del radar centrado sobre tu ubicación
+      L.marker([origLat, origLng], {
+        interactive: false,
+        zIndexOffset: 250,
+        icon: L.divIcon({
+          className: 'custom-user-radar',
+          html: `<div class="moviradar-user-radar${hasAlerts ? ' danger' : ''}">
+            <div class="moviradar-radar-ring outer"></div>
+            <div class="moviradar-radar-ring"></div>
+            <div class="moviradar-sweep-cone"></div>
+          </div>`,
+          iconSize: [112, 112],
+          iconAnchor: [56, 56]
+        })
+      }).addTo(routeLayer);
+
+      // Anillos pulsantes sobre las alertas detectadas en la zona de influencia
+      alertsInProximity.forEach(({ rep }) => {
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
         L.marker([rLat, rLng], {
           interactive: false,
           zIndexOffset: 350,
@@ -3936,7 +3780,18 @@
         }).addTo(routeLayer);
       });
 
-      // Marcador destino
+      // Zona y marcador del destino elegido (sin trazar líneas sobre los techos)
+      L.circle([dest.lat, dest.lng], {
+        radius: PROXIMITY_DEST_RADIUS_METERS,
+        color: '#06b6d4',
+        weight: 1,
+        opacity: 0.32,
+        dashArray: '6, 6',
+        fillColor: '#06b6d4',
+        fillOpacity: 0.04,
+        interactive: false
+      }).addTo(routeLayer);
+
       L.marker([dest.lat, dest.lng], {
         zIndexOffset: 650,
         icon: L.divIcon({
@@ -3947,159 +3802,105 @@
         })
       }).addTo(routeLayer);
 
-      // Marcador animado de barrido radar sobre el trazado real
-      iniciarAnimacionRadarEnRuta(coords, alertsOnRoute.length > 0);
-
-      if (shouldFitBounds) {
-        isFollowingUser = false;
-        map.fitBounds(L.latLngBounds(coords), { padding: [65, 65], maxZoom: 15 });
+      if (shouldCenter) {
+        isFollowingUser = true;
+        map.flyTo([origLat, origLng], Math.max(map.getZoom(), 14), { duration: 0.6 });
       }
 
-      const routeKm = (chosenRoute.distanceMeters / 1000).toFixed(1);
-      const routeMin = Math.max(1, Math.round(chosenRoute.durationSeconds / 60));
-      const modeTag = chosenRoute.isFallback ? 'Trayecto estimado (sin conexión)' : `Ruta por calles · ~${routeMin} min`;
-
+      const approxKm = (calcularDistanciaMetros(origLat, origLng, dest.lat, dest.lng) / 1000).toFixed(1);
       btnOpenRouteAssistant.classList.add('active');
       btnCancelRoute.style.display = 'block';
 
-      if (alertsOnRoute.length > 0) {
-        const first = alertsOnRoute[0].rep;
+      if (hasAlerts) {
+        const first = alertsInProximity[0].rep;
         const firstCat = getTipoMeta(first.tipo || first.type || 'Novedad').label;
-        const firstKm = (alertsOnRoute[0].distAlongRoute / 1000).toFixed(1);
-        const extraLabel = alertsOnRoute.length > 1 ? ` (+${alertsOnRoute.length - 1} más)` : '';
-        const warningText = `¡Alerta en tu calle! ${firstCat} a ${firstKm} km rumbo a ${dest.name}${extraLabel}`;
-        const altSuggestion = sugerirViasAlternas(dest, alertsOnRoute);
+        const firstKm = (alertsInProximity[0].distFromUser / 1000).toFixed(1);
+        const extraLabel = alertsInProximity.length > 1 ? ` (+${alertsInProximity.length - 1} más)` : '';
+        const warningText = `¡Radar detectó ${firstCat} a ${firstKm} km rumbo a ${dest.name}${extraLabel}!`;
+        const altSuggestion = sugerirViasAlternas(dest, alertsInProximity);
 
         routeAlertBanner.classList.remove('clear');
         routeAlertBanner.classList.add('visible', 'danger');
         routeAlertBannerText.innerHTML = `
-          <div>⚠️ ${escapeHtml(warningText)} (${routeKm} km · ~${routeMin} min)</div>
+          <div>⚠️ ${escapeHtml(warningText)}</div>
           <div style="font-size:11px;font-weight:600;opacity:0.95;margin-top:2px;">${escapeHtml(altSuggestion)}</div>
-          ${cleanerAltIdx !== -1 ? `<button type="button" class="route-alt-pill" id="btnSwitchAltRouteBanner">🔀 Cambiar a ruta alterna (${evaluatedCandidates[cleanerAltIdx].alerts.length} alertas)</button>` : ''}
         `;
 
-        const switchBannerBtn = document.getElementById('btnSwitchAltRouteBanner');
-        if (switchBannerBtn) {
-          switchBannerBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            selectedRouteCandidateIdx = cleanerAltIdx;
-            renderizarRutaActivaYEvaluar(true);
-            showToast('🔀 Cambiado a la ruta alterna sugerida.');
-          });
-        }
-
-        const alertListHtml = alertsOnRoute.slice(0, 4).map(({ rep, distAlongRoute, corridorDist }) => {
+        const alertListHtml = alertsInProximity.slice(0, 5).map(({ rep, distFromUser, reason }) => {
           const meta = getTipoMeta(rep.tipo || rep.type);
-          const kmAway = (distAlongRoute / 1000).toFixed(1);
+          const kmAway = (distFromUser / 1000).toFixed(1);
           const desc = String(rep.descripcion || '').trim();
-          return `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #334155;">
-            <strong>${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</strong> · a ${kmAway} km (a ${Math.round(corridorDist)} m de la vía)
+          return `<div class="route-proximity-hit" data-rep-id="${escapeHtml(rep.id)}" style="margin-top:6px;padding-top:6px;border-top:1px solid #334155;cursor:pointer;">
+            <strong>${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</strong> · a ${kmAway} km (${escapeHtml(reason)})
             ${desc ? `<div style="color:#94a3b8;font-size:11px;">${escapeHtml(desc)}</div>` : ''}
           </div>`;
         }).join('');
 
         routeStatusCard.innerHTML = `
           <div style="color:#fca5a5;font-weight:800;">⚠️ ${escapeHtml(warningText)}</div>
-          <div style="font-size:11px;color:#cbd5e1;margin-top:3px;">${escapeHtml(modeTag)} · ${routeKm} km · ${alertsOnRoute.length} novedad(es) sobre el trazado (radio ${corridorRadius}m)</div>
+          <div style="font-size:11px;color:#cbd5e1;margin-top:3px;">Destino a ~${approxKm} km · ${alertsInProximity.length} novedad(es) en tu zona de proximidad</div>
           <div style="font-size:11px;color:#fcd34d;margin-top:4px;font-weight:700;">💡 ${escapeHtml(altSuggestion)}</div>
-          ${cleanerAltIdx !== -1 ? `<button type="button" class="route-alt-pill" id="btnSwitchAltRouteCard">🔀 Usar ruta alterna despejada</button>` : ''}
           ${alertListHtml}
         `;
         routeStatusCard.classList.add('visible');
 
-        const switchCardBtn = document.getElementById('btnSwitchAltRouteCard');
-        if (switchCardBtn) {
-          switchCardBtn.addEventListener('click', () => {
-            selectedRouteCandidateIdx = cleanerAltIdx;
-            renderizarRutaActivaYEvaluar(true);
-            routeModal.classList.remove('open');
-            showToast('🔀 Cambiado a la ruta alterna sugerida.');
+        routeStatusCard.querySelectorAll('.route-proximity-hit').forEach((row) => {
+          row.addEventListener('click', () => {
+            const repId = row.dataset.repId;
+            const found = allActiveAlerts.find((r) => String(r.id) === String(repId));
+            if (found) {
+              routeModal.classList.remove('open');
+              focusAlertOnMap(found);
+            }
           });
-        }
+        });
 
-        const signature = `${dest.id}:r${selectedRouteCandidateIdx}:${alertsOnRoute.map((a) => a.rep.id).join(',')}`;
-        if (shouldFitBounds || signature !== lastRouteAlertSignature) {
+        const signature = `${dest.id}:${alertsInProximity.map((a) => a.rep.id).join(',')}`;
+        if (shouldCenter || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
           showToast(`⚠️ ${warningText}`);
         }
       } else {
-        const clearText = `✅ Ruta despejada hacia ${dest.name} (${routeKm} km · ~${routeMin} min)`;
+        const clearText = `📡 Radar activo hacia ${dest.name} (~${approxKm} km): zona despejada`;
         routeAlertBanner.classList.remove('danger');
         routeAlertBanner.classList.add('visible', 'clear');
-        routeAlertBannerText.innerHTML = `<div>${escapeHtml(clearText)}</div><div style="font-size:11px;font-weight:600;opacity:0.9;">Radar activo sobre el trazado real de calles</div>`;
+        routeAlertBannerText.innerHTML = `
+          <div>${escapeHtml(clearText)}</div>
+          <div style="font-size:11px;font-weight:600;opacity:0.9;">Escaneando alertas cercanas en tiempo real</div>
+        `;
 
         routeStatusCard.innerHTML = `
           <div style="color:#6ee7b7;font-weight:800;">${escapeHtml(clearText)}</div>
-          <div style="font-size:11px;color:#94a3b8;margin-top:3px;">${escapeHtml(modeTag)} · Sin alertas en tu camino.</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:3px;">Sin retenes ni accidentes activos en tu radio de proximidad hacia ${escapeHtml(dest.name)}.</div>
         `;
         routeStatusCard.classList.add('visible');
 
-        const signature = `${dest.id}:r${selectedRouteCandidateIdx}:clear`;
-        if (shouldFitBounds || signature !== lastRouteAlertSignature) {
+        const signature = `${dest.id}:clear`;
+        if (shouldCenter || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
           showToast(clearText);
         }
       }
     }
 
-    async function evaluarAlertasEnRutaActual(shouldFitBounds = false, forceRecalculate = false) {
-      if (!activeRouteDestination) return;
-      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
-      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
-      const dest = activeRouteDestination;
-
-      const movedSinceFetch = activeRouteFetchOrigin
-        ? calcularDistanciaMetros(activeRouteFetchOrigin.lat, activeRouteFetchOrigin.lng, origLat, origLng)
-        : Infinity;
-      const needsFetch =
-        forceRecalculate ||
-        activeRouteCandidates.length === 0 ||
-        (movedSinceFetch >= OSRM_RECALC_DISTANCE_METERS && Date.now() - activeRouteFetchAt >= OSRM_RECALC_MIN_MS);
-
-      if (!needsFetch) {
-        renderizarRutaActivaYEvaluar(shouldFitBounds);
-        return;
-      }
-
-      const reqId = ++activeRouteRequestSeq;
-      if (forceRecalculate || activeRouteCandidates.length === 0) {
-        routeAlertBanner.classList.remove('danger', 'clear');
-        routeAlertBanner.classList.add('visible');
-        routeAlertBannerText.textContent = `📡 Calculando ruta real por calles hacia ${dest.name}...`;
-      }
-
-      const routes = await fetchOsrmStreetRoutes(origLat, origLng, dest.lat, dest.lng);
-      if (reqId !== activeRouteRequestSeq || !activeRouteDestination) return;
-
-      activeRouteCandidates = routes;
-      if (forceRecalculate) {
-        selectedRouteCandidateIdx = 0;
-      }
-      activeRouteFetchOrigin = { lat: origLat, lng: origLng };
-      activeRouteFetchAt = Date.now();
-      renderizarRutaActivaYEvaluar(shouldFitBounds);
-    }
-
     function activarRutaHacia(destId) {
       const dest = resolveDestinoById(destId);
       if (!dest) {
-        showToast('Selecciona un destino válido para trazar la ruta.');
+        showToast('Selecciona un destino válido para activar el radar.');
         return;
       }
       activeRouteDestination = dest;
-      activeRouteCandidates = [];
-      selectedRouteCandidateIdx = 0;
       if (routeDestinationSelect) routeDestinationSelect.value = dest.id;
       renderDestQuickChips();
       routeModal.classList.remove('open');
-      evaluarAlertasEnRutaActual(true, true);
+      evaluarAlertasEnRutaActual(true);
     }
 
     btnOpenRouteAssistant.addEventListener('click', () => {
       poblarDestinosRuta();
       toggleDestManagerPanel(false);
       if (activeRouteDestination) {
-        renderizarRutaActivaYEvaluar(false);
+        evaluarAlertasEnRutaActual(false);
       }
       routeModal.classList.add('open');
     });
@@ -4135,12 +3936,12 @@
     btnCancelRoute.addEventListener('click', () => {
       limpiarRutaActiva();
       routeModal.classList.remove('open');
-      showToast('Asistente de ruta limpiado.');
+      showToast('Radar de proximidad desactivado.');
     });
 
     btnClearRouteBanner.addEventListener('click', () => {
       limpiarRutaActiva();
-      showToast('Ruta cancelada.');
+      showToast('Radar de proximidad desactivado.');
     });
 
     routeAlertBannerText.addEventListener('click', () => {
