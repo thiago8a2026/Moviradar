@@ -502,14 +502,14 @@
     }
 
     .map-btn.buzon-btn {
-      border-color: rgba(245, 158, 11, 0.65);
-      background: rgba(245, 158, 11, 0.14);
-      color: #fcd34d;
+      border: 1px solid var(--border);
+      background: #000000;
+      color: #f8fafc;
       flex-direction: column;
       gap: 1px;
       font-size: 16px;
       line-height: 1;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.22);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
     }
 
     .suggestion-intro {
@@ -1586,12 +1586,11 @@
       <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
       <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
       <button type="button" class="map-btn" id="btnLocateMe" title="Centrar mi ubicación GPS">🎯</button>
-      <button type="button" class="map-btn" id="btnOpenPoints" title="Puntos frecuentes guardados">⭐</button>
-      <button type="button" class="map-btn sonar-on" id="btnToggleSonarAudio" title="Activar o silenciar sonido de alerta Sónar">
-        <span>🔊</span><span class="sonar-btn-sub">Sónar</span>
-      </button>
       <button type="button" class="map-btn buzon-btn" id="btnOpenSuggestionBox" title="Buzón de Sugerencias y Consejos">
         <span>📮</span><span class="sonar-btn-sub">Buzón</span>
+      </button>
+      <button type="button" class="map-btn sonar-on" id="btnToggleSonarAudio" title="Activar o silenciar sonido de alerta Sónar">
+        <span>🔊</span><span class="sonar-btn-sub">Sónar</span>
       </button>
     </div>
 
@@ -1768,7 +1767,7 @@
     <div class="modal-backdrop" id="suggestionModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>⭐ Buzón de Sugerencias - MoviRadar</h2>
+          <h2>📮 Buzón de Sugerencias - MoviRadar</h2>
           <button type="button" class="btn-close" id="btnCloseSuggestionModal" aria-label="Cerrar">✕</button>
         </div>
 
@@ -3582,15 +3581,23 @@
 
     renderFrequentPoints();
 
-    document.getElementById('btnOpenPoints').addEventListener('click', () => {
-      pointsModal.classList.add('open');
-    });
-    document.getElementById('btnClosePointsModal').addEventListener('click', () => {
-      pointsModal.classList.remove('open');
-    });
-    pointsModal.addEventListener('click', (e) => {
-      if (e.target === pointsModal) pointsModal.classList.remove('open');
-    });
+    const btnOpenPointsEl = document.getElementById('btnOpenPoints');
+    if (btnOpenPointsEl && pointsModal) {
+      btnOpenPointsEl.addEventListener('click', () => {
+        pointsModal.classList.add('open');
+      });
+    }
+    const btnClosePointsModalEl = document.getElementById('btnClosePointsModal');
+    if (btnClosePointsModalEl && pointsModal) {
+      btnClosePointsModalEl.addEventListener('click', () => {
+        pointsModal.classList.remove('open');
+      });
+    }
+    if (pointsModal) {
+      pointsModal.addEventListener('click', (e) => {
+        if (e.target === pointsModal) pointsModal.classList.remove('open');
+      });
+    }
 
     document.getElementById('pointForm').addEventListener('submit', async (e) => {
       e.preventDefault();
