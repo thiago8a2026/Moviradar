@@ -1585,6 +1585,46 @@
       gap: 6px;
     }
 
+    .duplicate-guard-banner {
+      display: none;
+      flex-direction: column;
+      gap: 7px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .duplicate-guard-banner.open {
+      display: flex;
+    }
+
+    .duplicate-guard-banner.blocked {
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.58);
+      color: #fecaca;
+    }
+
+    .duplicate-guard-banner.admin-bypass {
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.5);
+      color: #fef08a;
+    }
+
+    .duplicate-guard-action {
+      align-self: flex-start;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(248, 250, 252, 0.28);
+      color: #f8fafc;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
     .btn-submit {
       width: 100%;
       min-height: 50px;
@@ -2206,6 +2246,7 @@
           <div class="gps-note" id="gpsStatusText">
             📍 Se capturará tu ubicación GPS actual.
           </div>
+          <div class="duplicate-guard-banner" id="duplicateProximityNotice" role="alert"></div>
 
           <label class="form-label" for="reportDesc">3. Indicación o referencia rápida (opcional)</label>
           <textarea
@@ -3201,6 +3242,9 @@
       lastServerReports = getVisibleServerReports(allNonExpiredServerReports);
       saveCachedReports(lastServerReports);
       renderCombinedReports(lastServerReports);
+      if (typeof updateDuplicateGuardPreview === 'function') {
+        updateDuplicateGuardPreview();
+      }
     }
 
     const adminPinModal = document.getElementById('adminPinModal');
@@ -5008,6 +5052,137 @@
 
     const bottomPanelEl = document.querySelector('.bottom-panel');
 
+    const DUPLICATE_REPORT_RADIUS_METERS = 300;
+    const DUPLICATE_REPORT_WINDOW_MS = 2 * 60 * 60 * 1000; // Últimas 2 horas
+    const duplicateProximityNotice = document.getElementById('duplicateProximityNotice');
+
+    function hasValidatedAdminPermission() {
+      return userRole === 'admin';
+    }
+
+    function normalizeReportTypeForDedupe(tipo) {
+      return String(getTipoMeta(tipo).label || tipo || '')
+        .trim()
+        .toLowerCase();
+    }
+
+    function findNearbyDuplicateActiveReport(
+      lat,
+      lng,
+      tipo,
+      radiusMeters = DUPLICATE_REPORT_RADIUS_METERS,
+      maxAgeMs = DUPLICATE_REPORT_WINDOW_MS
+    ) {
+      const targetLat = Number(lat);
+      const targetLng = Number(lng);
+      if (!Number.isFinite(targetLat) || !Number.isFinite(targetLng)) return null;
+
+      const targetTypeKey = normalizeReportTypeForDedupe(tipo);
+      if (!targetTypeKey) return null;
+
+      const nowMs = Date.now();
+      const minValidMs = nowMs - maxAgeMs;
+      const pendingList = loadPendingReports();
+      const serverList = Array.isArray(allNonExpiredServerReports) && allNonExpiredServerReports.length > 0
+        ? allNonExpiredServerReports
+        : (Array.isArray(lastServerReports) && lastServerReports.length > 0
+          ? lastServerReports
+          : loadCachedReports());
+      const combined = [...pendingList, ...serverList];
+
+      let closestMatch = null;
+      let closestDist = Infinity;
+
+      for (const rep of combined) {
+        if (!rep) continue;
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
+        if (!Number.isFinite(rLat) || !Number.isFinite(rLng)) continue;
+
+        const isFixed = Boolean(rep.isFixed);
+        const denials = Number(rep.denials || 0);
+        const confirmations = Number(rep.confirmations || 1);
+        const isResolved = !isFixed && denials >= 3 && denials > confirmations;
+        if (isResolved) continue;
+
+        const repTimeMs = extractTimestampMs(rep);
+        if (!isFixed && repTimeMs < minValidMs) continue;
+
+        const repTypeKey = normalizeReportTypeForDedupe(rep.tipo || rep.type);
+        if (repTypeKey !== targetTypeKey) continue;
+
+        const dist = calcularDistanciaMetros(targetLat, targetLng, rLat, rLng);
+        if (dist <= radiusMeters && dist < closestDist) {
+          closestDist = dist;
+          closestMatch = {
+            report: rep,
+            distanceMeters: Math.round(dist)
+          };
+        }
+      }
+
+      return closestMatch;
+    }
+
+    function renderDuplicateGuardBanner(dupMatch, isAdminAllowed) {
+      if (!duplicateProximityNotice) return;
+      duplicateProximityNotice.classList.remove('open', 'blocked', 'admin-bypass');
+      duplicateProximityNotice.innerHTML = '';
+
+      if (!dupMatch) return;
+
+      const meta = getTipoMeta(dupMatch.report.tipo || dupMatch.report.type || (selectedCategory && selectedCategory.type));
+      if (isAdminAllowed) {
+        duplicateProximityNotice.classList.add('open', 'admin-bypass');
+        duplicateProximityNotice.innerHTML = `
+          <div>👑 <strong>Modo Admin:</strong> ya existe un reporte activo de ${escapeHtml(meta.label)} a ${dupMatch.distanceMeters} m, pero tienes permiso para ubicar o ajustar otro punto cercano.</div>
+        `;
+        return;
+      }
+
+      duplicateProximityNotice.classList.add('open', 'blocked');
+      const msgDiv = document.createElement('div');
+      msgDiv.innerHTML = `🚫 <strong>Zona ya reportada (${dupMatch.distanceMeters} m):</strong> ya hay un reporte activo de <strong>${escapeHtml(meta.label)}</strong> en los últimos 300 m. Confírmalo en el mapa en vez de duplicarlo.`;
+      duplicateProximityNotice.appendChild(msgDiv);
+
+      const viewBtn = document.createElement('button');
+      viewBtn.type = 'button';
+      viewBtn.className = 'duplicate-guard-action';
+      viewBtn.textContent = '📍 Ver y confirmar alerta cercana';
+      viewBtn.addEventListener('click', () => {
+        modal.classList.remove('open');
+        focusAlertOnMap(dupMatch.report);
+      });
+      duplicateProximityNotice.appendChild(viewBtn);
+    }
+
+    function updateDuplicateGuardPreview() {
+      if (!duplicateProximityNotice) return;
+      if (!selectedCategory || !selectedCategory.type) {
+        renderDuplicateGuardBanner(null, false);
+        return;
+      }
+      let previewCoords = null;
+      if (manualReportCoords) {
+        previewCoords = manualReportCoords;
+      } else if (latestGps && !latestGps.isDefault) {
+        previewCoords = latestGps;
+      } else {
+        const cached = loadCachedGps();
+        if (cached) previewCoords = cached;
+      }
+      if (!previewCoords) {
+        renderDuplicateGuardBanner(null, false);
+        return;
+      }
+      const dupMatch = findNearbyDuplicateActiveReport(
+        previewCoords.lat,
+        previewCoords.lng,
+        selectedCategory.type
+      );
+      renderDuplicateGuardBanner(dupMatch, hasValidatedAdminPermission());
+    }
+
     function updateReportLocationUI() {
       if (manualReportCoords) {
         btnModeGpsReport.classList.remove('active');
@@ -5020,6 +5195,7 @@
         gpsStatusText.textContent = '📍 Se capturará tu ubicación GPS actual.';
         gpsStatusText.style.color = '';
       }
+      updateDuplicateGuardPreview();
     }
 
     function updateManualPinCenterDisplay() {
@@ -5125,6 +5301,7 @@
           color: btn.dataset.color,
           emoji: btn.dataset.emoji
         };
+        updateDuplicateGuardPreview();
         mediaInput.value = '';
         mediaInput.click();
       });
@@ -6291,8 +6468,23 @@
       try {
         const currentUser = auth.currentUser;
         const canFix = Boolean(currentUser.email === 'faoj2013@gmail.com' && currentUser.emailVerified);
+        let skippedDuplicates = 0;
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
+
+          if (!hasValidatedAdminPermission()) {
+            const dupMatch = findNearbyDuplicateActiveReport(
+              item.lat,
+              item.lng,
+              item.tipo || 'Retén'
+            );
+            if (dupMatch && String(dupMatch.report.localId || '') !== String(item.localId || '')) {
+              const remaining = loadPendingReports().filter((q) => q.localId !== item.localId);
+              savePendingReports(remaining);
+              skippedDuplicates += 1;
+              continue;
+            }
+          }
 
           let urlFoto = item.mediaDataUrl && String(item.mediaDataUrl).length <= 450000
             ? String(item.mediaDataUrl)
@@ -6326,6 +6518,14 @@
           updateNetworkAndSyncStatus();
         }
 
+        if (skippedDuplicates > 0) {
+          renderCombinedReports(lastServerReports);
+          updateNetworkAndSyncStatus();
+          showToast(
+            `ℹ️ ${skippedDuplicates} ${skippedDuplicates === 1 ? 'reporte omitido' : 'reportes omitidos'}: ya había una alerta activa a menos de 300 m.`
+          );
+        }
+
         if (syncedCount > 0) {
           showToast(
             `✅ ${syncedCount} ${syncedCount === 1 ? 'reporte sincronizado' : 'reportes sincronizados'} con Firestore.`
@@ -6348,6 +6548,7 @@
       const rawDesc = document.getElementById('reportDesc').value.trim();
       const descripcion = rawDesc.slice(0, 400);
       const wantsFixed = userRole === 'admin' && document.getElementById('chkIsFixed').checked;
+      const wasSignedOutBeforeSubmit = !auth.currentUser;
 
       btnSubmit.disabled = true;
       btnSubmit.textContent = manualReportCoords ? 'Fijando ubicación manual...' : 'Obteniendo ubicación GPS...';
@@ -6359,6 +6560,14 @@
           : await getReportCoordinates();
 
         if (!navigator.onLine) {
+          if (!hasValidatedAdminPermission()) {
+            const offlineDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
+            if (offlineDup) {
+              renderDuplicateGuardBanner(offlineDup, false);
+              showToast(`⚠️ Ya existe un reporte activo de ${getTipoMeta(selectedCategory.type).label} a ${offlineDup.distanceMeters} m.`);
+              return;
+            }
+          }
           await enqueueOfflineReport(coords, descripcion, wantsFixed, pendingImageDataUrl, pendingMediaType, pendingFileName);
           manualReportCoords = null;
           updateReportLocationUI();
@@ -6367,6 +6576,17 @@
 
         btnSubmit.textContent = 'Verificando cuenta...';
         const user = await ensureAuthenticated();
+        const adminBypass = hasValidatedAdminPermission() || (wasSignedOutBeforeSubmit && isPrimaryAdminEmail(user));
+
+        if (!adminBypass) {
+          const nearbyDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
+          if (nearbyDup) {
+            renderDuplicateGuardBanner(nearbyDup, false);
+            showToast(`⚠️ Ya hay un reporte activo cerca (${nearbyDup.distanceMeters} m). Confírmalo en el mapa en vez de duplicarlo.`);
+            return;
+          }
+        }
+
         const isFixed = wantsFixed && user.email === 'faoj2013@gmail.com' && user.emailVerified;
 
         const urlFoto = pendingImageDataUrl && String(pendingImageDataUrl).length <= 450000
