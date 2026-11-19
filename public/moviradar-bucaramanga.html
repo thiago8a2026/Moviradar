@@ -108,26 +108,38 @@
 
     .brand-text {
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
     .brand-text h1 {
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      color: #ffffff;
-      line-height: 1.2;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #e0f2fe 0%, #67e8f9 45%, #34d399 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.42)) drop-shadow(0 1px 2px rgba(2, 6, 23, 0.9));
+      line-height: 1.08;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .brand-subtitle {
-      font-size: 11px;
-      color: #34d399;
+      font-size: 10px;
+      color: #67e8f9;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 600;
+      justify-content: center;
+      text-align: center;
+      gap: 5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
       margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -139,8 +151,8 @@
     }
 
     .live-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       background-color: #10b981;
       border-radius: 50%;
       display: inline-block;
@@ -2072,7 +2084,7 @@
           <h1>ANTHI</h1>
           <div class="brand-subtitle" id="syncStatus">
             <span class="live-dot"></span>
-            <span id="syncStatusText">Conectando en vivo...</span>
+            <span id="syncStatusText">Prevención en tiempo real</span>
           </div>
         </div>
       </div>
@@ -3207,20 +3219,25 @@
     // =========================================================================
     // 🔧 Cambia aquí el PIN de Administrador cuando lo necesites:
     const ADMIN_PIN = '202688';
-    // 📧 Correo electrónico del Administrador principal autorizado:
-    const PRIMARY_ADMIN_EMAIL = 'faoj2013@gmail.com';
+    // 📧 Lista de correos electrónicos de Administradores autorizados:
+    const ADMIN_EMAILS = ['faoj2013@gmail.com', 'andrezmelo13@gmail.com'];
+    const PRIMARY_ADMIN_EMAIL = ADMIN_EMAILS[0];
     const ADMIN_SESSION_KEY = 'moviradar_admin_session_unlocked_v1';
     try {
       localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
     } catch (e) {}
     let userRole = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true' ? 'admin' : 'citizen';
 
-    function isPrimaryAdminEmail(user) {
-      return Boolean(
-        user &&
-        user.email &&
-        user.email.trim().toLowerCase() === PRIMARY_ADMIN_EMAIL.toLowerCase()
+    function isAuthorizedAdminEmail(user) {
+      if (!user || !user.email) return false;
+      const normalizedEmail = String(user.email).trim().toLowerCase();
+      return ADMIN_EMAILS.some(
+        (adminEmail) => String(adminEmail).trim().toLowerCase() === normalizedEmail
       );
+    }
+
+    function isPrimaryAdminEmail(user) {
+      return isAuthorizedAdminEmail(user);
     }
 
     function getVisibleServerReports(sourceList = allNonExpiredServerReports) {
@@ -3407,7 +3424,7 @@
         setSyncStatus(`En línea · ${pendingCount} pendiente(s)`, true);
         return;
       }
-      setSyncStatus(firestoreConnected ? 'En vivo · Firestore' : 'Conectando con Firestore...', false);
+      setSyncStatus('Prevención en tiempo real', false);
     }
 
     function blobToDataUrl(blob) {
@@ -4432,7 +4449,7 @@
             return;
           }
           if (err && err.code === 'permission-denied') {
-            showToast(`⛔ Firestore exige sesión con el correo Administrador (${PRIMARY_ADMIN_EMAIL}) para editar reportes de otros usuarios.`);
+            showToast(`⛔ Firestore exige sesión con un correo Administrador autorizado (${ADMIN_EMAILS.join(' o ')}) para editar reportes de otros usuarios.`);
           } else {
             showToast('No se pudo editar la novedad en Firestore.');
           }
@@ -4461,7 +4478,7 @@
           return;
         }
         if (err && err.code === 'permission-denied') {
-          showToast(`⛔ Firestore exige sesión con el correo Administrador (${PRIMARY_ADMIN_EMAIL}) para eliminar reportes de otros usuarios.`);
+          showToast(`⛔ Firestore exige sesión con un correo Administrador autorizado (${ADMIN_EMAILS.join(' o ')}) para eliminar reportes de otros usuarios.`);
         } else {
           showToast('No se pudo eliminar definitivamente este reporte.');
         }
@@ -6467,7 +6484,7 @@
 
       try {
         const currentUser = auth.currentUser;
-        const canFix = Boolean(currentUser.email === 'faoj2013@gmail.com' && currentUser.emailVerified);
+        const canFix = Boolean(isAuthorizedAdminEmail(currentUser) && currentUser.emailVerified);
         let skippedDuplicates = 0;
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
@@ -6587,7 +6604,7 @@
           }
         }
 
-        const isFixed = wantsFixed && user.email === 'faoj2013@gmail.com' && user.emailVerified;
+        const isFixed = wantsFixed && isAuthorizedAdminEmail(user) && Boolean(user.emailVerified);
 
         const urlFoto = pendingImageDataUrl && String(pendingImageDataUrl).length <= 450000
           ? String(pendingImageDataUrl)
