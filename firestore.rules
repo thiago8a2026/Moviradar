@@ -68,11 +68,22 @@ service cloud.firestore {
 
     function isValidSugerencia(data) {
       return data.keys().hasAll(['mensaje', 'usuario', 'authorId', 'timestamp'])
-        && data.keys().hasOnly(['mensaje', 'usuario', 'authorId', 'timestamp'])
+        && data.keys().hasOnly(['mensaje', 'usuario', 'authorId', 'timestamp', 'leido'])
         && data.mensaje is string && data.mensaje.size() >= 3 && data.mensaje.size() <= 1000
         && data.usuario is string && data.usuario.size() >= 3 && data.usuario.size() <= 200
         && data.authorId is string && isValidId(data.authorId)
-        && data.timestamp is timestamp;
+        && data.timestamp is timestamp
+        && (!('leido' in data) || data.leido is bool);
+    }
+
+    function isValidSugerenciaBuzonV2(data) {
+      return data.keys().hasAll(['mensaje', 'usuario', 'uid', 'fecha', 'leido'])
+        && data.keys().hasOnly(['mensaje', 'usuario', 'uid', 'fecha', 'leido'])
+        && data.mensaje is string && data.mensaje.size() >= 3 && data.mensaje.size() <= 1000
+        && data.usuario is string && data.usuario.size() >= 3 && data.usuario.size() <= 200
+        && data.uid is string && isValidId(data.uid)
+        && data.fecha is timestamp
+        && data.leido is bool;
     }
 
     function isValidUserSession(data) {
@@ -184,11 +195,43 @@ service cloud.firestore {
       allow create: if isValidId(sugerenciaId)
         && isValidSugerencia(incoming())
         && incoming().timestamp == request.time
+        && (!('leido' in incoming()) || incoming().leido == false)
         && (
           (request.auth == null && incoming().authorId == 'anonimo' && incoming().usuario == 'Anónimo') ||
           (isSignedIn() && incoming().authorId == request.auth.uid)
         );
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin()
+        && isValidId(sugerenciaId)
+        && isValidSugerencia(incoming())
+        && incoming().authorId == existing().authorId
+        && incoming().timestamp == existing().timestamp
+        && incoming().mensaje == existing().mensaje
+        && incoming().usuario == existing().usuario
+        && incoming().diff(existing()).affectedKeys().hasOnly(['leido'])
+        && incoming().leido is bool;
+      allow delete: if isAdmin() && isValidId(sugerenciaId);
+    }
+
+    match /buzon_sugerencias/{sugerenciaId} {
+      allow get, list: if isAdmin();
+      allow create: if isValidId(sugerenciaId)
+        && isValidSugerenciaBuzonV2(incoming())
+        && incoming().fecha == request.time
+        && incoming().leido == false
+        && (
+          (request.auth == null && incoming().uid == 'anonimo' && incoming().usuario == 'Anónimo') ||
+          (isSignedIn() && incoming().uid == request.auth.uid)
+        );
+      allow update: if isAdmin()
+        && isValidId(sugerenciaId)
+        && isValidSugerenciaBuzonV2(incoming())
+        && incoming().uid == existing().uid
+        && incoming().fecha == existing().fecha
+        && incoming().mensaje == existing().mensaje
+        && incoming().usuario == existing().usuario
+        && incoming().diff(existing()).affectedKeys().hasOnly(['leido'])
+        && incoming().leido is bool;
+      allow delete: if isAdmin() && isValidId(sugerenciaId);
     }
 
     match /users/{userId} {

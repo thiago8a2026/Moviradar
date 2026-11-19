@@ -747,6 +747,11 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
     }
 
+    #suggestionModal .modal-card {
+      background: #000000;
+      border-color: rgba(148, 163, 184, 0.38);
+    }
+
     .suggestion-intro {
       font-size: 12px;
       color: #cbd5e1;
@@ -2062,6 +2067,157 @@
     .hv-rem-item.warn {
       border-color: rgba(245, 158, 11, 0.65);
     }
+
+    /* Panel Administrador + Buzón de Sugerencias en tiempo real */
+    .admin-panel-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .admin-panel-tab {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .admin-panel-tab.active {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.72);
+      color: #fde047;
+    }
+
+    .admin-buzon-tab-count {
+      background: rgba(16, 185, 129, 0.24);
+      border: 1px solid rgba(16, 185, 129, 0.7);
+      color: #6ee7b7;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1px 7px;
+      line-height: 1.3;
+    }
+
+    .admin-buzon-tab-count.empty {
+      background: rgba(148, 163, 184, 0.15);
+      border-color: rgba(148, 163, 184, 0.35);
+      color: #94a3b8;
+    }
+
+    .admin-buzon-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .admin-buzon-filter-btn {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      border-radius: 9px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .admin-buzon-filter-btn.active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.7);
+      color: #6ee7b7;
+    }
+
+    .admin-buzon-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 55dvh;
+      overflow-y: auto;
+    }
+
+    .admin-buzon-item {
+      background: var(--bg-dark);
+      border: 1px solid var(--surface-light);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .admin-buzon-item.unread {
+      border-color: rgba(16, 185, 129, 0.75);
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.14);
+    }
+
+    .admin-buzon-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .admin-buzon-sender {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #67e8f9;
+      word-break: break-all;
+    }
+
+    .admin-buzon-status-badge {
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .admin-buzon-status-badge.unread {
+      background: rgba(16, 185, 129, 0.22);
+      border: 1px solid rgba(16, 185, 129, 0.75);
+      color: #6ee7b7;
+    }
+
+    .admin-buzon-status-badge.read {
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #94a3b8;
+    }
+
+    .admin-buzon-message {
+      font-size: 13px;
+      color: #f8fafc;
+      line-height: 1.48;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .admin-buzon-date {
+      font-size: 10.5px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .admin-buzon-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
@@ -2560,6 +2716,52 @@
       </div>
     </div>
 
+    <!-- Modal Panel de Administrador (Buzón de Sugerencias en tiempo real + Control Global) -->
+    <div class="modal-backdrop" id="adminPanelModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>👑 Panel de Administrador</h2>
+          <button type="button" class="btn-close" id="btnCloseAdminPanelModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="admin-panel-tabs">
+          <button type="button" class="admin-panel-tab active" id="tabAdminBuzon">
+            <span>📮 Buzón de Mensajes</span>
+            <span class="admin-buzon-tab-count empty" id="adminBuzonUnreadBadge">0</span>
+          </button>
+          <button type="button" class="admin-panel-tab" id="tabAdminControl">
+            <span>⚙️ Control Admin</span>
+          </button>
+        </div>
+
+        <div id="adminBuzonSection">
+          <div class="admin-buzon-toolbar">
+            <span id="adminBuzonStatsText" style="font-size:11.5px;color:#cbd5e1;font-weight:700;">Cargando sugerencias...</span>
+            <button type="button" class="admin-buzon-filter-btn" id="btnToggleUnreadFilter">Solo sin leer</button>
+          </div>
+          <div class="admin-buzon-list" id="adminBuzonList"></div>
+        </div>
+
+        <div id="adminControlSection" style="display:none;">
+          <div class="auth-account-box" style="margin-bottom:12px;">
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">Administrador autorizado</div>
+            <div id="adminPanelEmailLabel" style="font-size:12.5px;font-weight:800;color:#fcd34d;word-break:break-all;">--</div>
+          </div>
+          <p style="font-size:12px;color:#cbd5e1;line-height:1.45;margin-bottom:12px;">
+            Superpoderes activos: publicación fija oficial, edición y borrado global de alertas, excepción al bloqueo de 300 m y gestión del Buzón de Sugerencias.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button type="button" class="btn-submit" id="btnAdminOpenAlertsCenter" style="min-height:42px;font-size:13px;">
+              📡 Abrir Centro de Alertas Activas
+            </button>
+            <button type="button" class="btn-logout" id="btnSwitchToCitizenMode">
+              👤 Cambiar a modo Ciudadano
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Hoja de Vida del Vehículo y Pico y Placa AMB -->
     <div class="modal-backdrop" id="hojaVidaModal">
       <div class="modal-card">
@@ -2967,6 +3169,7 @@
         deleteDoc,
         writeBatch,
         query,
+        orderBy,
         limit,
         onSnapshot,
         getDocFromServer,
@@ -3276,7 +3479,10 @@
       const adminRow = document.getElementById('adminFixedRow');
       if (userRole === 'admin') {
         if (btn) {
-          btn.textContent = '👑 Admin';
+          const unreadCount = (window.__anthiAdminBuzonReady && typeof countUnreadBuzonMessages === 'function')
+            ? countUnreadBuzonMessages()
+            : 0;
+          btn.textContent = unreadCount > 0 ? `👑 Admin · ${unreadCount}` : '👑 Admin';
           btn.classList.add('admin');
         }
         if (icon) icon.classList.add('admin');
@@ -3289,6 +3495,9 @@
         if (icon) icon.classList.remove('admin');
         if (adminRow) adminRow.classList.remove('visible');
         document.getElementById('chkIsFixed').checked = false;
+      }
+      if (window.__anthiAdminBuzonReady && typeof syncAdminBuzonSubscription === 'function') {
+        syncAdminBuzonSubscription();
       }
     }
 
@@ -3309,13 +3518,9 @@
 
     document.getElementById('btnToggleRole').addEventListener('click', () => {
       if (userRole === 'admin') {
-        userRole = 'citizen';
-        try {
-          sessionStorage.removeItem(ADMIN_SESSION_KEY);
-        } catch (e) {}
-        applyRoleUI();
-        refreshReportsForRole();
-        showToast('Modo Ciudadano activo.');
+        if (typeof openAdminPanelModal === 'function') {
+          openAdminPanelModal('buzon');
+        }
         return;
       }
       if (isPrimaryAdminEmail(auth.currentUser)) {
@@ -3325,7 +3530,10 @@
         } catch (e) {}
         applyRoleUI();
         refreshReportsForRole();
-        showToast('👑 Administrador principal verificado: poderes globales activos.');
+        showToast('👑 Administrador verificado: poderes globales activos.');
+        if (typeof openAdminPanelModal === 'function') {
+          openAdminPanelModal('buzon');
+        }
         return;
       }
       openAdminPinModal();
@@ -3339,21 +3547,30 @@
     adminPinForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const enteredPin = adminPinInput.value.trim();
-      if (enteredPin === ADMIN_PIN) {
-        userRole = 'admin';
-        try {
-          sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
-        } catch (err) {}
-        closeAdminPinModal();
-        applyRoleUI();
-        refreshReportsForRole();
-        showToast('👑 Modo Administrador desbloqueado: control total sobre alertas activo.');
-      } else {
+      if (enteredPin !== ADMIN_PIN) {
         adminPinErrorMsg.textContent = 'PIN incorrecto. Acceso de administrador denegado.';
         adminPinErrorMsg.classList.add('visible');
         adminPinInput.value = '';
         adminPinInput.focus();
         showToast('⛔ PIN incorrecto. Acceso de administrador denegado.');
+        return;
+      }
+      if (!isAuthorizedAdminEmail(auth.currentUser)) {
+        adminPinErrorMsg.textContent = 'Inicia sesión con un correo Administrador autorizado (faoj2013@gmail.com o andrezmelo13@gmail.com).';
+        adminPinErrorMsg.classList.add('visible');
+        showToast('⛔ Solo correos autorizados (faoj2013@gmail.com o andrezmelo13@gmail.com) tienen rol Admin.');
+        return;
+      }
+      userRole = 'admin';
+      try {
+        sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+      } catch (err) {}
+      closeAdminPinModal();
+      applyRoleUI();
+      refreshReportsForRole();
+      showToast('👑 Modo Administrador desbloqueado: control total sobre alertas activo.');
+      if (typeof openAdminPanelModal === 'function') {
+        openAdminPanelModal('buzon');
       }
     });
     applyRoleUI();
@@ -3491,6 +3708,10 @@
     }
 
     function extractTimestampMs(data) {
+      if (data.fecha && typeof data.fecha.toMillis === 'function') {
+        return data.fecha.toMillis();
+      }
+      if (typeof data.fecha === 'number') return data.fecha;
       if (data.timestamp && typeof data.timestamp.toMillis === 'function') {
         return data.timestamp.toMillis();
       }
@@ -3999,7 +4220,7 @@
         refreshReportsForRole();
       }
 
-      ['reportModal', 'adminEditModal', 'adminPinModal', 'alertsCenterModal', 'routeModal', 'authModal'].forEach((id) => {
+      ['reportModal', 'adminPanelModal', 'adminEditModal', 'adminPinModal', 'alertsCenterModal', 'routeModal', 'authModal'].forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('open');
       });
@@ -4098,21 +4319,43 @@
       updateAuthUI(user);
       if (!user) {
         detachUserSessionListener();
+        if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
         currentTabSessionId = null;
-        renderCombinedReports(lastServerReports);
+        if (userRole === 'admin') {
+          userRole = 'citizen';
+          try {
+            sessionStorage.removeItem(ADMIN_SESSION_KEY);
+          } catch (e) {}
+          applyRoleUI();
+          refreshReportsForRole();
+        } else {
+          renderCombinedReports(lastServerReports);
+        }
         return;
       }
 
-      if (isPrimaryAdminEmail(user) && userRole !== 'admin') {
-        userRole = 'admin';
-        try {
-          sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
-        } catch (e) {}
+      if (isAuthorizedAdminEmail(user)) {
+        if (userRole !== 'admin') {
+          userRole = 'admin';
+          try {
+            sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+          } catch (e) {}
+          applyRoleUI();
+          refreshReportsForRole();
+          showToast('👑 Administrador autorizado conectado: superpoderes activos.');
+        } else {
+          applyRoleUI();
+          renderCombinedReports(lastServerReports);
+        }
+      } else {
+        if (userRole === 'admin') {
+          userRole = 'citizen';
+          try {
+            sessionStorage.removeItem(ADMIN_SESSION_KEY);
+          } catch (e) {}
+        }
         applyRoleUI();
         refreshReportsForRole();
-        showToast('👑 Administrador principal conectado: superpoderes activos.');
-      } else {
-        renderCombinedReports(lastServerReports);
       }
 
       if (authModal.classList.contains('open')) {
@@ -5074,7 +5317,7 @@
     const duplicateProximityNotice = document.getElementById('duplicateProximityNotice');
 
     function hasValidatedAdminPermission() {
-      return userRole === 'admin';
+      return userRole === 'admin' && isAuthorizedAdminEmail(auth.currentUser);
     }
 
     function normalizeReportTypeForDedupe(tipo) {
@@ -6702,9 +6945,9 @@
     }
 
     // =========================================================================
-    // 11. BUZÓN DE SUGERENCIAS Y CONSEJOS (COLECCIÓN FIRESTORE 'buzon')
+    // 11. BUZÓN DE SUGERENCIAS Y CONSEJOS (COLECCIÓN FIRESTORE 'buzon_sugerencias')
     // =========================================================================
-    const SUGGESTIONS_COLLECTION = 'buzon';
+    const SUGGESTIONS_COLLECTION = 'buzon_sugerencias';
     const btnOpenSuggestionBox = document.getElementById('btnOpenSuggestionBox');
     const suggestionModal = document.getElementById('suggestionModal');
     const btnCloseSuggestionModal = document.getElementById('btnCloseSuggestionModal');
@@ -6766,7 +7009,7 @@
 
         const currentUser = auth.currentUser;
         const usuario = currentUser && currentUser.email ? currentUser.email.slice(0, 200) : 'Anónimo';
-        const authorId = currentUser && currentUser.uid ? currentUser.uid : 'anonimo';
+        const uid = currentUser && currentUser.uid ? currentUser.uid : 'anonimo';
 
         btnSubmitSuggestion.disabled = true;
         btnSubmitSuggestion.textContent = 'Enviando sugerencia...';
@@ -6776,8 +7019,9 @@
             addDoc(collection(db, SUGGESTIONS_COLLECTION), {
               mensaje,
               usuario,
-              authorId,
-              timestamp: serverTimestamp()
+              uid,
+              fecha: serverTimestamp(),
+              leido: false
             }),
             15000
           );
@@ -6785,7 +7029,7 @@
           suggestionForm.reset();
           updateSuggestionSenderUI();
           suggestionModal.classList.remove('open');
-          showToast('¡Gracias por tu consejo, lo tendremos en cuenta!');
+          showToast('✅ ¡Sugerencia enviada al Buzón! Gracias por aportar a ANTHI.');
         } catch (err) {
           console.error('Error guardando sugerencia en Firestore:', err);
           if (err && err.code === 'permission-denied') {
@@ -6801,6 +7045,328 @@
           btnSubmitSuggestion.textContent = 'Enviar Sugerencia';
         }
       });
+    }
+
+    // Gestión en tiempo real del Buzón de Sugerencias en el Panel Administrador
+    const adminPanelModal = document.getElementById('adminPanelModal');
+    const btnCloseAdminPanelModal = document.getElementById('btnCloseAdminPanelModal');
+    const tabAdminBuzon = document.getElementById('tabAdminBuzon');
+    const tabAdminControl = document.getElementById('tabAdminControl');
+    const adminBuzonSection = document.getElementById('adminBuzonSection');
+    const adminControlSection = document.getElementById('adminControlSection');
+    const adminBuzonUnreadBadge = document.getElementById('adminBuzonUnreadBadge');
+    const adminBuzonStatsText = document.getElementById('adminBuzonStatsText');
+    const btnToggleUnreadFilter = document.getElementById('btnToggleUnreadFilter');
+    const adminBuzonList = document.getElementById('adminBuzonList');
+    const adminPanelEmailLabel = document.getElementById('adminPanelEmailLabel');
+    const btnAdminOpenAlertsCenter = document.getElementById('btnAdminOpenAlertsCenter');
+    const btnSwitchToCitizenMode = document.getElementById('btnSwitchToCitizenMode');
+
+    let adminBuzonMessages = [];
+    let adminBuzonUnsubscribe = null;
+    let adminBuzonSubscribedUid = null;
+    let adminBuzonFilterUnreadOnly = false;
+    let activeAdminPanelTab = 'buzon';
+
+    function countUnreadBuzonMessages() {
+      return adminBuzonMessages.filter((item) => item && item.leido !== true).length;
+    }
+
+    function formatSuggestionDateTime(ms) {
+      if (!ms) return 'Reciente';
+      try {
+        return new Date(ms).toLocaleString('es-CO', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch (e) {
+        return formatTimeLabel(ms);
+      }
+    }
+
+    function updateAdminRoleButtonBadge() {
+      const btn = document.getElementById('btnToggleRole');
+      if (!btn || userRole !== 'admin') return;
+      const unreadCount = countUnreadBuzonMessages();
+      btn.textContent = unreadCount > 0 ? `👑 Admin · ${unreadCount}` : '👑 Admin';
+    }
+
+    function renderAdminBuzonList() {
+      const unreadCount = countUnreadBuzonMessages();
+      const totalCount = adminBuzonMessages.length;
+
+      if (adminBuzonUnreadBadge) {
+        adminBuzonUnreadBadge.textContent = String(unreadCount);
+        adminBuzonUnreadBadge.classList.toggle('empty', unreadCount === 0);
+      }
+      updateAdminRoleButtonBadge();
+
+      if (!adminBuzonList) return;
+      adminBuzonList.innerHTML = '';
+
+      const currentUser = auth.currentUser;
+      if (userRole !== 'admin' || !isAuthorizedAdminEmail(currentUser)) {
+        if (adminBuzonStatsText) {
+          adminBuzonStatsText.textContent = 'Acceso exclusivo para administradores autorizados';
+        }
+        const lockBox = document.createElement('div');
+        lockBox.className = 'admin-buzon-item';
+        lockBox.innerHTML = `
+          <div style="font-size:12px;color:#fcd34d;font-weight:800;">🔒 Inicia sesión con una cuenta Administrador autorizada</div>
+          <div style="font-size:11.5px;color:#cbd5e1;line-height:1.45;">
+            Para leer y gestionar los mensajes del Buzón de Sugerencias en Firestore debes iniciar sesión con <strong>faoj2013@gmail.com</strong> o <strong>andrezmelo13@gmail.com</strong>.
+          </div>
+        `;
+        const loginBtn = document.createElement('button');
+        loginBtn.type = 'button';
+        loginBtn.className = 'btn-submit';
+        loginBtn.style.minHeight = '40px';
+        loginBtn.style.fontSize = '12.5px';
+        loginBtn.textContent = '🔑 Iniciar sesión Administrador';
+        loginBtn.addEventListener('click', () => {
+          if (adminPanelModal) adminPanelModal.classList.remove('open');
+          if (typeof openAuthModal === 'function') openAuthModal();
+        });
+        lockBox.appendChild(loginBtn);
+        adminBuzonList.appendChild(lockBox);
+        return;
+      }
+
+      if (adminBuzonStatsText) {
+        adminBuzonStatsText.textContent = `${totalCount} ${totalCount === 1 ? 'mensaje' : 'mensajes'} · ${unreadCount} sin leer`;
+      }
+
+      const filtered = adminBuzonFilterUnreadOnly
+        ? adminBuzonMessages.filter((item) => item.leido !== true)
+        : adminBuzonMessages;
+
+      if (filtered.length === 0) {
+        adminBuzonList.innerHTML = `<div style="font-size:12px;color:#94a3b8;text-align:center;padding:22px 10px;">${
+          adminBuzonFilterUnreadOnly
+            ? 'No tienes sugerencias sin leer en este momento.'
+            : 'El Buzón de Sugerencias está vacío por ahora.'
+        }</div>`;
+        return;
+      }
+
+      filtered.forEach((item) => {
+        const isRead = item.leido === true;
+        const card = document.createElement('div');
+        card.className = `admin-buzon-item${isRead ? '' : ' unread'}`;
+
+        const head = document.createElement('div');
+        head.className = 'admin-buzon-head';
+
+        const senderSpan = document.createElement('span');
+        senderSpan.className = 'admin-buzon-sender';
+        senderSpan.textContent = `👤 ${item.usuario || 'Anónimo'}`;
+
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `admin-buzon-status-badge ${isRead ? 'read' : 'unread'}`;
+        statusBadge.textContent = isRead ? '✓ Leído' : '● Sin leer';
+
+        head.appendChild(senderSpan);
+        head.appendChild(statusBadge);
+        card.appendChild(head);
+
+        const msgBody = document.createElement('div');
+        msgBody.className = 'admin-buzon-message';
+        msgBody.textContent = item.mensaje || '';
+        card.appendChild(msgBody);
+
+        const dateLine = document.createElement('div');
+        dateLine.className = 'admin-buzon-date';
+        dateLine.textContent = `🕒 ${formatSuggestionDateTime(item._sortMs)} (${formatTimeLabel(item._sortMs)})`;
+        card.appendChild(dateLine);
+
+        const actions = document.createElement('div');
+        actions.className = 'admin-buzon-actions';
+
+        const readBtn = document.createElement('button');
+        readBtn.type = 'button';
+        readBtn.className = 'alert-admin-btn edit';
+        readBtn.textContent = isRead ? '↩️ Marcar sin leer' : '✓ Marcar como leído';
+        readBtn.addEventListener('click', async () => {
+          const nextReadState = !isRead;
+          readBtn.disabled = true;
+          readBtn.textContent = 'Actualizando...';
+          try {
+            await withTimeout(
+              updateDoc(doc(db, SUGGESTIONS_COLLECTION, item.id), { leido: nextReadState }),
+              12000
+            );
+            showToast(nextReadState ? '✓ Mensaje marcado como leído.' : 'Mensaje marcado como sin leer.');
+          } catch (err) {
+            readBtn.disabled = false;
+            readBtn.textContent = isRead ? '↩️ Marcar sin leer' : '✓ Marcar como leído';
+            showToast('No se pudo actualizar el estado del mensaje.');
+            handleFirestoreError(err, OperationType.UPDATE, `${SUGGESTIONS_COLLECTION}/${item.id}`);
+          }
+        });
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'alert-admin-btn delete';
+        delBtn.textContent = '🗑️ Eliminar';
+        delBtn.addEventListener('click', async () => {
+          delBtn.disabled = true;
+          delBtn.textContent = 'Eliminando...';
+          try {
+            await withTimeout(
+              deleteDoc(doc(db, SUGGESTIONS_COLLECTION, item.id)),
+              12000
+            );
+            showToast('🗑️ Mensaje del buzón eliminado.');
+          } catch (err) {
+            delBtn.disabled = false;
+            delBtn.textContent = '🗑️ Eliminar';
+            showToast('No se pudo eliminar el mensaje del buzón.');
+            handleFirestoreError(err, OperationType.DELETE, `${SUGGESTIONS_COLLECTION}/${item.id}`);
+          }
+        });
+
+        actions.appendChild(readBtn);
+        actions.appendChild(delBtn);
+        card.appendChild(actions);
+        adminBuzonList.appendChild(card);
+      });
+    }
+
+    function detachAdminBuzonListener() {
+      if (typeof adminBuzonUnsubscribe === 'function') {
+        try {
+          adminBuzonUnsubscribe();
+        } catch (e) {}
+      }
+      adminBuzonUnsubscribe = null;
+      adminBuzonSubscribedUid = null;
+      adminBuzonMessages = [];
+      renderAdminBuzonList();
+    }
+
+    function syncAdminBuzonSubscription() {
+      const user = auth.currentUser;
+      const canReadBuzon = userRole === 'admin' && isAuthorizedAdminEmail(user);
+      if (!canReadBuzon) {
+        detachAdminBuzonListener();
+        return;
+      }
+
+      if (adminBuzonUnsubscribe && adminBuzonSubscribedUid === user.uid) {
+        renderAdminBuzonList();
+        return;
+      }
+
+      detachAdminBuzonListener();
+      adminBuzonSubscribedUid = user.uid;
+
+      const buzonQuery = query(
+        collection(db, SUGGESTIONS_COLLECTION),
+        orderBy('fecha', 'desc'),
+        limit(100)
+      );
+
+      adminBuzonUnsubscribe = onSnapshot(
+        buzonQuery,
+        (snapshot) => {
+          const items = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data() || {};
+            items.push({
+              id: docSnap.id,
+              mensaje: String(data.mensaje || ''),
+              usuario: String(data.usuario || 'Anónimo'),
+              uid: String(data.uid || data.authorId || ''),
+              leido: data.leido === true,
+              _sortMs: extractTimestampMs(data)
+            });
+          });
+          items.sort((a, b) => b._sortMs - a._sortMs);
+          adminBuzonMessages = items;
+          renderAdminBuzonList();
+        },
+        (err) => {
+          console.warn('Error escuchando Buzón Admin:', err && err.message ? err.message : err);
+          if (err && err.code === 'permission-denied') {
+            if (adminBuzonStatsText) {
+              adminBuzonStatsText.textContent = 'Requiere correo administrador verificado';
+            }
+            handleFirestoreError(err, OperationType.LIST, SUGGESTIONS_COLLECTION);
+          }
+        }
+      );
+    }
+
+    function setAdminPanelTab(tabName = 'buzon') {
+      activeAdminPanelTab = tabName === 'control' ? 'control' : 'buzon';
+      if (tabAdminBuzon) tabAdminBuzon.classList.toggle('active', activeAdminPanelTab === 'buzon');
+      if (tabAdminControl) tabAdminControl.classList.toggle('active', activeAdminPanelTab === 'control');
+      if (adminBuzonSection) adminBuzonSection.style.display = activeAdminPanelTab === 'buzon' ? '' : 'none';
+      if (adminControlSection) adminControlSection.style.display = activeAdminPanelTab === 'control' ? '' : 'none';
+    }
+
+    function openAdminPanelModal(initialTab = 'buzon') {
+      if (userRole !== 'admin') return;
+      const user = auth.currentUser;
+      if (adminPanelEmailLabel) {
+        adminPanelEmailLabel.textContent = user && user.email
+          ? `${user.email}${isAuthorizedAdminEmail(user) ? ' (Autorizado)' : ' (Solo PIN)'}`
+          : 'Sesión activa por PIN (inicia sesión para ver el Buzón)';
+      }
+      setAdminPanelTab(initialTab);
+      syncAdminBuzonSubscription();
+      renderAdminBuzonList();
+      if (adminPanelModal) adminPanelModal.classList.add('open');
+    }
+
+    if (tabAdminBuzon) {
+      tabAdminBuzon.addEventListener('click', () => setAdminPanelTab('buzon'));
+    }
+    if (tabAdminControl) {
+      tabAdminControl.addEventListener('click', () => setAdminPanelTab('control'));
+    }
+    if (btnToggleUnreadFilter) {
+      btnToggleUnreadFilter.addEventListener('click', () => {
+        adminBuzonFilterUnreadOnly = !adminBuzonFilterUnreadOnly;
+        btnToggleUnreadFilter.classList.toggle('active', adminBuzonFilterUnreadOnly);
+        renderAdminBuzonList();
+      });
+    }
+    if (btnCloseAdminPanelModal && adminPanelModal) {
+      btnCloseAdminPanelModal.addEventListener('click', () => adminPanelModal.classList.remove('open'));
+      adminPanelModal.addEventListener('click', (e) => {
+        if (e.target === adminPanelModal) adminPanelModal.classList.remove('open');
+      });
+    }
+    if (btnAdminOpenAlertsCenter) {
+      btnAdminOpenAlertsCenter.addEventListener('click', () => {
+        if (adminPanelModal) adminPanelModal.classList.remove('open');
+        if (typeof renderAlertsCenterList === 'function' && alertsCenterModal) {
+          renderAlertsCenterList(lastRenderedReports);
+          alertsCenterModal.classList.add('open');
+        }
+      });
+    }
+    if (btnSwitchToCitizenMode) {
+      btnSwitchToCitizenMode.addEventListener('click', () => {
+        userRole = 'citizen';
+        try {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        } catch (e) {}
+        if (adminPanelModal) adminPanelModal.classList.remove('open');
+        applyRoleUI();
+        refreshReportsForRole();
+        showToast('Modo Ciudadano activo.');
+      });
+    }
+
+    window.__anthiAdminBuzonReady = true;
+    if (userRole === 'admin' && isAuthorizedAdminEmail(auth.currentUser)) {
+      syncAdminBuzonSubscription();
+      updateAdminRoleButtonBadge();
     }
 
     // =========================================================================

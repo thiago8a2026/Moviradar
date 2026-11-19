@@ -220,9 +220,48 @@
           "type": "string",
           "format": "date-time",
           "description": "Marca de tiempo asignada por el servidor de Firestore."
+        },
+        "leido": {
+          "type": "boolean",
+          "description": "Indica si el mensaje del buzón ya fue marcado como leído por un administrador."
         }
       },
       "required": ["mensaje", "usuario", "authorId", "timestamp"]
+    },
+    "SugerenciaBuzonV2": {
+      "title": "Sugerencia del Buzón ANTHI (buzon_sugerencias)",
+      "description": "Mensaje enviado desde el Buzón de Sugerencias en colección buzon_sugerencias con control de lectura.",
+      "type": "object",
+      "properties": {
+        "mensaje": {
+          "type": "string",
+          "description": "Texto de la sugerencia o consejo escrito por el usuario.",
+          "minLength": 3,
+          "maxLength": 1000
+        },
+        "usuario": {
+          "type": "string",
+          "description": "Correo electrónico del usuario autenticado o 'Anónimo'.",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "uid": {
+          "type": "string",
+          "description": "UID de Firebase Auth o 'anonimo' si envió sin sesión iniciada.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "fecha": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo asignada por el servidor de Firestore."
+        },
+        "leido": {
+          "type": "boolean",
+          "description": "Estado de lectura por el administrador (false al crearse)."
+        }
+      },
+      "required": ["mensaje", "usuario", "uid", "fecha", "leido"]
     }
   },
   "firestore": {
@@ -236,7 +275,11 @@
     },
     "/buzon/{sugerenciaId}": {
       "schema": { "$ref": "#/entities/SugerenciaBuzon" },
-      "description": "Buzón de sugerencias, consejos y mejoras enviadas por los conductores."
+      "description": "Colección heredada de buzón de sugerencias."
+    },
+    "/buzon_sugerencias/{sugerenciaId}": {
+      "schema": { "$ref": "#/entities/SugerenciaBuzonV2" },
+      "description": "Buzón de sugerencias y consejos de los conductores sincronizado con el Panel Admin."
     },
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserSession" },
