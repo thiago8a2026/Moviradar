@@ -165,7 +165,7 @@
       flex-shrink: 0;
     }
 
-    .role-btn, .auth-btn {
+    .role-btn, .auth-btn, .header-controls-toggle {
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid var(--border);
       color: var(--text-main);
@@ -175,6 +175,21 @@
       border-radius: 10px;
       white-space: nowrap;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .header-controls-toggle {
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #67e8f9;
+      padding: 6px 8px;
+      font-weight: 800;
+    }
+
+    .header-controls-toggle.is-collapsed {
+      border-color: var(--border);
+      color: #94a3b8;
     }
 
     .map-btn.count-chip {
@@ -323,7 +338,7 @@
       border-color: rgba(16, 185, 129, 0.6);
       background: rgba(16, 185, 129, 0.14);
       color: #6ee7b7;
-      max-width: 145px;
+      max-width: 112px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -454,7 +469,7 @@
       background: #0b1120;
     }
 
-    /* Cápsula superior izquierda: Tipo de vehículo (izq) + Pico y Placa amarillo (der) */
+    /* Cápsula superior izquierda plegable: referencia visual de vehículo + Pico y Placa */
     .gps-hud {
       position: fixed;
       top: 74px;
@@ -466,13 +481,31 @@
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 6px 8px;
+      padding: 6px 9px;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.44);
       pointer-events: auto;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, padding 0.15s ease;
+    }
+
+    .gps-hud.pico-collapsed {
+      padding: 5px 10px;
+      border-radius: 12px;
+      gap: 0;
+      cursor: pointer;
+    }
+
+    .gps-hud.pico-collapsed .hud-vehicle-block,
+    .gps-hud.pico-collapsed .hud-divider,
+    .gps-hud.pico-collapsed .hud-pico-head-row {
+      display: none;
+    }
+
+    .gps-hud.pico-collapsed .hud-pico-digits {
+      font-size: 14px;
+      letter-spacing: 0.04em;
     }
 
     .gps-hud.pico-alert-active {
@@ -494,64 +527,56 @@
     .hud-vehicle-block {
       display: flex;
       align-items: center;
-      gap: 6px;
       flex-shrink: 0;
+      cursor: pointer;
     }
 
     .hud-vehicle-graphic {
-      width: 30px;
-      height: 26px;
-      border-radius: 8px;
-      background: rgba(2, 6, 23, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.35);
+      width: 34px;
+      height: 30px;
+      border-radius: 9px;
+      background: rgba(2, 6, 23, 0.88);
+      border: 1.5px solid rgba(56, 189, 248, 0.55);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      transition: border-color 0.18s ease, background-color 0.18s ease;
+    }
+
+    .hud-vehicle-graphic.particular {
+      border-color: rgba(56, 189, 248, 0.65);
+      background: rgba(14, 116, 144, 0.18);
+    }
+
+    .hud-vehicle-graphic.moto {
+      border-color: rgba(52, 211, 153, 0.65);
+      background: rgba(6, 95, 70, 0.2);
     }
 
     .hud-vehicle-graphic.taxi {
-      border-color: rgba(250, 204, 21, 0.65);
+      border-color: rgba(250, 204, 21, 0.85);
+      background: rgba(250, 204, 21, 0.18);
     }
 
-    .hud-vehicle-select,
-    .hud-pico-select {
-      background: rgba(2, 6, 23, 0.88);
-      color: #f8fafc;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      border-radius: 7px;
-      font-family: inherit;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 4px;
-      cursor: pointer;
-      outline: none;
-      max-width: 88px;
-    }
-
-    .hud-pico-select {
-      border-color: rgba(250, 204, 21, 0.55);
-      color: #fde047;
-      font-size: 9.5px;
-      padding: 2px 3px;
-      max-width: 92px;
-    }
-
-    .hud-label {
-      font-size: 8.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      font-weight: 700;
-      white-space: nowrap;
-      margin-bottom: 2px;
+    .hud-vehicle-graphic.camioneta {
+      border-color: rgba(167, 139, 250, 0.7);
+      background: rgba(91, 33, 182, 0.2);
     }
 
     .hud-divider {
       width: 1px;
-      height: 32px;
+      height: 28px;
       background: var(--border);
       flex-shrink: 0;
+    }
+
+    .hud-pico-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 2px;
     }
 
     .hud-pico-title {
@@ -561,8 +586,20 @@
       letter-spacing: 0.06em;
       color: #facc15;
       line-height: 1.1;
-      margin-bottom: 3px;
       white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .hud-pico-collapse-btn {
+      background: rgba(2, 6, 23, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #cbd5e1;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      padding: 2px 5px;
+      cursor: pointer;
     }
 
     .hud-pico-main {
@@ -578,6 +615,7 @@
       color: #f8fafc;
       white-space: nowrap;
       cursor: pointer;
+      line-height: 1.15;
     }
 
     .hud-pico-digits.restricted {
@@ -592,7 +630,7 @@
       color: #6ee7b7;
     }
 
-    /* Botones flotantes del mapa plegables a la derecha */
+    /* Botones flotantes del mapa plegables desde la barra superior */
     .map-controls {
       position: fixed;
       right: 12px;
@@ -611,18 +649,8 @@
       gap: 8px;
     }
 
-    .map-controls.collapsed .map-controls-group {
+    .map-controls.collapsed {
       display: none;
-    }
-
-    .map-btn.map-controls-toggle {
-      flex-direction: column;
-      gap: 1px;
-      font-size: 15px;
-      line-height: 1;
-      border-color: rgba(56, 189, 248, 0.55);
-      background: rgba(15, 23, 42, 0.96);
-      color: #67e8f9;
     }
 
     .map-btn {
@@ -2010,6 +2038,10 @@
       </div>
 
       <div class="header-actions">
+        <button type="button" class="header-controls-toggle" id="btnToggleMapControls" aria-expanded="true" title="Plegar o desplegar botones laterales">
+          <span id="mapControlsToggleIcon">▴</span>
+          <span id="mapControlsToggleLabel">Panel</span>
+        </button>
         <button type="button" class="auth-btn" id="btnAuth" title="Iniciar sesión o registrarse con correo electrónico">
           Entrar
         </button>
@@ -2019,31 +2051,19 @@
     <!-- Contenedor principal del mapa gratuito OpenStreetMap -->
     <main id="map"></main>
 
-    <!-- Cápsula superior: 4 tipos de vehículo (izq) + PICO Y PLACA amarillo (der) -->
+    <!-- Cápsula superior izquierda plegable: referencia visual de vehículo + PICO Y PLACA -->
     <div class="gps-hud" id="gpsHud">
-      <div class="hud-vehicle-block" id="hudVehicleBlock">
+      <div class="hud-vehicle-block" id="hudVehicleBlock" title="Abrir Hoja de Vida y vehículo">
         <div class="hud-vehicle-graphic" id="hudVehicleGraphic" aria-hidden="true"></div>
-        <div class="hud-block">
-          <span class="hud-label">Vehículo</span>
-          <select class="hud-vehicle-select" id="hudVehicleTypeSelect" aria-label="Tipo de vehículo">
-            <option value="particular">Particular</option>
-            <option value="moto">Moto</option>
-            <option value="taxi">Taxi</option>
-            <option value="camioneta">Camioneta</option>
-          </select>
-        </div>
       </div>
       <div class="hud-divider"></div>
       <div class="hud-block" id="hudPicoBlock">
-        <span class="hud-pico-title">PICO Y PLACA</span>
+        <div class="hud-pico-head-row">
+          <span class="hud-pico-title" id="hudPicoTitle">PICO Y PLACA</span>
+          <button type="button" class="hud-pico-collapse-btn" id="btnTogglePicoHud" aria-expanded="true" title="Plegar o desplegar Pico y Placa">▴</button>
+        </div>
         <div class="hud-pico-main">
-          <span class="hud-pico-digits" id="hudPicoDigits" title="Ver en Hoja de Vida">--</span>
-          <select class="hud-pico-select" id="hudPicoCitySelect" aria-label="Municipio Pico y Placa">
-            <option value="Bucaramanga">Bucaramanga</option>
-            <option value="Floridablanca">Floridablanca</option>
-            <option value="Girón">Girón</option>
-            <option value="Piedecuesta">Piedecuesta</option>
-          </select>
+          <span class="hud-pico-digits" id="hudPicoDigits" title="Plegar o abrir Pico y Placa">--</span>
         </div>
       </div>
     </div>
@@ -2073,12 +2093,8 @@
       </div>
     </div>
 
-    <!-- Controles rápidos del mapa (agrupación plegable / desplegable a la derecha) -->
+    <!-- Controles rápidos del mapa (plegables desde la barra superior) -->
     <div class="map-controls" id="mapControlsWrapper">
-      <button type="button" class="map-btn map-controls-toggle" id="btnToggleMapControls" aria-expanded="true" title="Plegar o desplegar controles del mapa">
-        <span id="mapControlsToggleIcon">▴</span>
-        <span class="sonar-btn-sub" id="mapControlsToggleLabel">Plegar</span>
-      </button>
       <div class="map-controls-group" id="mapControlsGroup">
         <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
         <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
@@ -3002,8 +3018,8 @@
       ACTIVE_SESSION: 'anthi_active_session_v1',
       HOJA_VIDA: 'anthi_hoja_vida_v1',
       HV_NOTIF_STATE: 'anthi_hv_notif_v1',
-      PICO_CITY: 'anthi_pico_city_v1',
-      MAP_CONTROLS_COLLAPSED: 'anthi_map_controls_collapsed_v1'
+      MAP_CONTROLS_COLLAPSED: 'anthi_map_controls_collapsed_v1',
+      PICO_HUD_COLLAPSED: 'anthi_pico_hud_collapsed_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -6570,18 +6586,22 @@
     const HOJA_VIDA_ALERT_DAYS = 15;
     const HOJA_VIDA_ALERT_KM = 500;
 
-    // Agrupación plegable / desplegable de los botones del lado derecho
+    // Agrupación plegable / desplegable de los botones del lado derecho desde la barra superior
     const mapControlsWrapper = document.getElementById('mapControlsWrapper');
     const btnToggleMapControls = document.getElementById('btnToggleMapControls');
     const mapControlsToggleIcon = document.getElementById('mapControlsToggleIcon');
     const mapControlsToggleLabel = document.getElementById('mapControlsToggleLabel');
 
     function applyMapControlsCollapsedUI(collapsed) {
-      if (!mapControlsWrapper) return;
-      mapControlsWrapper.classList.toggle('collapsed', collapsed);
-      if (btnToggleMapControls) btnToggleMapControls.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      if (mapControlsWrapper) {
+        mapControlsWrapper.classList.toggle('collapsed', collapsed);
+      }
+      if (btnToggleMapControls) {
+        btnToggleMapControls.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btnToggleMapControls.classList.toggle('is-collapsed', collapsed);
+      }
       if (mapControlsToggleIcon) mapControlsToggleIcon.textContent = collapsed ? '▾' : '▴';
-      if (mapControlsToggleLabel) mapControlsToggleLabel.textContent = collapsed ? 'Abrir' : 'Plegar';
+      if (mapControlsToggleLabel) mapControlsToggleLabel.textContent = 'Panel';
     }
 
     let isMapControlsCollapsed = safeReadJson(STORAGE_KEYS.MAP_CONTROLS_COLLAPSED, false) === true;
@@ -6756,22 +6776,16 @@
     }
 
     let hojaVidaState = loadHojaVidaLocal();
-    let selectedPicoCity = (() => {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEYS.PICO_CITY);
-        return ['Bucaramanga', 'Floridablanca', 'Girón', 'Piedecuesta'].includes(saved) ? saved : 'Bucaramanga';
-      } catch (e) {
-        return 'Bucaramanga';
-      }
-    })();
+    let isPicoHudCollapsed = safeReadJson(STORAGE_KEYS.PICO_HUD_COLLAPSED, false) === true;
     let hvReminderMode = 'tiempo';
     let hvToastNotifiedOnce = false;
 
     const gpsHudEl = document.getElementById('gpsHud');
+    const hudVehicleBlockEl = document.getElementById('hudVehicleBlock');
     const hudVehicleGraphicEl = document.getElementById('hudVehicleGraphic');
-    const hudVehicleTypeSelect = document.getElementById('hudVehicleTypeSelect');
+    const hudPicoTitleEl = document.getElementById('hudPicoTitle');
+    const btnTogglePicoHud = document.getElementById('btnTogglePicoHud');
     const hudPicoDigitsEl = document.getElementById('hudPicoDigits');
-    const hudPicoCitySelect = document.getElementById('hudPicoCitySelect');
 
     const btnOpenHojaVida = document.getElementById('btnOpenHojaVida');
     const hojaVidaModal = document.getElementById('hojaVidaModal');
@@ -6929,19 +6943,30 @@
       } catch (e) {}
     }
 
+    function applyPicoHudCollapsedUI(collapsed) {
+      if (gpsHudEl) {
+        gpsHudEl.classList.toggle('pico-collapsed', collapsed);
+        gpsHudEl.setAttribute(
+          'title',
+          collapsed ? 'Toca para desplegar Pico y Placa y vehículo' : ''
+        );
+      }
+      if (btnTogglePicoHud) {
+        btnTogglePicoHud.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btnTogglePicoHud.textContent = collapsed ? '▾' : '▴';
+      }
+    }
+
     function renderPicoYPlacaUI() {
       const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
       const tipoLabel = VEHICLE_LABELS[hojaVidaState.tipoVehiculo] || 'Particular';
 
+      applyPicoHudCollapsedUI(isPicoHudCollapsed);
+
       if (hudVehicleGraphicEl) {
         hudVehicleGraphicEl.innerHTML = VEHICLE_SVG_MAP[hojaVidaState.tipoVehiculo] || VEHICLE_SVG_MAP.particular;
-        hudVehicleGraphicEl.classList.toggle('taxi', info.isTaxi);
-      }
-      if (hudVehicleTypeSelect && hudVehicleTypeSelect.value !== hojaVidaState.tipoVehiculo) {
-        hudVehicleTypeSelect.value = hojaVidaState.tipoVehiculo;
-      }
-      if (hudPicoCitySelect && hudPicoCitySelect.value !== selectedPicoCity) {
-        hudPicoCitySelect.value = selectedPicoCity;
+        hudVehicleGraphicEl.classList.remove('particular', 'moto', 'taxi', 'camioneta');
+        hudVehicleGraphicEl.classList.add(hojaVidaState.tipoVehiculo || 'particular');
       }
 
       if (gpsHudEl) {
@@ -6951,7 +6976,19 @@
 
       if (hudPicoDigitsEl) {
         hudPicoDigitsEl.classList.remove('restricted', 'soon', 'free');
-        if (info.digits.length === 0) {
+        const compactDigits = info.digits.length === 2 ? `${info.digits[0]} - ${info.digits[1]}` : 'Libre';
+        if (isPicoHudCollapsed) {
+          hudPicoDigitsEl.textContent = compactDigits;
+          if (info.digits.length === 0) {
+            hudPicoDigitsEl.classList.add('free');
+          } else if (info.restrictedNow) {
+            hudPicoDigitsEl.classList.add('restricted');
+          } else if (info.appliesToPlateToday) {
+            hudPicoDigitsEl.classList.add('soon');
+          } else if (info.lastDigit !== null) {
+            hudPicoDigitsEl.classList.add('free');
+          }
+        } else if (info.digits.length === 0) {
           hudPicoDigitsEl.textContent = 'Libre hoy';
           hudPicoDigitsEl.classList.add('free');
         } else if (info.restrictedNow) {
@@ -6970,16 +7007,16 @@
         hvPicoResumenCard.classList.remove('restricted', 'free');
         if (info.digits.length === 0) {
           hvPicoResumenCard.classList.add('free');
-          hvPicoResumenCard.innerHTML = `<strong>✅ PICO Y PLACA (${escapeHtml(selectedPicoCity)} · ${escapeHtml(tipoLabel)}):</strong> Libre hoy.`;
+          hvPicoResumenCard.innerHTML = `<strong>✅ PICO Y PLACA (${escapeHtml(tipoLabel)}):</strong> Libre hoy.`;
         } else if (info.appliesToPlateToday) {
           hvPicoResumenCard.classList.add('restricted');
-          hvPicoResumenCard.innerHTML = `<strong>${info.restrictedNow ? '🚫' : '⚠️'} Tu placa terminada en ${info.lastDigit} tiene Pico y Placa hoy (${escapeHtml(info.digitsLabel)})</strong> en ${escapeHtml(selectedPicoCity)}.`;
+          hvPicoResumenCard.innerHTML = `<strong>${info.restrictedNow ? '🚫' : '⚠️'} Tu placa terminada en ${info.lastDigit} tiene Pico y Placa hoy (${escapeHtml(info.digitsLabel)})</strong> en el área metropolitana.`;
         } else {
           hvPicoResumenCard.classList.add('free');
           const plateInfo = info.lastDigit !== null
             ? `Tu dígito <strong>${info.lastDigit}</strong> circula libre hoy.`
             : 'Ingresa tu placa abajo para validar tu dígito.';
-          hvPicoResumenCard.innerHTML = `<strong>🚘 PICO Y PLACA hoy en ${escapeHtml(selectedPicoCity)} (${escapeHtml(tipoLabel)}): ${escapeHtml(info.digitsLabel)}</strong><br/>${plateInfo}`;
+          hvPicoResumenCard.innerHTML = `<strong>🚘 PICO Y PLACA hoy (${escapeHtml(tipoLabel)}): ${escapeHtml(info.digitsLabel)}</strong><br/>${plateInfo}`;
         }
       }
     }
@@ -7207,37 +7244,57 @@
       });
     }
 
-    function setVehicleServiceType(newType, fromTopHud = false) {
+    function setVehicleServiceType(newType) {
       const normalizedType = VALID_VEHICLE_TYPES.includes(newType) ? newType : 'particular';
       hojaVidaState.tipoVehiculo = normalizedType;
       persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
-      if (fromTopHud) {
-        const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
-        const label = VEHICLE_LABELS[normalizedType] || 'Particular';
-        showToast(`${label} · PICO Y PLACA (${selectedPicoCity}): ${info.digitsLabel}`);
-      }
     }
 
-    if (hudVehicleTypeSelect) {
-      hudVehicleTypeSelect.addEventListener('change', () => {
-        setVehicleServiceType(hudVehicleTypeSelect.value, true);
+    function togglePicoHudCollapsed() {
+      isPicoHudCollapsed = !isPicoHudCollapsed;
+      renderPicoYPlacaUI();
+      try {
+        localStorage.setItem(STORAGE_KEYS.PICO_HUD_COLLAPSED, JSON.stringify(isPicoHudCollapsed));
+      } catch (e) {}
+    }
+
+    if (btnTogglePicoHud) {
+      btnTogglePicoHud.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePicoHudCollapsed();
       });
     }
 
-    if (hudPicoCitySelect) {
-      hudPicoCitySelect.addEventListener('change', () => {
-        selectedPicoCity = hudPicoCitySelect.value;
-        try {
-          localStorage.setItem(STORAGE_KEYS.PICO_CITY, selectedPicoCity);
-        } catch (e) {}
-        renderPicoYPlacaUI();
-        const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
-        showToast(`PICO Y PLACA ${selectedPicoCity}: ${info.digitsLabel}`);
+    if (hudPicoTitleEl) {
+      hudPicoTitleEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePicoHudCollapsed();
       });
     }
 
-    if (hudPicoDigitsEl && hojaVidaModal) {
-      hudPicoDigitsEl.addEventListener('click', () => {
+    if (hudPicoDigitsEl) {
+      hudPicoDigitsEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isPicoHudCollapsed) {
+          togglePicoHudCollapsed();
+        } else if (hojaVidaModal) {
+          renderHojaVidaUI(false, false);
+          hojaVidaModal.classList.add('open');
+        }
+      });
+    }
+
+    if (gpsHudEl) {
+      gpsHudEl.addEventListener('click', () => {
+        if (isPicoHudCollapsed) {
+          togglePicoHudCollapsed();
+        }
+      });
+    }
+
+    if (hudVehicleBlockEl && hojaVidaModal) {
+      hudVehicleBlockEl.addEventListener('click', (e) => {
+        e.stopPropagation();
         renderHojaVidaUI(false, false);
         hojaVidaModal.classList.add('open');
       });
