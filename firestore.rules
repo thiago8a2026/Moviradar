@@ -79,6 +79,31 @@ service cloud.firestore {
         && data.lastLoginAt is timestamp;
     }
 
+    function isValidHojaVida(data) {
+      return data.keys().hasAll([
+          'tipoVehiculo', 'placa', 'kmActual',
+          'soatVencimiento', 'tecnoVencimiento',
+          'paseVencimiento', 'tarjetaOperacionVencimiento',
+          'recordatorios', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'tipoVehiculo', 'placa', 'kmActual',
+          'soatVencimiento', 'tecnoVencimiento',
+          'paseVencimiento', 'tarjetaOperacionVencimiento',
+          'recordatorios', 'updatedAt'
+        ])
+        && (data.tipoVehiculo == 'particular' || data.tipoVehiculo == 'moto' || data.tipoVehiculo == 'taxi' || data.tipoVehiculo == 'camioneta')
+        && data.placa is string && data.placa.size() <= 10
+        && data.kmActual is number && data.kmActual >= 0 && data.kmActual <= 5000000
+        && data.soatVencimiento is string && data.soatVencimiento.size() <= 20
+        && data.tecnoVencimiento is string && data.tecnoVencimiento.size() <= 20
+        && data.paseVencimiento is string && data.paseVencimiento.size() <= 20
+        && data.tarjetaOperacionVencimiento is string && data.tarjetaOperacionVencimiento.size() <= 20
+        && data.recordatorios is list && data.recordatorios.size() <= 25
+        && (data.recordatorios.size() == 0 || data.recordatorios[0] is map)
+        && data.updatedAt is timestamp;
+    }
+
     match /reportes/{reportId} {
       // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
       allow get: if isValidId(reportId);
@@ -179,6 +204,45 @@ service cloud.firestore {
       allow delete: if isSignedIn()
         && isValidId(userId)
         && (request.auth.uid == userId || isAdmin());
+
+      match /hojaVida/{docId} {
+        allow get: if isSignedIn()
+          && isValidId(userId)
+          && isValidId(docId)
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/users/$(userId));
+
+        allow list: if false;
+
+        allow create: if isSignedIn()
+          && isValidId(userId)
+          && isValidId(docId)
+          && docId == 'principal'
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidHojaVida(incoming())
+          && incoming().updatedAt == request.time;
+
+        allow update: if isSignedIn()
+          && isValidId(userId)
+          && isValidId(docId)
+          && docId == 'principal'
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidHojaVida(incoming())
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'tipoVehiculo', 'placa', 'kmActual',
+            'soatVencimiento', 'tecnoVencimiento',
+            'paseVencimiento', 'tarjetaOperacionVencimiento',
+            'recordatorios', 'updatedAt'
+          ])
+          && incoming().updatedAt == request.time;
+
+        allow delete: if isSignedIn()
+          && isValidId(userId)
+          && isValidId(docId)
+          && request.auth.uid == userId;
+      }
     }
 
     match /admins/{adminId} {

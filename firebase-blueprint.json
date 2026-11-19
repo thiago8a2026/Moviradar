@@ -108,6 +108,67 @@
       },
       "required": ["activeSessionId", "lastLoginAt"]
     },
+    "HojaVidaVehiculo": {
+      "title": "Hoja de Vida del Vehículo ANTHI",
+      "description": "Registro privado de placa, servicio (particular o taxi), kilometraje, documentos (SOAT, técnico-mecánica, pase, tarjeta de operación) y recordatorios de mantenimiento.",
+      "type": "object",
+      "properties": {
+        "tipoVehiculo": {
+          "type": "string",
+          "enum": ["particular", "moto", "taxi", "camioneta"],
+          "description": "Tipo de vehículo (Particular, Moto, Taxi o Camioneta) para Pico y Placa AMB y Hoja de Vida."
+        },
+        "placa": {
+          "type": "string",
+          "description": "Placa del vehículo registrada por el conductor.",
+          "maxLength": 10
+        },
+        "kmActual": {
+          "type": "number",
+          "description": "Kilometraje actual del vehículo en km."
+        },
+        "soatVencimiento": {
+          "type": "string",
+          "description": "Fecha de vencimiento del SOAT en formato YYYY-MM-DD.",
+          "maxLength": 20
+        },
+        "tecnoVencimiento": {
+          "type": "string",
+          "description": "Fecha de vencimiento de la revisión técnico-mecánica en formato YYYY-MM-DD.",
+          "maxLength": 20
+        },
+        "paseVencimiento": {
+          "type": "string",
+          "description": "Fecha de vencimiento de la licencia/pase de conducción (taxi/público) en formato YYYY-MM-DD.",
+          "maxLength": 20
+        },
+        "tarjetaOperacionVencimiento": {
+          "type": "string",
+          "description": "Fecha de vencimiento de la tarjeta de operación para taxi en formato YYYY-MM-DD.",
+          "maxLength": 20
+        },
+        "recordatorios": {
+          "type": "array",
+          "description": "Lista acotada de hasta 25 recordatorios adicionales por tiempo o kilometraje."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo asignada por el servidor de Firestore al guardar."
+        }
+      },
+      "required": [
+        "tipoVehiculo",
+        "placa",
+        "kmActual",
+        "soatVencimiento",
+        "tecnoVencimiento",
+        "paseVencimiento",
+        "tarjetaOperacionVencimiento",
+        "recordatorios",
+        "updatedAt"
+      ]
+    },
     "VotoReporte": {
       "title": "Voto Único de Reporte MoviRadar",
       "description": "Registro único por usuario autenticado para validar o desmentir un reporte vial sin duplicados.",
@@ -180,6 +241,10 @@
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserSession" },
       "description": "Estado de sesión única activa por usuario autenticado."
+    },
+    "/users/{userId}/hojaVida/{docId}": {
+      "schema": { "$ref": "#/entities/HojaVidaVehiculo" },
+      "description": "Hoja de vida del vehículo privada por usuario autenticado."
     },
     "/admins/{adminId}": {
       "schema": { "$ref": "#/entities/AdminUser" },

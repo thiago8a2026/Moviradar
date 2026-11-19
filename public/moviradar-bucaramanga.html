@@ -454,59 +454,145 @@
       background: #0b1120;
     }
 
-    /* HUD velocidad y coordenadas arriba a la izquierda */
+    /* Cápsula superior izquierda: Tipo de vehículo (izq) + Pico y Placa amarillo (der) */
     .gps-hud {
       position: fixed;
       top: 74px;
       left: 12px;
+      max-width: calc(100vw - 74px);
       z-index: 900;
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.94);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 8px 12px;
+      padding: 6px 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      pointer-events: none;
+      gap: 7px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.44);
+      pointer-events: auto;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gps-hud.pico-alert-active {
+      border-color: rgba(239, 68, 68, 0.85);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.35), 0 8px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    .gps-hud.pico-alert-soon {
+      border-color: rgba(245, 158, 11, 0.78);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.24), 0 8px 20px rgba(0, 0, 0, 0.42);
     }
 
     .hud-block {
       display: flex;
       flex-direction: column;
+      min-width: 0;
+    }
+
+    .hud-vehicle-block {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .hud-vehicle-graphic {
+      width: 30px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(2, 6, 23, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hud-vehicle-graphic.taxi {
+      border-color: rgba(250, 204, 21, 0.65);
+    }
+
+    .hud-vehicle-select,
+    .hud-pico-select {
+      background: rgba(2, 6, 23, 0.88);
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 4px;
+      cursor: pointer;
+      outline: none;
+      max-width: 88px;
+    }
+
+    .hud-pico-select {
+      border-color: rgba(250, 204, 21, 0.55);
+      color: #fde047;
+      font-size: 9.5px;
+      padding: 2px 3px;
+      max-width: 92px;
     }
 
     .hud-label {
-      font-size: 9px;
+      font-size: 8.5px;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-muted);
       font-weight: 700;
-    }
-
-    .hud-speed {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--accent-cyan);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .hud-coords {
-      font-size: 11px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: #e2e8f0;
-      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      margin-bottom: 2px;
     }
 
     .hud-divider {
       width: 1px;
-      height: 24px;
+      height: 32px;
       background: var(--border);
+      flex-shrink: 0;
     }
 
-    /* Botones flotantes del mapa (Zoom, GPS, Puntos) */
+    .hud-pico-title {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #facc15;
+      line-height: 1.1;
+      margin-bottom: 3px;
+      white-space: nowrap;
+    }
+
+    .hud-pico-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .hud-pico-digits {
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #f8fafc;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .hud-pico-digits.restricted {
+      color: #fca5a5;
+    }
+
+    .hud-pico-digits.soon {
+      color: #fde047;
+    }
+
+    .hud-pico-digits.free {
+      color: #6ee7b7;
+    }
+
+    /* Botones flotantes del mapa plegables a la derecha */
     .map-controls {
       position: fixed;
       right: 12px;
@@ -516,6 +602,27 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 8px;
+    }
+
+    .map-controls-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .map-controls.collapsed .map-controls-group {
+      display: none;
+    }
+
+    .map-btn.map-controls-toggle {
+      flex-direction: column;
+      gap: 1px;
+      font-size: 15px;
+      line-height: 1;
+      border-color: rgba(56, 189, 248, 0.55);
+      background: rgba(15, 23, 42, 0.96);
+      color: #67e8f9;
     }
 
     .map-btn {
@@ -817,10 +924,32 @@
       transform: scale(0.96);
     }
 
-    .quick-btn.whatsapp {
-      border-color: rgba(34, 197, 94, 0.55);
-      color: #86efac;
-      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.12);
+    .quick-btn.hoja-vida {
+      position: relative;
+      border-color: rgba(59, 130, 246, 0.62);
+      color: #93c5fd;
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.14);
+    }
+
+    .quick-btn.hoja-vida.has-alerts {
+      border-color: rgba(245, 158, 11, 0.85);
+      color: #fde68a;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.22);
+    }
+
+    .hv-alert-dot {
+      display: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 1.5px solid #020617;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.85);
+      flex-shrink: 0;
+    }
+
+    .quick-btn.hoja-vida.has-alerts .hv-alert-dot {
+      display: inline-block;
     }
 
     .quick-btn.route {
@@ -1616,6 +1745,243 @@
       font-weight: 700;
       color: #34d399;
     }
+
+    /* Hoja de Vida del Vehículo y Pico y Placa AMB */
+    .hv-alerts-banner {
+      display: none;
+      background: rgba(127, 29, 29, 0.55);
+      border: 1px solid rgba(248, 113, 113, 0.72);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: #fecaca;
+    }
+
+    .hv-alerts-banner.open {
+      display: block;
+    }
+
+    .hv-alerts-banner ul {
+      margin: 6px 0 0 16px;
+      padding: 0;
+    }
+
+    .hv-service-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .hv-service-tab {
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .hv-service-tab.active {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.16);
+      color: #67e8f9;
+    }
+
+    .hv-service-tab.active.taxi {
+      border-color: #eab308;
+      background: rgba(234, 179, 8, 0.18);
+      color: #fde047;
+    }
+
+    .hv-pico-card {
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: #e2e8f0;
+    }
+
+    .hv-pico-card.restricted {
+      border-color: rgba(239, 68, 68, 0.75);
+      background: rgba(69, 10, 10, 0.6);
+      color: #fecaca;
+    }
+
+    .hv-pico-card.free {
+      border-color: rgba(16, 185, 129, 0.55);
+      background: rgba(6, 78, 59, 0.35);
+      color: #a7f3d0;
+    }
+
+    .hv-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .hv-plate-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .hv-plate-row .text-input {
+      margin-bottom: 0;
+      flex: 1;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .hv-digit-pill {
+      min-width: 96px;
+      min-height: 44px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: rgba(250, 204, 21, 0.14);
+      border: 1px solid rgba(250, 204, 21, 0.5);
+      color: #fde047;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .hv-doc-row {
+      margin-bottom: 12px;
+    }
+
+    .hv-doc-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .hv-doc-head .form-label {
+      margin-bottom: 0;
+    }
+
+    .hv-status-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    .hv-status-pill.ok {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+    }
+
+    .hv-status-pill.warn {
+      background: rgba(245, 158, 11, 0.22);
+      color: #fcd34d;
+    }
+
+    .hv-status-pill.danger {
+      background: rgba(239, 68, 68, 0.24);
+      color: #fca5a5;
+    }
+
+    .hv-taxi-section {
+      display: none;
+      background: rgba(234, 179, 8, 0.08);
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    .hv-taxi-section.open {
+      display: block;
+    }
+
+    .hv-section-divider {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+
+    .hv-preset-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .hv-chip-btn {
+      padding: 5px 9px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--bg-dark);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hv-chip-btn:active {
+      transform: scale(0.96);
+    }
+
+    .hv-rem-card {
+      background: rgba(2, 6, 23, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .hv-rem-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .hv-rem-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 8px 10px;
+    }
+
+    .hv-rem-item.danger {
+      border-color: rgba(239, 68, 68, 0.65);
+    }
+
+    .hv-rem-item.warn {
+      border-color: rgba(245, 158, 11, 0.65);
+    }
   </style>
 </head>
 <body>
@@ -1653,16 +2019,32 @@
     <!-- Contenedor principal del mapa gratuito OpenStreetMap -->
     <main id="map"></main>
 
-    <!-- HUD compacto de velocidad y GPS en vivo -->
-    <div class="gps-hud">
-      <div class="hud-block">
-        <span class="hud-label">Velocidad</span>
-        <span class="hud-speed"><span id="hudSpeed">0.0</span> <small style="font-size:10px;color:#94a3b8;">km/h</small></span>
+    <!-- Cápsula superior: 4 tipos de vehículo (izq) + PICO Y PLACA amarillo (der) -->
+    <div class="gps-hud" id="gpsHud">
+      <div class="hud-vehicle-block" id="hudVehicleBlock">
+        <div class="hud-vehicle-graphic" id="hudVehicleGraphic" aria-hidden="true"></div>
+        <div class="hud-block">
+          <span class="hud-label">Vehículo</span>
+          <select class="hud-vehicle-select" id="hudVehicleTypeSelect" aria-label="Tipo de vehículo">
+            <option value="particular">Particular</option>
+            <option value="moto">Moto</option>
+            <option value="taxi">Taxi</option>
+            <option value="camioneta">Camioneta</option>
+          </select>
+        </div>
       </div>
       <div class="hud-divider"></div>
-      <div class="hud-block">
-        <span class="hud-label">GPS en vivo</span>
-        <span class="hud-coords" id="hudCoords">7.1193, -73.1227</span>
+      <div class="hud-block" id="hudPicoBlock">
+        <span class="hud-pico-title">PICO Y PLACA</span>
+        <div class="hud-pico-main">
+          <span class="hud-pico-digits" id="hudPicoDigits" title="Ver en Hoja de Vida">--</span>
+          <select class="hud-pico-select" id="hudPicoCitySelect" aria-label="Municipio Pico y Placa">
+            <option value="Bucaramanga">Bucaramanga</option>
+            <option value="Floridablanca">Floridablanca</option>
+            <option value="Girón">Girón</option>
+            <option value="Piedecuesta">Piedecuesta</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -1691,18 +2073,24 @@
       </div>
     </div>
 
-    <!-- Controles rápidos del mapa -->
-    <div class="map-controls">
-      <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
-      <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
-      <button type="button" class="map-btn" id="btnLocateMe" title="Centrar mi ubicación GPS">🎯</button>
-      <button type="button" class="map-btn buzon-btn" id="btnOpenSuggestionBox" title="Buzón de Sugerencias y Consejos">
-        <span>📮</span><span class="sonar-btn-sub">Buzón</span>
+    <!-- Controles rápidos del mapa (agrupación plegable / desplegable a la derecha) -->
+    <div class="map-controls" id="mapControlsWrapper">
+      <button type="button" class="map-btn map-controls-toggle" id="btnToggleMapControls" aria-expanded="true" title="Plegar o desplegar controles del mapa">
+        <span id="mapControlsToggleIcon">▴</span>
+        <span class="sonar-btn-sub" id="mapControlsToggleLabel">Plegar</span>
       </button>
-      <button type="button" class="map-btn count-chip" id="reportCountChip" title="Ver todas las alertas activas" aria-label="0 alertas">
-        <span class="alerts-chip-count" id="reportCountNum">0</span>
-        <span class="sonar-btn-sub" id="reportCountWord">alertas</span>
-      </button>
+      <div class="map-controls-group" id="mapControlsGroup">
+        <button type="button" class="map-btn" id="btnZoomIn" title="Acercar">+</button>
+        <button type="button" class="map-btn" id="btnZoomOut" title="Alejar">−</button>
+        <button type="button" class="map-btn" id="btnLocateMe" title="Centrar mi ubicación GPS">🎯</button>
+        <button type="button" class="map-btn buzon-btn" id="btnOpenSuggestionBox" title="Buzón de Sugerencias y Consejos">
+          <span>📮</span><span class="sonar-btn-sub">Buzón</span>
+        </button>
+        <button type="button" class="map-btn count-chip" id="reportCountChip" title="Ver todas las alertas activas" aria-label="0 alertas">
+          <span class="alerts-chip-count" id="reportCountNum">0</span>
+          <span class="sonar-btn-sub" id="reportCountWord">alertas</span>
+        </button>
+      </div>
     </div>
 
     <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos / Ciudadano y botón "+ Reportar Novedad" -->
@@ -1713,9 +2101,10 @@
       </div>
 
       <div class="quick-actions-bar">
-        <a href="#" target="_blank" rel="noopener noreferrer" class="quick-btn whatsapp" id="btnWhatsApp" title="Compartir ubicación actual">
-          📲 Compartir
-        </a>
+        <button type="button" class="quick-btn hoja-vida" id="btnOpenHojaVida" title="Hoja de vida del vehículo, documentos y Pico y Placa AMB">
+          <span>📋 Hoja de Vida</span>
+          <span class="hv-alert-dot" id="hvAlertDot"></span>
+        </button>
         <button type="button" class="quick-btn route" id="btnOpenRouteAssistant" title="Activar Radar de Proximidad hacia tu destino">
           📡 Ruta
         </button>
@@ -2102,6 +2491,185 @@
       </div>
     </div>
 
+    <!-- Modal Hoja de Vida del Vehículo y Pico y Placa AMB -->
+    <div class="modal-backdrop" id="hojaVidaModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>📋 Hoja de Vida del Vehículo</h2>
+          <button type="button" class="btn-close" id="btnCloseHojaVidaModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="hv-alerts-banner" id="hvAlertsBanner"></div>
+
+        <div class="hv-service-tabs">
+          <button type="button" class="hv-service-tab active" id="hvTipoParticular" data-vehicle-type="particular">
+            🚗 Particular
+          </button>
+          <button type="button" class="hv-service-tab" id="hvTipoMoto" data-vehicle-type="moto">
+            🏍️ Moto
+          </button>
+          <button type="button" class="hv-service-tab" id="hvTipoTaxi" data-vehicle-type="taxi">
+            🚕 Taxi
+          </button>
+          <button type="button" class="hv-service-tab" id="hvTipoCamioneta" data-vehicle-type="camioneta">
+            🚙 Camioneta
+          </button>
+        </div>
+
+        <div class="hv-pico-card" id="hvPicoResumenCard">
+          Consultando Pico y Placa AMB (Bucaramanga, Floridablanca, Girón y Piedecuesta)...
+        </div>
+
+        <form id="hojaVidaForm">
+          <span class="form-label">Placa del vehículo y último dígito</span>
+          <div class="hv-plate-row">
+            <input
+              type="text"
+              id="hvPlacaInput"
+              class="text-input"
+              maxlength="10"
+              placeholder="Ej: ABC123"
+              autocomplete="off"
+            />
+            <div class="hv-digit-pill" id="hvUltimoDigitoBadge">
+              <span style="font-size:9px;opacity:0.85;text-transform:uppercase;">Últ. dígito</span>
+              <strong style="font-size:15px;">--</strong>
+            </div>
+          </div>
+
+          <div class="hv-doc-row">
+            <div class="hv-doc-head">
+              <label class="form-label" for="hvKmActualInput">Kilometraje actual (km)</label>
+              <span class="hv-status-pill" id="hvKmBadge">Registro vivo</span>
+            </div>
+            <input
+              type="number"
+              id="hvKmActualInput"
+              class="text-input"
+              min="0"
+              max="5000000"
+              step="1"
+              placeholder="Ej: 48500"
+              style="margin-bottom:0;"
+            />
+          </div>
+
+          <div class="hv-grid-2">
+            <div class="hv-doc-row">
+              <div class="hv-doc-head">
+                <label class="form-label" for="hvSoatInput">SOAT (Vence)</label>
+                <span class="hv-status-pill" id="hvSoatBadge">Sin fecha</span>
+              </div>
+              <input type="date" id="hvSoatInput" class="text-input" style="margin-bottom:0;" />
+            </div>
+
+            <div class="hv-doc-row">
+              <div class="hv-doc-head">
+                <label class="form-label" for="hvTecnoInput">Técnico-mecánica</label>
+                <span class="hv-status-pill" id="hvTecnoBadge">Sin fecha</span>
+              </div>
+              <input type="date" id="hvTecnoInput" class="text-input" style="margin-bottom:0;" />
+            </div>
+          </div>
+
+          <div class="hv-taxi-section" id="hvTaxiSection">
+            <div style="font-size:11.5px;font-weight:800;color:#fde047;margin-bottom:8px;">
+              🚕 Documentos Servicio Público (Taxi)
+            </div>
+
+            <div class="hv-doc-row">
+              <div class="hv-doc-head">
+                <label class="form-label" for="hvPaseInput">Pase / Licencia de conducción</label>
+                <span class="hv-status-pill" id="hvPaseBadge">Sin fecha</span>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="date" id="hvPaseInput" class="text-input" style="margin-bottom:0;flex:1;" />
+                <button type="button" class="hv-chip-btn" id="btnHvPasePlus3Years" title="Calcular renovación de servicio público (+3 años)">
+                  +3 años
+                </button>
+              </div>
+              <div style="font-size:10px;color:#cbd5e1;margin-top:4px;">
+                Ciclo público cada 3 años en Colombia. Alerta automática a ≤15 días.
+              </div>
+            </div>
+
+            <div class="hv-doc-row" style="margin-bottom:0;">
+              <div class="hv-doc-head">
+                <label class="form-label" for="hvTarjetaOpInput">Tarjeta de operación</label>
+                <span class="hv-status-pill" id="hvTarjetaOpBadge">Sin fecha</span>
+              </div>
+              <input type="date" id="hvTarjetaOpInput" class="text-input" style="margin-bottom:0;" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnSaveHojaVida">
+            💾 Guardar Hoja de Vida
+          </button>
+        </form>
+
+        <div class="hv-section-divider">
+          <div class="hv-doc-head" style="margin-bottom:8px;">
+            <span class="form-label" style="margin-bottom:0;">Recordatorios adicionales (Tiempo o Km)</span>
+            <span class="hv-status-pill" id="hvRemCountPill">0 activos</span>
+          </div>
+
+          <div class="hv-preset-chips">
+            <button type="button" class="hv-chip-btn" data-hv-preset="Cambio de aceite" data-hv-mode="km" data-hv-km="5000">🛢️ Aceite (+5.000 km)</button>
+            <button type="button" class="hv-chip-btn" data-hv-preset="Correa de repartición" data-hv-mode="km" data-hv-km="50000">⚙️ Correa repartición</button>
+            <button type="button" class="hv-chip-btn" data-hv-preset="Batería" data-hv-mode="tiempo" data-hv-months="12">🔋 Batería (+1 año)</button>
+            <button type="button" class="hv-chip-btn" data-hv-preset="Frenos y llantas" data-hv-mode="km" data-hv-km="10000">🛞 Frenos (+10.000 km)</button>
+          </div>
+
+          <div class="hv-rem-card">
+            <label class="form-label" for="hvRemNameInput">Nombre del recordatorio *</label>
+            <input
+              type="text"
+              id="hvRemNameInput"
+              class="text-input"
+              maxlength="60"
+              placeholder="Ej: Correa de repartición, Cambio de aceite, Batería..."
+            />
+
+            <div class="loc-mode-row" style="margin-bottom:8px;">
+              <button type="button" class="loc-mode-btn active" id="hvRemModeTime">📅 Por Tiempo</button>
+              <button type="button" class="loc-mode-btn" id="hvRemModeKm">🛣️ Por Kilometraje</button>
+            </div>
+
+            <div id="hvRemTimeWrap">
+              <div class="hv-preset-chips">
+                <button type="button" class="hv-chip-btn" data-hv-add-months="3">+3 meses</button>
+                <button type="button" class="hv-chip-btn" data-hv-add-months="6">+6 meses</button>
+                <button type="button" class="hv-chip-btn" data-hv-add-months="12">+1 año</button>
+              </div>
+              <input type="date" id="hvRemDateInput" class="text-input" />
+            </div>
+
+            <div id="hvRemKmWrap" style="display:none;">
+              <div class="hv-preset-chips">
+                <button type="button" class="hv-chip-btn" data-hv-add-km="5000">+5.000 km</button>
+                <button type="button" class="hv-chip-btn" data-hv-add-km="10000">+10.000 km</button>
+                <button type="button" class="hv-chip-btn" data-hv-add-km="50000">+50.000 km</button>
+              </div>
+              <input
+                type="number"
+                id="hvRemKmInput"
+                class="text-input"
+                min="1"
+                max="6000000"
+                placeholder="Kilometraje objetivo (ej: 53500)"
+              />
+            </div>
+
+            <button type="button" class="dest-helper-btn" id="btnAddHvReminder" style="width:100%;border-color:rgba(16,185,129,0.55);color:#6ee7b7;">
+              + Agregar recordatorio
+            </button>
+          </div>
+
+          <div class="hv-rem-list" id="hvRemindersList"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de Radar de Proximidad Inteligente (Voy para...) con Destinos Personalizables -->
     <div class="modal-backdrop" id="routeModal">
       <div class="modal-card">
@@ -2431,7 +2999,11 @@
       USER_ROLE: 'moviradar_user_role_v1',
       SONAR_AUDIO: 'moviradar_sonar_audio_v1',
       USER_VOTES: 'moviradar_user_votes_v1',
-      ACTIVE_SESSION: 'anthi_active_session_v1'
+      ACTIVE_SESSION: 'anthi_active_session_v1',
+      HOJA_VIDA: 'anthi_hoja_vida_v1',
+      HV_NOTIF_STATE: 'anthi_hv_notif_v1',
+      PICO_CITY: 'anthi_pico_city_v1',
+      MAP_CONTROLS_COLLAPSED: 'anthi_map_controls_collapsed_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -2743,14 +3315,13 @@
     }
 
     function updateQuickExternalLinks(lat, lng) {
+      const waBtn = document.getElementById('btnWhatsApp');
+      if (!waBtn) return;
       const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       const waText = encodeURIComponent(
         `📍 Mi ubicación actual en ANTHI (Radar Antitodo): ${gmapsUrl}`
       );
-      const waBtn = document.getElementById('btnWhatsApp');
-      if (waBtn) {
-        waBtn.href = `https://wa.me/?text=${waText}`;
-      }
+      waBtn.href = `https://wa.me/?text=${waText}`;
     }
     updateQuickExternalLinks(initialMapCenter[0], initialMapCenter[1]);
 
@@ -3486,6 +4057,10 @@
           attachUserSessionListener(user, existingLocalSessionId);
         }
       }
+
+      if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
+        window.__anthiSyncHojaVidaOnAuth(user);
+      }
     });
 
     async function ensureAuthenticated() {
@@ -3951,9 +4526,13 @@
       const isCached = mode === 'cached';
       latestGps = { lat, lng, isDefault, isCached };
 
-      document.getElementById('hudCoords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      const hudCoordsEl = document.getElementById('hudCoords');
+      if (hudCoordsEl) {
+        hudCoordsEl.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      }
       if (typeof speedKmh === 'number' && !Number.isNaN(speedKmh) && speedKmh >= 0) {
-        document.getElementById('hudSpeed').textContent = speedKmh.toFixed(1);
+        const hudSpeedEl = document.getElementById('hudSpeed');
+        if (hudSpeedEl) hudSpeedEl.textContent = speedKmh.toFixed(1);
       }
       updateQuickExternalLinks(lat, lng);
 
@@ -5970,6 +6549,856 @@
         }
       });
     }
+
+    // =========================================================================
+    // 12. PICO Y PLACA AMB + 4 VEHÍCULOS + BARRA DERECHA PLEGABLE + HOJA DE VIDA
+    // =========================================================================
+    const PICO_PAIRS_AMB = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 0]];
+    const VALID_VEHICLE_TYPES = ['particular', 'moto', 'taxi', 'camioneta'];
+    const VEHICLE_LABELS = {
+      particular: 'Particular',
+      moto: 'Moto',
+      taxi: 'Taxi',
+      camioneta: 'Camioneta'
+    };
+    const VEHICLE_SVG_MAP = {
+      particular: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><path d="M5 14L9 7H25L30 14H33V18H30.5A3 3 0 0 1 24.5 18H11.5A3 3 0 0 1 5.5 18H3V14H5Z" fill="#38bdf8" fill-opacity="0.22" stroke="#67e8f9" stroke-width="2" stroke-linejoin="round"/><circle cx="8.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/><circle cx="27.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/></svg>`,
+      moto: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><circle cx="8" cy="17" r="4" stroke="#6ee7b7" stroke-width="2"/><circle cx="28" cy="17" r="4" stroke="#6ee7b7" stroke-width="2"/><path d="M8 17L14 11H21L24 7H28M17 11L20 17H28" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      taxi: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><rect x="14" y="3" width="8" height="3.5" rx="1" fill="#facc15"/><path d="M5 14L9 7H25L30 14H33V18H30.5A3 3 0 0 1 24.5 18H11.5A3 3 0 0 1 5.5 18H3V14H5Z" fill="#facc15" fill-opacity="0.26" stroke="#fde047" stroke-width="2" stroke-linejoin="round"/><circle cx="8.5" cy="18" r="2.5" fill="#0f172a" stroke="#fef08a" stroke-width="1.8"/><circle cx="27.5" cy="18" r="2.5" fill="#0f172a" stroke="#fef08a" stroke-width="1.8"/></svg>`,
+      camioneta: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><path d="M3 13L6 6H21V11H31L33 14V18H30.5A3 3 0 0 1 24.5 18H11.5A3 3 0 0 1 5.5 18H3V13Z" fill="#a78bfa" fill-opacity="0.24" stroke="#c4b5fd" stroke-width="2" stroke-linejoin="round"/><circle cx="8.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/><circle cx="27.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/></svg>`
+    };
+    const HOJA_VIDA_ALERT_DAYS = 15;
+    const HOJA_VIDA_ALERT_KM = 500;
+
+    // Agrupación plegable / desplegable de los botones del lado derecho
+    const mapControlsWrapper = document.getElementById('mapControlsWrapper');
+    const btnToggleMapControls = document.getElementById('btnToggleMapControls');
+    const mapControlsToggleIcon = document.getElementById('mapControlsToggleIcon');
+    const mapControlsToggleLabel = document.getElementById('mapControlsToggleLabel');
+
+    function applyMapControlsCollapsedUI(collapsed) {
+      if (!mapControlsWrapper) return;
+      mapControlsWrapper.classList.toggle('collapsed', collapsed);
+      if (btnToggleMapControls) btnToggleMapControls.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      if (mapControlsToggleIcon) mapControlsToggleIcon.textContent = collapsed ? '▾' : '▴';
+      if (mapControlsToggleLabel) mapControlsToggleLabel.textContent = collapsed ? 'Abrir' : 'Plegar';
+    }
+
+    let isMapControlsCollapsed = safeReadJson(STORAGE_KEYS.MAP_CONTROLS_COLLAPSED, false) === true;
+    applyMapControlsCollapsedUI(isMapControlsCollapsed);
+
+    if (btnToggleMapControls) {
+      btnToggleMapControls.addEventListener('click', () => {
+        isMapControlsCollapsed = !isMapControlsCollapsed;
+        applyMapControlsCollapsedUI(isMapControlsCollapsed);
+        try {
+          localStorage.setItem(STORAGE_KEYS.MAP_CONTROLS_COLLAPSED, JSON.stringify(isMapControlsCollapsed));
+        } catch (e) {}
+      });
+    }
+
+    function createDefaultHojaVida() {
+      return {
+        tipoVehiculo: 'particular',
+        placa: '',
+        kmActual: 0,
+        soatVencimiento: '',
+        tecnoVencimiento: '',
+        paseVencimiento: '',
+        tarjetaOperacionVencimiento: '',
+        recordatorios: []
+      };
+    }
+
+    function normalizeHojaVida(raw) {
+      const base = createDefaultHojaVida();
+      if (!raw || typeof raw !== 'object') return base;
+      const tipo = VALID_VEHICLE_TYPES.includes(raw.tipoVehiculo) ? raw.tipoVehiculo : 'particular';
+      const placa = String(raw.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+      const kmNum = Math.max(0, Math.min(5000000, Math.round(Number(raw.kmActual) || 0)));
+      const cleanDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || '').trim()) ? String(v).trim() : '');
+      const rawRems = Array.isArray(raw.recordatorios) ? raw.recordatorios : [];
+      const recordatorios = rawRems.slice(0, 25).map((r, idx) => ({
+        id: String((r && r.id) || `rem_${Date.now()}_${idx}`),
+        nombre: String((r && r.nombre) || 'Mantenimiento').trim().slice(0, 60),
+        modo: r && r.modo === 'km' ? 'km' : 'tiempo',
+        fechaObjetivo: cleanDate(r && r.fechaObjetivo),
+        kmObjetivo: Math.max(0, Math.min(6000000, Math.round(Number(r && r.kmObjetivo) || 0)))
+      })).filter((r) => r.nombre.length > 0);
+
+      return {
+        tipoVehiculo: tipo,
+        placa,
+        kmActual: kmNum,
+        soatVencimiento: cleanDate(raw.soatVencimiento),
+        tecnoVencimiento: cleanDate(raw.tecnoVencimiento),
+        paseVencimiento: cleanDate(raw.paseVencimiento),
+        tarjetaOperacionVencimiento: cleanDate(raw.tarjetaOperacionVencimiento),
+        recordatorios
+      };
+    }
+
+    function loadHojaVidaLocal() {
+      return normalizeHojaVida(safeReadJson(STORAGE_KEYS.HOJA_VIDA, null));
+    }
+
+    function saveHojaVidaLocal(hv) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.HOJA_VIDA, JSON.stringify(hv));
+      } catch (e) {}
+    }
+
+    function getColombiaClockParts(now = new Date()) {
+      const colMs = now.getTime() + (now.getTimezoneOffset() - 300) * 60000;
+      const d = new Date(colMs);
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      const dow = d.getDay();
+      const hour = d.getHours();
+      const minute = d.getMinutes();
+      return {
+        year,
+        month,
+        day,
+        dow,
+        hour,
+        minute,
+        minutesOfDay: hour * 60 + minute
+      };
+    }
+
+    function extractLastPlateDigit(placaStr) {
+      const clean = String(placaStr || '').toUpperCase().trim();
+      const matches = clean.match(/\d/g);
+      if (matches && matches.length > 0) {
+        return Number(matches[matches.length - 1]);
+      }
+      return null;
+    }
+
+    function computeDaysUntilDate(dateStr, now = new Date()) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr || ''))) return null;
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const col = getColombiaClockParts(now);
+      const targetUtc = Date.UTC(y, m - 1, d);
+      const todayUtc = Date.UTC(col.year, col.month - 1, col.day);
+      return Math.round((targetUtc - todayUtc) / 86400000);
+    }
+
+    function addMonthsToDateStr(baseDateStr, monthsToAdd) {
+      const col = getColombiaClockParts();
+      let y = col.year;
+      let m = col.month - 1;
+      let d = col.day;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(baseDateStr || ''))) {
+        const parts = baseDateStr.split('-').map(Number);
+        y = parts[0];
+        m = parts[1] - 1;
+        d = parts[2];
+      }
+      const target = new Date(Date.UTC(y, m + Number(monthsToAdd || 0), d));
+      const yy = target.getUTCFullYear();
+      const mm = String(target.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(target.getUTCDate()).padStart(2, '0');
+      return `${yy}-${mm}-${dd}`;
+    }
+
+    // Cálculo de dígitos de Pico y Placa AMB (Bucaramanga, Floridablanca, Girón y Piedecuesta)
+    function calcularPicoYPlacaAMB(tipoVehiculo, placaStr, now = new Date()) {
+      const col = getColombiaClockParts(now);
+      const isTaxi = tipoVehiculo === 'taxi';
+      const lastDigit = extractLastPlateDigit(placaStr);
+      let digits = [];
+      let enHorario = false;
+
+      if (isTaxi) {
+        if (col.dow >= 1 && col.dow <= 5) {
+          const dayNum = Math.floor(Date.UTC(col.year, col.month - 1, col.day) / 86400000);
+          const dayNumMon0 = Math.floor(Date.UTC(2026, 0, 5) / 86400000);
+          const delta = dayNum - dayNumMon0;
+          const fullWeeks = Math.floor(delta / 7);
+          const remDow = ((delta % 7) + 7) % 7;
+          const bizDays = fullWeeks * 5 + Math.min(remDow, 4);
+          const pairIdx = ((bizDays % 5) + 5) % 5;
+          digits = PICO_PAIRS_AMB[pairIdx];
+          enHorario = col.minutesOfDay >= 420 && col.minutesOfDay < 1260;
+        }
+      } else {
+        if (col.dow >= 1 && col.dow <= 5) {
+          const quarterAbs = (col.year - 2026) * 4 + Math.floor((col.month - 1) / 3);
+          const quarterShift = quarterAbs - 3;
+          const pairIdx = (((2 + quarterShift + (col.dow - 1)) % 5) + 5) % 5;
+          digits = PICO_PAIRS_AMB[pairIdx];
+          enHorario = col.minutesOfDay >= 360 && col.minutesOfDay < 1200;
+        } else if (col.dow === 6) {
+          const dayNum = Math.floor(Date.UTC(col.year, col.month - 1, col.day) / 86400000);
+          const dayNumSat0 = Math.floor(Date.UTC(2026, 0, 3) / 86400000);
+          const weeksSince = Math.floor((dayNum - dayNumSat0) / 7);
+          const pairIdx = ((weeksSince % 5) + 5) % 5;
+          digits = PICO_PAIRS_AMB[pairIdx];
+          enHorario = col.minutesOfDay >= 540 && col.minutesOfDay < 780;
+        }
+      }
+
+      const hasDigit = lastDigit !== null;
+      const appliesToPlateToday = hasDigit && digits.includes(lastDigit);
+      return {
+        tipoVehiculo,
+        isTaxi,
+        digits,
+        digitsLabel: digits.length === 2 ? `${digits[0]} y ${digits[1]}` : 'Libre',
+        enHorario,
+        lastDigit,
+        appliesToPlateToday,
+        restrictedNow: appliesToPlateToday && enHorario
+      };
+    }
+
+    let hojaVidaState = loadHojaVidaLocal();
+    let selectedPicoCity = (() => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.PICO_CITY);
+        return ['Bucaramanga', 'Floridablanca', 'Girón', 'Piedecuesta'].includes(saved) ? saved : 'Bucaramanga';
+      } catch (e) {
+        return 'Bucaramanga';
+      }
+    })();
+    let hvReminderMode = 'tiempo';
+    let hvToastNotifiedOnce = false;
+
+    const gpsHudEl = document.getElementById('gpsHud');
+    const hudVehicleGraphicEl = document.getElementById('hudVehicleGraphic');
+    const hudVehicleTypeSelect = document.getElementById('hudVehicleTypeSelect');
+    const hudPicoDigitsEl = document.getElementById('hudPicoDigits');
+    const hudPicoCitySelect = document.getElementById('hudPicoCitySelect');
+
+    const btnOpenHojaVida = document.getElementById('btnOpenHojaVida');
+    const hojaVidaModal = document.getElementById('hojaVidaModal');
+    const btnCloseHojaVidaModal = document.getElementById('btnCloseHojaVidaModal');
+    const hvAlertsBanner = document.getElementById('hvAlertsBanner');
+    const hvServiceTabButtons = document.querySelectorAll('.hv-service-tab[data-vehicle-type]');
+    const hvPicoResumenCard = document.getElementById('hvPicoResumenCard');
+    const hojaVidaForm = document.getElementById('hojaVidaForm');
+    const hvPlacaInput = document.getElementById('hvPlacaInput');
+    const hvUltimoDigitoBadge = document.getElementById('hvUltimoDigitoBadge');
+    const hvKmActualInput = document.getElementById('hvKmActualInput');
+    const hvSoatInput = document.getElementById('hvSoatInput');
+    const hvSoatBadge = document.getElementById('hvSoatBadge');
+    const hvTecnoInput = document.getElementById('hvTecnoInput');
+    const hvTecnoBadge = document.getElementById('hvTecnoBadge');
+    const hvTaxiSection = document.getElementById('hvTaxiSection');
+    const hvPaseInput = document.getElementById('hvPaseInput');
+    const hvPaseBadge = document.getElementById('hvPaseBadge');
+    const btnHvPasePlus3Years = document.getElementById('btnHvPasePlus3Years');
+    const hvTarjetaOpInput = document.getElementById('hvTarjetaOpInput');
+    const hvTarjetaOpBadge = document.getElementById('hvTarjetaOpBadge');
+    const hvRemCountPill = document.getElementById('hvRemCountPill');
+    const hvRemNameInput = document.getElementById('hvRemNameInput');
+    const hvRemModeTimeBtn = document.getElementById('hvRemModeTime');
+    const hvRemModeKmBtn = document.getElementById('hvRemModeKm');
+    const hvRemTimeWrap = document.getElementById('hvRemTimeWrap');
+    const hvRemKmWrap = document.getElementById('hvRemKmWrap');
+    const hvRemDateInput = document.getElementById('hvRemDateInput');
+    const hvRemKmInput = document.getElementById('hvRemKmInput');
+    const btnAddHvReminder = document.getElementById('btnAddHvReminder');
+    const hvRemindersList = document.getElementById('hvRemindersList');
+
+    function evaluateDateStatus(dateStr, labelPrefix = '') {
+      if (!dateStr) {
+        return { level: 'none', text: 'Sin fecha', daysLeft: null };
+      }
+      const days = computeDaysUntilDate(dateStr);
+      if (days === null) return { level: 'none', text: 'Sin fecha', daysLeft: null };
+      if (days < 0) {
+        return {
+          level: 'danger',
+          text: `${labelPrefix}Vencido hace ${Math.abs(days)} d`,
+          daysLeft: days
+        };
+      }
+      if (days === 0) {
+        return { level: 'danger', text: `${labelPrefix}Vence HOY`, daysLeft: 0 };
+      }
+      if (days <= HOJA_VIDA_ALERT_DAYS) {
+        return { level: 'warn', text: `${labelPrefix}Faltan ${days} d`, daysLeft: days };
+      }
+      return { level: 'ok', text: `${days} días`, daysLeft: days };
+    }
+
+    function applyStatusPill(el, status) {
+      if (!el) return;
+      el.classList.remove('ok', 'warn', 'danger');
+      if (status.level === 'ok' || status.level === 'warn' || status.level === 'danger') {
+        el.classList.add(status.level);
+      }
+      el.textContent = status.text;
+    }
+
+    function collectHojaVidaEarlyAlerts(hv) {
+      const alerts = [];
+      const checkDoc = (name, dateStr) => {
+        const st = evaluateDateStatus(dateStr);
+        if (st.level === 'danger' || st.level === 'warn') {
+          alerts.push({ name, level: st.level, detail: st.text });
+        }
+      };
+
+      checkDoc('SOAT', hv.soatVencimiento);
+      checkDoc('Técnico-mecánica', hv.tecnoVencimiento);
+      if (hv.tipoVehiculo === 'taxi') {
+        checkDoc('Pase / Licencia (Taxi)', hv.paseVencimiento);
+        checkDoc('Tarjeta de operación', hv.tarjetaOperacionVencimiento);
+      } else if (hv.paseVencimiento) {
+        checkDoc('Pase / Licencia', hv.paseVencimiento);
+      }
+
+      (hv.recordatorios || []).forEach((rem) => {
+        if (rem.modo === 'km') {
+          if (rem.kmObjetivo > 0) {
+            const diff = rem.kmObjetivo - (Number(hv.kmActual) || 0);
+            if (diff <= 0) {
+              alerts.push({
+                name: rem.nombre,
+                level: 'danger',
+                detail: `Cumplido (${Math.abs(diff).toLocaleString('es-CO')} km pasados)`
+              });
+            } else if (diff <= HOJA_VIDA_ALERT_KM) {
+              alerts.push({
+                name: rem.nombre,
+                level: 'warn',
+                detail: `Faltan ${diff.toLocaleString('es-CO')} km`
+              });
+            }
+          }
+        } else {
+          const st = evaluateDateStatus(rem.fechaObjetivo);
+          if (st.level === 'danger' || st.level === 'warn') {
+            alerts.push({ name: rem.nombre, level: st.level, detail: st.text });
+          }
+        }
+      });
+
+      return alerts;
+    }
+
+    async function maybeDispatchHojaVidaNotifications(alerts, fromUserSave = false) {
+      if (!Array.isArray(alerts) || alerts.length === 0) return;
+
+      const summaryText = alerts
+        .slice(0, 3)
+        .map((a) => `${a.name}: ${a.detail}`)
+        .join(' · ');
+
+      if (!hvToastNotifiedOnce && !fromUserSave) {
+        hvToastNotifiedOnce = true;
+        showToast(`⚠️ Hoja de Vida: ${summaryText}`);
+      }
+
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const fingerprint = alerts.map((a) => `${a.name}:${a.detail}`).join('|');
+      const prevState = safeReadJson(STORAGE_KEYS.HV_NOTIF_STATE, { fingerprint: '', ts: 0 });
+      const twelveHours = 12 * 60 * 60 * 1000;
+      if (!fromUserSave && prevState.fingerprint === fingerprint && Date.now() - Number(prevState.ts || 0) < twelveHours) {
+        return;
+      }
+
+      try {
+        localStorage.setItem(
+          STORAGE_KEYS.HV_NOTIF_STATE,
+          JSON.stringify({ fingerprint, ts: Date.now() })
+        );
+      } catch (e) {}
+
+      const title = `⚠️ Alerta Hoja de Vida (${alerts.length})`;
+      const options = {
+        body: summaryText,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
+        tag: 'anthi-hoja-vida-alerta',
+        renotify: true
+      };
+
+      try {
+        if (window.__anthiSwRegistration && typeof window.__anthiSwRegistration.showNotification === 'function') {
+          await window.__anthiSwRegistration.showNotification(title, options);
+        } else {
+          new Notification(title, options);
+        }
+      } catch (e) {}
+    }
+
+    function renderPicoYPlacaUI() {
+      const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
+      const tipoLabel = VEHICLE_LABELS[hojaVidaState.tipoVehiculo] || 'Particular';
+
+      if (hudVehicleGraphicEl) {
+        hudVehicleGraphicEl.innerHTML = VEHICLE_SVG_MAP[hojaVidaState.tipoVehiculo] || VEHICLE_SVG_MAP.particular;
+        hudVehicleGraphicEl.classList.toggle('taxi', info.isTaxi);
+      }
+      if (hudVehicleTypeSelect && hudVehicleTypeSelect.value !== hojaVidaState.tipoVehiculo) {
+        hudVehicleTypeSelect.value = hojaVidaState.tipoVehiculo;
+      }
+      if (hudPicoCitySelect && hudPicoCitySelect.value !== selectedPicoCity) {
+        hudPicoCitySelect.value = selectedPicoCity;
+      }
+
+      if (gpsHudEl) {
+        gpsHudEl.classList.toggle('pico-alert-active', info.restrictedNow);
+        gpsHudEl.classList.toggle('pico-alert-soon', info.appliesToPlateToday && !info.enHorario);
+      }
+
+      if (hudPicoDigitsEl) {
+        hudPicoDigitsEl.classList.remove('restricted', 'soon', 'free');
+        if (info.digits.length === 0) {
+          hudPicoDigitsEl.textContent = 'Libre hoy';
+          hudPicoDigitsEl.classList.add('free');
+        } else if (info.restrictedNow) {
+          hudPicoDigitsEl.textContent = `🚫 ${info.digitsLabel}`;
+          hudPicoDigitsEl.classList.add('restricted');
+        } else if (info.appliesToPlateToday) {
+          hudPicoDigitsEl.textContent = `⚠️ ${info.digitsLabel}`;
+          hudPicoDigitsEl.classList.add('soon');
+        } else {
+          hudPicoDigitsEl.textContent = info.digitsLabel;
+          if (info.lastDigit !== null) hudPicoDigitsEl.classList.add('free');
+        }
+      }
+
+      if (hvPicoResumenCard) {
+        hvPicoResumenCard.classList.remove('restricted', 'free');
+        if (info.digits.length === 0) {
+          hvPicoResumenCard.classList.add('free');
+          hvPicoResumenCard.innerHTML = `<strong>✅ PICO Y PLACA (${escapeHtml(selectedPicoCity)} · ${escapeHtml(tipoLabel)}):</strong> Libre hoy.`;
+        } else if (info.appliesToPlateToday) {
+          hvPicoResumenCard.classList.add('restricted');
+          hvPicoResumenCard.innerHTML = `<strong>${info.restrictedNow ? '🚫' : '⚠️'} Tu placa terminada en ${info.lastDigit} tiene Pico y Placa hoy (${escapeHtml(info.digitsLabel)})</strong> en ${escapeHtml(selectedPicoCity)}.`;
+        } else {
+          hvPicoResumenCard.classList.add('free');
+          const plateInfo = info.lastDigit !== null
+            ? `Tu dígito <strong>${info.lastDigit}</strong> circula libre hoy.`
+            : 'Ingresa tu placa abajo para validar tu dígito.';
+          hvPicoResumenCard.innerHTML = `<strong>🚘 PICO Y PLACA hoy en ${escapeHtml(selectedPicoCity)} (${escapeHtml(tipoLabel)}): ${escapeHtml(info.digitsLabel)}</strong><br/>${plateInfo}`;
+        }
+      }
+    }
+
+    function renderHojaVidaRemindersList() {
+      if (!hvRemindersList) return;
+      const rems = hojaVidaState.recordatorios || [];
+      if (hvRemCountPill) {
+        hvRemCountPill.textContent = `${rems.length} ${rems.length === 1 ? 'activo' : 'activos'}`;
+      }
+      hvRemindersList.innerHTML = '';
+
+      if (rems.length === 0) {
+        hvRemindersList.innerHTML = '<div style="font-size:11.5px;color:#94a3b8;text-align:center;padding:10px;">Aún no tienes recordatorios de mantenimiento (ej. correa de repartición, aceite o batería).</div>';
+        return;
+      }
+
+      rems.forEach((rem) => {
+        const item = document.createElement('div');
+        item.className = 'hv-rem-item';
+
+        let pillText = 'Programado';
+        let pillLevel = 'ok';
+        let subText = '';
+
+        if (rem.modo === 'km') {
+          const targetKm = Number(rem.kmObjetivo) || 0;
+          const diff = targetKm - (Number(hojaVidaState.kmActual) || 0);
+          subText = `Meta: ${targetKm.toLocaleString('es-CO')} km`;
+          if (diff <= 0) {
+            pillLevel = 'danger';
+            pillText = `Pasado ${Math.abs(diff).toLocaleString('es-CO')} km`;
+          } else if (diff <= HOJA_VIDA_ALERT_KM) {
+            pillLevel = 'warn';
+            pillText = `Faltan ${diff.toLocaleString('es-CO')} km`;
+          } else {
+            pillLevel = 'ok';
+            pillText = `Faltan ${diff.toLocaleString('es-CO')} km`;
+          }
+        } else {
+          subText = rem.fechaObjetivo ? `Fecha: ${rem.fechaObjetivo}` : 'Sin fecha objetivo';
+          const st = evaluateDateStatus(rem.fechaObjetivo);
+          pillLevel = st.level === 'none' ? 'ok' : st.level;
+          pillText = st.text;
+        }
+
+        if (pillLevel === 'danger' || pillLevel === 'warn') {
+          item.classList.add(pillLevel);
+        }
+
+        const left = document.createElement('div');
+        left.style.minWidth = '0';
+        left.style.flex = '1';
+        left.innerHTML = `
+          <div style="font-size:12px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${rem.modo === 'km' ? '🛣️' : '📅'} ${escapeHtml(rem.nombre)}
+          </div>
+          <div style="font-size:10.5px;color:#94a3b8;margin-top:2px;">${escapeHtml(subText)}</div>
+        `;
+
+        const right = document.createElement('div');
+        right.style.display = 'flex';
+        right.style.alignItems = 'center';
+        right.style.gap = '6px';
+
+        const badge = document.createElement('span');
+        badge.className = `hv-status-pill ${pillLevel}`;
+        badge.textContent = pillText;
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'point-delete';
+        delBtn.style.minWidth = '30px';
+        delBtn.style.minHeight = '30px';
+        delBtn.title = 'Eliminar recordatorio';
+        delBtn.textContent = '🗑️';
+        delBtn.addEventListener('click', () => {
+          hojaVidaState.recordatorios = (hojaVidaState.recordatorios || []).filter((x) => x.id !== rem.id);
+          persistHojaVidaState({ showFeedback: false, syncCloud: true });
+        });
+
+        right.appendChild(badge);
+        right.appendChild(delBtn);
+        item.appendChild(left);
+        item.appendChild(right);
+        hvRemindersList.appendChild(item);
+      });
+    }
+
+    function renderHojaVidaUI(triggerNotifs = false, fromUserSave = false) {
+      const isTaxi = hojaVidaState.tipoVehiculo === 'taxi';
+      hvServiceTabButtons.forEach((tabBtn) => {
+        const type = tabBtn.getAttribute('data-vehicle-type');
+        const isActive = type === hojaVidaState.tipoVehiculo;
+        tabBtn.classList.toggle('active', isActive);
+        tabBtn.classList.toggle('taxi', isActive && type === 'taxi');
+      });
+      if (hvTaxiSection) hvTaxiSection.classList.toggle('open', isTaxi);
+
+      if (hvPlacaInput && document.activeElement !== hvPlacaInput) {
+        hvPlacaInput.value = hojaVidaState.placa || '';
+      }
+      const lastDigit = extractLastPlateDigit(hojaVidaState.placa);
+      if (hvUltimoDigitoBadge) {
+        const strong = hvUltimoDigitoBadge.querySelector('strong');
+        if (strong) strong.textContent = lastDigit !== null ? String(lastDigit) : '--';
+      }
+
+      if (hvKmActualInput && document.activeElement !== hvKmActualInput) {
+        hvKmActualInput.value = hojaVidaState.kmActual > 0 ? String(hojaVidaState.kmActual) : '';
+      }
+      if (hvSoatInput && document.activeElement !== hvSoatInput) {
+        hvSoatInput.value = hojaVidaState.soatVencimiento || '';
+      }
+      if (hvTecnoInput && document.activeElement !== hvTecnoInput) {
+        hvTecnoInput.value = hojaVidaState.tecnoVencimiento || '';
+      }
+      if (hvPaseInput && document.activeElement !== hvPaseInput) {
+        hvPaseInput.value = hojaVidaState.paseVencimiento || '';
+      }
+      if (hvTarjetaOpInput && document.activeElement !== hvTarjetaOpInput) {
+        hvTarjetaOpInput.value = hojaVidaState.tarjetaOperacionVencimiento || '';
+      }
+
+      applyStatusPill(hvSoatBadge, evaluateDateStatus(hojaVidaState.soatVencimiento));
+      applyStatusPill(hvTecnoBadge, evaluateDateStatus(hojaVidaState.tecnoVencimiento));
+      applyStatusPill(hvPaseBadge, evaluateDateStatus(hojaVidaState.paseVencimiento));
+      applyStatusPill(hvTarjetaOpBadge, evaluateDateStatus(hojaVidaState.tarjetaOperacionVencimiento));
+
+      renderHojaVidaRemindersList();
+      renderPicoYPlacaUI();
+
+      const alerts = collectHojaVidaEarlyAlerts(hojaVidaState);
+      if (btnOpenHojaVida) {
+        btnOpenHojaVida.classList.toggle('has-alerts', alerts.length > 0);
+      }
+      if (hvAlertsBanner) {
+        if (alerts.length > 0) {
+          hvAlertsBanner.classList.add('open');
+          hvAlertsBanner.innerHTML = `
+            <strong>⚠️ Alertas tempranas activas (${alerts.length}):</strong>
+            <ul>${alerts.map((a) => `<li><strong>${escapeHtml(a.name)}:</strong> ${escapeHtml(a.detail)}</li>`).join('')}</ul>
+          `;
+        } else {
+          hvAlertsBanner.classList.remove('open');
+          hvAlertsBanner.innerHTML = '';
+        }
+      }
+
+      if (triggerNotifs && alerts.length > 0) {
+        maybeDispatchHojaVidaNotifications(alerts, fromUserSave);
+      }
+    }
+
+    async function saveHojaVidaToFirestore(hv) {
+      const user = auth.currentUser;
+      if (!user || !navigator.onLine) return;
+      try {
+        await setDoc(doc(db, USERS_COLLECTION, user.uid, 'hojaVida', 'principal'), {
+          tipoVehiculo: hv.tipoVehiculo,
+          placa: hv.placa,
+          kmActual: Number(hv.kmActual) || 0,
+          soatVencimiento: hv.soatVencimiento || '',
+          tecnoVencimiento: hv.tecnoVencimiento || '',
+          paseVencimiento: hv.paseVencimiento || '',
+          tarjetaOperacionVencimiento: hv.tarjetaOperacionVencimiento || '',
+          recordatorios: Array.isArray(hv.recordatorios) ? hv.recordatorios.slice(0, 25) : [],
+          updatedAt: serverTimestamp()
+        });
+      } catch (err) {
+        console.warn('No se pudo sincronizar Hoja de Vida con Firestore:', err && err.message ? err.message : err);
+      }
+    }
+
+    function persistHojaVidaState(options = {}) {
+      const { showFeedback = false, syncCloud = true, triggerNotifs = true } = options;
+      hojaVidaState = normalizeHojaVida(hojaVidaState);
+      saveHojaVidaLocal(hojaVidaState);
+      renderHojaVidaUI(triggerNotifs, showFeedback);
+      if (syncCloud) {
+        saveHojaVidaToFirestore(hojaVidaState);
+      }
+      if (showFeedback) {
+        showToast('✅ Hoja de Vida guardada y sincronizada.');
+      }
+    }
+
+    window.__anthiSyncHojaVidaOnAuth = async function(user) {
+      if (!user || !navigator.onLine) return;
+      try {
+        const snap = await getDoc(doc(db, USERS_COLLECTION, user.uid, 'hojaVida', 'principal'));
+        if (snap.exists()) {
+          const remote = normalizeHojaVida(snap.data());
+          const hasLocalData = Boolean(
+            hojaVidaState.placa ||
+            hojaVidaState.soatVencimiento ||
+            hojaVidaState.tecnoVencimiento ||
+            (hojaVidaState.recordatorios && hojaVidaState.recordatorios.length > 0)
+          );
+          if (!hasLocalData || remote.placa || remote.soatVencimiento || remote.tecnoVencimiento) {
+            hojaVidaState = remote;
+            saveHojaVidaLocal(hojaVidaState);
+            renderHojaVidaUI(true, false);
+          }
+        } else if (
+          hojaVidaState.placa ||
+          hojaVidaState.soatVencimiento ||
+          hojaVidaState.tecnoVencimiento ||
+          (hojaVidaState.recordatorios && hojaVidaState.recordatorios.length > 0)
+        ) {
+          saveHojaVidaToFirestore(hojaVidaState);
+        }
+      } catch (e) {}
+    };
+
+    function syncFormInputsIntoState() {
+      hojaVidaState = normalizeHojaVida({
+        ...hojaVidaState,
+        placa: hvPlacaInput ? hvPlacaInput.value : hojaVidaState.placa,
+        kmActual: hvKmActualInput ? hvKmActualInput.value : hojaVidaState.kmActual,
+        soatVencimiento: hvSoatInput ? hvSoatInput.value : hojaVidaState.soatVencimiento,
+        tecnoVencimiento: hvTecnoInput ? hvTecnoInput.value : hojaVidaState.tecnoVencimiento,
+        paseVencimiento: hvPaseInput ? hvPaseInput.value : hojaVidaState.paseVencimiento,
+        tarjetaOperacionVencimiento: hvTarjetaOpInput ? hvTarjetaOpInput.value : hojaVidaState.tarjetaOperacionVencimiento
+      });
+    }
+
+    function setVehicleServiceType(newType, fromTopHud = false) {
+      const normalizedType = VALID_VEHICLE_TYPES.includes(newType) ? newType : 'particular';
+      hojaVidaState.tipoVehiculo = normalizedType;
+      persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
+      if (fromTopHud) {
+        const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
+        const label = VEHICLE_LABELS[normalizedType] || 'Particular';
+        showToast(`${label} · PICO Y PLACA (${selectedPicoCity}): ${info.digitsLabel}`);
+      }
+    }
+
+    if (hudVehicleTypeSelect) {
+      hudVehicleTypeSelect.addEventListener('change', () => {
+        setVehicleServiceType(hudVehicleTypeSelect.value, true);
+      });
+    }
+
+    if (hudPicoCitySelect) {
+      hudPicoCitySelect.addEventListener('change', () => {
+        selectedPicoCity = hudPicoCitySelect.value;
+        try {
+          localStorage.setItem(STORAGE_KEYS.PICO_CITY, selectedPicoCity);
+        } catch (e) {}
+        renderPicoYPlacaUI();
+        const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
+        showToast(`PICO Y PLACA ${selectedPicoCity}: ${info.digitsLabel}`);
+      });
+    }
+
+    if (hudPicoDigitsEl && hojaVidaModal) {
+      hudPicoDigitsEl.addEventListener('click', () => {
+        renderHojaVidaUI(false, false);
+        hojaVidaModal.classList.add('open');
+      });
+    }
+
+    if (btnOpenHojaVida && hojaVidaModal) {
+      btnOpenHojaVida.addEventListener('click', () => {
+        renderHojaVidaUI(false, false);
+        hojaVidaModal.classList.add('open');
+      });
+    }
+
+    if (btnCloseHojaVidaModal && hojaVidaModal) {
+      btnCloseHojaVidaModal.addEventListener('click', () => hojaVidaModal.classList.remove('open'));
+      hojaVidaModal.addEventListener('click', (e) => {
+        if (e.target === hojaVidaModal) hojaVidaModal.classList.remove('open');
+      });
+    }
+
+    hvServiceTabButtons.forEach((tabBtn) => {
+      tabBtn.addEventListener('click', () => {
+        const targetType = tabBtn.getAttribute('data-vehicle-type') || 'particular';
+        setVehicleServiceType(targetType, false);
+      });
+    });
+
+    if (hvPlacaInput) {
+      hvPlacaInput.addEventListener('input', () => {
+        const clean = hvPlacaInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+        if (hvPlacaInput.value !== clean) hvPlacaInput.value = clean;
+        syncFormInputsIntoState();
+        saveHojaVidaLocal(hojaVidaState);
+        renderHojaVidaUI(false, false);
+      });
+    }
+
+    [hvKmActualInput, hvSoatInput, hvTecnoInput, hvPaseInput, hvTarjetaOpInput].forEach((inputEl) => {
+      if (!inputEl) return;
+      inputEl.addEventListener('change', () => {
+        syncFormInputsIntoState();
+        persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
+      });
+    });
+
+    if (btnHvPasePlus3Years && hvPaseInput) {
+      btnHvPasePlus3Years.addEventListener('click', () => {
+        const nextDate = addMonthsToDateStr(hvPaseInput.value || '', 36);
+        hvPaseInput.value = nextDate;
+        syncFormInputsIntoState();
+        persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
+        showToast(`🚕 Pase programado a +3 años (${nextDate}).`);
+      });
+    }
+
+    if (hojaVidaForm) {
+      hojaVidaForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        syncFormInputsIntoState();
+        persistHojaVidaState({ showFeedback: true, syncCloud: true, triggerNotifs: true });
+      });
+    }
+
+    function setHvReminderMode(mode) {
+      hvReminderMode = mode === 'km' ? 'km' : 'tiempo';
+      if (hvRemModeTimeBtn) hvRemModeTimeBtn.classList.toggle('active', hvReminderMode === 'tiempo');
+      if (hvRemModeKmBtn) hvRemModeKmBtn.classList.toggle('active', hvReminderMode === 'km');
+      if (hvRemTimeWrap) hvRemTimeWrap.style.display = hvReminderMode === 'tiempo' ? 'block' : 'none';
+      if (hvRemKmWrap) hvRemKmWrap.style.display = hvReminderMode === 'km' ? 'block' : 'none';
+    }
+
+    if (hvRemModeTimeBtn) hvRemModeTimeBtn.addEventListener('click', () => setHvReminderMode('tiempo'));
+    if (hvRemModeKmBtn) hvRemModeKmBtn.addEventListener('click', () => setHvReminderMode('km'));
+
+    document.querySelectorAll('[data-hv-preset]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const presetName = btn.getAttribute('data-hv-preset') || '';
+        const mode = btn.getAttribute('data-hv-mode') || 'tiempo';
+        if (hvRemNameInput) hvRemNameInput.value = presetName;
+        setHvReminderMode(mode);
+        if (mode === 'km') {
+          const deltaKm = Number(btn.getAttribute('data-hv-km') || 5000);
+          const baseKm = Number(hvKmActualInput && hvKmActualInput.value) || hojaVidaState.kmActual || 0;
+          if (hvRemKmInput) hvRemKmInput.value = String(baseKm + deltaKm);
+        } else {
+          const months = Number(btn.getAttribute('data-hv-months') || 6);
+          if (hvRemDateInput) hvRemDateInput.value = addMonthsToDateStr('', months);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-hv-add-months]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const months = Number(btn.getAttribute('data-hv-add-months') || 3);
+        if (hvRemDateInput) hvRemDateInput.value = addMonthsToDateStr('', months);
+      });
+    });
+
+    document.querySelectorAll('[data-hv-add-km]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const deltaKm = Number(btn.getAttribute('data-hv-add-km') || 5000);
+        const baseKm = Number(hvKmActualInput && hvKmActualInput.value) || hojaVidaState.kmActual || 0;
+        if (hvRemKmInput) hvRemKmInput.value = String(baseKm + deltaKm);
+      });
+    });
+
+    if (btnAddHvReminder) {
+      btnAddHvReminder.addEventListener('click', () => {
+        const nombre = hvRemNameInput ? hvRemNameInput.value.trim().slice(0, 60) : '';
+        if (nombre.length < 2) {
+          showToast('Escribe el nombre del recordatorio (ej: Correa de repartición).');
+          if (hvRemNameInput) hvRemNameInput.focus();
+          return;
+        }
+        if ((hojaVidaState.recordatorios || []).length >= 25) {
+          showToast('Alcanzaste el límite de 25 recordatorios activos.');
+          return;
+        }
+
+        if (hvReminderMode === 'km') {
+          const kmObj = Math.round(Number(hvRemKmInput ? hvRemKmInput.value : 0));
+          if (!kmObj || kmObj <= 0) {
+            showToast('Ingresa el kilometraje objetivo del recordatorio.');
+            if (hvRemKmInput) hvRemKmInput.focus();
+            return;
+          }
+          hojaVidaState.recordatorios.unshift({
+            id: `rem_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+            nombre,
+            modo: 'km',
+            fechaObjetivo: '',
+            kmObjetivo: kmObj
+          });
+          if (hvRemKmInput) hvRemKmInput.value = '';
+        } else {
+          const fechaObj = hvRemDateInput ? hvRemDateInput.value.trim() : '';
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaObj)) {
+            showToast('Selecciona una fecha o toca un acceso rápido (+3m / +6m / +1 año).');
+            if (hvRemDateInput) hvRemDateInput.focus();
+            return;
+          }
+          hojaVidaState.recordatorios.unshift({
+            id: `rem_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+            nombre,
+            modo: 'tiempo',
+            fechaObjetivo: fechaObj,
+            kmObjetivo: 0
+          });
+          if (hvRemDateInput) hvRemDateInput.value = '';
+        }
+
+        if (hvRemNameInput) hvRemNameInput.value = '';
+        syncFormInputsIntoState();
+        persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
+        showToast(`✅ Recordatorio "${nombre}" agregado.`);
+      });
+    }
+
+    renderHojaVidaUI(true, false);
+    setInterval(() => {
+      renderPicoYPlacaUI();
+    }, 60000);
     });
   </script>
 </body>
