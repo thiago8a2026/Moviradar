@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "AN-THI - Radar Vial Antitodo",
-  "short_name": "AN-THI",
-  "description": "AN-THI (Andrés y Thiago): radar vial preventivo antitodo en Bucaramanga (anti-retenes, anti-grúas, anti-cepos, anti-accidentes) con GPS en vivo y alertas en segundo plano.",
+  "name": "ANTHI · Radar Vial Antitodo",
+  "short_name": "ANTHI",
+  "description": "ANTHI (Andrés y Thiago): radar vial preventivo antitodo en Bucaramanga (anti-retenes, anti-grúas, anti-cepos, anti-accidentes) con GPS en vivo y alertas en segundo plano.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

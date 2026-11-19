@@ -69,6 +69,16 @@ service cloud.firestore {
         && data.timestamp is timestamp;
     }
 
+    function isValidUserSession(data) {
+      return data.keys().hasAll(['activeSessionId', 'lastLoginAt'])
+        && data.keys().hasOnly(['activeSessionId', 'lastLoginAt'])
+        && data.activeSessionId is string
+        && data.activeSessionId.size() >= 8
+        && data.activeSessionId.size() <= 128
+        && data.activeSessionId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.lastLoginAt is timestamp;
+    }
+
     match /reportes/{reportId} {
       // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
       allow get: if isValidId(reportId);
@@ -148,6 +158,27 @@ service cloud.firestore {
           (isSignedIn() && incoming().authorId == request.auth.uid)
         );
       allow update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn()
+        && isValidId(userId)
+        && (request.auth.uid == userId || isAdmin());
+      allow list: if false;
+      allow create: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidUserSession(incoming())
+        && incoming().lastLoginAt == request.time;
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidUserSession(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['activeSessionId', 'lastLoginAt'])
+        && incoming().lastLoginAt == request.time;
+      allow delete: if isSignedIn()
+        && isValidId(userId)
+        && (request.auth.uid == userId || isAdmin());
     }
 
     match /admins/{adminId} {

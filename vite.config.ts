@@ -16,9 +16,9 @@ export default defineConfig(() => {
         includeAssets: ['icon.svg', 'manifest.webmanifest'],
         manifest: {
           id: '/',
-          name: 'AN-THI - Radar Vial Antitodo',
-          short_name: 'AN-THI',
-          description: 'AN-THI (Andrés y Thiago): radar vial preventivo antitodo en Bucaramanga con GPS en vivo, mapa OpenStreetMap y alertas en segundo plano.',
+          name: 'ANTHI · Radar Vial Antitodo',
+          short_name: 'ANTHI',
+          description: 'ANTHI (Andrés y Thiago): radar vial preventivo antitodo en Bucaramanga con GPS en vivo, mapa OpenStreetMap y alertas en segundo plano.',
           theme_color: '#020617',
           background_color: '#020617',
           display: 'standalone',

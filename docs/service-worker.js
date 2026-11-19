@@ -1,4 +1,4 @@
-/* Service Worker Oficial de AN-THI (Radar Vial Antitodo) */
+/* Service Worker Oficial de ANTHI (Radar Vial Antitodo) */
 const CACHE_NAME = 'anthi-pwa-v1';
 const PRECACHE_URLS = [
   '/',
@@ -59,7 +59,7 @@ self.addEventListener('fetch', (event) => {
 });
 
 async function showAnthiNativeNotification(payload) {
-  const title = (payload && payload.title) || '⚠️ ¡Alerta AN-THI!';
+  const title = (payload && payload.title) || '⚠️ ¡Alerta ANTHI!';
   const body = (payload && payload.body) || 'Novedad vial detectada a pocos metros de tu ubicación.';
   const tag = (payload && payload.tag) || 'anthi-radar-alert';
 
@@ -109,7 +109,7 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('push', (event) => {
   let payload = {
-    title: '⚠️ ¡Alerta AN-THI!',
+    title: '⚠️ ¡Alerta ANTHI!',
     body: 'Novedad vial detectada en tu radio de proximidad.'
   };
   try {

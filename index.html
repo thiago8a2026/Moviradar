@@ -7,11 +7,11 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="AN-THI" />
-  <title>AN-THI | Radar Vial Antitodo</title>
-  <meta name="description" content="AN-THI (Andrés y Thiago): radar vial antitodo en tiempo real (anti-retenes, anti-grúas, anti-cepos y anti-accidentes) con mapa OpenStreetMap, GPS continuo y alertas sónar." />
-  <meta property="og:title" content="AN-THI | Radar Vial Antitodo" />
-  <meta property="og:description" content="AN-THI: radar vial antitodo en tiempo real para prevenir retenes, grúas, cepos y accidentes con GPS en vivo y notificaciones." />
+  <meta name="apple-mobile-web-app-title" content="ANTHI" />
+  <title>ANTHI | Radar Vial Antitodo</title>
+  <meta name="description" content="ANTHI (Andrés y Thiago): radar vial antitodo en tiempo real (anti-retenes, anti-grúas, anti-cepos y anti-accidentes) con mapa OpenStreetMap, GPS continuo y alertas sónar." />
+  <meta property="og:title" content="ANTHI | Radar Vial Antitodo" />
+  <meta property="og:description" content="ANTHI: radar vial antitodo en tiempo real para prevenir retenes, grúas, cepos y accidentes con GPS en vivo y notificaciones." />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/icon.svg" />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
@@ -87,22 +87,22 @@
     }
 
     .brand-icon {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #10b981, #06b6d4);
-      color: #020617;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.22));
+      border: 1px solid rgba(6, 182, 212, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      font-size: 18px;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
       flex-shrink: 0;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     }
 
     .brand-icon.admin {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.24), rgba(245, 158, 11, 0.22));
+      border-color: rgba(245, 158, 11, 0.78);
       box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
     }
 
@@ -165,29 +165,38 @@
       flex-shrink: 0;
     }
 
-    .role-btn, .count-chip, .auth-btn {
+    .role-btn, .auth-btn {
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid var(--border);
       color: var(--text-main);
       font-size: 11px;
       font-weight: 700;
-      padding: 6px 9px;
+      padding: 6px 10px;
       border-radius: 10px;
       white-space: nowrap;
-    }
-
-    .role-btn, .auth-btn, .count-chip {
       cursor: pointer;
     }
 
-    .count-chip {
-      border-color: rgba(6, 182, 212, 0.55);
+    .map-btn.count-chip {
+      border-color: rgba(6, 182, 212, 0.65);
+      background: rgba(15, 23, 42, 0.96);
       color: #67e8f9;
+      flex-direction: column;
+      gap: 1px;
+      line-height: 1;
+      box-shadow: 0 6px 16px rgba(6, 182, 212, 0.2);
       transition: transform 0.12s ease, background-color 0.15s ease;
     }
 
-    .count-chip:active {
-      transform: scale(0.95);
+    .alerts-chip-count {
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.05;
+      color: #67e8f9;
+    }
+
+    .map-btn.count-chip:active {
+      transform: scale(0.94);
     }
 
     .alerts-list {
@@ -204,17 +213,69 @@
       background: var(--bg-dark);
       border: 1px solid var(--surface-light);
       border-radius: 14px;
-      padding: 11px 12px;
+      padding: 10px 12px;
       color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .alert-list-main {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+      text-align: left;
       cursor: pointer;
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      transition: border-color 0.15s ease, transform 0.12s ease;
     }
 
-    .alert-list-item:active {
-      transform: scale(0.98);
+    .alert-list-main:active {
+      transform: scale(0.985);
+    }
+
+    .alert-list-admin-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(245, 158, 11, 0.35);
+    }
+
+    .alert-admin-btn {
+      min-height: 34px;
+      padding: 4px 8px;
+      border-radius: 9px;
+      font-size: 10.5px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .alert-admin-btn.edit {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.65);
+      color: #fcd34d;
+    }
+
+    .alert-admin-btn.delete {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.65);
+      color: #fca5a5;
+    }
+
+    .alert-admin-btn:active {
+      transform: scale(0.96);
     }
 
     .alert-list-icon {
@@ -453,12 +514,13 @@
       z-index: 900;
       display: flex;
       flex-direction: column;
+      align-items: flex-end;
       gap: 8px;
     }
 
     .map-btn {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 46px;
       border-radius: 12px;
       background: rgba(15, 23, 42, 0.94);
       border: 1px solid var(--border);
@@ -476,25 +538,48 @@
       transform: scale(0.94);
     }
 
-    .map-btn.sonar-on {
-      border-color: rgba(6, 182, 212, 0.72);
-      background: rgba(6, 182, 212, 0.16);
-      color: #67e8f9;
-      box-shadow: 0 0 14px rgba(6, 182, 212, 0.25);
-      flex-direction: column;
-      gap: 1px;
-      font-size: 16px;
-      line-height: 1;
+    .sonar-toggle-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.72);
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      text-align: left;
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
     }
 
-    .map-btn.sonar-muted {
+    .sonar-toggle-card.sonar-on {
+      border-color: rgba(6, 182, 212, 0.7);
+      background: rgba(6, 182, 212, 0.14);
+      color: #67e8f9;
+    }
+
+    .sonar-toggle-card.sonar-muted {
       border-color: rgba(239, 68, 68, 0.55);
-      background: rgba(15, 23, 42, 0.94);
+      background: rgba(239, 68, 68, 0.1);
       color: #fca5a5;
-      flex-direction: column;
-      gap: 1px;
-      font-size: 16px;
-      line-height: 1;
+    }
+
+    .sonar-toggle-pill {
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid currentColor;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .sonar-btn-sub {
@@ -699,26 +784,26 @@
       width: 100%;
       max-width: 460px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7px;
+      grid-template-columns: 1fr 0.84fr 1.18fr 1fr;
+      gap: 6px;
     }
 
     .quick-btn {
-      min-height: 46px;
-      padding: 0 6px;
+      min-height: 44px;
+      padding: 0 5px;
       border-radius: 13px;
       border: 1px solid var(--border);
       background: rgba(15, 23, 42, 0.94);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       color: #f8fafc;
-      font-size: 11.5px;
+      font-size: 10.5px;
       font-weight: 800;
       letter-spacing: 0.01em;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
       text-decoration: none;
       white-space: nowrap;
@@ -1483,9 +1568,27 @@
       font-weight: 700;
       cursor: pointer;
     }
+    .popup-vote-btn.edit {
+      border-color: rgba(245, 158, 11, 0.6);
+      background: rgba(245, 158, 11, 0.14);
+      color: #fcd34d;
+    }
     .popup-vote-btn.delete {
-      border-color: rgba(239, 68, 68, 0.45);
+      border-color: rgba(239, 68, 68, 0.6);
+      background: rgba(239, 68, 68, 0.14);
       color: #fca5a5;
+    }
+    .popup-admin-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(245, 158, 11, 0.4);
+    }
+    .popup-admin-bar .popup-vote-btn {
+      width: 100%;
+      padding: 5px 8px;
     }
     .popup-vote-btn:active {
       transform: scale(0.96);
@@ -1520,9 +1623,19 @@
     <!-- Barra superior fija -->
     <header class="top-bar">
       <div class="brand-group">
-        <div class="brand-icon" id="brandIcon">📡</div>
+        <div class="brand-icon" id="brandIcon" aria-label="Escudo radar ANTHI">
+          <svg width="26" height="26" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <path d="M32 6L54 15V31C54 45.2 44.5 55.6 32 59C19.5 55.6 10 45.2 10 31V15L32 6Z" fill="#020617" stroke="#06b6d4" stroke-width="3.2" stroke-linejoin="round"/>
+            <circle cx="32" cy="31" r="14" stroke="#10b981" stroke-opacity="0.45" stroke-width="2.2"/>
+            <circle cx="32" cy="31" r="8" stroke="#22d3ee" stroke-opacity="0.72" stroke-width="2"/>
+            <path d="M32 31L32 17A14 14 0 0 1 46 31Z" fill="#10b981" fill-opacity="0.35"/>
+            <line x1="32" y1="31" x2="43" y2="21" stroke="#67e8f9" stroke-width="2.6" stroke-linecap="round"/>
+            <circle cx="32" cy="31" r="3.2" fill="#ffffff"/>
+            <circle cx="40" cy="24" r="2.6" fill="#ef4444"/>
+          </svg>
+        </div>
         <div class="brand-text">
-          <h1>AN-THI · Antitodo</h1>
+          <h1>ANTHI</h1>
           <div class="brand-subtitle" id="syncStatus">
             <span class="live-dot"></span>
             <span id="syncStatusText">Conectando en vivo...</span>
@@ -1533,12 +1646,6 @@
       <div class="header-actions">
         <button type="button" class="auth-btn" id="btnAuth" title="Iniciar sesión o registrarse con correo electrónico">
           Entrar
-        </button>
-        <button type="button" class="role-btn" id="btnToggleRole" title="Cambiar rol">
-          Ciudadano
-        </button>
-        <button type="button" class="count-chip" id="reportCountChip" title="Ver todas las alertas activas">
-          0 alertas ▾
         </button>
       </div>
     </header>
@@ -1592,12 +1699,13 @@
       <button type="button" class="map-btn buzon-btn" id="btnOpenSuggestionBox" title="Buzón de Sugerencias y Consejos">
         <span>📮</span><span class="sonar-btn-sub">Buzón</span>
       </button>
-      <button type="button" class="map-btn sonar-on" id="btnToggleSonarAudio" title="Activar o silenciar sonido de alerta Sónar">
-        <span>🔊</span><span class="sonar-btn-sub">Sónar</span>
+      <button type="button" class="map-btn count-chip" id="reportCountChip" title="Ver todas las alertas activas" aria-label="0 alertas">
+        <span class="alerts-chip-count" id="reportCountNum">0</span>
+        <span class="sonar-btn-sub" id="reportCountWord">alertas</span>
       </button>
     </div>
 
-    <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos y botón "+ Reportar Novedad" -->
+    <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos / Ciudadano y botón "+ Reportar Novedad" -->
     <div class="bottom-panel">
       <div class="route-alert-banner" id="routeAlertBanner">
         <div id="routeAlertBannerText" style="flex:1;font-weight:700;cursor:pointer;"></div>
@@ -1613,6 +1721,9 @@
         </button>
         <button type="button" class="quick-btn destinations" id="btnQuickManageDest" title="Ver, agregar o editar destinos guardados">
           📍 Mis Destinos
+        </button>
+        <button type="button" class="quick-btn role-btn" id="btnToggleRole" title="Cambiar rol">
+          👤 Ciudadano
         </button>
       </div>
 
@@ -1718,6 +1829,11 @@
             <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar foto</button>
           </div>
 
+          <button type="button" class="sonar-toggle-card sonar-on" id="btnToggleSonarAudioReport" data-sonar-toggle="true" title="Activar o silenciar el sónar cada 30s al acercarse a alertas">
+            <span>🔊 Sónar de proximidad (cada 30 s)</span>
+            <span class="sonar-toggle-pill">Activo</span>
+          </button>
+
           <button type="submit" class="btn-submit" id="btnSubmitReport">
             Publicar reporte en vivo
           </button>
@@ -1766,16 +1882,16 @@
       </div>
     </div>
 
-    <!-- Modal flotante de Buzón de Sugerencias - AN-THI -->
+    <!-- Modal flotante de Buzón de Sugerencias ANTHI -->
     <div class="modal-backdrop" id="suggestionModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>📮 Buzón de Sugerencias - AN-THI</h2>
+          <h2>📮 Buzón de Sugerencias ANTHI</h2>
           <button type="button" class="btn-close" id="btnCloseSuggestionModal" aria-label="Cerrar">✕</button>
         </div>
 
         <p class="suggestion-intro">
-          ¿Tienes ideas, consejos o encontraste algún fallo? Escríbenos para seguir mejorando AN-THI (radar vial antitodo).
+          ¿Tienes ideas, consejos o encontraste algún fallo? Escríbenos para seguir mejorando ANTHI (radar vial antitodo).
         </p>
 
         <form id="suggestionForm">
@@ -1807,7 +1923,7 @@
     <div class="modal-backdrop" id="authModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 id="authModalTitle">Acceso a AN-THI</h2>
+          <h2 id="authModalTitle">Acceso a ANTHI</h2>
           <button type="button" class="btn-close" id="btnCloseAuthModal" aria-label="Cerrar">✕</button>
         </div>
 
@@ -1864,11 +1980,37 @@
 
         <div id="authSignedInView" style="display:none;">
           <div class="auth-account-box">
-            <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">Sesión activa en AN-THI</div>
+            <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">Sesión activa en ANTHI</div>
             <div id="authUserEmailLabel" style="font-weight:800;color:#6ee7b7;word-break:break-all;"></div>
           </div>
           <button type="button" class="btn-logout" id="btnSignOut">
             Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Bloqueo por Sesión Duplicada en Otro Dispositivo -->
+    <div class="modal-backdrop" id="sessionConflictModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>🔒 Sesión cerrada en este dispositivo</h2>
+          <button type="button" class="btn-close" id="btnCloseSessionConflictModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="auth-account-box" style="border-color:rgba(239,68,68,0.55);background:rgba(127,29,29,0.22);margin-bottom:14px;">
+          <div style="font-weight:800;color:#fca5a5;margin-bottom:6px;">⚠️ Cuenta abierta en otro dispositivo</div>
+          <div id="sessionConflictMsg" style="font-size:12.5px;color:#e2e8f0;line-height:1.45;">
+            Tu cuenta fue iniciada en otro celular o navegador. Por seguridad, ANTHI solo permite una sesión activa al mismo tiempo, por lo que esta sesión fue cerrada automáticamente.
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="btn-submit" id="btnReloginAfterConflict" style="flex:1;">
+            🔑 Iniciar sesión aquí
+          </button>
+          <button type="button" class="btn-logout" id="btnDismissSessionConflict" style="width:auto;padding:0 14px;">
+            Entendido
           </button>
         </div>
       </div>
@@ -1883,13 +2025,13 @@
         </div>
 
         <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;line-height:1.45;">
-          Ingresa el PIN secreto para desbloquear funciones de administrador (crear alertas oficiales fijas y retirar reportes).
+          Ingresa el PIN de seguridad o inicia sesión con la cuenta de Administrador principal para desbloquear poderes globales de moderación (editar, fijar o eliminar cualquier novedad).
         </p>
 
         <div class="auth-error" id="adminPinErrorMsg"></div>
 
         <form id="adminPinForm">
-          <label class="form-label" for="adminPinInput">PIN o Contraseña de Administrador *</label>
+          <label class="form-label" for="adminPinInput">PIN de Administrador *</label>
           <input
             type="password"
             id="adminPinInput"
@@ -1898,11 +2040,64 @@
             autocomplete="off"
             required
             maxlength="20"
-            placeholder="Ingresa el PIN secreto..."
+            placeholder="Ingresa el PIN de seguridad..."
           />
           <button type="submit" class="btn-submit" id="btnUnlockAdmin">
             Desbloquear modo 👑 Admin
           </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal exclusivo para Editar Novedad (Superpoderes Administrador) -->
+    <div class="modal-backdrop" id="adminEditModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>👑 Editar Novedad (Admin)</h2>
+          <button type="button" class="btn-close" id="btnCloseAdminEditModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <p style="font-size:12px;color:#cbd5e1;margin-bottom:12px;line-height:1.45;">
+          Modifica la categoría o descripción de cualquier alerta activa. El cambio se reflejará en el mapa de todos los usuarios en tiempo real.
+        </p>
+
+        <form id="adminEditForm">
+          <input type="hidden" id="adminEditReportId" value="" />
+
+          <label class="form-label" for="adminEditTipo">Categoría de la novedad *</label>
+          <select id="adminEditTipo" class="text-input select-input" required>
+            <option value="Retén de Tránsito">🚧 Retén de Tránsito</option>
+            <option value="Grúa">🚛 Grúa</option>
+            <option value="Cepos">🔒 Cepos</option>
+            <option value="Accidente">💥 Accidente</option>
+            <option value="Vía Cerrada / Obras">⛔ Vía Cerrada / Obras</option>
+            <option value="Peligro en Vía">⚠️ Peligro en Vía</option>
+            <option value="Trancón">🚗 Trancón / Congestión</option>
+            <option value="Policía">👮 Policía</option>
+          </select>
+
+          <label class="form-label" for="adminEditDesc">Texto descriptivo / Referencia</label>
+          <textarea
+            id="adminEditDesc"
+            class="text-input"
+            rows="3"
+            maxlength="400"
+            placeholder="Ej: Retén móvil frente al parque, grúa levantando vehículos..."
+          ></textarea>
+
+          <label class="admin-pin-row visible" style="margin-bottom:12px;">
+            <input type="checkbox" id="adminEditIsFixed" />
+            <span>👑 Fijar como Ubicación Oficial (no expira)</span>
+          </label>
+
+          <div style="display:flex;gap:8px;">
+            <button type="submit" class="btn-submit" id="btnSaveAdminEdit" style="flex:1;">
+              💾 Guardar cambios (Admin)
+            </button>
+            <button type="button" class="btn-logout" id="btnCancelAdminEdit" style="width:auto;padding:0 14px;">
+              Cancelar
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -2004,6 +2199,11 @@
 
         <div class="route-status-card" id="routeStatusCard"></div>
 
+        <button type="button" class="sonar-toggle-card sonar-on" id="btnToggleSonarAudio" data-sonar-toggle="true" title="Activar o silenciar el sónar cada 30s al acercarse a alertas">
+          <span>🔊 Sónar de submarino (cada 30 s)</span>
+          <span class="sonar-toggle-pill">Activo</span>
+        </button>
+
         <div style="display:flex;gap:8px;">
           <button type="button" class="btn-submit" id="btnCheckRouteNow" style="flex:1;">
             📡 Activar radar hacia destino
@@ -2063,7 +2263,7 @@
           }
         })
         .catch(function(err) {
-          console.warn('No se pudo registrar el Service Worker de AN-THI:', err);
+          console.warn('No se pudo registrar el Service Worker de ANTHI:', err);
         });
 
       navigator.serviceWorker.addEventListener('message', function(event) {
@@ -2125,6 +2325,7 @@
         doc,
         addDoc,
         getDoc,
+        setDoc,
         updateDoc,
         deleteDoc,
         writeBatch,
@@ -2229,7 +2430,8 @@
       CUSTOM_DESTINATIONS: 'moviradar_custom_destinations_v1',
       USER_ROLE: 'moviradar_user_role_v1',
       SONAR_AUDIO: 'moviradar_sonar_audio_v1',
-      USER_VOTES: 'moviradar_user_votes_v1'
+      USER_VOTES: 'moviradar_user_votes_v1',
+      ACTIVE_SESSION: 'anthi_active_session_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -2365,20 +2567,53 @@
     let hasKnownRealGps = Boolean(initialCachedGps);
     let hasReceivedLiveGps = false;
     let lastServerReports = loadCachedReports();
+    let allNonExpiredServerReports = Array.isArray(lastServerReports) ? [...lastServerReports] : [];
     let isSyncingPending = false;
     let firestoreConnected = false;
     let activeRouteDestination = null;
     let lastRouteAlertSignature = '';
 
     // =========================================================================
-    // 4. ROL DE USUARIO CON ACCESO RESTRINGIDO POR PIN PARA ADMINISTRADOR
+    // 4. ROL DE USUARIO Y ACCESO ADMINISTRADOR (PIN PERSONALIZADO + CORREO PRINCIPAL)
     // =========================================================================
-    const ADMIN_SECRET_PIN = '1234';
+    // 🔧 Cambia aquí el PIN de Administrador cuando lo necesites:
+    const ADMIN_PIN = '202688';
+    // 📧 Correo electrónico del Administrador principal autorizado:
+    const PRIMARY_ADMIN_EMAIL = 'faoj2013@gmail.com';
     const ADMIN_SESSION_KEY = 'moviradar_admin_session_unlocked_v1';
     try {
       localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
     } catch (e) {}
     let userRole = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true' ? 'admin' : 'citizen';
+
+    function isPrimaryAdminEmail(user) {
+      return Boolean(
+        user &&
+        user.email &&
+        user.email.trim().toLowerCase() === PRIMARY_ADMIN_EMAIL.toLowerCase()
+      );
+    }
+
+    function getVisibleServerReports(sourceList = allNonExpiredServerReports) {
+      const list = Array.isArray(sourceList) ? sourceList : [];
+      if (userRole === 'admin') {
+        // El Modo Administrador ignora la regla de los 3 votos y muestra todo para moderación global
+        return list.map((rep) => ({ ...rep }));
+      }
+      return list.filter((rep) => {
+        const isFixed = Boolean(rep.isFixed);
+        const denials = Number(rep.denials || 0);
+        const confirmations = Number(rep.confirmations || 1);
+        const isResolved = !isFixed && denials >= 3 && denials > confirmations;
+        return !isResolved;
+      });
+    }
+
+    function refreshReportsForRole() {
+      lastServerReports = getVisibleServerReports(allNonExpiredServerReports);
+      saveCachedReports(lastServerReports);
+      renderCombinedReports(lastServerReports);
+    }
 
     const adminPinModal = document.getElementById('adminPinModal');
     const adminPinForm = document.getElementById('adminPinForm');
@@ -2391,17 +2626,19 @@
       const icon = document.getElementById('brandIcon');
       const adminRow = document.getElementById('adminFixedRow');
       if (userRole === 'admin') {
-        btn.textContent = '👑 Admin';
-        btn.classList.add('admin');
-        icon.textContent = '👑';
-        icon.classList.add('admin');
-        adminRow.classList.add('visible');
+        if (btn) {
+          btn.textContent = '👑 Admin';
+          btn.classList.add('admin');
+        }
+        if (icon) icon.classList.add('admin');
+        if (adminRow) adminRow.classList.add('visible');
       } else {
-        btn.textContent = 'Ciudadano';
-        btn.classList.remove('admin');
-        icon.textContent = '📡';
-        icon.classList.remove('admin');
-        adminRow.classList.remove('visible');
+        if (btn) {
+          btn.textContent = '👤 Ciudadano';
+          btn.classList.remove('admin');
+        }
+        if (icon) icon.classList.remove('admin');
+        if (adminRow) adminRow.classList.remove('visible');
         document.getElementById('chkIsFixed').checked = false;
       }
     }
@@ -2428,8 +2665,18 @@
           sessionStorage.removeItem(ADMIN_SESSION_KEY);
         } catch (e) {}
         applyRoleUI();
-        renderCombinedReports(lastServerReports);
+        refreshReportsForRole();
         showToast('Modo Ciudadano activo.');
+        return;
+      }
+      if (isPrimaryAdminEmail(auth.currentUser)) {
+        userRole = 'admin';
+        try {
+          sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+        } catch (e) {}
+        applyRoleUI();
+        refreshReportsForRole();
+        showToast('👑 Administrador principal verificado: poderes globales activos.');
         return;
       }
       openAdminPinModal();
@@ -2443,15 +2690,15 @@
     adminPinForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const enteredPin = adminPinInput.value.trim();
-      if (enteredPin === ADMIN_SECRET_PIN) {
+      if (enteredPin === ADMIN_PIN) {
         userRole = 'admin';
         try {
           sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
         } catch (err) {}
         closeAdminPinModal();
         applyRoleUI();
-        renderCombinedReports(lastServerReports);
-        showToast('👑 Modo Administrador desbloqueado: puedes fijar alertas y retirar reportes.');
+        refreshReportsForRole();
+        showToast('👑 Modo Administrador desbloqueado: control total sobre alertas activo.');
       } else {
         adminPinErrorMsg.textContent = 'PIN incorrecto. Acceso de administrador denegado.';
         adminPinErrorMsg.classList.add('visible');
@@ -2498,7 +2745,7 @@
     function updateQuickExternalLinks(lat, lng) {
       const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       const waText = encodeURIComponent(
-        `📍 Mi ubicación actual en AN-THI (Radar Antitodo): ${gmapsUrl}`
+        `📍 Mi ubicación actual en ANTHI (Radar Antitodo): ${gmapsUrl}`
       );
       const waBtn = document.getElementById('btnWhatsApp');
       if (waBtn) {
@@ -2682,11 +2929,19 @@
         const isPending = Boolean(rep.isPending);
         const badgeBg = isFixed ? 'linear-gradient(135deg,#fcd34d,#d97706)' : meta.color;
         const prefix = isFixed ? '👑 ' : isPending ? '⏳ ' : '';
+        const denials = Number(rep.denials || 0);
+        const confirmations = Number(rep.confirmations || 1);
+        const resolvedTag = userRole === 'admin' && !isFixed && denials >= 3 && denials > confirmations
+          ? ' · ⚖️ Marcado por votos (visible solo Admin)'
+          : '';
 
-        const itemBtn = document.createElement('button');
-        itemBtn.type = 'button';
-        itemBtn.className = 'alert-list-item';
-        itemBtn.innerHTML = `
+        const itemCard = document.createElement('div');
+        itemCard.className = 'alert-list-item';
+
+        const mainBtn = document.createElement('button');
+        mainBtn.type = 'button';
+        mainBtn.className = 'alert-list-main';
+        mainBtn.innerHTML = `
           <div class="alert-list-icon" style="background:${escapeHtml(badgeBg)};">${escapeHtml(meta.emoji)}</div>
           <div class="alert-list-body">
             <div class="alert-list-title">
@@ -2694,12 +2949,42 @@
               <span class="alert-list-time">🕒 ${escapeHtml(formatTimeLabel(timeMs))}</span>
             </div>
             <div class="alert-list-meta">
-              📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}${rawDesc ? ` · ${escapeHtml(rawDesc)}` : ''}
+              📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}${rawDesc ? ` · ${escapeHtml(rawDesc)}` : ''}${escapeHtml(resolvedTag)}
             </div>
           </div>
         `;
-        itemBtn.addEventListener('click', () => focusAlertOnMap(rep));
-        alertsCenterList.appendChild(itemBtn);
+        mainBtn.addEventListener('click', () => focusAlertOnMap(rep));
+        itemCard.appendChild(mainBtn);
+
+        if (userRole === 'admin' && !isPending) {
+          const adminActions = document.createElement('div');
+          adminActions.className = 'alert-list-admin-actions';
+
+          const editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'alert-admin-btn edit';
+          editBtn.textContent = '✏️ Editar Novedad (Admin)';
+          editBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            alertsCenterModal.classList.remove('open');
+            window.openAdminEditModal(rep.id);
+          });
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'alert-admin-btn delete';
+          delBtn.textContent = '🗑️ Eliminar Definitivamente (Admin)';
+          delBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            window.deleteReportFromFirestore(rep.id);
+          });
+
+          adminActions.appendChild(editBtn);
+          adminActions.appendChild(delBtn);
+          itemCard.appendChild(adminActions);
+        }
+
+        alertsCenterList.appendChild(itemCard);
       });
     }
 
@@ -2763,8 +3048,11 @@
         const votedHint = existingVote
           ? `<div class="popup-voted-note">✓ Ya registraste tu voto en este reporte</div>`
           : '';
-        const adminDeleteBtn = userRole === 'admin' && !isPending
-          ? `<button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Retirar</button>`
+        const adminModerationBar = userRole === 'admin' && !isPending
+          ? `<div class="popup-admin-bar">
+              <button type="button" class="popup-vote-btn edit" onclick="openAdminEditModal('${escapeHtml(rep.id)}')">✏️ Editar Novedad (Admin)</button>
+              <button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Eliminar Definitivamente (Admin)</button>
+            </div>`
           : '';
 
         const actionsHtml = isPending
@@ -2772,8 +3060,7 @@
           : `<div class="popup-actions">
               <button type="button" class="${confirmCls}" ${voteDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">${confirmLabel}</button>
               <button type="button" class="${denyCls}" ${voteDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">${denyLabel}</button>
-              ${adminDeleteBtn}
-            </div>${votedHint}`;
+            </div>${votedHint}${adminModerationBar}`;
 
         const badgeColor = isFixed ? '#d97706' : meta.color;
         const badgePrefix = isFixed ? '👑 Fija · ' : '';
@@ -2798,8 +3085,18 @@
         markersLayer.addLayer(marker);
       });
 
-      reportCountChipBtn.textContent =
-        `${lastRenderedReports.length} ${lastRenderedReports.length === 1 ? 'alerta' : 'alertas'} ▾`;
+      const alertCount = lastRenderedReports.length;
+      const alertWord = alertCount === 1 ? 'alerta' : 'alertas';
+      const numEl = document.getElementById('reportCountNum');
+      const wordEl = document.getElementById('reportCountWord');
+      if (numEl && wordEl) {
+        numEl.textContent = String(alertCount);
+        wordEl.textContent = alertWord;
+      } else {
+        reportCountChipBtn.textContent = `${alertCount} ${alertWord}`;
+      }
+      reportCountChipBtn.setAttribute('aria-label', `${alertCount} ${alertWord}`);
+      reportCountChipBtn.title = `Ver todas las alertas activas (${alertCount} ${alertWord})`;
       if (alertsCenterModal && alertsCenterModal.classList.contains('open')) {
         renderAlertsCenterList(lastRenderedReports);
       }
@@ -2911,12 +3208,12 @@
       setAuthMode(defaultMode);
       const user = auth.currentUser;
       if (user) {
-        authModalTitle.textContent = 'Cuenta AN-THI';
+        authModalTitle.textContent = 'Cuenta ANTHI';
         authSignedOutView.style.display = 'none';
         authSignedInView.style.display = 'block';
         authUserEmailLabel.textContent = user.email || 'Usuario conectado';
       } else {
-        authModalTitle.textContent = 'Acceso a AN-THI';
+        authModalTitle.textContent = 'Acceso a ANTHI';
         authSignedOutView.style.display = 'block';
         authSignedInView.style.display = 'none';
       }
@@ -2950,19 +3247,243 @@
       }
     }
 
-    onAuthStateChanged(auth, (user) => {
+    const USERS_COLLECTION = 'users';
+    const sessionConflictModal = document.getElementById('sessionConflictModal');
+    const btnCloseSessionConflictModal = document.getElementById('btnCloseSessionConflictModal');
+    const btnDismissSessionConflict = document.getElementById('btnDismissSessionConflict');
+    const btnReloginAfterConflict = document.getElementById('btnReloginAfterConflict');
+
+    let userSessionUnsubscribe = null;
+    let currentTabSessionId = null;
+    let currentMonitoredUid = null;
+    let isClaimingSingleSession = false;
+    let isHandlingSessionConflict = false;
+
+    function generateDeviceSessionId() {
+      let randPart = '';
+      try {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+          randPart = window.crypto.randomUUID().replace(/[^a-zA-Z0-9_-]/g, '');
+        }
+      } catch (e) {}
+      if (!randPart) {
+        randPart = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      }
+      return `sess_${Date.now()}_${randPart}`.slice(0, 96);
+    }
+
+    function readStoredDeviceSession(uid) {
+      if (!uid) return null;
+      const saved = safeReadJson(STORAGE_KEYS.ACTIVE_SESSION, null);
+      if (saved && saved.uid === uid && typeof saved.sessionId === 'string' && saved.sessionId.length >= 8) {
+        return saved.sessionId;
+      }
+      return null;
+    }
+
+    function saveStoredDeviceSession(uid, sessionId) {
+      if (!uid || !sessionId) return;
+      try {
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, JSON.stringify({ uid, sessionId }));
+      } catch (e) {}
+    }
+
+    function clearStoredDeviceSession(uid = null) {
+      try {
+        if (!uid) {
+          localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+          return;
+        }
+        const saved = safeReadJson(STORAGE_KEYS.ACTIVE_SESSION, null);
+        if (saved && saved.uid === uid) {
+          localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+        }
+      } catch (e) {}
+    }
+
+    function detachUserSessionListener() {
+      if (typeof userSessionUnsubscribe === 'function') {
+        try {
+          userSessionUnsubscribe();
+        } catch (e) {}
+      }
+      userSessionUnsubscribe = null;
+      currentMonitoredUid = null;
+    }
+
+    function closeSessionConflictModal() {
+      if (sessionConflictModal) sessionConflictModal.classList.remove('open');
+    }
+
+    if (btnCloseSessionConflictModal) {
+      btnCloseSessionConflictModal.addEventListener('click', closeSessionConflictModal);
+    }
+    if (btnDismissSessionConflict) {
+      btnDismissSessionConflict.addEventListener('click', closeSessionConflictModal);
+    }
+    if (btnReloginAfterConflict) {
+      btnReloginAfterConflict.addEventListener('click', () => {
+        closeSessionConflictModal();
+        openAuthModal('login');
+      });
+    }
+    if (sessionConflictModal) {
+      sessionConflictModal.addEventListener('click', (e) => {
+        if (e.target === sessionConflictModal) closeSessionConflictModal();
+      });
+    }
+
+    async function handleDuplicateSessionDetected() {
+      if (isHandlingSessionConflict) return;
+      isHandlingSessionConflict = true;
+      const kickedUid = currentMonitoredUid || (auth.currentUser ? auth.currentUser.uid : null);
+
+      detachUserSessionListener();
+      currentTabSessionId = null;
+      clearStoredDeviceSession(kickedUid);
+
+      if (userRole === 'admin') {
+        userRole = 'citizen';
+        try {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        } catch (e) {}
+        applyRoleUI();
+        refreshReportsForRole();
+      }
+
+      ['reportModal', 'adminEditModal', 'adminPinModal', 'alertsCenterModal', 'routeModal', 'authModal'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+      });
+
+      try {
+        if (auth.currentUser) {
+          await signOut(auth);
+        }
+      } catch (e) {}
+
+      if (sessionConflictModal) {
+        sessionConflictModal.classList.add('open');
+      }
+      showToast('🔒 Sesión cerrada: tu cuenta fue abierta en otro dispositivo.');
+      isHandlingSessionConflict = false;
+    }
+
+    function attachUserSessionListener(user, expectedSessionId) {
+      if (!user || !user.uid || !expectedSessionId) return;
+      if (currentMonitoredUid === user.uid && currentTabSessionId === expectedSessionId && userSessionUnsubscribe) {
+        return;
+      }
+
+      detachUserSessionListener();
+      currentMonitoredUid = user.uid;
+      currentTabSessionId = expectedSessionId;
+
+      const userDocRef = doc(db, USERS_COLLECTION, user.uid);
+      userSessionUnsubscribe = onSnapshot(
+        userDocRef,
+        (docSnap) => {
+          if (isClaimingSingleSession || isHandlingSessionConflict) return;
+          if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+          if (!docSnap.exists() || docSnap.metadata.hasPendingWrites) return;
+
+          const data = docSnap.data();
+          const remoteSessionId = data && typeof data.activeSessionId === 'string'
+            ? data.activeSessionId.trim()
+            : '';
+
+          if (remoteSessionId && currentTabSessionId && remoteSessionId !== currentTabSessionId) {
+            handleDuplicateSessionDetected();
+          }
+        },
+        (err) => {
+          if (err && err.code === 'permission-denied') {
+            console.warn('Sin permiso para escuchar users/{uid}:', err.message);
+          }
+        }
+      );
+    }
+
+    async function claimExclusiveSessionForUser(user) {
+      if (!user || !user.uid) return;
+      isClaimingSingleSession = true;
+      detachUserSessionListener();
+
+      const newSessionId = generateDeviceSessionId();
+      currentTabSessionId = newSessionId;
+      saveStoredDeviceSession(user.uid, newSessionId);
+
+      const userPath = `${USERS_COLLECTION}/${user.uid}`;
+      try {
+        await withTimeout(
+          setDoc(doc(db, USERS_COLLECTION, user.uid), {
+            activeSessionId: newSessionId,
+            lastLoginAt: serverTimestamp()
+          }),
+          12000
+        );
+      } catch (err) {
+        console.error('Error registrando sesión única en Firestore:', err);
+        if (err && err.code === 'permission-denied') {
+          handleFirestoreError(err, OperationType.WRITE, userPath);
+        }
+      } finally {
+        isClaimingSingleSession = false;
+      }
+
+      if (auth.currentUser && auth.currentUser.uid === user.uid && !isHandlingSessionConflict) {
+        attachUserSessionListener(user, newSessionId);
+      }
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key !== STORAGE_KEYS.ACTIVE_SESSION) return;
+      const user = auth.currentUser;
+      if (!user || isClaimingSingleSession || isHandlingSessionConflict) return;
+      const latest = readStoredDeviceSession(user.uid);
+      if (currentTabSessionId && latest && latest !== currentTabSessionId) {
+        handleDuplicateSessionDetected();
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
       updateAuthUI(user);
-      renderCombinedReports(lastServerReports);
-      if (user) {
-        if (authModal.classList.contains('open')) {
-          closeAuthModal(false);
-        }
-        if (pendingAuthResolvers.length > 0) {
-          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
-          waiters.forEach((w) => w.resolve(user));
-        }
-        if (navigator.onLine && loadPendingReports().length > 0) {
-          sincronizarReportesPendientes();
+      if (!user) {
+        detachUserSessionListener();
+        currentTabSessionId = null;
+        renderCombinedReports(lastServerReports);
+        return;
+      }
+
+      if (isPrimaryAdminEmail(user) && userRole !== 'admin') {
+        userRole = 'admin';
+        try {
+          sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+        } catch (e) {}
+        applyRoleUI();
+        refreshReportsForRole();
+        showToast('👑 Administrador principal conectado: superpoderes activos.');
+      } else {
+        renderCombinedReports(lastServerReports);
+      }
+
+      if (authModal.classList.contains('open')) {
+        closeAuthModal(false);
+      }
+      if (pendingAuthResolvers.length > 0) {
+        const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
+        waiters.forEach((w) => w.resolve(user));
+      }
+      if (navigator.onLine && loadPendingReports().length > 0) {
+        sincronizarReportesPendientes();
+      }
+
+      if (!isClaimingSingleSession && !isHandlingSessionConflict) {
+        const existingLocalSessionId = readStoredDeviceSession(user.uid);
+        if (!existingLocalSessionId) {
+          await claimExclusiveSessionForUser(user);
+        } else {
+          attachUserSessionListener(user, existingLocalSessionId);
         }
       }
     });
@@ -3002,21 +3523,28 @@
 
       btnAuthSubmit.disabled = true;
       btnAuthSubmit.textContent = authMode === 'register' ? 'Creando cuenta...' : 'Ingresando...';
+      isClaimingSingleSession = true;
 
       try {
+        let cred;
         if (authMode === 'register') {
-          await createUserWithEmailAndPassword(auth, email, password);
-          showToast('¡Cuenta creada y sesión iniciada!');
+          cred = await createUserWithEmailAndPassword(auth, email, password);
+          await claimExclusiveSessionForUser(cred.user);
+          showToast('¡Cuenta creada y sesión única activada en este dispositivo!');
         } else {
-          await signInWithEmailAndPassword(auth, email, password);
-          showToast('¡Sesión iniciada correctamente!');
+          cred = await signInWithEmailAndPassword(auth, email, password);
+          await claimExclusiveSessionForUser(cred.user);
+          showToast('¡Sesión única activada en este dispositivo!');
         }
+        closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
       } catch (err) {
+        isClaimingSingleSession = false;
         console.error('Error en Firebase Auth:', err);
         showAuthError(mapFirebaseAuthError(err));
       } finally {
+        isClaimingSingleSession = false;
         btnAuthSubmit.disabled = false;
         btnAuthSubmit.textContent = authMode === 'register' ? 'Crear cuenta' : 'Iniciar Sesión';
       }
@@ -3027,22 +3555,31 @@
       const labelSpan = googleLoginBtn.querySelector('span');
       googleLoginBtn.disabled = true;
       if (labelSpan) labelSpan.textContent = 'Abriendo Google...';
+      isClaimingSingleSession = true;
 
       try {
-        await signInWithPopup(auth, googleProvider);
+        const cred = await signInWithPopup(auth, googleProvider);
+        await claimExclusiveSessionForUser(cred.user);
+        closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
-        showToast('¡Sesión iniciada con Google!');
+        showToast('¡Sesión única con Google activada en este dispositivo!');
       } catch (err) {
+        isClaimingSingleSession = false;
         console.error('Error en acceso rápido con Google:', err);
         showAuthError(mapFirebaseAuthError(err));
       } finally {
+        isClaimingSingleSession = false;
         googleLoginBtn.disabled = false;
         if (labelSpan) labelSpan.textContent = 'Continuar con Google';
       }
     });
 
     btnSignOut.addEventListener('click', async () => {
+      const uid = auth.currentUser ? auth.currentUser.uid : null;
+      detachUserSessionListener();
+      currentTabSessionId = null;
+      clearStoredDeviceSession(uid);
       try {
         await signOut(auth);
         closeAuthModal(false);
@@ -3168,19 +3705,131 @@
       }
     };
 
+    const adminEditModal = document.getElementById('adminEditModal');
+    const adminEditForm = document.getElementById('adminEditForm');
+    const adminEditReportId = document.getElementById('adminEditReportId');
+    const adminEditTipo = document.getElementById('adminEditTipo');
+    const adminEditDesc = document.getElementById('adminEditDesc');
+    const adminEditIsFixed = document.getElementById('adminEditIsFixed');
+    const btnCloseAdminEditModal = document.getElementById('btnCloseAdminEditModal');
+    const btnCancelAdminEdit = document.getElementById('btnCancelAdminEdit');
+    const btnSaveAdminEdit = document.getElementById('btnSaveAdminEdit');
+
+    function closeAdminEditModal() {
+      if (adminEditModal) adminEditModal.classList.remove('open');
+    }
+
+    if (btnCloseAdminEditModal) btnCloseAdminEditModal.addEventListener('click', closeAdminEditModal);
+    if (btnCancelAdminEdit) btnCancelAdminEdit.addEventListener('click', closeAdminEditModal);
+    if (adminEditModal) {
+      adminEditModal.addEventListener('click', (e) => {
+        if (e.target === adminEditModal) closeAdminEditModal();
+      });
+    }
+
+    window.openAdminEditModal = function(reportId) {
+      if (!reportId || userRole !== 'admin') return;
+      const sourcePool = [...allNonExpiredServerReports, ...lastServerReports, ...lastRenderedReports];
+      const rep = sourcePool.find((r) => String(r.id) === String(reportId));
+      if (!rep) {
+        showToast('No se encontró la novedad seleccionada.');
+        return;
+      }
+
+      adminEditReportId.value = String(rep.id);
+      const currentTipo = String(rep.tipo || rep.type || 'Retén de Tránsito').trim();
+      const hasOption = Array.from(adminEditTipo.options).some((opt) => opt.value === currentTipo);
+      if (!hasOption && currentTipo) {
+        const customOpt = document.createElement('option');
+        customOpt.value = currentTipo;
+        customOpt.textContent = currentTipo;
+        adminEditTipo.appendChild(customOpt);
+      }
+      adminEditTipo.value = currentTipo;
+      adminEditDesc.value = String(rep.descripcion || rep.description || '');
+      adminEditIsFixed.checked = Boolean(rep.isFixed);
+      adminEditModal.classList.add('open');
+      setTimeout(() => adminEditDesc.focus(), 120);
+    };
+
+    if (adminEditForm) {
+      adminEditForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (userRole !== 'admin') {
+          showToast('⛔ Activa el Modo Administrador para editar novedades.');
+          return;
+        }
+        const reportId = adminEditReportId.value.trim();
+        const newTipo = adminEditTipo.value.trim().slice(0, 40);
+        const newDesc = adminEditDesc.value.trim().slice(0, 400);
+        const newFixed = Boolean(adminEditIsFixed.checked);
+        if (!reportId || newTipo.length < 2) {
+          showToast('Selecciona una categoría válida.');
+          return;
+        }
+
+        const path = `${COLLECTION_NAME}/${reportId}`;
+        btnSaveAdminEdit.disabled = true;
+        btnSaveAdminEdit.textContent = 'Guardando cambios...';
+
+        try {
+          await ensureAuthenticated();
+          await withTimeout(
+            updateDoc(doc(db, COLLECTION_NAME, reportId), {
+              tipo: newTipo,
+              descripcion: newDesc,
+              isFixed: newFixed
+            }),
+            15000
+          );
+
+          allNonExpiredServerReports = allNonExpiredServerReports.map((item) =>
+            String(item.id) === String(reportId)
+              ? { ...item, tipo: newTipo, descripcion: newDesc, isFixed: newFixed }
+              : item
+          );
+          refreshReportsForRole();
+          closeAdminEditModal();
+          showToast('✅ Novedad editada y actualizada globalmente en Firestore.');
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') {
+            showToast('Inicia sesión con el correo Administrador para editar reportes.');
+            return;
+          }
+          if (err && err.code === 'permission-denied') {
+            showToast(`⛔ Firestore exige sesión con el correo Administrador (${PRIMARY_ADMIN_EMAIL}) para editar reportes de otros usuarios.`);
+          } else {
+            showToast('No se pudo editar la novedad en Firestore.');
+          }
+          handleFirestoreError(err, OperationType.UPDATE, path);
+        } finally {
+          btnSaveAdminEdit.disabled = false;
+          btnSaveAdminEdit.textContent = '💾 Guardar cambios (Admin)';
+        }
+      });
+    }
+
     window.deleteReportFromFirestore = async function(reportId) {
       if (!reportId || userRole !== 'admin') return;
       const path = `${COLLECTION_NAME}/${reportId}`;
       try {
         await ensureAuthenticated();
-        await deleteDoc(doc(db, COLLECTION_NAME, reportId));
-        showToast('Alerta retirada por el Administrador.');
+        await withTimeout(deleteDoc(doc(db, COLLECTION_NAME, reportId)), 15000);
+        allNonExpiredServerReports = allNonExpiredServerReports.filter(
+          (item) => String(item.id) !== String(reportId)
+        );
+        refreshReportsForRole();
+        showToast('🗑️ Alerta eliminada definitivamente de Firestore por el Administrador.');
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') {
-          showToast('Inicia sesión con tu correo para retirar reportes.');
+          showToast('Inicia sesión con el correo Administrador para eliminar reportes.');
           return;
         }
-        showToast('Solo el autor o el Administrador pueden retirar este reporte.');
+        if (err && err.code === 'permission-denied') {
+          showToast(`⛔ Firestore exige sesión con el correo Administrador (${PRIMARY_ADMIN_EMAIL}) para eliminar reportes de otros usuarios.`);
+        } else {
+          showToast('No se pudo eliminar definitivamente este reporte.');
+        }
         handleFirestoreError(err, OperationType.DELETE, path);
       }
     };
@@ -3198,31 +3847,30 @@
             return;
           }
 
-          const activeReports = [];
+          const nonExpiredReports = [];
           snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             const timeMs = extractTimestampMs(data);
-            const denials = Number(data.denials || 0);
-            const confirmations = Number(data.confirmations || 1);
             const isFixed = Boolean(data.isFixed);
             const isExpired = !isFixed && timeMs < twelveHoursAgo;
-            const isResolved = !isFixed && denials >= 3 && denials > confirmations;
 
-            if (!isExpired && !isResolved) {
-              activeReports.push({ id: docSnap.id, ...data, _sortMs: timeMs });
+            if (!isExpired) {
+              nonExpiredReports.push({ id: docSnap.id, ...data, _sortMs: timeMs });
             }
           });
 
-          activeReports.sort((a, b) => {
+          nonExpiredReports.sort((a, b) => {
             if (Boolean(a.isFixed) !== Boolean(b.isFixed)) return a.isFixed ? -1 : 1;
             return b._sortMs - a._sortMs;
           });
 
-          lastServerReports = activeReports;
-          saveCachedReports(activeReports);
+          allNonExpiredServerReports = nonExpiredReports;
+          const visibleReports = getVisibleServerReports(nonExpiredReports);
+          lastServerReports = visibleReports;
+          saveCachedReports(visibleReports);
           firestoreConnected = true;
 
-          renderCombinedReports(activeReports);
+          renderCombinedReports(visibleReports);
           updateNetworkAndSyncStatus();
           if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
             evaluarAlertasEnRutaActual(false);
@@ -3942,7 +4590,7 @@
     const BACKGROUND_PUSH_REPEAT_MS = 30000;
 
     // Sintetizador Web Audio API para el sonido de Sónar de Submarino
-    const btnToggleSonarAudio = document.getElementById('btnToggleSonarAudio');
+    const sonarToggleButtons = Array.from(document.querySelectorAll('[data-sonar-toggle="true"]'));
     let sonarAudioCtx = null;
     let isSonarAudioEnabled = safeReadJson(STORAGE_KEYS.SONAR_AUDIO, true) !== false;
     let lastSonarPingAt = 0;
@@ -3970,18 +4618,19 @@
     }, { passive: true });
 
     function updateSonarAudioButtonUI() {
-      if (!btnToggleSonarAudio) return;
-      if (isSonarAudioEnabled) {
-        btnToggleSonarAudio.innerHTML = '<span>🔊</span><span class="sonar-btn-sub">Sónar</span>';
-        btnToggleSonarAudio.classList.add('sonar-on');
-        btnToggleSonarAudio.classList.remove('sonar-muted');
-        btnToggleSonarAudio.title = 'Audio Sónar activo (toca para silenciar)';
-      } else {
-        btnToggleSonarAudio.innerHTML = '<span>🔇</span><span class="sonar-btn-sub">Mute</span>';
-        btnToggleSonarAudio.classList.remove('sonar-on');
-        btnToggleSonarAudio.classList.add('sonar-muted');
-        btnToggleSonarAudio.title = 'Audio Sónar silenciado (toca para activar)';
-      }
+      sonarToggleButtons.forEach((btn) => {
+        if (isSonarAudioEnabled) {
+          btn.innerHTML = '<span>🔊 Sónar de submarino (cada 30 s)</span><span class="sonar-toggle-pill">Sonido</span>';
+          btn.classList.add('sonar-on');
+          btn.classList.remove('sonar-muted');
+          btn.title = 'Audio Sónar activo cada 30 s (toca para silenciar)';
+        } else {
+          btn.innerHTML = '<span>🔇 Sónar de submarino (cada 30 s)</span><span class="sonar-toggle-pill">Mute</span>';
+          btn.classList.remove('sonar-on');
+          btn.classList.add('sonar-muted');
+          btn.title = 'Audio Sónar silenciado (toca para activar)';
+        }
+      });
     }
 
     function scheduleSonarOscillators(ctx) {
@@ -4052,7 +4701,7 @@
       const distMeters = Math.round(closestHit.dist);
       const desc = String(rep.descripcion || '').trim();
       const extraSuffix = totalNearbyCount > 1 ? ` (+${totalNearbyCount - 1} alerta(s) cerca)` : '';
-      const title = '⚠️ ¡Alerta AN-THI!';
+      const title = '⚠️ ¡Alerta ANTHI!';
       const body = `${meta.emoji} ${meta.label} a ${distMeters} m de tu ubicación${desc ? ` · ${desc}` : ''}${extraSuffix}`;
 
       const payload = {
@@ -4188,7 +4837,7 @@
           } catch (e) {}
         }
         if (!document.hidden) {
-          showToast(`📡 AN-THI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`);
+          showToast(`📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`);
         }
       }
 
@@ -4223,20 +4872,22 @@
       }
     }, 5000);
 
-    if (btnToggleSonarAudio) {
+    if (sonarToggleButtons.length > 0) {
       updateSonarAudioButtonUI();
-      btnToggleSonarAudio.addEventListener('click', () => {
-        isSonarAudioEnabled = !isSonarAudioEnabled;
-        try {
-          localStorage.setItem(STORAGE_KEYS.SONAR_AUDIO, JSON.stringify(isSonarAudioEnabled));
-        } catch (e) {}
-        updateSonarAudioButtonUI();
-        if (isSonarAudioEnabled) {
-          playSubmarineSonarPing(true);
-          showToast('🔊 Sonido de alerta Sónar activado.');
-        } else {
-          showToast('🔇 Sonido de alerta Sónar silenciado.');
-        }
+      sonarToggleButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          isSonarAudioEnabled = !isSonarAudioEnabled;
+          try {
+            localStorage.setItem(STORAGE_KEYS.SONAR_AUDIO, JSON.stringify(isSonarAudioEnabled));
+          } catch (e) {}
+          updateSonarAudioButtonUI();
+          if (isSonarAudioEnabled) {
+            playSubmarineSonarPing(true);
+            showToast('🔊 Sonido de alerta Sónar activado (cada 30 s).');
+          } else {
+            showToast('🔇 Sonido de alerta Sónar silenciado (Mute).');
+          }
+        });
       });
     }
 

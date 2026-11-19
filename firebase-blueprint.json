@@ -87,7 +87,27 @@
         }
       },
       "required": ["email", "role"]
-    }
+    },
+    "UserSession": {
+      "title": "Sesión Única de Usuario ANTHI",
+      "description": "Control de sesión única por dispositivo para impedir múltiples sesiones simultáneas con la misma cuenta.",
+      "type": "object",
+      "properties": {
+        "activeSessionId": {
+          "type": "string",
+          "description": "Identificador único generado en el dispositivo actualmente autorizado.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "minLength": 8,
+          "maxLength": 128
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo asignada por el servidor de Firestore al iniciar sesión."
+        }
+      },
+      "required": ["activeSessionId", "lastLoginAt"]
+    },
     "VotoReporte": {
       "title": "Voto Único de Reporte MoviRadar",
       "description": "Registro único por usuario autenticado para validar o desmentir un reporte vial sin duplicados.",
@@ -156,6 +176,10 @@
     "/buzon/{sugerenciaId}": {
       "schema": { "$ref": "#/entities/SugerenciaBuzon" },
       "description": "Buzón de sugerencias, consejos y mejoras enviadas por los conductores."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserSession" },
+      "description": "Estado de sesión única activa por usuario autenticado."
     },
     "/admins/{adminId}": {
       "schema": { "$ref": "#/entities/AdminUser" },
