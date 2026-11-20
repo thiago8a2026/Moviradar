@@ -48,6 +48,19 @@
           "type": "integer",
           "description": "Número de confirmaciones ciudadanas (Sigue ahí)."
         },
+        "confirmaciones": {
+          "type": "integer",
+          "description": "Nivel de consenso ciudadano (inicia en 1; >=2 activa alertas; >=3 es firme)."
+        },
+        "confirmadoPor": {
+          "type": "array",
+          "description": "Lista acotada de UIDs que han confirmado este reporte para evitar duplicados por usuario."
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp de expiración automática escalonada (30m con 1, 60m con 2, 180m con 3+)."
+        },
         "denials": {
           "type": "integer",
           "description": "Número de reportes de vía despejada (Ya pasó)."

@@ -43,7 +43,8 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
-          'timestamp', 'urlFoto', 'mediaType', 'confirmations', 'denials', 'authorId'
+          'timestamp', 'urlFoto', 'mediaType', 'confirmations', 'denials', 'authorId',
+          'confirmaciones', 'confirmadoPor', 'expiresAt'
         ])
         && data.lat is number && data.lat >= -90 && data.lat <= 90
         && data.lng is number && data.lng >= -180 && data.lng <= 180
@@ -55,7 +56,16 @@ service cloud.firestore {
         && data.denials is int && data.denials >= 0
         && data.authorId is string && isValidId(data.authorId)
         && (!('urlFoto' in data) || data.urlFoto == null || (data.urlFoto is string && data.urlFoto.size() <= 450000))
-        && (!('mediaType' in data) || data.mediaType == null || data.mediaType == 'image' || data.mediaType == 'video');
+        && (!('mediaType' in data) || data.mediaType == null || data.mediaType == 'image' || data.mediaType == 'video')
+        && (!('confirmaciones' in data) || (data.confirmaciones is int && data.confirmaciones >= 1))
+        && (!('confirmadoPor' in data) || (
+          data.confirmadoPor is list
+          && data.confirmadoPor.size() >= 1
+          && data.confirmadoPor.size() <= 50
+          && data.confirmadoPor[0] is string
+          && data.confirmadoPor[0].size() <= 128
+        ))
+        && (!('expiresAt' in data) || data.expiresAt is timestamp);
     }
 
     function isValidVoto(data) {
@@ -133,6 +143,12 @@ service cloud.firestore {
         && incoming().timestamp == request.time
         && incoming().confirmations == 1
         && incoming().denials == 0
+        && (!('confirmaciones' in incoming()) || incoming().confirmaciones == 1)
+        && (!('confirmadoPor' in incoming()) || (
+          incoming().confirmadoPor.size() == 1
+          && incoming().confirmadoPor[0] == request.auth.uid
+        ))
+        && (!('expiresAt' in incoming()) || incoming().expiresAt <= request.time + duration.value(12, 'h'))
         && (incoming().isFixed == false || isAdmin());
 
       allow update: if isSignedIn()
@@ -145,11 +161,20 @@ service cloud.firestore {
         && (
           (
             isAdmin()
-            && !incoming().diff(existing()).affectedKeys().hasAny(['confirmations', 'denials'])
+            && !incoming().diff(existing()).affectedKeys().hasAny(['confirmations', 'denials', 'confirmaciones', 'confirmadoPor'])
           ) ||
           (
-            incoming().diff(existing()).affectedKeys().hasOnly(['confirmations'])
+            incoming().diff(existing()).affectedKeys().hasOnly(['confirmations', 'confirmaciones', 'confirmadoPor', 'expiresAt'])
             && incoming().confirmations == existing().confirmations + 1
+            && (!('confirmaciones' in incoming()) || (
+              (!('confirmaciones' in existing()) && incoming().confirmaciones == existing().confirmations + 1) ||
+              ('confirmaciones' in existing() && incoming().confirmaciones == existing().confirmaciones + 1)
+            ))
+            && (!('confirmadoPor' in incoming()) || (
+              (!('confirmadoPor' in existing()) && request.auth.uid in incoming().confirmadoPor && incoming().confirmadoPor.size() == 1) ||
+              ('confirmadoPor' in existing() && !(request.auth.uid in existing().confirmadoPor) && request.auth.uid in incoming().confirmadoPor && incoming().confirmadoPor.size() == existing().confirmadoPor.size() + 1)
+            ))
+            && (!('expiresAt' in incoming()) || incoming().expiresAt <= request.time + duration.value(12, 'h'))
             && !exists(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
             && existsAfter(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
           ) ||

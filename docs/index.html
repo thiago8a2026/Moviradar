@@ -511,8 +511,10 @@
 
     .gps-hud.pico-collapsed .hud-vehicle-block,
     .gps-hud.pico-collapsed .hud-divider,
-    .gps-hud.pico-collapsed .hud-pico-head-row {
-      display: none;
+    .gps-hud.pico-collapsed .hud-pico-head-row,
+    .gps-hud.pico-collapsed .hud-pico-sync-btn,
+    .gps-hud.pico-collapsed .hud-pico-calibrator {
+      display: none !important;
     }
 
     .gps-hud.pico-collapsed .hud-pico-digits {
@@ -640,6 +642,79 @@
 
     .hud-pico-digits.free {
       color: #6ee7b7;
+    }
+
+    .hud-pico-sync-btn {
+      background: rgba(2, 6, 23, 0.78);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      color: #fde047;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      padding: 3px 5px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .hud-pico-sync-btn.active {
+      background: rgba(250, 204, 21, 0.2);
+      border-color: rgba(250, 204, 21, 0.85);
+    }
+
+    .hud-pico-calibrator {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-width: 220px;
+    }
+
+    .hud-pico-cal-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #cbd5e1;
+      line-height: 1.2;
+    }
+
+    .hud-pico-cal-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .pico-cal-btn {
+      background: rgba(2, 6, 23, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #e2e8f0;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 6px;
+      cursor: pointer;
+    }
+
+    .pico-cal-btn.active {
+      background: rgba(250, 204, 21, 0.22);
+      border-color: #facc15;
+      color: #fef08a;
+    }
+
+    .pico-cal-btn.auto {
+      border-color: rgba(16, 185, 129, 0.55);
+      color: #6ee7b7;
+    }
+
+    .hv-pico-cal-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      margin-top: 7px;
+      padding-top: 7px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.28);
     }
 
     /* Botones flotantes del mapa plegables desde la barra superior */
@@ -2272,6 +2347,18 @@
         </div>
         <div class="hud-pico-main">
           <span class="hud-pico-digits" id="hudPicoDigits" title="Plegar o abrir Pico y Placa">--</span>
+          <button type="button" class="hud-pico-sync-btn" id="btnOpenPicoCalibrator" title="Ajustar rotación manualmente" aria-expanded="false">⚙️</button>
+        </div>
+        <div class="hud-pico-calibrator" id="hudPicoCalibrator" style="display:none;">
+          <div class="hud-pico-cal-title" id="hudPicoCalTitle">Calibrar dígitos de hoy:</div>
+          <div class="hud-pico-cal-grid" id="hudPicoCalGrid">
+            <button type="button" class="pico-cal-btn" data-pico-pair-idx="0">1-2</button>
+            <button type="button" class="pico-cal-btn" data-pico-pair-idx="1">3-4</button>
+            <button type="button" class="pico-cal-btn" data-pico-pair-idx="2">5-6</button>
+            <button type="button" class="pico-cal-btn" data-pico-pair-idx="3">7-8</button>
+            <button type="button" class="pico-cal-btn" data-pico-pair-idx="4">9-0</button>
+            <button type="button" class="pico-cal-btn auto" id="btnResetPicoCalibration">Auto</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2597,6 +2684,24 @@
             <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">Sesión activa en ANTHI</div>
             <div id="authUserEmailLabel" style="font-weight:800;color:#6ee7b7;word-break:break-all;"></div>
           </div>
+
+          <div style="margin-bottom:12px;">
+            <label class="form-label" for="authApodoInput">Apodo / Indicativo visible (editable)</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input
+                type="text"
+                id="authApodoInput"
+                class="text-input"
+                maxlength="24"
+                style="margin-bottom:0;flex:1;"
+                placeholder="Ej: Centella 14, Faoj, Ruta Sur..."
+              />
+              <button type="button" class="btn-submit" id="btnSaveAuthApodo" style="width:auto;padding:0 14px;min-height:42px;font-size:12px;">
+                Guardar
+              </button>
+            </div>
+          </div>
+
           <button type="button" class="btn-logout" id="btnSignOut">
             Cerrar sesión
           </button>
@@ -2743,13 +2848,19 @@
         </div>
 
         <div id="adminControlSection" style="display:none;">
-          <div class="auth-account-box" style="margin-bottom:12px;">
+          <div class="auth-account-box" style="margin-bottom:10px;">
             <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">Administrador autorizado</div>
             <div id="adminPanelEmailLabel" style="font-size:12.5px;font-weight:800;color:#fcd34d;word-break:break-all;">--</div>
           </div>
-          <p style="font-size:12px;color:#cbd5e1;line-height:1.45;margin-bottom:12px;">
-            Superpoderes activos: publicación fija oficial, edición y borrado global de alertas, excepción al bloqueo de 300 m y gestión del Buzón de Sugerencias.
+          <p style="font-size:11.5px;color:#cbd5e1;line-height:1.4;margin-bottom:10px;">
+            Superpoderes activos: publicación fija oficial, edición y borrado global de alertas (incluidas 1/3 sin confirmar), excepción al radio de 300 m y gestión del Buzón.
           </p>
+          <div id="adminReportsModerationBox" style="background:rgba(2,6,23,0.72);border:1px solid rgba(51,65,85,0.85);border-radius:12px;padding:10px;margin-bottom:12px;">
+            <div id="adminReportsSummaryStats" style="font-size:11.5px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">
+              Cargando reportes activos...
+            </div>
+            <div id="adminQuickReportsList" style="display:flex;flex-direction:column;gap:6px;max-height:210px;overflow-y:auto;"></div>
+          </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <button type="button" class="btn-submit" id="btnAdminOpenAlertsCenter" style="min-height:42px;font-size:13px;">
               📡 Abrir Centro de Alertas Activas
@@ -3174,6 +3285,8 @@
         onSnapshot,
         getDocFromServer,
         serverTimestamp,
+        Timestamp,
+        arrayUnion,
         increment
       },
       { getStorage, ref, uploadBytesResumable, getDownloadURL },
@@ -3272,10 +3385,12 @@
       SONAR_AUDIO: 'moviradar_sonar_audio_v1',
       USER_VOTES: 'moviradar_user_votes_v1',
       ACTIVE_SESSION: 'anthi_active_session_v1',
+      USER_APODO: 'anthi_user_apodo_v1',
       HOJA_VIDA: 'anthi_hoja_vida_v1',
       HV_NOTIF_STATE: 'anthi_hv_notif_v1',
       MAP_CONTROLS_COLLAPSED: 'anthi_map_controls_collapsed_v1',
-      PICO_HUD_COLLAPSED: 'anthi_pico_hud_collapsed_v1'
+      PICO_HUD_COLLAPSED: 'anthi_pico_hud_collapsed_v1',
+      PICO_CALIBRATION: 'anthi_pico_calibration_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -3329,10 +3444,14 @@
         tipo: rep.tipo || rep.type || 'Novedad',
         descripcion: rep.descripcion || rep.description || '',
         createdAtMs: extractTimestampMs(rep),
+        expiresAtMs: extractExpiresAtMs(rep),
         urlFoto: rep.urlFoto || rep.mediaUrl || null,
         mediaType: rep.mediaType || null,
         isFixed: Boolean(rep.isFixed),
-        confirmations: Number(rep.confirmations || 1),
+        confirmations: getConfirmCount(rep),
+        confirmaciones: getConfirmCount(rep),
+        confirmadoPor: getConfirmedByList(rep),
+        authorId: rep.authorId || null,
         denials: Number(rep.denials || 0)
       }));
       try {
@@ -3422,7 +3541,7 @@
     // =========================================================================
     // 🔧 Cambia aquí el PIN de Administrador cuando lo necesites:
     const ADMIN_PIN = '202688';
-    // 📧 Lista de correos electrónicos de Administradores autorizados:
+    // 📧 Lista de correos electrónicos de Administradores autorizados (siempre en minúsculas):
     const ADMIN_EMAILS = ['faoj2013@gmail.com', 'andrezmelo13@gmail.com'];
     const PRIMARY_ADMIN_EMAIL = ADMIN_EMAILS[0];
     const ADMIN_SESSION_KEY = 'moviradar_admin_session_unlocked_v1';
@@ -3431,12 +3550,15 @@
     } catch (e) {}
     let userRole = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true' ? 'admin' : 'citizen';
 
+    function normalizeEmail(email) {
+      return typeof email === 'string' ? email.trim().toLowerCase() : '';
+    }
+
     function isAuthorizedAdminEmail(user) {
       if (!user || !user.email) return false;
-      const normalizedEmail = String(user.email).trim().toLowerCase();
-      return ADMIN_EMAILS.some(
-        (adminEmail) => String(adminEmail).trim().toLowerCase() === normalizedEmail
-      );
+      const normalizedEmail = normalizeEmail(user.email);
+      if (!normalizedEmail) return false;
+      return ADMIN_EMAILS.some((adminEmail) => normalizeEmail(adminEmail) === normalizedEmail);
     }
 
     function isPrimaryAdminEmail(user) {
@@ -3444,15 +3566,18 @@
     }
 
     function getVisibleServerReports(sourceList = allNonExpiredServerReports) {
-      const list = Array.isArray(sourceList) ? sourceList : [];
+      const nowMs = Date.now();
+      const list = (Array.isArray(sourceList) ? sourceList : []).filter(
+        (rep) => rep && !isReportExpired(rep, nowMs)
+      );
       if (userRole === 'admin') {
-        // El Modo Administrador ignora la regla de los 3 votos y muestra todo para moderación global
+        // El Modo Administrador ignora la regla de los 3 votos negativos y muestra todo lo vigente
         return list.map((rep) => ({ ...rep }));
       }
       return list.filter((rep) => {
         const isFixed = Boolean(rep.isFixed);
         const denials = Number(rep.denials || 0);
-        const confirmations = Number(rep.confirmations || 1);
+        const confirmations = getConfirmCount(rep);
         const isResolved = !isFixed && denials >= 3 && denials > confirmations;
         return !isResolved;
       });
@@ -3464,6 +3589,9 @@
       renderCombinedReports(lastServerReports);
       if (typeof updateDuplicateGuardPreview === 'function') {
         updateDuplicateGuardPreview();
+      }
+      if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
+        window.__anthiRefreshAdminReportsUI();
       }
     }
 
@@ -3720,14 +3848,153 @@
       return Date.now();
     }
 
-    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false) {
-      const bg = isFixed ? 'linear-gradient(135deg,#fcd34d,#d97706)' : (color || '#ef4444');
-      const borderColor = isPending ? '#fbbf24' : '#ffffff';
+    const CONSENSUS_TTL_LEVEL1_MS = 30 * 60 * 1000;   // 1 confirmación: 30 min
+    const CONSENSUS_TTL_LEVEL2_MS = 60 * 60 * 1000;   // 2 confirmaciones: 1 hora
+    const CONSENSUS_TTL_LEVEL3_MS = 180 * 60 * 1000;  // 3+ confirmaciones (firme): 3 horas
+    const LEGACY_FALLBACK_TTL_MS = 12 * 60 * 60 * 1000;
+
+    function getConfirmedByList(rep) {
+      if (!rep || !Array.isArray(rep.confirmadoPor)) return [];
+      return Array.from(
+        new Set(
+          rep.confirmadoPor
+            .map((entry) => String(entry || '').trim())
+            .filter(Boolean)
+        )
+      );
+    }
+
+    function getConfirmCount(rep) {
+      if (!rep) return 1;
+      const explicit = Number(rep.confirmaciones != null ? rep.confirmaciones : rep.confirmations);
+      const listLen = Array.isArray(rep.confirmadoPor) ? getConfirmedByList(rep).length : 0;
+      const numeric = Number.isFinite(explicit) && explicit >= 1 ? Math.floor(explicit) : 1;
+      return Math.max(1, numeric, listLen);
+    }
+
+    function hasUserConfirmedReport(rep, user = auth.currentUser) {
+      if (!rep) return false;
+      const uid = user && user.uid ? String(user.uid) : null;
+      const emailNorm = user && user.email ? normalizeEmail(user.email) : null;
+      const confirmedBy = getConfirmedByList(rep);
+      if (uid && confirmedBy.includes(uid)) return true;
+      if (emailNorm && confirmedBy.some((item) => normalizeEmail(item) === emailNorm)) return true;
+      if (!rep.isPending && rep.id && getUserVoteForReport(rep.id, uid || undefined) === 'confirm') return true;
+      return false;
+    }
+
+    function getConsensusTtlMs(confirmCount) {
+      const count = Math.max(1, Number(confirmCount || 1));
+      if (count >= 3) return CONSENSUS_TTL_LEVEL3_MS;
+      if (count === 2) return CONSENSUS_TTL_LEVEL2_MS;
+      return CONSENSUS_TTL_LEVEL1_MS;
+    }
+
+    function extractExpiresAtMs(rep) {
+      if (!rep) return Date.now() + CONSENSUS_TTL_LEVEL1_MS;
+      if (rep.isFixed) return Number.MAX_SAFE_INTEGER;
+      if (rep.expiresAt && typeof rep.expiresAt.toMillis === 'function') {
+        return rep.expiresAt.toMillis();
+      }
+      if (rep.expiresAt && typeof rep.expiresAt.seconds === 'number') {
+        return rep.expiresAt.seconds * 1000;
+      }
+      if (typeof rep.expiresAt === 'number' && Number.isFinite(rep.expiresAt)) {
+        return rep.expiresAt;
+      }
+      if (typeof rep.expiresAtMs === 'number' && Number.isFinite(rep.expiresAtMs)) {
+        return rep.expiresAtMs;
+      }
+      const baseMs = extractTimestampMs(rep);
+      const hasConsensusFields = 'confirmaciones' in rep || 'confirmadoPor' in rep || rep.isPending;
+      return baseMs + (hasConsensusFields ? getConsensusTtlMs(getConfirmCount(rep)) : LEGACY_FALLBACK_TTL_MS);
+    }
+
+    function isReportExpired(rep, nowMs = Date.now()) {
+      if (!rep) return true;
+      if (Boolean(rep.isFixed)) return false;
+      return nowMs >= extractExpiresAtMs(rep);
+    }
+
+    function formatRemainingTimeLabel(rep, nowMs = Date.now()) {
+      if (!rep) return '--';
+      if (Boolean(rep.isFixed)) return 'Fija (Admin)';
+      const remMs = Math.max(0, extractExpiresAtMs(rep) - nowMs);
+      if (remMs <= 0) return 'Expirado';
+      const totalMin = Math.ceil(remMs / 60000);
+      if (totalMin < 60) return `${totalMin} min rest.`;
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return m > 0 ? `${h}h ${m}m rest.` : `${h}h rest.`;
+    }
+
+    function getConsensusBadgeInfo(rep) {
+      if (rep && Boolean(rep.isFixed)) {
+        return {
+          level: 'fixed',
+          label: '👑 Oficial Fija',
+          shortLabel: '👑 Fija',
+          color: '#fcd34d',
+          bg: 'rgba(245,158,11,0.18)',
+          border: 'rgba(251,191,36,0.55)'
+        };
+      }
+      const count = getConfirmCount(rep);
+      if (count >= 3) {
+        return {
+          level: 3,
+          label: `✅ Firme (${count} conf. · 3h)`,
+          shortLabel: `✅ Firme (${count})`,
+          color: '#34d399',
+          bg: 'rgba(16,185,129,0.16)',
+          border: 'rgba(52,211,153,0.5)'
+        };
+      }
+      if (count === 2) {
+        return {
+          level: 2,
+          label: '🟠 Activa (2/3 conf. · 1h)',
+          shortLabel: '🟠 2/3 · 1h',
+          color: '#fb923c',
+          bg: 'rgba(249,115,22,0.16)',
+          border: 'rgba(251,146,60,0.5)'
+        };
+      }
+      return {
+        level: 1,
+        label: '⏳ 1/3 por confirmar (30 min)',
+        shortLabel: '⏳ 1/3 · 30m',
+        color: '#fde047',
+        bg: 'rgba(234,179,8,0.15)',
+        border: 'rgba(250,204,21,0.45)'
+      };
+    }
+
+    function isReportAudibleForCurrentUser(rep) {
+      if (!rep) return false;
+      if (hasValidatedAdminPermission()) return true;
+      if (Boolean(rep.isFixed)) return true;
+      return getConfirmCount(rep) >= 2;
+    }
+
+    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false, confirmCount = 1) {
+      const count = Math.max(1, Number(confirmCount || 1));
+      const isUnvalidated = !isPending && !isFixed && count < 2;
+      const bg = isFixed
+        ? 'linear-gradient(135deg,#fcd34d,#d97706)'
+        : isUnvalidated
+        ? 'rgba(30,41,59,0.92)'
+        : (color || '#ef4444');
+      const borderColor = isPending ? '#fbbf24' : isUnvalidated ? '#eab308' : '#ffffff';
       const badge = isPending
         ? `<span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#020617;border:1.5px solid #020617;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:900;">⏳</span>`
         : isFixed
         ? `<span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#020617;border:1.5px solid #fbbf24;font-size:10px;display:flex;align-items:center;justify-content:center;">👑</span>`
-        : '';
+        : count === 1
+        ? `<span style="position:absolute;top:-6px;right:-6px;padding:1px 4px;border-radius:999px;background:#eab308;color:#020617;border:1.5px solid #020617;font-size:9px;line-height:1.1;font-weight:900;">1/3</span>`
+        : count === 2
+        ? `<span style="position:absolute;top:-6px;right:-6px;padding:1px 4px;border-radius:999px;background:#f97316;color:#020617;border:1.5px solid #020617;font-size:9px;line-height:1.1;font-weight:900;">2/3</span>`
+        : `<span style="position:absolute;top:-6px;right:-6px;padding:1px 4px;border-radius:999px;background:#10b981;color:#020617;border:1.5px solid #020617;font-size:9px;line-height:1.1;font-weight:900;">✓${count}</span>`;
 
       return L.divIcon({
         className: 'custom-pin',
@@ -3737,6 +4004,7 @@
           background:${bg};border:2px solid ${borderColor};
           display:flex;align-items:center;justify-content:center;
           font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,0.55);
+          opacity:${isUnvalidated ? '0.88' : '1'};
         ">${emoji || '📍'}${badge}</div>`,
         iconSize: [38, 38],
         iconAnchor: [19, 19],
@@ -3775,7 +4043,10 @@
 
     function renderAlertsCenterList(reportsList) {
       if (!alertsCenterList) return;
-      const list = Array.isArray(reportsList) ? reportsList : [];
+      const nowMs = Date.now();
+      const list = (Array.isArray(reportsList) ? reportsList : []).filter(
+        (rep) => rep && !isReportExpired(rep, nowMs)
+      );
       if (alertsCenterTitle) {
         alertsCenterTitle.textContent = `📡 Centro de Alertas (${list.length})`;
       }
@@ -3799,9 +4070,11 @@
         const badgeBg = isFixed ? 'linear-gradient(135deg,#fcd34d,#d97706)' : meta.color;
         const prefix = isFixed ? '👑 ' : isPending ? '⏳ ' : '';
         const denials = Number(rep.denials || 0);
-        const confirmations = Number(rep.confirmations || 1);
+        const confirmations = getConfirmCount(rep);
+        const consensusInfo = getConsensusBadgeInfo(rep);
+        const remainingLabel = formatRemainingTimeLabel(rep, nowMs);
         const resolvedTag = userRole === 'admin' && !isFixed && denials >= 3 && denials > confirmations
-          ? ' · ⚖️ Marcado por votos (visible solo Admin)'
+          ? ' · ⚖️ Marcado por votos (solo Admin)'
           : '';
 
         const itemCard = document.createElement('div');
@@ -3816,6 +4089,10 @@
             <div class="alert-list-title">
               <span>${prefix}${escapeHtml(meta.label)}</span>
               <span class="alert-list-time">🕒 ${escapeHtml(formatTimeLabel(timeMs))}</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:3px 0;">
+              <span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              <span style="font-size:10.5px;color:#94a3b8;font-weight:700;">⏱ ${escapeHtml(remainingLabel)}</span>
             </div>
             <div class="alert-list-meta">
               📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}${rawDesc ? ` · ${escapeHtml(rawDesc)}` : ''}${escapeHtml(resolvedTag)}
@@ -3874,7 +4151,10 @@
         }
       });
       markersLayer.clearLayers();
-      lastRenderedReports = Array.isArray(reportsList) ? reportsList : [];
+      const nowMs = Date.now();
+      lastRenderedReports = (Array.isArray(reportsList) ? reportsList : []).filter(
+        (rep) => rep && !isReportExpired(rep, nowMs)
+      );
 
       lastRenderedReports.forEach((rep) => {
         const lat = Number(rep.lat);
@@ -3889,10 +4169,13 @@
         const timeMs = extractTimestampMs(rep);
         const isPending = Boolean(rep.isPending);
         const isFixed = Boolean(rep.isFixed);
+        const confirmations = getConfirmCount(rep);
+        const consensusInfo = getConsensusBadgeInfo(rep);
+        const remainingLabel = formatRemainingTimeLabel(rep, nowMs);
 
         const marker = L.marker([lat, lng], {
-          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed),
-          zIndexOffset: isFixed ? 700 : 400
+          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed, confirmations),
+          zIndexOffset: isFixed ? 700 : confirmations >= 3 ? 520 : confirmations === 2 ? 420 : 280
         });
 
         let mediaHtml = '';
@@ -3906,16 +4189,21 @@
             : `<img src="${escapeHtml(fotoUrl)}" class="popup-media" alt="Foto del reporte" loading="lazy" />`;
         }
 
-        const confirmations = Number(rep.confirmations || 1);
         const denials = Number(rep.denials || 0);
         const existingVote = !isPending ? getUserVoteForReport(rep.id) : null;
-        const voteDisabledAttr = existingVote ? 'disabled' : '';
-        const confirmCls = existingVote === 'confirm' ? 'popup-vote-btn voted' : 'popup-vote-btn';
+        const alreadyConfirmed = !isPending && hasUserConfirmedReport(rep, auth.currentUser);
+        const confirmDisabledAttr = existingVote || alreadyConfirmed ? 'disabled' : '';
+        const denyDisabledAttr = existingVote ? 'disabled' : '';
+        const confirmCls = existingVote === 'confirm' || alreadyConfirmed ? 'popup-vote-btn voted' : 'popup-vote-btn';
         const denyCls = existingVote === 'deny' ? 'popup-vote-btn voted-deny' : 'popup-vote-btn';
-        const confirmLabel = existingVote === 'confirm' ? `✓ Sigue (${confirmations})` : `👍 Sigue (${confirmations})`;
+        const confirmLabel = existingVote === 'confirm' || alreadyConfirmed
+          ? `✓ Confirmado (${confirmations})`
+          : `👍 Sigue (${confirmations})`;
         const denyLabel = existingVote === 'deny' ? `✓ Ya pasó (${denials})` : `✅ Ya pasó (${denials})`;
         const votedHint = existingVote
           ? `<div class="popup-voted-note">✓ Ya registraste tu voto en este reporte</div>`
+          : alreadyConfirmed
+          ? `<div class="popup-voted-note">✓ Ya aportaste tu confirmación a esta alerta</div>`
           : '';
         const adminModerationBar = userRole === 'admin' && !isPending
           ? `<div class="popup-admin-bar">
@@ -3927,8 +4215,8 @@
         const actionsHtml = isPending
           ? `<div class="popup-meta" style="color:#fbbf24;font-weight:700;margin-top:8px;">⏳ Guardado sin internet · Se subirá a Firestore al recuperar señal</div>`
           : `<div class="popup-actions">
-              <button type="button" class="${confirmCls}" ${voteDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">${confirmLabel}</button>
-              <button type="button" class="${denyCls}" ${voteDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">${denyLabel}</button>
+              <button type="button" class="${confirmCls}" ${confirmDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'confirm')">${confirmLabel}</button>
+              <button type="button" class="${denyCls}" ${denyDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">${denyLabel}</button>
             </div>${votedHint}${adminModerationBar}`;
 
         const badgeColor = isFixed ? '#d97706' : meta.color;
@@ -3939,9 +4227,12 @@
             <span class="popup-badge" style="background:${escapeHtml(badgeColor)}">
               ${badgePrefix}${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
             </span>
+            <div style="margin:5px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+              <span style="font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+            </div>
             <div>${escapeHtml(descripcionTexto)}</div>
             ${mediaHtml}
-            <div class="popup-meta">🕒 ${formatTimeLabel(timeMs)} · 📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+            <div class="popup-meta">🕒 ${formatTimeLabel(timeMs)} · ⏱ ${escapeHtml(remainingLabel)} · 📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
             ${actionsHtml}
           </div>
         `);
@@ -4073,6 +4364,36 @@
         : 'No se pudo completar el acceso. Verifica tu conexión e inténtalo de nuevo.';
     }
 
+    const authApodoInput = document.getElementById('authApodoInput');
+    const btnSaveAuthApodo = document.getElementById('btnSaveAuthApodo');
+
+    function loadUserApodoMap() {
+      const parsed = safeReadJson(STORAGE_KEYS.USER_APODO, {});
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    }
+
+    function getUserApodo(user = auth.currentUser) {
+      if (!user || !user.uid) return '';
+      const map = loadUserApodoMap();
+      const val = map[user.uid];
+      return typeof val === 'string' ? val.trim().slice(0, 24) : '';
+    }
+
+    function saveUserApodo(uid, apodoRaw) {
+      if (!uid) return '';
+      const clean = String(apodoRaw || '').trim().slice(0, 24);
+      const map = loadUserApodoMap();
+      if (clean) {
+        map[uid] = clean;
+      } else {
+        delete map[uid];
+      }
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER_APODO, JSON.stringify(map));
+      } catch (e) {}
+      return clean;
+    }
+
     function openAuthModal(defaultMode = 'login') {
       setAuthMode(defaultMode);
       const user = auth.currentUser;
@@ -4081,6 +4402,9 @@
         authSignedOutView.style.display = 'none';
         authSignedInView.style.display = 'block';
         authUserEmailLabel.textContent = user.email || 'Usuario conectado';
+        if (authApodoInput) {
+          authApodoInput.value = getUserApodo(user);
+        }
       } else {
         authModalTitle.textContent = 'Acceso a ANTHI';
         authSignedOutView.style.display = 'block';
@@ -4101,12 +4425,14 @@
     function updateAuthUI(user) {
       if (!btnAuth) return;
       if (user && user.email) {
-        const alias = user.email.split('@')[0].slice(0, 12);
+        const apodo = getUserApodo(user);
+        const alias = (apodo || user.email.split('@')[0]).slice(0, 12);
         btnAuth.textContent = `✓ ${alias}`;
         btnAuth.classList.add('signed-in');
-        btnAuth.title = `Conectado como ${user.email} (clic para ver cuenta o cerrar sesión)`;
+        btnAuth.title = `Conectado como ${apodo ? `${apodo} (${user.email})` : user.email} (clic para ver cuenta, editar apodo o cerrar sesión)`;
       } else if (user) {
-        btnAuth.textContent = '✓ Cuenta';
+        const apodo = getUserApodo(user);
+        btnAuth.textContent = apodo ? `✓ ${apodo.slice(0, 12)}` : '✓ Cuenta';
         btnAuth.classList.add('signed-in');
         btnAuth.title = 'Sesión activa (clic para ver cuenta o cerrar sesión)';
       } else {
@@ -4116,6 +4442,19 @@
       }
     }
 
+    if (btnSaveAuthApodo) {
+      btnSaveAuthApodo.addEventListener('click', () => {
+        const user = auth.currentUser;
+        if (!user) return;
+        const saved = saveUserApodo(user.uid, authApodoInput ? authApodoInput.value : '');
+        updateAuthUI(user);
+        if (typeof updateSuggestionSenderUI === 'function') {
+          updateSuggestionSenderUI();
+        }
+        showToast(saved ? `✅ Indicativo guardado: ${saved}` : 'Indicativo limpiado.');
+      });
+    }
+
     const USERS_COLLECTION = 'users';
     const sessionConflictModal = document.getElementById('sessionConflictModal');
     const btnCloseSessionConflictModal = document.getElementById('btnCloseSessionConflictModal');
@@ -4123,10 +4462,15 @@
     const btnReloginAfterConflict = document.getElementById('btnReloginAfterConflict');
 
     let userSessionUnsubscribe = null;
-    let currentTabSessionId = null;
+    let currentSessionId = null;
     let currentMonitoredUid = null;
     let isClaimingSingleSession = false;
     let isHandlingSessionConflict = false;
+    let sessionListenerArmed = false;
+    let sessionClaimSeq = 0;
+    let activeClaimPromise = null;
+    let activeClaimUid = null;
+    let pendingOfflineRetryUid = null;
 
     function generateDeviceSessionId() {
       let randPart = '';
@@ -4170,14 +4514,15 @@
       } catch (e) {}
     }
 
-    function detachUserSessionListener() {
+    function detachUserSessionListener(bumpSeq = true) {
+      if (bumpSeq) sessionClaimSeq += 1;
+      sessionListenerArmed = false;
       if (typeof userSessionUnsubscribe === 'function') {
         try {
           userSessionUnsubscribe();
         } catch (e) {}
       }
       userSessionUnsubscribe = null;
-      currentMonitoredUid = null;
     }
 
     function closeSessionConflictModal() {
@@ -4207,8 +4552,10 @@
       isHandlingSessionConflict = true;
       const kickedUid = currentMonitoredUid || (auth.currentUser ? auth.currentUser.uid : null);
 
-      detachUserSessionListener();
-      currentTabSessionId = null;
+      detachUserSessionListener(true);
+      currentSessionId = null;
+      currentMonitoredUid = null;
+      pendingOfflineRetryUid = null;
       clearStoredDeviceSession(kickedUid);
 
       if (userRole === 'admin') {
@@ -4229,40 +4576,65 @@
         if (auth.currentUser) {
           await signOut(auth);
         }
-      } catch (e) {}
-
-      if (sessionConflictModal) {
-        sessionConflictModal.classList.add('open');
+      } catch (e) {} finally {
+        if (sessionConflictModal) {
+          sessionConflictModal.classList.add('open');
+        }
+        showToast('🔒 Sesión cerrada: tu cuenta fue abierta en otro dispositivo.');
+        isHandlingSessionConflict = false;
       }
-      showToast('🔒 Sesión cerrada: tu cuenta fue abierta en otro dispositivo.');
-      isHandlingSessionConflict = false;
     }
 
-    function attachUserSessionListener(user, expectedSessionId) {
+    function attachUserSessionListener(user, expectedSessionId, expectedSeq) {
       if (!user || !user.uid || !expectedSessionId) return;
-      if (currentMonitoredUid === user.uid && currentTabSessionId === expectedSessionId && userSessionUnsubscribe) {
-        return;
-      }
+      if (expectedSeq !== sessionClaimSeq || !sessionListenerArmed) return;
 
-      detachUserSessionListener();
+      if (typeof userSessionUnsubscribe === 'function') {
+        try {
+          userSessionUnsubscribe();
+        } catch (e) {}
+        userSessionUnsubscribe = null;
+      }
       currentMonitoredUid = user.uid;
-      currentTabSessionId = expectedSessionId;
+      currentSessionId = expectedSessionId;
 
       const userDocRef = doc(db, USERS_COLLECTION, user.uid);
       userSessionUnsubscribe = onSnapshot(
         userDocRef,
-        (docSnap) => {
-          if (isClaimingSingleSession || isHandlingSessionConflict) return;
+        async (docSnap) => {
+          if (expectedSeq !== sessionClaimSeq) return;
+          if (!sessionListenerArmed || isClaimingSingleSession || isHandlingSessionConflict) return;
           if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
-          if (!docSnap.exists() || docSnap.metadata.hasPendingWrites) return;
+          if (currentSessionId !== expectedSessionId) return;
+          if (!docSnap.exists()) return;
+          // Ignorar snapshots locales en caché o escrituras pendientes del arranque
+          if (docSnap.metadata.hasPendingWrites || docSnap.metadata.fromCache) return;
 
           const data = docSnap.data();
           const remoteSessionId = data && typeof data.activeSessionId === 'string'
             ? data.activeSessionId.trim()
             : '';
 
-          if (remoteSessionId && currentTabSessionId && remoteSessionId !== currentTabSessionId) {
-            handleDuplicateSessionDetected();
+          if (!remoteSessionId || remoteSessionId === expectedSessionId) return;
+
+          // Verificación directa contra servidor para evitar falsos cierres por eventos residuales
+          try {
+            const serverSnap = await withTimeout(getDocFromServer(userDocRef), 8000);
+            if (expectedSeq !== sessionClaimSeq) return;
+            if (!sessionListenerArmed || isClaimingSingleSession || isHandlingSessionConflict) return;
+            if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+            if (currentSessionId !== expectedSessionId) return;
+
+            const confirmedRemote = serverSnap.exists() && typeof serverSnap.data()?.activeSessionId === 'string'
+              ? serverSnap.data().activeSessionId.trim()
+              : '';
+
+            if (confirmedRemote && confirmedRemote !== expectedSessionId) {
+              handleDuplicateSessionDetected();
+            }
+          } catch (verifyErr) {
+            // Si hay fallo de red al confirmar contra servidor, no expulsar falsamente
+            console.warn('No se pudo verificar sesión en servidor:', verifyErr && verifyErr.message ? verifyErr.message : verifyErr);
           }
         },
         (err) => {
@@ -4273,44 +4645,98 @@
       );
     }
 
-    async function claimExclusiveSessionForUser(user) {
-      if (!user || !user.uid) return;
-      isClaimingSingleSession = true;
-      detachUserSessionListener();
+    async function claimExclusiveSessionForUser(user, options = {}) {
+      const { forceNew = false } = options;
+      if (!user || !user.uid || isHandlingSessionConflict) return false;
 
-      const newSessionId = generateDeviceSessionId();
-      currentTabSessionId = newSessionId;
-      saveStoredDeviceSession(user.uid, newSessionId);
-
-      const userPath = `${USERS_COLLECTION}/${user.uid}`;
-      try {
-        await withTimeout(
-          setDoc(doc(db, USERS_COLLECTION, user.uid), {
-            activeSessionId: newSessionId,
-            lastLoginAt: serverTimestamp()
-          }),
-          12000
-        );
-      } catch (err) {
-        console.error('Error registrando sesión única en Firestore:', err);
-        if (err && err.code === 'permission-denied') {
-          handleFirestoreError(err, OperationType.WRITE, userPath);
-        }
-      } finally {
-        isClaimingSingleSession = false;
+      if (activeClaimPromise && activeClaimUid === user.uid) {
+        return await activeClaimPromise;
       }
 
-      if (auth.currentUser && auth.currentUser.uid === user.uid && !isHandlingSessionConflict) {
-        attachUserSessionListener(user, newSessionId);
+      if (
+        !forceNew &&
+        currentMonitoredUid === user.uid &&
+        currentSessionId &&
+        sessionListenerArmed &&
+        typeof userSessionUnsubscribe === 'function'
+      ) {
+        return true;
+      }
+
+      const runClaim = (async () => {
+        const mySeq = ++sessionClaimSeq;
+        sessionListenerArmed = false;
+        isClaimingSingleSession = true;
+        detachUserSessionListener(false);
+
+        const newSessionId = generateDeviceSessionId();
+        currentSessionId = newSessionId;
+        currentMonitoredUid = user.uid;
+        saveStoredDeviceSession(user.uid, newSessionId);
+
+        const userDocRef = doc(db, USERS_COLLECTION, user.uid);
+        let writeConfirmed = false;
+        try {
+          await withTimeout(
+            setDoc(
+              userDocRef,
+              {
+                activeSessionId: newSessionId,
+                lastLoginAt: serverTimestamp()
+              },
+              { merge: true }
+            ),
+            15000
+          );
+          writeConfirmed = true;
+        } catch (err) {
+          console.error('Error registrando sesión única en Firestore:', err);
+          if (err && err.code === 'permission-denied') {
+            try {
+              handleFirestoreError(err, OperationType.WRITE, `${USERS_COLLECTION}/${user.uid}`);
+            } catch (loggedErr) {}
+          }
+        } finally {
+          isClaimingSingleSession = false;
+        }
+
+        if (
+          writeConfirmed &&
+          mySeq === sessionClaimSeq &&
+          auth.currentUser &&
+          auth.currentUser.uid === user.uid &&
+          !isHandlingSessionConflict
+        ) {
+          pendingOfflineRetryUid = null;
+          sessionListenerArmed = true;
+          attachUserSessionListener(user, newSessionId, mySeq);
+          return true;
+        }
+
+        if (!writeConfirmed && auth.currentUser && auth.currentUser.uid === user.uid) {
+          pendingOfflineRetryUid = user.uid;
+        }
+        return false;
+      })();
+
+      activeClaimUid = user.uid;
+      activeClaimPromise = runClaim;
+      try {
+        return await runClaim;
+      } finally {
+        if (activeClaimPromise === runClaim) {
+          activeClaimPromise = null;
+          activeClaimUid = null;
+        }
       }
     }
 
     window.addEventListener('storage', (e) => {
-      if (e.key !== STORAGE_KEYS.ACTIVE_SESSION) return;
+      if (e.storageArea !== localStorage || e.key !== STORAGE_KEYS.ACTIVE_SESSION) return;
       const user = auth.currentUser;
-      if (!user || isClaimingSingleSession || isHandlingSessionConflict) return;
+      if (!user || !sessionListenerArmed || isClaimingSingleSession || isHandlingSessionConflict) return;
       const latest = readStoredDeviceSession(user.uid);
-      if (currentTabSessionId && latest && latest !== currentTabSessionId) {
+      if (currentSessionId && latest && latest !== currentSessionId) {
         handleDuplicateSessionDetected();
       }
     });
@@ -4318,9 +4744,11 @@
     onAuthStateChanged(auth, async (user) => {
       updateAuthUI(user);
       if (!user) {
-        detachUserSessionListener();
+        detachUserSessionListener(true);
         if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
-        currentTabSessionId = null;
+        currentSessionId = null;
+        currentMonitoredUid = null;
+        pendingOfflineRetryUid = null;
         if (userRole === 'admin') {
           userRole = 'citizen';
           try {
@@ -4369,13 +4797,8 @@
         sincronizarReportesPendientes();
       }
 
-      if (!isClaimingSingleSession && !isHandlingSessionConflict) {
-        const existingLocalSessionId = readStoredDeviceSession(user.uid);
-        if (!existingLocalSessionId) {
-          await claimExclusiveSessionForUser(user);
-        } else {
-          attachUserSessionListener(user, existingLocalSessionId);
-        }
+      if (!isHandlingSessionConflict) {
+        await claimExclusiveSessionForUser(user);
       }
 
       if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
@@ -4418,28 +4841,25 @@
 
       btnAuthSubmit.disabled = true;
       btnAuthSubmit.textContent = authMode === 'register' ? 'Creando cuenta...' : 'Ingresando...';
-      isClaimingSingleSession = true;
 
       try {
         let cred;
         if (authMode === 'register') {
           cred = await createUserWithEmailAndPassword(auth, email, password);
-          await claimExclusiveSessionForUser(cred.user);
+          await claimExclusiveSessionForUser(cred.user, { forceNew: false });
           showToast('¡Cuenta creada y sesión única activada en este dispositivo!');
         } else {
           cred = await signInWithEmailAndPassword(auth, email, password);
-          await claimExclusiveSessionForUser(cred.user);
+          await claimExclusiveSessionForUser(cred.user, { forceNew: false });
           showToast('¡Sesión única activada en este dispositivo!');
         }
         closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
       } catch (err) {
-        isClaimingSingleSession = false;
         console.error('Error en Firebase Auth:', err);
         showAuthError(mapFirebaseAuthError(err));
       } finally {
-        isClaimingSingleSession = false;
         btnAuthSubmit.disabled = false;
         btnAuthSubmit.textContent = authMode === 'register' ? 'Crear cuenta' : 'Iniciar Sesión';
       }
@@ -4450,21 +4870,18 @@
       const labelSpan = googleLoginBtn.querySelector('span');
       googleLoginBtn.disabled = true;
       if (labelSpan) labelSpan.textContent = 'Abriendo Google...';
-      isClaimingSingleSession = true;
 
       try {
         const cred = await signInWithPopup(auth, googleProvider);
-        await claimExclusiveSessionForUser(cred.user);
+        await claimExclusiveSessionForUser(cred.user, { forceNew: false });
         closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
         showToast('¡Sesión única con Google activada en este dispositivo!');
       } catch (err) {
-        isClaimingSingleSession = false;
         console.error('Error en acceso rápido con Google:', err);
         showAuthError(mapFirebaseAuthError(err));
       } finally {
-        isClaimingSingleSession = false;
         googleLoginBtn.disabled = false;
         if (labelSpan) labelSpan.textContent = 'Continuar con Google';
       }
@@ -4472,8 +4889,10 @@
 
     btnSignOut.addEventListener('click', async () => {
       const uid = auth.currentUser ? auth.currentUser.uid : null;
-      detachUserSessionListener();
-      currentTabSessionId = null;
+      detachUserSessionListener(true);
+      currentSessionId = null;
+      currentMonitoredUid = null;
+      pendingOfflineRetryUid = null;
       clearStoredDeviceSession(uid);
       try {
         await signOut(auth);
@@ -4562,6 +4981,36 @@
           return;
         }
 
+        let nextConfirmCount = 1;
+        let nextExpiresAt = null;
+        if (voteType === 'confirm') {
+          const reportSnap = await withTimeout(getDoc(reportRef), 10000);
+          if (!reportSnap.exists()) {
+            showToast('Este reporte ya expiró o fue eliminado.');
+            return;
+          }
+          const currentData = reportSnap.data() || {};
+          const confirmedBy = getConfirmedByList(currentData);
+          if (confirmedBy.includes(user.uid)) {
+            recordUserVote(reportId, 'confirm', user.uid);
+            renderCombinedReports(lastServerReports);
+            showToast('Ya confirmaste este reporte anteriormente.');
+            return;
+          }
+          const baseServerCount = Math.max(
+            0,
+            Math.floor(
+              Number(
+                currentData.confirmations != null
+                  ? currentData.confirmations
+                  : (currentData.confirmaciones != null ? currentData.confirmaciones : 1)
+              )
+            )
+          );
+          nextConfirmCount = baseServerCount + 1;
+          nextExpiresAt = Timestamp.fromMillis(Date.now() + getConsensusTtlMs(nextConfirmCount));
+        }
+
         const batch = writeBatch(db);
         batch.set(voteRef, {
           voteType,
@@ -4571,18 +5020,46 @@
         batch.update(
           reportRef,
           voteType === 'confirm'
-            ? { confirmations: increment(1) }
+            ? {
+                confirmations: increment(1),
+                confirmaciones: nextConfirmCount,
+                confirmadoPor: arrayUnion(user.uid),
+                expiresAt: nextExpiresAt
+              }
             : { denials: increment(1) }
         );
         await withTimeout(batch.commit(), 15000);
 
         recordUserVote(reportId, voteType, user.uid);
-        renderCombinedReports(lastServerReports);
-        showToast(
-          voteType === 'confirm'
-            ? '✓ Confirmaste que la novedad sigue activa.'
-            : '✓ Reportaste que la vía ya está despejada.'
-        );
+        if (voteType === 'confirm') {
+          allNonExpiredServerReports = allNonExpiredServerReports.map((item) =>
+            String(item.id) === String(reportId)
+              ? {
+                  ...item,
+                  confirmations: nextConfirmCount,
+                  confirmaciones: nextConfirmCount,
+                  confirmadoPor: Array.from(new Set([...getConfirmedByList(item), user.uid])),
+                  expiresAt: nextExpiresAt,
+                  expiresAtMs: nextExpiresAt.toMillis()
+                }
+              : item
+          );
+          refreshReportsForRole();
+        } else {
+          renderCombinedReports(lastServerReports);
+        }
+
+        if (voteType === 'confirm') {
+          showToast(
+            nextConfirmCount >= 3
+              ? `🛡️ ¡Alerta FIRME (${nextConfirmCount} conf. · vigencia extendida a 3 horas)!`
+              : nextConfirmCount === 2
+              ? '🟠 Confirmación 2/3 sumada (alerta activa 1 hora y sonar habilitado).'
+              : '✓ Confirmaste que la novedad sigue activa.'
+          );
+        } else {
+          showToast('✓ Reportaste que la vía ya está despejada.');
+        }
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') {
           showToast('Inicia sesión con tu correo para votar reportes.');
@@ -4592,7 +5069,7 @@
           const uid = getVoteStorageUid();
           if (uid) recordUserVote(reportId, voteType, uid);
           renderCombinedReports(lastServerReports);
-          showToast('Solo se permite un voto por usuario en cada reporte.');
+          showToast('Solo se permite un voto o confirmación por usuario en cada reporte.');
           return;
         }
         showToast('No se pudo actualizar el voto.');
@@ -4730,7 +5207,6 @@
     };
 
     function startFirestoreListener() {
-      const twelveHoursAgo = Date.now() - 12 * 60 * 60 * 1000;
       const reportesQuery = query(collection(db, COLLECTION_NAME), limit(150));
 
       onSnapshot(
@@ -4742,20 +5218,21 @@
             return;
           }
 
+          const nowMs = Date.now();
           const nonExpiredReports = [];
           snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             const timeMs = extractTimestampMs(data);
-            const isFixed = Boolean(data.isFixed);
-            const isExpired = !isFixed && timeMs < twelveHoursAgo;
-
-            if (!isExpired) {
-              nonExpiredReports.push({ id: docSnap.id, ...data, _sortMs: timeMs });
+            const candidate = { id: docSnap.id, ...data, _sortMs: timeMs };
+            if (!isReportExpired(candidate, nowMs)) {
+              nonExpiredReports.push(candidate);
             }
           });
 
           nonExpiredReports.sort((a, b) => {
             if (Boolean(a.isFixed) !== Boolean(b.isFixed)) return a.isFixed ? -1 : 1;
+            const confDiff = getConfirmCount(b) - getConfirmCount(a);
+            if (confDiff !== 0) return confDiff;
             return b._sortMs - a._sortMs;
           });
 
@@ -4767,6 +5244,9 @@
 
           renderCombinedReports(visibleReports);
           updateNetworkAndSyncStatus();
+          if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
+            window.__anthiRefreshAdminReportsUI();
+          }
           if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
             evaluarAlertasEnRutaActual(false);
           }
@@ -4795,6 +5275,20 @@
         }
       );
     }
+
+    // Limpieza automática local de reportes expirados cada 30s (0 lecturas/escrituras en Firestore)
+    setInterval(() => {
+      const nowMs = Date.now();
+      const beforeAll = allNonExpiredServerReports.length;
+      const beforeVisible = lastServerReports.length;
+      const nextAll = allNonExpiredServerReports.filter((rep) => rep && !isReportExpired(rep, nowMs));
+      if (nextAll.length !== beforeAll || lastServerReports.some((rep) => isReportExpired(rep, nowMs))) {
+        allNonExpiredServerReports = nextAll;
+        refreshReportsForRole();
+      } else if (beforeVisible > 0 && alertsCenterModal && alertsCenterModal.classList.contains('open')) {
+        renderAlertsCenterList(lastRenderedReports);
+      }
+    }, 30000);
 
     // =========================================================================
     // 7. MOTOR DE RASTREO GPS POR SONDEO ACTIVO + FILTRO QUIRÚRGICO ANTI-REBOTES
@@ -5359,14 +5853,17 @@
         const rLng = Number(rep.lng);
         if (!Number.isFinite(rLat) || !Number.isFinite(rLng)) continue;
 
+        if (isReportExpired(rep, nowMs)) continue;
+
         const isFixed = Boolean(rep.isFixed);
         const denials = Number(rep.denials || 0);
-        const confirmations = Number(rep.confirmations || 1);
+        const confirmations = getConfirmCount(rep);
         const isResolved = !isFixed && denials >= 3 && denials > confirmations;
         if (isResolved) continue;
 
+        const hasExplicitExpiration = 'expiresAt' in rep || 'expiresAtMs' in rep || 'confirmaciones' in rep;
         const repTimeMs = extractTimestampMs(rep);
-        if (!isFixed && repTimeMs < minValidMs) continue;
+        if (!isFixed && !hasExplicitExpiration && repTimeMs < minValidMs) continue;
 
         const repTypeKey = normalizeReportTypeForDedupe(rep.tipo || rep.type);
         if (repTypeKey !== targetTypeKey) continue;
@@ -5392,23 +5889,29 @@
       if (!dupMatch) return;
 
       const meta = getTipoMeta(dupMatch.report.tipo || dupMatch.report.type || (selectedCategory && selectedCategory.type));
+      const count = getConfirmCount(dupMatch.report);
+      const alreadyConfirmed = hasUserConfirmedReport(dupMatch.report, auth.currentUser);
       if (isAdminAllowed) {
         duplicateProximityNotice.classList.add('open', 'admin-bypass');
         duplicateProximityNotice.innerHTML = `
-          <div>👑 <strong>Modo Admin:</strong> ya existe un reporte activo de ${escapeHtml(meta.label)} a ${dupMatch.distanceMeters} m, pero tienes permiso para ubicar o ajustar otro punto cercano.</div>
+          <div>👑 <strong>Modo Admin:</strong> ya existe un reporte activo de ${escapeHtml(meta.label)} a ${dupMatch.distanceMeters} m (${count} conf.), pero tienes permiso para ubicar o ajustar otro punto cercano.</div>
         `;
         return;
       }
 
       duplicateProximityNotice.classList.add('open', 'blocked');
       const msgDiv = document.createElement('div');
-      msgDiv.innerHTML = `🚫 <strong>Zona ya reportada (${dupMatch.distanceMeters} m):</strong> ya hay un reporte activo de <strong>${escapeHtml(meta.label)}</strong> en los últimos 300 m. Confírmalo en el mapa en vez de duplicarlo.`;
+      if (alreadyConfirmed || dupMatch.report.isPending) {
+        msgDiv.innerHTML = `🚫 <strong>Zona ya reportada (${dupMatch.distanceMeters} m):</strong> ya existe esta alerta de <strong>${escapeHtml(meta.label)}</strong> (${count} conf.) y ya aportaste tu confirmación.`;
+      } else {
+        msgDiv.innerHTML = `🛡️ <strong>Alerta cercana detectada (${dupMatch.distanceMeters} m):</strong> hay un reporte de <strong>${escapeHtml(meta.label)}</strong> (${count} conf.). Al enviarlo se sumará <strong>+1 confirmación</strong> automática en vez de duplicarse.`;
+      }
       duplicateProximityNotice.appendChild(msgDiv);
 
       const viewBtn = document.createElement('button');
       viewBtn.type = 'button';
       viewBtn.className = 'duplicate-guard-action';
-      viewBtn.textContent = '📍 Ver y confirmar alerta cercana';
+      viewBtn.textContent = '📍 Ver alerta cercana en el mapa';
       viewBtn.addEventListener('click', () => {
         modal.classList.remove('open');
         focusAlertOnMap(dupMatch.report);
@@ -5788,8 +6291,12 @@
       if (!hasKnownRealGps || gpsPermissionDenied) return;
       const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
-      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
-      const allActiveAlerts = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+      const nowMs = Date.now();
+      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId, isPending: true }));
+      const allActiveAlerts = [
+        ...pendingList,
+        ...(Array.isArray(lastServerReports) ? lastServerReports : [])
+      ].filter((rep) => rep && !isReportExpired(rep, nowMs) && isReportAudibleForCurrentUser(rep));
 
       const nearbyHits = [];
       allActiveAlerts.forEach((rep) => {
@@ -5855,7 +6362,6 @@
       const closest = nearbyHits[0];
       const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
       const sig = nearbyHits.map((h) => h.rep.id).join(',');
-      const nowMs = Date.now();
       const isNewSignature = sig !== lastNearbySonarSignature;
       const shouldRepeatSonar = allowRepeatInterval && (nowMs - lastNearbySonarAt >= SONAR_REPEAT_INTERVAL_MS);
 
@@ -6296,8 +6802,12 @@
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const dest = activeRouteDestination;
 
-      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
-      const allActiveAlerts = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+      const nowMs = Date.now();
+      const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId, isPending: true }));
+      const allActiveAlerts = [
+        ...pendingList,
+        ...(Array.isArray(lastServerReports) ? lastServerReports : [])
+      ].filter((rep) => rep && !isReportExpired(rep, nowMs) && isReportAudibleForCurrentUser(rep));
 
       const alertsInProximity = [];
       allActiveAlerts.forEach((rep) => {
@@ -6678,6 +7188,7 @@
         : null;
 
       const localId = `pending_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const nowMs = Date.now();
       const queue = loadPendingReports();
       queue.push({
         localId,
@@ -6686,11 +7197,14 @@
         tipo: selectedCategory.type,
         descripcion: descripcion.slice(0, 400),
         isFixed,
-        createdAtMs: Date.now(),
+        createdAtMs: nowMs,
+        expiresAtMs: nowMs + CONSENSUS_TTL_LEVEL1_MS,
         mediaDataUrl,
         mediaType: mediaDataUrl ? (mediaType || 'image') : null,
         fileName: mediaDataUrl ? fileName : null,
         confirmations: 1,
+        confirmaciones: 1,
+        confirmadoPor: auth.currentUser ? [auth.currentUser.uid] : [],
         denials: 0
       });
       const savedWithMedia = savePendingReports(queue);
@@ -6716,6 +7230,90 @@
       );
     }
 
+    async function confirmNearbyExistingReport(existingRep, user) {
+      if (!existingRep || !existingRep.id || !user || !user.uid) {
+        return { confirmed: false, reason: 'invalid' };
+      }
+      if (existingRep.isPending) {
+        return { confirmed: false, reason: 'pending' };
+      }
+      if (hasUserConfirmedReport(existingRep, user)) {
+        return { confirmed: false, reason: 'already_confirmed' };
+      }
+
+      const reportRef = doc(db, COLLECTION_NAME, existingRep.id);
+      const voteRef = doc(db, COLLECTION_NAME, existingRep.id, 'votos', user.uid);
+
+      const [voteSnap, reportSnap] = await Promise.all([
+        withTimeout(getDoc(voteRef), 10000),
+        withTimeout(getDoc(reportRef), 10000)
+      ]);
+
+      if (voteSnap.exists()) {
+        const prevData = voteSnap.data();
+        const prevType = prevData && prevData.voteType === 'deny' ? 'deny' : 'confirm';
+        recordUserVote(existingRep.id, prevType, user.uid);
+        return { confirmed: false, reason: 'already_confirmed' };
+      }
+      if (!reportSnap.exists()) {
+        return { confirmed: false, reason: 'missing' };
+      }
+
+      const currentData = reportSnap.data() || {};
+      const confirmedBy = getConfirmedByList(currentData);
+      if (confirmedBy.includes(user.uid)) {
+        recordUserVote(existingRep.id, 'confirm', user.uid);
+        return { confirmed: false, reason: 'already_confirmed' };
+      }
+
+      const baseServerCount = Math.max(
+        0,
+        Math.floor(
+          Number(
+            currentData.confirmations != null
+              ? currentData.confirmations
+              : (currentData.confirmaciones != null ? currentData.confirmaciones : 1)
+          )
+        )
+      );
+      const nextConfirmCount = baseServerCount + 1;
+      const nextExpiresAt = Timestamp.fromMillis(Date.now() + getConsensusTtlMs(nextConfirmCount));
+
+      const batch = writeBatch(db);
+      batch.set(voteRef, {
+        voteType: 'confirm',
+        userId: user.uid,
+        createdAt: serverTimestamp()
+      });
+      batch.update(reportRef, {
+        confirmations: increment(1),
+        confirmaciones: nextConfirmCount,
+        confirmadoPor: arrayUnion(user.uid),
+        expiresAt: nextExpiresAt
+      });
+      await withTimeout(batch.commit(), 15000);
+
+      recordUserVote(existingRep.id, 'confirm', user.uid);
+      allNonExpiredServerReports = allNonExpiredServerReports.map((item) =>
+        String(item.id) === String(existingRep.id)
+          ? {
+              ...item,
+              confirmations: nextConfirmCount,
+              confirmaciones: nextConfirmCount,
+              confirmadoPor: Array.from(new Set([...confirmedBy, user.uid])),
+              expiresAt: nextExpiresAt,
+              expiresAtMs: nextExpiresAt.toMillis()
+            }
+          : item
+      );
+      refreshReportsForRole();
+      return {
+        confirmed: true,
+        nextConfirmCount,
+        nextExpiresAt
+      };
+    }
+
     async function sincronizarReportesPendientes() {
       if (isSyncingPending || !navigator.onLine || !auth.currentUser) return;
       const initialQueue = loadPendingReports();
@@ -6729,6 +7327,7 @@
         const currentUser = auth.currentUser;
         const canFix = Boolean(isAuthorizedAdminEmail(currentUser) && currentUser.emailVerified);
         let skippedDuplicates = 0;
+        let autoConfirmedNearby = 0;
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
 
@@ -6739,9 +7338,16 @@
               item.tipo || 'Retén'
             );
             if (dupMatch && String(dupMatch.report.localId || '') !== String(item.localId || '')) {
+              if (!dupMatch.report.isPending && !hasUserConfirmedReport(dupMatch.report, currentUser)) {
+                try {
+                  const res = await confirmNearbyExistingReport(dupMatch.report, currentUser);
+                  if (res.confirmed) autoConfirmedNearby += 1;
+                } catch (confirmErr) {}
+              } else {
+                skippedDuplicates += 1;
+              }
               const remaining = loadPendingReports().filter((q) => q.localId !== item.localId);
               savePendingReports(remaining);
-              skippedDuplicates += 1;
               continue;
             }
           }
@@ -6762,9 +7368,12 @@
               descripcion: String(item.descripcion || '').trim().slice(0, 400),
               isFixed: canFix && Boolean(item.isFixed),
               timestamp: serverTimestamp(),
+              expiresAt: Timestamp.fromMillis(Date.now() + CONSENSUS_TTL_LEVEL1_MS),
               urlFoto,
               mediaType: urlFoto ? (item.mediaType || 'image') : null,
               confirmations: 1,
+              confirmaciones: 1,
+              confirmadoPor: [currentUser.uid],
               denials: 0,
               authorId: currentUser.uid
             }),
@@ -6776,6 +7385,12 @@
           savePendingReports(remaining);
           renderCombinedReports(lastServerReports);
           updateNetworkAndSyncStatus();
+        }
+
+        if (autoConfirmedNearby > 0) {
+          renderCombinedReports(lastServerReports);
+          updateNetworkAndSyncStatus();
+          showToast(`✅ ${autoConfirmedNearby} alerta(s) cercana(s) confirmada(s) automáticamente sin duplicar.`);
         }
 
         if (skippedDuplicates > 0) {
@@ -6841,8 +7456,26 @@
         if (!adminBypass) {
           const nearbyDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
           if (nearbyDup) {
+            if (!nearbyDup.report.isPending && !hasUserConfirmedReport(nearbyDup.report, user)) {
+              btnSubmit.textContent = 'Sumando confirmación a alerta cercana...';
+              const mergeRes = await confirmNearbyExistingReport(nearbyDup.report, user);
+              if (mergeRes.confirmed) {
+                reportForm.reset();
+                resetMediaState();
+                manualReportCoords = null;
+                updateReportLocationUI();
+                modal.classList.remove('open');
+                focusAlertOnMap(nearbyDup.report);
+                showToast(
+                  mergeRes.nextConfirmCount >= 3
+                    ? `🛡️ ¡Alerta cercana FIRME (${mergeRes.nextConfirmCount} confirmaciones · 3h vigentes)!`
+                    : `🟠 Confirmación ${mergeRes.nextConfirmCount}/3 sumada a la alerta cercana (+1 hora · radar activo).`
+                );
+                return;
+              }
+            }
             renderDuplicateGuardBanner(nearbyDup, false);
-            showToast(`⚠️ Ya hay un reporte activo cerca (${nearbyDup.distanceMeters} m). Confírmalo en el mapa en vez de duplicarlo.`);
+            showToast(`⚠️ Ya hay un reporte activo cerca (${nearbyDup.distanceMeters} m) que ya confirmaste.`);
             return;
           }
         }
@@ -6863,9 +7496,12 @@
             descripcion,
             isFixed,
             timestamp: serverTimestamp(),
+            expiresAt: Timestamp.fromMillis(Date.now() + CONSENSUS_TTL_LEVEL1_MS),
             urlFoto,
             mediaType: urlFoto ? 'image' : null,
             confirmations: 1,
+            confirmaciones: 1,
+            confirmadoPor: [user.uid],
             denials: 0,
             authorId: user.uid
           }),
@@ -6886,11 +7522,9 @@
         modal.classList.remove('open');
 
         showToast(
-          coords.isManual
-            ? '¡Reporte publicado en el punto exacto del mapa!'
-            : coords.simulated
-            ? '¡Reporte publicado en Firebase (zona Bucaramanga)!'
-            : '¡Reporte publicado en vivo en Firestore!'
+          isFixed
+            ? '👑 ¡Alerta oficial fija publicada en Firestore!'
+            : '⏳ Alerta publicada (1/3 · 30 min). Se activará el radar masivo al llegar a 2 confirmaciones.'
         );
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') {
@@ -6926,6 +7560,9 @@
       updateNetworkAndSyncStatus();
       showToast('Señal recuperada. Sincronizando reportes con Firestore...');
       sincronizarReportesPendientes();
+      if (auth.currentUser && pendingOfflineRetryUid === auth.currentUser.uid && !isHandlingSessionConflict) {
+        claimExclusiveSessionForUser(auth.currentUser, { forceNew: true });
+      }
       if (!gpsPermissionDenied) {
         gpsPollInFlight = false;
         ejecutarSondeoGps(false);
@@ -6959,7 +7596,10 @@
 
     function updateSuggestionSenderUI() {
       const user = auth.currentUser;
-      const senderName = user && user.email ? user.email : 'Anónimo';
+      const apodo = user ? getUserApodo(user) : '';
+      const senderName = user && user.email
+        ? (apodo ? `${apodo} (${user.email})` : user.email)
+        : 'Anónimo';
       if (suggestionSenderBadge) {
         suggestionSenderBadge.textContent = `👤 Enviando como: ${senderName}`;
       }
@@ -7008,7 +7648,10 @@
         }
 
         const currentUser = auth.currentUser;
-        const usuario = currentUser && currentUser.email ? currentUser.email.slice(0, 200) : 'Anónimo';
+        const apodo = currentUser ? getUserApodo(currentUser) : '';
+        const usuario = currentUser && currentUser.email
+          ? (apodo ? `${apodo} · ${currentUser.email}` : currentUser.email).slice(0, 200)
+          : 'Anónimo';
         const uid = currentUser && currentUser.uid ? currentUser.uid : 'anonimo';
 
         btnSubmitSuggestion.disabled = true;
@@ -7292,13 +7935,86 @@
           console.warn('Error escuchando Buzón Admin:', err && err.message ? err.message : err);
           if (err && err.code === 'permission-denied') {
             if (adminBuzonStatsText) {
-              adminBuzonStatsText.textContent = 'Requiere correo administrador verificado';
+              adminBuzonStatsText.textContent = 'Requiere correo administrador verificado (Google o verificación)';
             }
-            handleFirestoreError(err, OperationType.LIST, SUGGESTIONS_COLLECTION);
+            try {
+              handleFirestoreError(err, OperationType.LIST, SUGGESTIONS_COLLECTION);
+            } catch (loggedErr) {}
           }
         }
       );
     }
+
+    const adminReportsSummaryStats = document.getElementById('adminReportsSummaryStats');
+    const adminQuickReportsList = document.getElementById('adminQuickReportsList');
+
+    window.__anthiRefreshAdminReportsUI = function renderAdminControlReportsModeration() {
+      if (!adminReportsSummaryStats || !adminQuickReportsList) return;
+      const nowMs = Date.now();
+      const activeList = (Array.isArray(allNonExpiredServerReports) ? allNonExpiredServerReports : [])
+        .filter((rep) => rep && !isReportExpired(rep, nowMs));
+
+      const pendingConf = activeList.filter((r) => !r.isFixed && getConfirmCount(r) === 1).length;
+      const lvl2Conf = activeList.filter((r) => !r.isFixed && getConfirmCount(r) === 2).length;
+      const firmOrFixed = activeList.filter((r) => Boolean(r.isFixed) || getConfirmCount(r) >= 3).length;
+
+      adminReportsSummaryStats.innerHTML = `
+        Activos: <strong>${activeList.length}</strong> · ⏳ 1/3: <strong style="color:#fde047;">${pendingConf}</strong> · 🟠 2/3: <strong style="color:#fb923c;">${lvl2Conf}</strong> · ✅ Firme/Fija: <strong style="color:#34d399;">${firmOrFixed}</strong>
+      `;
+      adminQuickReportsList.innerHTML = '';
+
+      if (activeList.length === 0) {
+        adminQuickReportsList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">No hay alertas vigentes en Firestore.</div>';
+        return;
+      }
+
+      activeList.slice(0, 25).forEach((rep) => {
+        const meta = getTipoMeta(rep.tipo || rep.type || 'Novedad');
+        const cBadge = getConsensusBadgeInfo(rep);
+        const remText = formatRemainingTimeLabel(rep, nowMs);
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:9px;background:rgba(15,23,42,0.85);border:1px solid rgba(51,65,85,0.75);';
+
+        const info = document.createElement('div');
+        info.style.cssText = 'min-width:0;flex:1;';
+        info.innerHTML = `
+          <div style="font-size:11.5px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
+          </div>
+          <div style="font-size:10px;color:${escapeHtml(cBadge.color)};font-weight:700;">
+            ${escapeHtml(cBadge.shortLabel)} · ${escapeHtml(remText)}
+          </div>
+        `;
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:4px;flex-shrink:0;';
+
+        const goBtn = document.createElement('button');
+        goBtn.type = 'button';
+        goBtn.textContent = '📍';
+        goBtn.title = 'Ubicar en mapa';
+        goBtn.style.cssText = 'border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        goBtn.addEventListener('click', () => {
+          if (adminPanelModal) adminPanelModal.classList.remove('open');
+          focusAlertOnMap(rep);
+        });
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.textContent = '🗑️';
+        delBtn.title = 'Eliminar reporte';
+        delBtn.style.cssText = 'border:1px solid rgba(239,68,68,0.55);background:rgba(127,29,29,0.55);color:#fecaca;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        delBtn.addEventListener('click', () => {
+          window.deleteReportFromFirestore(rep.id);
+        });
+
+        actions.appendChild(goBtn);
+        actions.appendChild(delBtn);
+        row.appendChild(info);
+        row.appendChild(actions);
+        adminQuickReportsList.appendChild(row);
+      });
+    };
 
     function setAdminPanelTab(tabName = 'buzon') {
       activeAdminPanelTab = tabName === 'control' ? 'control' : 'buzon';
@@ -7306,6 +8022,9 @@
       if (tabAdminControl) tabAdminControl.classList.toggle('active', activeAdminPanelTab === 'control');
       if (adminBuzonSection) adminBuzonSection.style.display = activeAdminPanelTab === 'buzon' ? '' : 'none';
       if (adminControlSection) adminControlSection.style.display = activeAdminPanelTab === 'control' ? '' : 'none';
+      if (activeAdminPanelTab === 'control' && typeof window.__anthiRefreshAdminReportsUI === 'function') {
+        window.__anthiRefreshAdminReportsUI();
+      }
     }
 
     function openAdminPanelModal(initialTab = 'buzon') {
@@ -7319,6 +8038,9 @@
       setAdminPanelTab(initialTab);
       syncAdminBuzonSubscription();
       renderAdminBuzonList();
+      if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
+        window.__anthiRefreshAdminReportsUI();
+      }
       if (adminPanelModal) adminPanelModal.classList.add('open');
     }
 
@@ -7527,38 +8249,66 @@
       return `${yy}-${mm}-${dd}`;
     }
 
-    // Cálculo de dígitos de Pico y Placa AMB (Bucaramanga, Floridablanca, Girón y Piedecuesta)
-    function calcularPicoYPlacaAMB(tipoVehiculo, placaStr, now = new Date()) {
+    function loadPicoCalibration() {
+      const saved = safeReadJson(STORAGE_KEYS.PICO_CALIBRATION, null);
+      const parseOffset = (v) => {
+        const n = Number(v);
+        return Number.isInteger(n) ? ((n % 5) + 5) % 5 : 0;
+      };
+      return {
+        particularOffset: saved ? parseOffset(saved.particularOffset) : 0,
+        taxiOffset: saved ? parseOffset(saved.taxiOffset) : 0
+      };
+    }
+
+    function savePicoCalibration(cal) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.PICO_CALIBRATION, JSON.stringify(cal));
+      } catch (e) {}
+    }
+
+    // Cálculo de dígitos de Pico y Placa AMB (Tablas separadas: Taxi vs Particular/Camioneta/Moto + calibración manual)
+    function calcularPicoYPlacaAMB(tipoVehiculo, placaStr, now = new Date(), ignoreManualOffset = false) {
       const col = getColombiaClockParts(now);
       const isTaxi = tipoVehiculo === 'taxi';
       const lastDigit = extractLastPlateDigit(placaStr);
+      const calibration = loadPicoCalibration();
+      const manualOffset = ignoreManualOffset
+        ? 0
+        : (isTaxi ? calibration.taxiOffset : calibration.particularOffset);
       let digits = [];
       let enHorario = false;
+      let basePairIdx = null;
+      let pairIdx = null;
 
       if (isTaxi) {
+        // Servicio Público (Taxi AMB): Jueves 2026-11-19 = 9 y 0, Viernes 2026-11-20 = 1 y 2;
+        // avanza dos dígitos (+1 par) cada semana según resolución de Tránsito AMB (L-V, 7:00 a.m. a 9:00 p.m.)
         if (col.dow >= 1 && col.dow <= 5) {
           const dayNum = Math.floor(Date.UTC(col.year, col.month - 1, col.day) / 86400000);
-          const dayNumMon0 = Math.floor(Date.UTC(2026, 0, 5) / 86400000);
-          const delta = dayNum - dayNumMon0;
-          const fullWeeks = Math.floor(delta / 7);
-          const remDow = ((delta % 7) + 7) % 7;
-          const bizDays = fullWeeks * 5 + Math.min(remDow, 4);
-          const pairIdx = ((bizDays % 5) + 5) % 5;
+          const mondayOfThisWeek = dayNum - (col.dow - 1);
+          const refMonDayNum = Math.floor(Date.UTC(2026, 10, 16) / 86400000); // Lunes 2026-11-16 = 3 y 4 (pairIdx 1)
+          const weeksSinceRef = Math.round((mondayOfThisWeek - refMonDayNum) / 7);
+          basePairIdx = (((1 + weeksSinceRef + (col.dow - 1)) % 5) + 5) % 5;
+          pairIdx = (((basePairIdx + manualOffset) % 5) + 5) % 5;
           digits = PICO_PAIRS_AMB[pairIdx];
           enHorario = col.minutesOfDay >= 420 && col.minutesOfDay < 1260;
         }
       } else {
+        // Particular / Camioneta / Moto AMB: Lunes 5-6, Martes 7-8, Miércoles 9-0, Jueves 1-2, Viernes 3-4 (+ sábados)
         if (col.dow >= 1 && col.dow <= 5) {
           const quarterAbs = (col.year - 2026) * 4 + Math.floor((col.month - 1) / 3);
-          const quarterShift = quarterAbs - 3;
-          const pairIdx = (((2 + quarterShift + (col.dow - 1)) % 5) + 5) % 5;
+          const quarterShift = quarterAbs - 3; // Q4 2026 = 0
+          basePairIdx = (((2 + quarterShift + (col.dow - 1)) % 5) + 5) % 5;
+          pairIdx = (((basePairIdx + manualOffset) % 5) + 5) % 5;
           digits = PICO_PAIRS_AMB[pairIdx];
           enHorario = col.minutesOfDay >= 360 && col.minutesOfDay < 1200;
         } else if (col.dow === 6) {
           const dayNum = Math.floor(Date.UTC(col.year, col.month - 1, col.day) / 86400000);
           const dayNumSat0 = Math.floor(Date.UTC(2026, 0, 3) / 86400000);
           const weeksSince = Math.floor((dayNum - dayNumSat0) / 7);
-          const pairIdx = ((weeksSince % 5) + 5) % 5;
+          basePairIdx = ((weeksSince % 5) + 5) % 5;
+          pairIdx = (((basePairIdx + manualOffset) % 5) + 5) % 5;
           digits = PICO_PAIRS_AMB[pairIdx];
           enHorario = col.minutesOfDay >= 540 && col.minutesOfDay < 780;
         }
@@ -7571,6 +8321,9 @@
         isTaxi,
         digits,
         digitsLabel: digits.length === 2 ? `${digits[0]} y ${digits[1]}` : 'Libre',
+        basePairIdx,
+        pairIdx,
+        manualOffset,
         enHorario,
         lastDigit,
         appliesToPlateToday,
@@ -7580,6 +8333,8 @@
 
     let hojaVidaState = loadHojaVidaLocal();
     let isPicoHudCollapsed = safeReadJson(STORAGE_KEYS.PICO_HUD_COLLAPSED, false) === true;
+    let isPicoCalibratorOpen = false;
+    let isHvPicoCalibratorOpen = false;
     let hvReminderMode = 'tiempo';
     let hvToastNotifiedOnce = false;
 
@@ -7589,6 +8344,11 @@
     const hudPicoTitleEl = document.getElementById('hudPicoTitle');
     const btnTogglePicoHud = document.getElementById('btnTogglePicoHud');
     const hudPicoDigitsEl = document.getElementById('hudPicoDigits');
+    const btnOpenPicoCalibrator = document.getElementById('btnOpenPicoCalibrator');
+    const hudPicoCalibratorEl = document.getElementById('hudPicoCalibrator');
+    const hudPicoCalTitleEl = document.getElementById('hudPicoCalTitle');
+    const hudPicoCalGridEl = document.getElementById('hudPicoCalGrid');
+    const btnResetPicoCalibration = document.getElementById('btnResetPicoCalibration');
 
     const btnOpenHojaVida = document.getElementById('btnOpenHojaVida');
     const hojaVidaModal = document.getElementById('hojaVidaModal');
@@ -7746,6 +8506,40 @@
       } catch (e) {}
     }
 
+    function calibratePicoTodayPair(targetPairIdx) {
+      const baseInfo = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa, new Date(), true);
+      if (baseInfo.basePairIdx === null) {
+        showToast('Hoy es día libre sin restricción para este tipo de vehículo.');
+        return;
+      }
+      const nextOffset = (((Number(targetPairIdx) - baseInfo.basePairIdx) % 5) + 5) % 5;
+      const cal = loadPicoCalibration();
+      if (baseInfo.isTaxi) {
+        cal.taxiOffset = nextOffset;
+      } else {
+        cal.particularOffset = nextOffset;
+      }
+      savePicoCalibration(cal);
+      isPicoCalibratorOpen = false;
+      renderPicoYPlacaUI();
+      const pair = PICO_PAIRS_AMB[Number(targetPairIdx)] || [1, 2];
+      showToast(`✅ Pico y Placa (${baseInfo.isTaxi ? 'Taxi' : 'Particular'}) calibrado hoy a ${pair[0]} y ${pair[1]}.`);
+    }
+
+    function resetPicoCalibration() {
+      const isTaxi = hojaVidaState.tipoVehiculo === 'taxi';
+      const cal = loadPicoCalibration();
+      if (isTaxi) {
+        cal.taxiOffset = 0;
+      } else {
+        cal.particularOffset = 0;
+      }
+      savePicoCalibration(cal);
+      isPicoCalibratorOpen = false;
+      renderPicoYPlacaUI();
+      showToast(`🔄 Rotación automática AMB restaurada (${isTaxi ? 'Taxi' : 'Particular/Moto/Camioneta'}).`);
+    }
+
     function applyPicoHudCollapsedUI(collapsed) {
       if (gpsHudEl) {
         gpsHudEl.classList.toggle('pico-collapsed', collapsed);
@@ -7757,6 +8551,9 @@
       if (btnTogglePicoHud) {
         btnTogglePicoHud.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
         btnTogglePicoHud.textContent = collapsed ? '▾' : '▴';
+      }
+      if (collapsed) {
+        isPicoCalibratorOpen = false;
       }
     }
 
@@ -7806,21 +8603,62 @@
         }
       }
 
+      if (btnOpenPicoCalibrator) {
+        btnOpenPicoCalibrator.classList.toggle('active', isPicoCalibratorOpen || info.manualOffset !== 0);
+        btnOpenPicoCalibrator.setAttribute('aria-expanded', isPicoCalibratorOpen ? 'true' : 'false');
+      }
+      if (hudPicoCalibratorEl) {
+        const showCal = !isPicoHudCollapsed && isPicoCalibratorOpen;
+        hudPicoCalibratorEl.style.display = showCal ? 'flex' : 'none';
+        if (hudPicoCalTitleEl) {
+          hudPicoCalTitleEl.textContent = info.digits.length === 0
+            ? `Sin restricción hoy (${tipoLabel})`
+            : `Sincronizar hoy (${tipoLabel})${info.manualOffset ? ' · Manual' : ''}:`;
+        }
+        if (hudPicoCalGridEl) {
+          hudPicoCalGridEl.querySelectorAll('.pico-cal-btn[data-pico-pair-idx]').forEach((btn) => {
+            const idx = Number(btn.getAttribute('data-pico-pair-idx'));
+            btn.classList.toggle('active', info.pairIdx === idx);
+            btn.disabled = info.digits.length === 0;
+          });
+        }
+      }
+
       if (hvPicoResumenCard) {
         hvPicoResumenCard.classList.remove('restricted', 'free');
+        const reglaTexto = info.isTaxi
+          ? 'Tabla Servicio Público (Taxi AMB · rotación semanal +2 dígitos)'
+          : 'Tabla Particular / Camioneta / Moto AMB (L-V 5-6, 7-8, 9-0, 1-2, 3-4 + sábados)';
+        let mainSummaryHtml = '';
         if (info.digits.length === 0) {
           hvPicoResumenCard.classList.add('free');
-          hvPicoResumenCard.innerHTML = `<strong>✅ PICO Y PLACA (${escapeHtml(tipoLabel)}):</strong> Libre hoy.`;
+          mainSummaryHtml = `<strong>✅ PICO Y PLACA (${escapeHtml(tipoLabel)}):</strong> Libre hoy.`;
         } else if (info.appliesToPlateToday) {
           hvPicoResumenCard.classList.add('restricted');
-          hvPicoResumenCard.innerHTML = `<strong>${info.restrictedNow ? '🚫' : '⚠️'} Tu placa terminada en ${info.lastDigit} tiene Pico y Placa hoy (${escapeHtml(info.digitsLabel)})</strong> en el área metropolitana.`;
+          mainSummaryHtml = `<strong>${info.restrictedNow ? '🚫' : '⚠️'} Tu placa terminada en ${info.lastDigit} tiene Pico y Placa hoy (${escapeHtml(info.digitsLabel)})</strong> en el área metropolitana.`;
         } else {
           hvPicoResumenCard.classList.add('free');
           const plateInfo = info.lastDigit !== null
             ? `Tu dígito <strong>${info.lastDigit}</strong> circula libre hoy.`
             : 'Ingresa tu placa abajo para validar tu dígito.';
-          hvPicoResumenCard.innerHTML = `<strong>🚘 PICO Y PLACA hoy (${escapeHtml(tipoLabel)}): ${escapeHtml(info.digitsLabel)}</strong><br/>${plateInfo}`;
+          mainSummaryHtml = `<strong>🚘 PICO Y PLACA hoy (${escapeHtml(tipoLabel)}): ${escapeHtml(info.digitsLabel)}</strong><br/>${plateInfo}`;
         }
+
+        const calButtonsHtml = isHvPicoCalibratorOpen && info.digits.length === 2
+          ? `<div class="hv-pico-cal-bar">
+              ${PICO_PAIRS_AMB.map((p, idx) => `<button type="button" class="pico-cal-btn${info.pairIdx === idx ? ' active' : ''}" data-hv-pico-pair="${idx}">${p[0]}-${p[1]}</button>`).join('')}
+              <button type="button" class="pico-cal-btn auto" data-hv-pico-reset="1">Auto</button>
+            </div>`
+          : '';
+
+        hvPicoResumenCard.innerHTML = `
+          ${mainSummaryHtml}
+          <div style="font-size:10.5px;color:#cbd5e1;margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+            <span>${escapeHtml(reglaTexto)}${info.manualOffset ? ' · Ajustado manualmente' : ''}</span>
+            ${info.digits.length === 2 ? `<button type="button" class="pico-cal-btn" data-hv-toggle-cal="1">⚙️ Calibrar hoy</button>` : ''}
+          </div>
+          ${calButtonsHtml}
+        `;
       }
     }
 
@@ -8065,6 +8903,50 @@
       btnTogglePicoHud.addEventListener('click', (e) => {
         e.stopPropagation();
         togglePicoHudCollapsed();
+      });
+    }
+
+    if (btnOpenPicoCalibrator) {
+      btnOpenPicoCalibrator.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isPicoCalibratorOpen = !isPicoCalibratorOpen;
+        renderPicoYPlacaUI();
+      });
+    }
+
+    if (hudPicoCalGridEl) {
+      hudPicoCalGridEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pairBtn = e.target.closest('[data-pico-pair-idx]');
+        if (pairBtn) {
+          calibratePicoTodayPair(Number(pairBtn.getAttribute('data-pico-pair-idx')));
+          return;
+        }
+        if (e.target.closest('#btnResetPicoCalibration')) {
+          resetPicoCalibration();
+        }
+      });
+    }
+
+    if (hvPicoResumenCard) {
+      hvPicoResumenCard.addEventListener('click', (e) => {
+        if (e.target.closest('[data-hv-toggle-cal]')) {
+          isHvPicoCalibratorOpen = !isHvPicoCalibratorOpen;
+          renderPicoYPlacaUI();
+          return;
+        }
+        const pairBtn = e.target.closest('[data-hv-pico-pair]');
+        if (pairBtn) {
+          calibratePicoTodayPair(Number(pairBtn.getAttribute('data-hv-pico-pair')));
+          isHvPicoCalibratorOpen = false;
+          renderPicoYPlacaUI();
+          return;
+        }
+        if (e.target.closest('[data-hv-pico-reset]')) {
+          resetPicoCalibration();
+          isHvPicoCalibratorOpen = false;
+          renderPicoYPlacaUI();
+        }
       });
     }
 
