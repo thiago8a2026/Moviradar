@@ -833,13 +833,15 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
     }
 
-    .map-btn.vip-btn.vip-fundador {
+    .map-btn.vip-btn.vip-fundador,
+    .map-btn.vip-btn.vip-active {
       border-color: rgba(251, 191, 36, 0.9);
       background: rgba(120, 53, 15, 0.48);
       color: #fcd34d;
     }
 
-    .map-btn.vip-btn.vip-cepos {
+    .map-btn.vip-btn.vip-cepos,
+    .map-btn.vip-btn.vip-active.vip-cepos {
       border-color: rgba(192, 132, 252, 0.9);
       background: rgba(88, 28, 135, 0.48);
       color: #e9d5ff;
@@ -1021,7 +1023,7 @@
       color: #67e8f9;
     }
 
-    /* Panel inferior flotante: acciones rápidas + botón principal */
+    /* Panel inferior flotante: acceso rápido admin (solo admins) + acciones rápidas + botón principal */
     .bottom-panel {
       position: fixed;
       bottom: 14px;
@@ -1033,6 +1035,96 @@
       align-items: center;
       gap: 8px;
       pointer-events: none;
+    }
+
+    .admin-quick-bar {
+      display: none;
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-quick-bar.visible {
+      display: flex;
+    }
+
+    .btn-admin-reaction-quick {
+      width: 100%;
+      min-height: 40px;
+      padding: 6px 12px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(34, 211, 238, 0.78);
+      background: linear-gradient(135deg, rgba(8, 47, 73, 0.96), rgba(15, 23, 42, 0.96));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #a5f3fc;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.25);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-admin-reaction-quick:active {
+      transform: scale(0.97);
+    }
+
+    .admin-rp-count-badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(6, 182, 212, 0.24);
+      border: 1px solid rgba(34, 211, 238, 0.72);
+      color: #ecfeff;
+      font-size: 10.5px;
+      font-weight: 900;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .reaction-map-mode-bar {
+      position: fixed;
+      bottom: 14px;
+      left: 12px;
+      right: 12px;
+      max-width: 460px;
+      margin: 0 auto;
+      z-index: 1060;
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(34, 211, 238, 0.78);
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.72);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reaction-map-mode-bar.visible {
+      display: flex;
+    }
+
+    @keyframes anthiCeposMotion {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+        box-shadow: 0 4px 14px rgba(168, 85, 247, 0.55);
+      }
+      50% {
+        transform: translateY(-2.5px) scale(1.04);
+        box-shadow: 0 8px 20px rgba(192, 132, 252, 0.8);
+      }
+    }
+
+    .cepos-marker-motion {
+      animation: anthiCeposMotion 2.4s ease-in-out infinite;
     }
 
     .quick-actions-bar {
@@ -2334,12 +2426,14 @@
       color: #e2e8f0;
     }
 
-    .vip-status-card.fundador {
+    .vip-status-card.fundador,
+    .vip-status-card.is-vip {
       border-color: rgba(251, 191, 36, 0.72);
       background: rgba(120, 53, 15, 0.25);
     }
 
-    .vip-status-card.rastreo_cepos {
+    .vip-status-card.rastreo_cepos,
+    .vip-status-card.is-vip.is-cepos {
       border-color: rgba(192, 132, 252, 0.72);
       background: rgba(88, 28, 135, 0.28);
     }
@@ -2462,6 +2556,79 @@
       </div>
     </div>
 
+    <!-- Modal dedicado de Puntos de Reacción Inmediata (Solo Administradores autorizados) -->
+    <div class="modal-backdrop" id="reactionPointsModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>⚡ Puntos de reacción inmediata</h2>
+          <button type="button" class="btn-close" id="btnCloseReactionPointsModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.42;margin-bottom:10px;">
+          Coloca zonas en Bucaramanga donde <strong>cualquier usuario</strong> que reporte dentro del radio active la alerta <strong>FIRME de inmediato</strong> (3 h, sin esperar confirmaciones).
+        </p>
+
+        <button type="button" class="btn-submit" id="btnStartReactionMapMode" style="min-height:42px;font-size:12.5px;margin-bottom:10px;">
+          🎯 Tocar mapa para colocar múltiples puntos
+        </button>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:8px 10px;border-radius:10px;background:rgba(2,6,23,0.72);border:1px solid rgba(6,182,212,0.35);">
+          <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#a5f3fc;font-weight:700;cursor:pointer;">
+            <input type="checkbox" id="chkModalShowReactionZones" checked />
+            <span>👁️ Ver zonas en el mapa</span>
+          </label>
+          <span id="rpModalCountLabel" style="font-size:11px;color:#67e8f9;font-weight:800;">0 activos</span>
+        </div>
+
+        <form id="rpModalForm" style="display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:12px;background:rgba(2,6,23,0.75);border:1px solid rgba(51,65,85,0.85);margin-bottom:12px;">
+          <div style="font-size:11.5px;font-weight:800;color:#67e8f9;" id="rpModalFormTitle">➕ Nuevo punto desde GPS o mapa</div>
+          <input
+            type="text"
+            id="rpModalNameInput"
+            class="text-input"
+            maxlength="60"
+            minlength="2"
+            required
+            style="margin-bottom:0;"
+            placeholder="Nombre / referencia (ej: Puerta del Sol)"
+          />
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <label for="rpModalRadiusInput" style="font-size:11px;color:#cbd5e1;font-weight:700;white-space:nowrap;">Radio (m):</label>
+            <input
+              type="number"
+              id="rpModalRadiusInput"
+              class="text-input"
+              min="50"
+              max="2000"
+              step="25"
+              value="150"
+              required
+              style="margin-bottom:0;width:80px;padding:6px 8px;"
+            />
+            <button type="button" class="pico-cal-btn" data-rp-modal-radius="100">100m</button>
+            <button type="button" class="pico-cal-btn active" data-rp-modal-radius="150">150m</button>
+            <button type="button" class="pico-cal-btn" data-rp-modal-radius="200">200m</button>
+            <button type="button" class="pico-cal-btn" data-rp-modal-radius="300">300m</button>
+            <button type="button" class="pico-cal-btn" data-rp-modal-radius="500">500m</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+            <span id="rpModalCoordsBadge" style="font-size:10.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#cbd5e1;">Ubicación: GPS / centro mapa</span>
+            <button type="button" class="alert-admin-btn edit" id="btnRpModalUseGps" style="padding:5px 8px;font-size:10.5px;">📍 Usar mi GPS</button>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button type="submit" class="btn-submit" id="btnRpModalSave" style="min-height:38px;font-size:12px;flex:1;">
+              ⚡ Guardar punto
+            </button>
+            <button type="button" class="btn-logout" id="btnRpModalCancelEdit" style="display:none;width:auto;min-height:38px;padding:0 12px;font-size:11.5px;">
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        <div id="rpModalList" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
     <!-- Banner cuando el usuario está eligiendo un destino en el mapa -->
     <div class="map-pick-banner" id="mapPickBanner">
       <span>🎯 Toca cualquier lugar en el mapa para fijar tu destino</span>
@@ -2484,6 +2651,54 @@
       <div class="manual-pin-actions">
         <button type="button" class="btn-submit" id="btnConfirmManualPin" style="min-height:42px;font-size:13px;">✅ Confirmar este punto</button>
         <button type="button" class="btn-close" id="btnCancelManualPin" style="width:auto;padding:0 14px;height:42px;font-size:12px;font-weight:700;">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Barra flotante interactiva (Solo Admin) para colocar múltiples Puntos de Reacción Inmediata tocando el mapa -->
+    <div class="reaction-map-mode-bar" id="reactionMapModeBar" aria-hidden="true">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-size:12px;font-weight:800;color:#a5f3fc;">🎯 Toca el mapa para ubicar Puntos de Reacción</span>
+        <span id="rpMapCoordsLabel" style="font-size:10.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#67e8f9;">Sin punto tocado</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input
+          type="text"
+          id="rpMapNameInput"
+          class="text-input"
+          maxlength="60"
+          style="margin-bottom:0;flex:1;padding:7px 10px;font-size:12px;"
+          placeholder="Nombre / referencia (ej: Glorieta Estadio)"
+        />
+        <input
+          type="number"
+          id="rpMapRadiusInput"
+          class="text-input"
+          min="50"
+          max="2000"
+          step="25"
+          value="150"
+          style="margin-bottom:0;width:72px;padding:7px 8px;font-size:12px;text-align:center;"
+          title="Radio en metros"
+        />
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+        <button type="button" class="pico-cal-btn" data-rp-map-radius="100">100m</button>
+        <button type="button" class="pico-cal-btn active" data-rp-map-radius="150">150m</button>
+        <button type="button" class="pico-cal-btn" data-rp-map-radius="200">200m</button>
+        <button type="button" class="pico-cal-btn" data-rp-map-radius="300">300m</button>
+        <button type="button" class="pico-cal-btn" data-rp-map-radius="500">500m</button>
+        <button type="button" class="alert-admin-btn edit" id="btnRpMapUseGps" style="margin-left:auto;padding:4px 8px;font-size:10.5px;">📍 Mi GPS</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button type="button" class="btn-submit" id="btnRpMapSavePoint" style="min-height:38px;font-size:12px;flex:1;">
+          ⚡ Guardar punto en mapa
+        </button>
+        <button type="button" class="alert-admin-btn edit" id="btnRpMapOpenList" style="min-height:38px;padding:0 10px;font-size:11px;">
+          📋 Lista
+        </button>
+        <button type="button" class="btn-close" id="btnRpMapExit" style="width:auto;padding:0 12px;height:38px;font-size:11.5px;font-weight:800;">
+          ✓ Salir
+        </button>
       </div>
     </div>
 
@@ -2511,6 +2726,13 @@
       <div class="route-alert-banner" id="routeAlertBanner">
         <div id="routeAlertBannerText" style="flex:1;font-weight:700;cursor:pointer;"></div>
         <button type="button" class="route-banner-close" id="btnClearRouteBanner" title="Quitar ruta">✕</button>
+      </div>
+
+      <div class="admin-quick-bar" id="adminQuickActionBar" aria-hidden="true">
+        <button type="button" class="btn-admin-reaction-quick" id="adminReactionQuickBtn" title="Crear, ver y administrar Puntos de Reacción Inmediata en el mapa">
+          <span>⚡ Puntos de reacción inmediata</span>
+          <span class="admin-rp-count-badge" id="adminReactionQuickCount">0</span>
+        </button>
       </div>
 
       <div class="quick-actions-bar">
@@ -3080,6 +3302,9 @@
             <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
               Los reportes enviados dentro de estas zonas quedan activos y FIRMES en primera opción de inmediato (sin espera de confirmaciones ni bloqueo de 300 m).
             </p>
+            <button type="button" class="alert-admin-btn edit" id="btnLaunchMapReactionModeFromAdmin" style="width:100%;padding:7px 10px;font-size:11.5px;margin-bottom:8px;">
+              🎯 Colocar varios puntos tocando el mapa
+            </button>
             <form id="reactionPointForm" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
               <input
                 type="text"
@@ -3100,12 +3325,13 @@
                   min="50"
                   max="2000"
                   step="25"
-                  value="200"
+                  value="150"
                   required
                   style="margin-bottom:0;width:82px;padding:7px 10px;"
                 />
                 <button type="button" class="pico-cal-btn" data-rp-radius="100">100m</button>
-                <button type="button" class="pico-cal-btn active" data-rp-radius="200">200m</button>
+                <button type="button" class="pico-cal-btn active" data-rp-radius="150">150m</button>
+                <button type="button" class="pico-cal-btn" data-rp-radius="200">200m</button>
                 <button type="button" class="pico-cal-btn" data-rp-radius="300">300m</button>
                 <button type="button" class="pico-cal-btn" data-rp-radius="500">500m</button>
               </div>
@@ -3936,8 +4162,13 @@
     const markersLayer = L.layerGroup().addTo(map);
     const frequentPointsLayer = L.layerGroup().addTo(map);
     const reactionZonesLayer = L.layerGroup().addTo(map);
+    const reactionPreviewLayer = L.layerGroup().addTo(map);
     const agentZonesLayer = L.layerGroup().addTo(map);
-    const REACTION_POINTS_COLLECTION = 'puntos_reaccion';
+    const REACTION_POINTS_COLLECTION = 'puntos_reaccion_inmediata';
+    const LEGACY_REACTION_POINTS_COLLECTION = 'puntos_reaccion';
+    let reactionPointsPrimary = [];
+    let reactionPointsLegacy = [];
+    let isReactionMapModeActive = false;
     let activeReactionPoints = loadCachedReactionPoints();
     let userMarker = null;
     let latestGps = initialCachedGps
@@ -4286,11 +4517,17 @@
       if (window.__anthiAdminBuzonReady && typeof syncAdminBuzonSubscription === 'function') {
         syncAdminBuzonSubscription();
       }
+      if (typeof window.__anthiUpdateAdminReactionQuickBar === 'function') {
+        window.__anthiUpdateAdminReactionQuickBar();
+      }
       if (typeof renderReactionZonesOnMap === 'function') {
         renderReactionZonesOnMap();
       }
       if (window.__anthiReportModalReady && typeof updateFastActivationPreview === 'function') {
         updateFastActivationPreview();
+      }
+      if (window.__anthiPicoYPlacaReady && typeof renderPicoYPlacaUI === 'function') {
+        renderPicoYPlacaUI();
       }
     }
 
@@ -4701,9 +4938,10 @@
       return getConfirmCount(rep) >= 2;
     }
 
-    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false, confirmCount = 1) {
+    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false, confirmCount = 1, tipoTexto = '') {
       const count = Math.max(1, Number(confirmCount || 1));
       const isUnvalidated = !isPending && !isFixed && count < 2;
+      const isCeposMarker = String(tipoTexto || '').trim().toLowerCase().includes('cepo');
       const bg = isFixed
         ? 'linear-gradient(135deg,#fcd34d,#d97706)'
         : isUnvalidated
@@ -4722,7 +4960,7 @@
 
       return L.divIcon({
         className: 'custom-pin',
-        html: `<div style="
+        html: `<div class="${isCeposMarker ? 'cepos-marker-motion' : ''}" style="
           position:relative;
           width:38px;height:38px;border-radius:50%;
           background:${bg};border:2px solid ${borderColor};
@@ -4920,7 +5158,7 @@
         }
 
         const marker = L.marker([lat, lng], {
-          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed, confirmations),
+          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed, confirmations, tipoTexto),
           zIndexOffset: isFixed ? 700 : confirmations >= 3 ? 520 : confirmations === 2 ? 420 : 280
         });
 
@@ -6158,6 +6396,8 @@
       } catch (e) {}
       const chk = document.getElementById('chkShowCriticalZonesAdmin');
       if (chk) chk.checked = next;
+      const chkModal = document.getElementById('chkModalShowReactionZones');
+      if (chkModal) chkModal.checked = next;
       renderReactionZonesOnMap();
       return next;
     };
@@ -6165,74 +6405,103 @@
     function renderReactionZonesOnMap() {
       if (!reactionZonesLayer) return;
       reactionZonesLayer.clearLayers();
-      if (userRole !== 'admin' || !isCriticalZonesMapVisible()) return;
+      const canShowZones = typeof hasValidatedAdminPermission === 'function'
+        ? hasValidatedAdminPermission()
+        : (userRole === 'admin' && isAuthorizedAdminEmail(auth.currentUser));
+      if (!canShowZones || (!isCriticalZonesMapVisible() && !isReactionMapModeActive)) return;
 
       const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
       list.forEach((rp) => {
         const lat = Number(rp.lat);
         const lng = Number(rp.lng);
-        const radiusM = Math.max(50, Math.min(2000, Number(rp.radioMetros || 200)));
+        const radiusM = Math.max(50, Math.min(2000, Number(rp.radioMetros || 150)));
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
         const circle = L.circle([lat, lng], {
           radius: radiusM,
           color: '#06b6d4',
           weight: 1.8,
-          opacity: 0.82,
+          opacity: 0.85,
           dashArray: '6, 5',
           fillColor: '#06b6d4',
-          fillOpacity: 0.12,
-          interactive: true
+          fillOpacity: 0.14,
+          interactive: !isReactionMapModeActive
         });
 
         const popupHtml = `
           <div class="popup-card">
-            <span class="popup-badge" style="background:#0891b2;">⚡ Punto Crítico (Reacción Inmediata)</span>
+            <span class="popup-badge" style="background:#0891b2;">⚡ Punto de Reacción Inmediata</span>
             <div style="font-weight:800;margin-bottom:4px;">${escapeHtml(rp.nombre || 'Punto Crítico')}</div>
             <div class="popup-meta">Radio: ${radiusM} m · 📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
             <div class="popup-meta" style="color:#67e8f9;margin-top:4px;">Reportes dentro de esta zona quedan FIRMES en primera opción al instante.</div>
-            ${hasValidatedAdminPermission() ? `<div class="popup-admin-bar">
+            ${canShowZones ? `<div class="popup-admin-bar">
               <button type="button" class="popup-vote-btn edit" onclick="startEditReactionPoint('${escapeHtml(rp.id)}')">✏️ Ajustar radio / punto</button>
               <button type="button" class="popup-vote-btn delete" onclick="deleteReactionPointFromFirestore('${escapeHtml(rp.id)}')">🗑️ Eliminar</button>
             </div>` : ''}
           </div>
         `;
-        circle.bindPopup(popupHtml);
+        if (!isReactionMapModeActive) {
+          circle.bindPopup(popupHtml);
+        }
         circle.addTo(reactionZonesLayer);
 
         const labelMarker = L.marker([lat, lng], {
           zIndexOffset: 240,
+          interactive: !isReactionMapModeActive,
           icon: L.divIcon({
             className: 'custom-reaction-zone-pin',
-            html: `<div style="padding:2px 7px;border-radius:999px;background:rgba(8,47,73,0.92);border:1.5px solid #22d3ee;color:#a5f3fc;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.45);">⚡ ${escapeHtml(rp.nombre || 'Crítico')} (${radiusM}m)</div>`,
+            html: `<div style="padding:2px 7px;border-radius:999px;background:rgba(8,47,73,0.92);border:1.5px solid #22d3ee;color:#a5f3fc;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.45);">⚡ ${escapeHtml(rp.nombre || 'Reacción')} (${radiusM}m)</div>`,
             iconSize: [148, 22],
             iconAnchor: [74, 11]
           })
         });
-        labelMarker.bindPopup(popupHtml);
+        if (!isReactionMapModeActive) {
+          labelMarker.bindPopup(popupHtml);
+        }
         labelMarker.addTo(reactionZonesLayer);
       });
     }
 
+    function mergeAndPublishReactionPoints() {
+      const mergedMap = new Map();
+      (Array.isArray(reactionPointsLegacy) ? reactionPointsLegacy : []).forEach((item) => {
+        if (item && item.id) mergedMap.set(String(item.id), item);
+      });
+      (Array.isArray(reactionPointsPrimary) ? reactionPointsPrimary : []).forEach((item) => {
+        if (item && item.id) mergedMap.set(String(item.id), item);
+      });
+      const items = Array.from(mergedMap.values()).sort((a, b) => (b._sortMs || 0) - (a._sortMs || 0));
+      activeReactionPoints = items;
+      saveCachedReactionPoints(items);
+      renderReactionZonesOnMap();
+      if (typeof window.__anthiUpdateAdminReactionQuickBar === 'function') {
+        window.__anthiUpdateAdminReactionQuickBar();
+      }
+      if (typeof window.__anthiRefreshReactionPointsUI === 'function') {
+        window.__anthiRefreshReactionPointsUI();
+      }
+      if (typeof updateDuplicateGuardPreview === 'function') {
+        updateDuplicateGuardPreview();
+      }
+    }
+
     window.deleteReactionPointFromFirestore = async function(puntoId) {
-      if (!puntoId || userRole !== 'admin') return;
-      const path = `${REACTION_POINTS_COLLECTION}/${puntoId}`;
+      if (!puntoId || typeof hasValidatedAdminPermission !== 'function' || !hasValidatedAdminPermission()) return;
+      const existingItem = (Array.isArray(activeReactionPoints) ? activeReactionPoints : []).find(
+        (item) => String(item.id) === String(puntoId)
+      );
+      const targetCol = (existingItem && existingItem._collection) || REACTION_POINTS_COLLECTION;
+      const path = `${targetCol}/${puntoId}`;
       try {
         await ensureAuthenticated();
         if (!isAuthorizedAdminEmail(auth.currentUser)) {
           showToast(`⛔ Inicia sesión como Administrador (${ADMIN_EMAILS.join(' o ')}) para eliminar Puntos de Reacción.`);
           return;
         }
-        await withTimeout(deleteDoc(doc(db, REACTION_POINTS_COLLECTION, puntoId)), 15000);
-        activeReactionPoints = activeReactionPoints.filter((item) => String(item.id) !== String(puntoId));
-        saveCachedReactionPoints(activeReactionPoints);
-        renderReactionZonesOnMap();
-        if (typeof window.__anthiRefreshReactionPointsUI === 'function') {
-          window.__anthiRefreshReactionPointsUI();
-        }
-        if (typeof updateDuplicateGuardPreview === 'function') {
-          updateDuplicateGuardPreview();
-        }
+        await withTimeout(deleteDoc(doc(db, targetCol, puntoId)), 15000);
+        reactionPointsPrimary = reactionPointsPrimary.filter((item) => String(item.id) !== String(puntoId));
+        reactionPointsLegacy = reactionPointsLegacy.filter((item) => String(item.id) !== String(puntoId));
+        mergeAndPublishReactionPoints();
         showToast('🗑️ Punto de Reacción eliminado.');
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') return;
@@ -6242,33 +6511,40 @@
     };
 
     function startReactionPointsListener() {
-      const rpQuery = query(collection(db, REACTION_POINTS_COLLECTION), limit(100));
-      onSnapshot(
-        rpQuery,
-        (snapshot) => {
-          const items = [];
-          snapshot.forEach((docSnap) => {
-            const data = docSnap.data() || {};
-            items.push({
-              id: docSnap.id,
-              nombre: String(data.nombre || 'Zona de Reacción'),
-              lat: Number(data.lat),
-              lng: Number(data.lng),
-              radioMetros: Number(data.radioMetros || 200),
-              createdBy: String(data.createdBy || ''),
-              _sortMs: extractTimestampMs(data)
-            });
+      const parseSnapshotItems = (snapshot, collectionName) => {
+        const items = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() || {};
+          items.push({
+            id: docSnap.id,
+            _collection: collectionName,
+            nombre: String(data.nombre || 'Zona de Reacción'),
+            lat: Number(data.lat),
+            lng: Number(data.lng),
+            radioMetros: Number(data.radioMetros || 150),
+            createdBy: String(data.createdBy || ''),
+            _sortMs: extractTimestampMs(data)
           });
-          items.sort((a, b) => b._sortMs - a._sortMs);
-          activeReactionPoints = items;
-          saveCachedReactionPoints(items);
-          renderReactionZonesOnMap();
-          if (typeof window.__anthiRefreshReactionPointsUI === 'function') {
-            window.__anthiRefreshReactionPointsUI();
-          }
-          if (typeof updateDuplicateGuardPreview === 'function') {
-            updateDuplicateGuardPreview();
-          }
+        });
+        return items;
+      };
+
+      onSnapshot(
+        query(collection(db, REACTION_POINTS_COLLECTION), limit(100)),
+        (snapshot) => {
+          reactionPointsPrimary = parseSnapshotItems(snapshot, REACTION_POINTS_COLLECTION);
+          mergeAndPublishReactionPoints();
+        },
+        (err) => {
+          console.warn('Error escuchando puntos_reaccion_inmediata:', err && err.message ? err.message : err);
+        }
+      );
+
+      onSnapshot(
+        query(collection(db, LEGACY_REACTION_POINTS_COLLECTION), limit(100)),
+        (snapshot) => {
+          reactionPointsLegacy = parseSnapshotItems(snapshot, LEGACY_REACTION_POINTS_COLLECTION);
+          mergeAndPublishReactionPoints();
         },
         (err) => {
           console.warn('Error escuchando puntos_reaccion:', err && err.message ? err.message : err);
@@ -6966,7 +7242,7 @@
         bannerEl.style.background = 'rgba(6, 182, 212, 0.14)';
         bannerEl.style.border = '1px solid rgba(34, 211, 238, 0.5)';
         bannerEl.style.color = '#a5f3fc';
-        bannerEl.innerHTML = `⚡ <strong>Punto Crítico «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> activación <strong>FIRME en primera opción</strong> de inmediato (sin espera ni bloqueo de 300 m).`;
+        bannerEl.innerHTML = `⚡ <strong>Punto de Reacción Inmediata «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> tu alerta quedará <strong>FIRME y activa de inmediato</strong> para toda la comunidad.`;
         if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = '⚡ Publicar FIRME en primera opción';
         return;
       }
@@ -7815,6 +8091,12 @@
     });
 
     map.on('click', (e) => {
+      if (isReactionMapModeActive && hasValidatedAdminPermission() && e && e.latlng) {
+        if (typeof window.__anthiHandleReactionMapTap === 'function') {
+          window.__anthiHandleReactionMapTap(e.latlng);
+        }
+        return;
+      }
       if (isPickingReportPin && e && e.latlng) {
         map.panTo(e.latlng, { animate: true });
         return;
@@ -9315,63 +9597,229 @@
     const btnCancelEditReactionPoint = document.getElementById('btnCancelEditReactionPoint');
     const chkShowCriticalZonesAdmin = document.getElementById('chkShowCriticalZonesAdmin');
     const adminReactionPointsList = document.getElementById('adminReactionPointsList');
+    const btnLaunchMapReactionModeFromAdmin = document.getElementById('btnLaunchMapReactionModeFromAdmin');
+
+    const adminQuickActionBar = document.getElementById('adminQuickActionBar');
+    const adminReactionQuickBtn = document.getElementById('adminReactionQuickBtn');
+    const adminReactionQuickCount = document.getElementById('adminReactionQuickCount');
+
+    const reactionPointsModal = document.getElementById('reactionPointsModal');
+    const btnCloseReactionPointsModal = document.getElementById('btnCloseReactionPointsModal');
+    const btnStartReactionMapMode = document.getElementById('btnStartReactionMapMode');
+    const chkModalShowReactionZones = document.getElementById('chkModalShowReactionZones');
+    const rpModalCountLabel = document.getElementById('rpModalCountLabel');
+    const rpModalForm = document.getElementById('rpModalForm');
+    const rpModalFormTitle = document.getElementById('rpModalFormTitle');
+    const rpModalNameInput = document.getElementById('rpModalNameInput');
+    const rpModalRadiusInput = document.getElementById('rpModalRadiusInput');
+    const rpModalCoordsBadge = document.getElementById('rpModalCoordsBadge');
+    const btnRpModalUseGps = document.getElementById('btnRpModalUseGps');
+    const btnRpModalSave = document.getElementById('btnRpModalSave');
+    const btnRpModalCancelEdit = document.getElementById('btnRpModalCancelEdit');
+    const rpModalList = document.getElementById('rpModalList');
+
+    const reactionMapModeBar = document.getElementById('reactionMapModeBar');
+    const rpMapCoordsLabel = document.getElementById('rpMapCoordsLabel');
+    const rpMapNameInput = document.getElementById('rpMapNameInput');
+    const rpMapRadiusInput = document.getElementById('rpMapRadiusInput');
+    const btnRpMapUseGps = document.getElementById('btnRpMapUseGps');
+    const btnRpMapSavePoint = document.getElementById('btnRpMapSavePoint');
+    const btnRpMapOpenList = document.getElementById('btnRpMapOpenList');
+    const btnRpMapExit = document.getElementById('btnRpMapExit');
+
     let editingReactionPointId = null;
+    let reactionMapDraftCoords = null;
+
+    function renderReactionMapPreview() {
+      if (!reactionPreviewLayer) return;
+      reactionPreviewLayer.clearLayers();
+      if (!isReactionMapModeActive || !reactionMapDraftCoords || !hasValidatedAdminPermission()) return;
+      const lat = Number(reactionMapDraftCoords.lat);
+      const lng = Number(reactionMapDraftCoords.lng);
+      const radiusM = Math.max(50, Math.min(2000, Math.round(Number(rpMapRadiusInput ? rpMapRadiusInput.value : 150) || 150)));
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+      L.circle([lat, lng], {
+        radius: radiusM,
+        color: '#22d3ee',
+        weight: 2.2,
+        opacity: 0.95,
+        dashArray: '5, 5',
+        fillColor: '#06b6d4',
+        fillOpacity: 0.22,
+        interactive: false
+      }).addTo(reactionPreviewLayer);
+
+      L.marker([lat, lng], {
+        zIndexOffset: 900,
+        interactive: false,
+        icon: L.divIcon({
+          className: 'custom-reaction-preview-pin',
+          html: `<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#22d3ee,#0284c7);border:2px solid #ffffff;color:#020617;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.6);">⚡</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        })
+      }).addTo(reactionPreviewLayer);
+    }
+
+    function syncReactionMapRadiusPresets(radiusVal) {
+      const clamped = Math.max(50, Math.min(2000, Math.round(Number(radiusVal) || 150)));
+      if (rpMapRadiusInput) rpMapRadiusInput.value = String(clamped);
+      document.querySelectorAll('[data-rp-map-radius]').forEach((b) => {
+        b.classList.toggle('active', Number(b.dataset.rpMapRadius) === clamped);
+      });
+      renderReactionMapPreview();
+    }
+
+    function stopReactionMapMode(clearDraft = true) {
+      isReactionMapModeActive = false;
+      if (clearDraft) {
+        reactionMapDraftCoords = null;
+        if (rpMapNameInput) rpMapNameInput.value = '';
+        if (rpMapCoordsLabel) rpMapCoordsLabel.textContent = 'Sin punto tocado';
+      }
+      if (reactionPreviewLayer) reactionPreviewLayer.clearLayers();
+      if (reactionMapModeBar) {
+        reactionMapModeBar.classList.remove('visible');
+        reactionMapModeBar.setAttribute('aria-hidden', 'true');
+      }
+      if (bottomPanelEl && !isPickingReportPin) bottomPanelEl.style.display = '';
+      if (map && map.getContainer) map.getContainer().style.cursor = '';
+      if (typeof renderReactionZonesOnMap === 'function') renderReactionZonesOnMap();
+    }
+
+    function startReactionMapMode() {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Solo los administradores autorizados pueden crear Puntos de Reacción Inmediata.');
+        return;
+      }
+      isReactionMapModeActive = true;
+      isFollowingUser = false;
+      reactionMapDraftCoords = null;
+      if (reactionPointsModal) reactionPointsModal.classList.remove('open');
+      if (adminPanelModal) adminPanelModal.classList.remove('open');
+      if (bottomPanelEl) bottomPanelEl.style.display = 'none';
+      if (rpMapCoordsLabel) rpMapCoordsLabel.textContent = 'Toca el mapa...';
+      if (reactionMapModeBar) {
+        reactionMapModeBar.classList.add('visible');
+        reactionMapModeBar.setAttribute('aria-hidden', 'false');
+      }
+      syncReactionMapRadiusPresets(rpMapRadiusInput ? rpMapRadiusInput.value : 150);
+      if (map && map.getContainer) map.getContainer().style.cursor = 'crosshair';
+      renderReactionZonesOnMap();
+      showToast('🎯 Modo mapa activo: toca cualquier lugar en Bucaramanga para colocar puntos.');
+    }
+
+    window.__anthiHandleReactionMapTap = function(latlng) {
+      if (!isReactionMapModeActive || !hasValidatedAdminPermission() || !latlng) return;
+      reactionMapDraftCoords = {
+        lat: Number(Number(latlng.lat).toFixed(6)),
+        lng: Number(Number(latlng.lng).toFixed(6))
+      };
+      if (rpMapCoordsLabel) {
+        rpMapCoordsLabel.textContent = `📌 ${reactionMapDraftCoords.lat.toFixed(5)}, ${reactionMapDraftCoords.lng.toFixed(5)}`;
+      }
+      renderReactionMapPreview();
+      if (rpMapNameInput && !rpMapNameInput.value.trim()) {
+        rpMapNameInput.focus();
+      }
+    };
+
+    window.__anthiUpdateAdminReactionQuickBar = function updateAdminReactionQuickBar() {
+      const canUseAdminQuick = hasValidatedAdminPermission();
+      const count = Array.isArray(activeReactionPoints) ? activeReactionPoints.length : 0;
+      if (adminReactionQuickCount) {
+        adminReactionQuickCount.textContent = `${count} ${count === 1 ? 'punto' : 'puntos'}`;
+      }
+      if (adminQuickActionBar) {
+        adminQuickActionBar.classList.toggle('visible', canUseAdminQuick);
+        adminQuickActionBar.setAttribute('aria-hidden', canUseAdminQuick ? 'false' : 'true');
+      }
+      if (!canUseAdminQuick) {
+        if (reactionPointsModal) reactionPointsModal.classList.remove('open');
+        if (isReactionMapModeActive) stopReactionMapMode(true);
+      }
+    };
 
     if (chkShowCriticalZonesAdmin) {
       chkShowCriticalZonesAdmin.checked = isCriticalZonesMapVisible();
       chkShowCriticalZonesAdmin.addEventListener('change', () => {
         const visible = window.toggleCriticalZonesMapVisibility(chkShowCriticalZonesAdmin.checked);
-        showToast(visible ? '👁️ Puntos Críticos visibles en tu mapa.' : '🙈 Puntos Críticos ocultos en el mapa (siguen activos).');
+        showToast(visible ? '👁️ Puntos de Reacción visibles en tu mapa.' : '🙈 Puntos de Reacción ocultos en el mapa (siguen activos).');
+      });
+    }
+
+    if (chkModalShowReactionZones) {
+      chkModalShowReactionZones.checked = isCriticalZonesMapVisible();
+      chkModalShowReactionZones.addEventListener('change', () => {
+        const visible = window.toggleCriticalZonesMapVisibility(chkModalShowReactionZones.checked);
+        showToast(visible ? '👁️ Zonas visibles en el mapa.' : '🙈 Zonas ocultas en el mapa (siguen activas).');
       });
     }
 
     function syncReactionRadiusPresets(radiusVal) {
-      const clamped = Math.max(50, Math.min(2000, Math.round(Number(radiusVal) || 200)));
+      const clamped = Math.max(50, Math.min(2000, Math.round(Number(radiusVal) || 150)));
       if (rpRadiusInput) rpRadiusInput.value = String(clamped);
+      if (rpModalRadiusInput) rpModalRadiusInput.value = String(clamped);
       document.querySelectorAll('[data-rp-radius]').forEach((b) => {
         b.classList.toggle('active', Number(b.dataset.rpRadius) === clamped);
+      });
+      document.querySelectorAll('[data-rp-modal-radius]').forEach((b) => {
+        b.classList.toggle('active', Number(b.dataset.rpModalRadius) === clamped);
       });
     }
 
     function resetReactionPointFormMode() {
       editingReactionPointId = null;
       if (rpNameInput) rpNameInput.value = '';
-      syncReactionRadiusPresets(200);
+      if (rpModalNameInput) rpModalNameInput.value = '';
+      syncReactionRadiusPresets(150);
       pendingReactionCoords = null;
+      if (rpModalFormTitle) rpModalFormTitle.textContent = '➕ Nuevo punto desde GPS o mapa';
       if (btnSaveReactionPoint) btnSaveReactionPoint.textContent = '⚡ Guardar Punto Crítico';
+      if (btnRpModalSave) btnRpModalSave.textContent = '⚡ Guardar punto';
       if (btnCancelEditReactionPoint) btnCancelEditReactionPoint.style.display = 'none';
+      if (btnRpModalCancelEdit) btnRpModalCancelEdit.style.display = 'none';
       if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') {
         window.__anthiUpdateReactionCoordsBadge();
       }
     }
 
     window.startEditReactionPoint = function(puntoId) {
-      if (!puntoId || userRole !== 'admin') return;
+      if (!puntoId || !hasValidatedAdminPermission()) return;
       const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
       const rp = list.find((item) => String(item.id) === String(puntoId));
       if (!rp) {
-        showToast('No se encontró ese Punto Crítico.');
+        showToast('No se encontró ese Punto de Reacción.');
         return;
       }
       editingReactionPointId = String(rp.id);
       if (rpNameInput) rpNameInput.value = String(rp.nombre || '');
-      syncReactionRadiusPresets(rp.radioMetros || 200);
+      if (rpModalNameInput) rpModalNameInput.value = String(rp.nombre || '');
+      syncReactionRadiusPresets(rp.radioMetros || 150);
       pendingReactionCoords = {
         lat: Number(Number(rp.lat).toFixed(6)),
         lng: Number(Number(rp.lng).toFixed(6)),
         isManual: true
       };
+      if (rpModalFormTitle) rpModalFormTitle.textContent = `✏️ Editando: ${rp.nombre || 'Punto'}`;
       if (btnSaveReactionPoint) btnSaveReactionPoint.textContent = '💾 Actualizar Punto Crítico';
+      if (btnRpModalSave) btnRpModalSave.textContent = '💾 Actualizar punto';
       if (btnCancelEditReactionPoint) btnCancelEditReactionPoint.style.display = 'inline-flex';
+      if (btnRpModalCancelEdit) btnRpModalCancelEdit.style.display = 'inline-flex';
       if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') {
         window.__anthiUpdateReactionCoordsBadge();
       }
-      if (typeof openAdminPanelModal === 'function') {
+      if (reactionPointsModal && reactionPointsModal.classList.contains('open')) {
+        setTimeout(() => {
+          if (rpModalRadiusInput) rpModalRadiusInput.focus();
+        }, 100);
+      } else if (typeof openAdminPanelModal === 'function') {
         openAdminPanelModal('control');
+        setTimeout(() => {
+          if (rpRadiusInput) rpRadiusInput.focus();
+        }, 120);
       }
-      setTimeout(() => {
-        if (rpRadiusInput) rpRadiusInput.focus();
-      }, 120);
     };
 
     if (btnCancelEditReactionPoint) {
@@ -9380,31 +9828,43 @@
         showToast('Edición cancelada.');
       });
     }
+    if (btnRpModalCancelEdit) {
+      btnRpModalCancelEdit.addEventListener('click', () => {
+        resetReactionPointFormMode();
+        showToast('Edición cancelada.');
+      });
+    }
 
     window.__anthiUpdateReactionCoordsBadge = function updateReactionCoordsBadge() {
-      if (!rpCoordsBadge) return;
+      let labelText = '';
+      let labelColor = '#cbd5e1';
       if (pendingReactionCoords) {
-        rpCoordsBadge.textContent = `📌 ${pendingReactionCoords.lat.toFixed(5)}, ${pendingReactionCoords.lng.toFixed(5)}`;
-        rpCoordsBadge.style.color = '#67e8f9';
+        labelText = `📌 ${pendingReactionCoords.lat.toFixed(5)}, ${pendingReactionCoords.lng.toFixed(5)}`;
+        labelColor = '#67e8f9';
       } else if (latestGps && !latestGps.isDefault) {
-        rpCoordsBadge.textContent = `📍 GPS: ${latestGps.lat.toFixed(5)}, ${latestGps.lng.toFixed(5)}`;
-        rpCoordsBadge.style.color = '#6ee7b7';
+        labelText = `📍 GPS: ${latestGps.lat.toFixed(5)}, ${latestGps.lng.toFixed(5)}`;
+        labelColor = '#6ee7b7';
       } else {
         const c = map.getCenter();
-        rpCoordsBadge.textContent = `🗺️ Centro mapa: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
-        rpCoordsBadge.style.color = '#cbd5e1';
+        labelText = `🗺️ Centro mapa: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+        labelColor = '#cbd5e1';
+      }
+      if (rpCoordsBadge) {
+        rpCoordsBadge.textContent = labelText;
+        rpCoordsBadge.style.color = labelColor;
+      }
+      if (rpModalCoordsBadge) {
+        rpModalCoordsBadge.textContent = labelText;
+        rpModalCoordsBadge.style.color = labelColor;
       }
     };
 
-    window.__anthiRefreshReactionPointsUI = function renderAdminReactionPointsList() {
-      if (chkShowCriticalZonesAdmin) {
-        chkShowCriticalZonesAdmin.checked = isCriticalZonesMapVisible();
-      }
-      if (!adminReactionPointsList) return;
-      adminReactionPointsList.innerHTML = '';
+    function populateReactionPointsListContainer(containerEl) {
+      if (!containerEl) return;
+      containerEl.innerHTML = '';
       const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
       if (list.length === 0) {
-        adminReactionPointsList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay Puntos Críticos configurados.</div>';
+        containerEl.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay Puntos de Reacción Inmediata configurados.</div>';
         return;
       }
 
@@ -9419,7 +9879,7 @@
             ⚡ ${escapeHtml(rp.nombre)}
           </div>
           <div style="font-size:10px;color:#67e8f9;font-weight:700;">
-            Radio ${Number(rp.radioMetros || 200)} m · ${Number(rp.lat).toFixed(4)}, ${Number(rp.lng).toFixed(4)}
+            Radio ${Number(rp.radioMetros || 150)} m · ${Number(rp.lat).toFixed(4)}, ${Number(rp.lng).toFixed(4)}
           </div>
         `;
 
@@ -9436,6 +9896,7 @@
             window.toggleCriticalZonesMapVisibility(true);
           }
           if (adminPanelModal) adminPanelModal.classList.remove('open');
+          if (reactionPointsModal) reactionPointsModal.classList.remove('open');
           isFollowingUser = false;
           map.setView([Number(rp.lat), Number(rp.lng)], 16, { animate: true });
         });
@@ -9452,7 +9913,7 @@
         const delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.textContent = '🗑️';
-        delBtn.title = 'Eliminar Punto Crítico';
+        delBtn.title = 'Eliminar Punto de Reacción';
         delBtn.style.cssText = 'border:1px solid rgba(239,68,68,0.55);background:rgba(127,29,29,0.55);color:#fecaca;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
         delBtn.addEventListener('click', () => {
           if (editingReactionPointId === rp.id) {
@@ -9466,18 +9927,213 @@
         actions.appendChild(delBtn);
         row.appendChild(info);
         row.appendChild(actions);
-        adminReactionPointsList.appendChild(row);
+        containerEl.appendChild(row);
       });
+    }
+
+    window.__anthiRefreshReactionPointsUI = function renderAdminReactionPointsList() {
+      const visible = isCriticalZonesMapVisible();
+      if (chkShowCriticalZonesAdmin) chkShowCriticalZonesAdmin.checked = visible;
+      if (chkModalShowReactionZones) chkModalShowReactionZones.checked = visible;
+      const count = Array.isArray(activeReactionPoints) ? activeReactionPoints.length : 0;
+      if (rpModalCountLabel) {
+        rpModalCountLabel.textContent = `${count} ${count === 1 ? 'punto activo' : 'puntos activos'}`;
+      }
+      populateReactionPointsListContainer(adminReactionPointsList);
+      populateReactionPointsListContainer(rpModalList);
     };
 
-    document.querySelectorAll('[data-rp-radius]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        syncReactionRadiusPresets(btn.dataset.rpRadius || '200');
+    async function saveReactionPointToFirestore({ nombre, radioMetros, coords, editId = null }) {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Solo los administradores autorizados pueden gestionar Puntos de Reacción Inmediata.');
+        return false;
+      }
+      const cleanName = String(nombre || '').trim().slice(0, 60);
+      const cleanRadius = Math.max(50, Math.min(2000, Math.round(Number(radioMetros) || 150)));
+      if (cleanName.length < 2) {
+        showToast('Escribe un nombre o referencia válido (mínimo 2 letras).');
+        return false;
+      }
+      let targetCoords = coords;
+      if (!targetCoords) {
+        if (latestGps && !latestGps.isDefault) {
+          targetCoords = { lat: Number(latestGps.lat.toFixed(6)), lng: Number(latestGps.lng.toFixed(6)) };
+        } else {
+          const c = map.getCenter();
+          targetCoords = { lat: Number(c.lat.toFixed(6)), lng: Number(c.lng.toFixed(6)) };
+        }
+      }
+
+      const isEditing = Boolean(editId);
+      const existingItem = isEditing
+        ? (Array.isArray(activeReactionPoints) ? activeReactionPoints : []).find((i) => String(i.id) === String(editId))
+        : null;
+      const targetCollection = (existingItem && existingItem._collection) || REACTION_POINTS_COLLECTION;
+
+      try {
+        const user = await ensureAuthenticated();
+        if (!isAuthorizedAdminEmail(user)) {
+          showToast(`⛔ Requiere sesión con cuenta Administrador autorizada (${ADMIN_EMAILS.join(' o ')}).`);
+          return false;
+        }
+        if (isEditing) {
+          await withTimeout(
+            updateDoc(doc(db, targetCollection, editId), {
+              nombre: cleanName,
+              lat: Number(targetCoords.lat),
+              lng: Number(targetCoords.lng),
+              radioMetros: cleanRadius
+            }),
+            15000
+          );
+          const updater = (arr) => arr.map((item) =>
+            String(item.id) === String(editId)
+              ? { ...item, nombre: cleanName, lat: Number(targetCoords.lat), lng: Number(targetCoords.lng), radioMetros: cleanRadius }
+              : item
+          );
+          reactionPointsPrimary = updater(reactionPointsPrimary);
+          reactionPointsLegacy = updater(reactionPointsLegacy);
+          mergeAndPublishReactionPoints();
+          showToast(`💾 Punto «${cleanName}» actualizado (${cleanRadius} m).`);
+        } else {
+          await withTimeout(
+            addDoc(collection(db, REACTION_POINTS_COLLECTION), {
+              nombre: cleanName,
+              lat: Number(targetCoords.lat),
+              lng: Number(targetCoords.lng),
+              radioMetros: cleanRadius,
+              createdBy: user.uid,
+              createdAt: serverTimestamp()
+            }),
+            15000
+          );
+          showToast(`⚡ Punto «${cleanName}» (${cleanRadius} m) guardado y activo.`);
+        }
+        return true;
+      } catch (err) {
+        if (err && err.message === 'AUTH_CANCELLED') return false;
+        if (err && err.code === 'permission-denied') {
+          showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+        } else {
+          showToast(isEditing ? 'No se pudo actualizar el Punto de Reacción.' : 'No se pudo guardar el Punto de Reacción.');
+        }
+        handleFirestoreError(err, isEditing ? OperationType.UPDATE : OperationType.CREATE, targetCollection);
+        return false;
+      }
+    }
+
+    function openReactionPointsModal() {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Acceso restringido exclusivamente a administradores autorizados.');
+        return;
+      }
+      if (isReactionMapModeActive) stopReactionMapMode(true);
+      window.__anthiRefreshReactionPointsUI();
+      window.__anthiUpdateReactionCoordsBadge();
+      if (reactionPointsModal) reactionPointsModal.classList.add('open');
+    }
+
+    if (adminReactionQuickBtn) {
+      adminReactionQuickBtn.addEventListener('click', () => {
+        openReactionPointsModal();
       });
+    }
+    if (btnCloseReactionPointsModal && reactionPointsModal) {
+      btnCloseReactionPointsModal.addEventListener('click', () => reactionPointsModal.classList.remove('open'));
+      reactionPointsModal.addEventListener('click', (e) => {
+        if (e.target === reactionPointsModal) reactionPointsModal.classList.remove('open');
+      });
+    }
+    if (btnStartReactionMapMode) {
+      btnStartReactionMapMode.addEventListener('click', startReactionMapMode);
+    }
+    if (btnLaunchMapReactionModeFromAdmin) {
+      btnLaunchMapReactionModeFromAdmin.addEventListener('click', startReactionMapMode);
+    }
+
+    document.querySelectorAll('[data-rp-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => syncReactionRadiusPresets(btn.dataset.rpRadius || '150'));
     });
     if (rpRadiusInput) {
-      rpRadiusInput.addEventListener('change', () => {
-        syncReactionRadiusPresets(rpRadiusInput.value);
+      rpRadiusInput.addEventListener('change', () => syncReactionRadiusPresets(rpRadiusInput.value));
+    }
+    document.querySelectorAll('[data-rp-modal-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => syncReactionRadiusPresets(btn.dataset.rpModalRadius || '150'));
+    });
+    if (rpModalRadiusInput) {
+      rpModalRadiusInput.addEventListener('change', () => syncReactionRadiusPresets(rpModalRadiusInput.value));
+    }
+
+    document.querySelectorAll('[data-rp-map-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => syncReactionMapRadiusPresets(btn.dataset.rpMapRadius || '150'));
+    });
+    if (rpMapRadiusInput) {
+      rpMapRadiusInput.addEventListener('input', () => syncReactionMapRadiusPresets(rpMapRadiusInput.value));
+      rpMapRadiusInput.addEventListener('change', () => syncReactionMapRadiusPresets(rpMapRadiusInput.value));
+    }
+
+    if (btnRpMapUseGps) {
+      btnRpMapUseGps.addEventListener('click', async () => {
+        if (!hasValidatedAdminPermission()) return;
+        const gpsCoords = await getReportCoordinates();
+        reactionMapDraftCoords = {
+          lat: Number(gpsCoords.lat.toFixed(6)),
+          lng: Number(gpsCoords.lng.toFixed(6))
+        };
+        if (rpMapCoordsLabel) {
+          rpMapCoordsLabel.textContent = `📍 ${reactionMapDraftCoords.lat.toFixed(5)}, ${reactionMapDraftCoords.lng.toFixed(5)}`;
+        }
+        map.setView([reactionMapDraftCoords.lat, reactionMapDraftCoords.lng], Math.max(map.getZoom(), 16), { animate: true });
+        renderReactionMapPreview();
+        if (rpMapNameInput && !rpMapNameInput.value.trim()) rpMapNameInput.focus();
+      });
+    }
+
+    if (btnRpMapSavePoint) {
+      btnRpMapSavePoint.addEventListener('click', async () => {
+        if (!hasValidatedAdminPermission()) return;
+        if (!reactionMapDraftCoords) {
+          showToast('🎯 Primero toca un punto en el mapa (o presiona "Mi GPS").');
+          return;
+        }
+        const nombre = rpMapNameInput ? rpMapNameInput.value.trim() : '';
+        const radioMetros = rpMapRadiusInput ? rpMapRadiusInput.value : 150;
+        if (nombre.length < 2) {
+          showToast('Escribe un nombre o referencia para este punto.');
+          if (rpMapNameInput) rpMapNameInput.focus();
+          return;
+        }
+        btnRpMapSavePoint.disabled = true;
+        btnRpMapSavePoint.textContent = 'Guardando...';
+        try {
+          const ok = await saveReactionPointToFirestore({
+            nombre,
+            radioMetros,
+            coords: reactionMapDraftCoords
+          });
+          if (ok) {
+            reactionMapDraftCoords = null;
+            if (rpMapNameInput) rpMapNameInput.value = '';
+            if (rpMapCoordsLabel) rpMapCoordsLabel.textContent = 'Toca el siguiente punto...';
+            if (reactionPreviewLayer) reactionPreviewLayer.clearLayers();
+          }
+        } finally {
+          btnRpMapSavePoint.disabled = false;
+          btnRpMapSavePoint.textContent = '⚡ Guardar punto en mapa';
+        }
+      });
+    }
+
+    if (btnRpMapOpenList) {
+      btnRpMapOpenList.addEventListener('click', () => {
+        openReactionPointsModal();
+      });
+    }
+
+    if (btnRpMapExit) {
+      btnRpMapExit.addEventListener('click', () => {
+        stopReactionMapMode(true);
+        showToast('✓ Modo de colocación finalizado.');
       });
     }
 
@@ -9486,96 +10142,72 @@
         const gpsCoords = await getReportCoordinates();
         pendingReactionCoords = { lat: Number(gpsCoords.lat.toFixed(6)), lng: Number(gpsCoords.lng.toFixed(6)) };
         window.__anthiUpdateReactionCoordsBadge();
-        showToast('📍 Coordenadas GPS cargadas para el Punto Crítico.');
+        showToast('📍 Coordenadas GPS cargadas para el Punto de Reacción.');
+      });
+    }
+
+    if (btnRpModalUseGps) {
+      btnRpModalUseGps.addEventListener('click', async () => {
+        const gpsCoords = await getReportCoordinates();
+        pendingReactionCoords = { lat: Number(gpsCoords.lat.toFixed(6)), lng: Number(gpsCoords.lng.toFixed(6)) };
+        window.__anthiUpdateReactionCoordsBadge();
+        showToast('📍 Coordenadas GPS cargadas para el Punto de Reacción.');
       });
     }
 
     if (btnPickReactionCoordsOnMap) {
       btnPickReactionCoordsOnMap.addEventListener('click', () => {
-        if (userRole !== 'admin') return;
+        if (!hasValidatedAdminPermission()) return;
         openManualPinPicker('reactionPoint');
+      });
+    }
+
+    if (rpModalForm) {
+      rpModalForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!hasValidatedAdminPermission()) return;
+        const isEditing = Boolean(editingReactionPointId);
+        if (btnRpModalSave) {
+          btnRpModalSave.disabled = true;
+          btnRpModalSave.textContent = isEditing ? 'Actualizando...' : 'Guardando...';
+        }
+        try {
+          const ok = await saveReactionPointToFirestore({
+            nombre: rpModalNameInput ? rpModalNameInput.value : '',
+            radioMetros: rpModalRadiusInput ? rpModalRadiusInput.value : 150,
+            coords: pendingReactionCoords,
+            editId: editingReactionPointId
+          });
+          if (ok) resetReactionPointFormMode();
+        } finally {
+          if (btnRpModalSave) {
+            btnRpModalSave.disabled = false;
+            btnRpModalSave.textContent = editingReactionPointId ? '💾 Actualizar punto' : '⚡ Guardar punto';
+          }
+        }
       });
     }
 
     if (reactionPointForm) {
       reactionPointForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (userRole !== 'admin') {
+        if (!hasValidatedAdminPermission()) {
           showToast('⛔ Solo los administradores pueden gestionar Puntos Críticos.');
           return;
         }
-        const nombre = (rpNameInput ? rpNameInput.value : '').trim().slice(0, 60);
-        const radioMetros = Math.max(50, Math.min(2000, Math.round(Number(rpRadiusInput ? rpRadiusInput.value : 200) || 200)));
-        if (nombre.length < 2) {
-          showToast('Escribe un nombre válido (mínimo 2 letras).');
-          return;
-        }
-        let coords = pendingReactionCoords;
-        if (!coords) {
-          if (latestGps && !latestGps.isDefault) {
-            coords = { lat: Number(latestGps.lat.toFixed(6)), lng: Number(latestGps.lng.toFixed(6)) };
-          } else {
-            const c = map.getCenter();
-            coords = { lat: Number(c.lat.toFixed(6)), lng: Number(c.lng.toFixed(6)) };
-          }
-        }
-
         const isEditing = Boolean(editingReactionPointId);
         if (btnSaveReactionPoint) {
           btnSaveReactionPoint.disabled = true;
           btnSaveReactionPoint.textContent = isEditing ? 'Actualizando Punto Crítico...' : 'Guardando Punto Crítico...';
         }
         try {
-          const user = await ensureAuthenticated();
-          if (!isAuthorizedAdminEmail(user)) {
-            showToast(`⛔ Requiere sesión con cuenta Administrador autorizada (${ADMIN_EMAILS.join(' o ')}).`);
-            return;
-          }
-          if (isEditing) {
-            const targetId = editingReactionPointId;
-            await withTimeout(
-              updateDoc(doc(db, REACTION_POINTS_COLLECTION, targetId), {
-                nombre,
-                lat: Number(coords.lat),
-                lng: Number(coords.lng),
-                radioMetros
-              }),
-              15000
-            );
-            activeReactionPoints = activeReactionPoints.map((item) =>
-              String(item.id) === String(targetId)
-                ? { ...item, nombre, lat: Number(coords.lat), lng: Number(coords.lng), radioMetros }
-                : item
-            );
-            saveCachedReactionPoints(activeReactionPoints);
-            renderReactionZonesOnMap();
-            window.__anthiRefreshReactionPointsUI();
-            if (typeof updateDuplicateGuardPreview === 'function') updateDuplicateGuardPreview();
-            resetReactionPointFormMode();
-            showToast(`💾 Punto Crítico «${nombre}» actualizado (${radioMetros} m).`);
-          } else {
-            await withTimeout(
-              addDoc(collection(db, REACTION_POINTS_COLLECTION), {
-                nombre,
-                lat: Number(coords.lat),
-                lng: Number(coords.lng),
-                radioMetros,
-                createdBy: user.uid,
-                createdAt: serverTimestamp()
-              }),
-              15000
-            );
-            resetReactionPointFormMode();
-            showToast(`⚡ Punto Crítico «${nombre}» (${radioMetros} m) guardado y activo.`);
-          }
-        } catch (err) {
-          if (err && err.message === 'AUTH_CANCELLED') return;
-          if (err && err.code === 'permission-denied') {
-            showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
-          } else {
-            showToast(isEditing ? 'No se pudo actualizar el Punto Crítico.' : 'No se pudo guardar el Punto Crítico.');
-          }
-          handleFirestoreError(err, isEditing ? OperationType.UPDATE : OperationType.CREATE, REACTION_POINTS_COLLECTION);
+          const ok = await saveReactionPointToFirestore({
+            nombre: rpNameInput ? rpNameInput.value : '',
+            radioMetros: rpRadiusInput ? rpRadiusInput.value : 150,
+            coords: pendingReactionCoords,
+            editId: editingReactionPointId
+          });
+          if (ok) resetReactionPointFormMode();
         } finally {
           if (btnSaveReactionPoint) {
             btnSaveReactionPoint.disabled = false;
@@ -9584,6 +10216,8 @@
         }
       });
     }
+
+    window.__anthiUpdateAdminReactionQuickBar();
 
     const adminAgentPointForm = document.getElementById('adminAgentPointForm');
     const agentSectorInput = document.getElementById('agentSectorInput');
@@ -10873,6 +11507,10 @@
     }
 
     function calibratePicoTodayPair(targetPairIdx) {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Solo los administradores autorizados pueden editar la rotación de Pico y Placa.');
+        return;
+      }
       const baseInfo = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa, new Date(), true);
       if (baseInfo.basePairIdx === null) {
         showToast('Hoy es día libre sin restricción para este tipo de vehículo.');
@@ -10893,6 +11531,10 @@
     }
 
     function resetPicoCalibration() {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Solo los administradores autorizados pueden editar la rotación de Pico y Placa.');
+        return;
+      }
       const isTaxi = hojaVidaState.tipoVehiculo === 'taxi';
       const cal = loadPicoCalibration();
       if (isTaxi) {
@@ -10926,6 +11568,11 @@
     function renderPicoYPlacaUI() {
       const info = calcularPicoYPlacaAMB(hojaVidaState.tipoVehiculo, hojaVidaState.placa);
       const tipoLabel = VEHICLE_LABELS[hojaVidaState.tipoVehiculo] || 'Particular';
+      const canEditPico = hasValidatedAdminPermission();
+      if (!canEditPico) {
+        isPicoCalibratorOpen = false;
+        isHvPicoCalibratorOpen = false;
+      }
 
       applyPicoHudCollapsedUI(isPicoHudCollapsed);
 
@@ -10970,11 +11617,12 @@
       }
 
       if (btnOpenPicoCalibrator) {
-        btnOpenPicoCalibrator.classList.toggle('active', isPicoCalibratorOpen || info.manualOffset !== 0);
-        btnOpenPicoCalibrator.setAttribute('aria-expanded', isPicoCalibratorOpen ? 'true' : 'false');
+        btnOpenPicoCalibrator.style.display = canEditPico ? 'inline-flex' : 'none';
+        btnOpenPicoCalibrator.classList.toggle('active', canEditPico && (isPicoCalibratorOpen || info.manualOffset !== 0));
+        btnOpenPicoCalibrator.setAttribute('aria-expanded', canEditPico && isPicoCalibratorOpen ? 'true' : 'false');
       }
       if (hudPicoCalibratorEl) {
-        const showCal = !isPicoHudCollapsed && isPicoCalibratorOpen;
+        const showCal = canEditPico && !isPicoHudCollapsed && isPicoCalibratorOpen;
         hudPicoCalibratorEl.style.display = showCal ? 'flex' : 'none';
         if (hudPicoCalTitleEl) {
           hudPicoCalTitleEl.textContent = info.digits.length === 0
@@ -10985,7 +11633,7 @@
           hudPicoCalGridEl.querySelectorAll('.pico-cal-btn[data-pico-pair-idx]').forEach((btn) => {
             const idx = Number(btn.getAttribute('data-pico-pair-idx'));
             btn.classList.toggle('active', info.pairIdx === idx);
-            btn.disabled = info.digits.length === 0;
+            btn.disabled = !canEditPico || info.digits.length === 0;
           });
         }
       }
@@ -11010,7 +11658,7 @@
           mainSummaryHtml = `<strong>🚘 PICO Y PLACA hoy (${escapeHtml(tipoLabel)}): ${escapeHtml(info.digitsLabel)}</strong><br/>${plateInfo}`;
         }
 
-        const calButtonsHtml = isHvPicoCalibratorOpen && info.digits.length === 2
+        const calButtonsHtml = canEditPico && isHvPicoCalibratorOpen && info.digits.length === 2
           ? `<div class="hv-pico-cal-bar">
               ${PICO_PAIRS_AMB.map((p, idx) => `<button type="button" class="pico-cal-btn${info.pairIdx === idx ? ' active' : ''}" data-hv-pico-pair="${idx}">${p[0]}-${p[1]}</button>`).join('')}
               <button type="button" class="pico-cal-btn auto" data-hv-pico-reset="1">Auto</button>
@@ -11021,7 +11669,7 @@
           ${mainSummaryHtml}
           <div style="font-size:10.5px;color:#cbd5e1;margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
             <span>${escapeHtml(reglaTexto)}${info.manualOffset ? ' · Ajustado manualmente' : ''}</span>
-            ${info.digits.length === 2 ? `<button type="button" class="pico-cal-btn" data-hv-toggle-cal="1">⚙️ Calibrar hoy</button>` : ''}
+            ${canEditPico && info.digits.length === 2 ? `<button type="button" class="pico-cal-btn" data-hv-toggle-cal="1">⚙️ Calibrar hoy</button>` : ''}
           </div>
           ${calButtonsHtml}
         `;
@@ -11275,6 +11923,10 @@
     if (btnOpenPicoCalibrator) {
       btnOpenPicoCalibrator.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (!hasValidatedAdminPermission()) {
+          showToast('⛔ Solo los administradores autorizados pueden calibrar Pico y Placa.');
+          return;
+        }
         isPicoCalibratorOpen = !isPicoCalibratorOpen;
         renderPicoYPlacaUI();
       });
@@ -11283,6 +11935,7 @@
     if (hudPicoCalGridEl) {
       hudPicoCalGridEl.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (!hasValidatedAdminPermission()) return;
         const pairBtn = e.target.closest('[data-pico-pair-idx]');
         if (pairBtn) {
           calibratePicoTodayPair(Number(pairBtn.getAttribute('data-pico-pair-idx')));
@@ -11296,6 +11949,7 @@
 
     if (hvPicoResumenCard) {
       hvPicoResumenCard.addEventListener('click', (e) => {
+        if (!hasValidatedAdminPermission()) return;
         if (e.target.closest('[data-hv-toggle-cal]')) {
           isHvPicoCalibratorOpen = !isHvPicoCalibratorOpen;
           renderPicoYPlacaUI();
@@ -11504,6 +12158,7 @@
     }
 
     renderHojaVidaUI(true, false);
+    window.__anthiPicoYPlacaReady = true;
     setInterval(() => {
       renderPicoYPlacaUI();
     }, 60000);

@@ -118,7 +118,10 @@ service cloud.firestore {
       return 'puntoReaccionId' in data
         && data.puntoReaccionId is string
         && isValidId(data.puntoReaccionId)
-        && exists(/databases/$(database)/documents/puntos_reaccion/$(data.puntoReaccionId));
+        && (
+          exists(/databases/$(database)/documents/puntos_reaccion_inmediata/$(data.puntoReaccionId)) ||
+          exists(/databases/$(database)/documents/puntos_reaccion/$(data.puntoReaccionId))
+        );
     }
 
     function isValidPuntoReaccion(data) {
@@ -478,6 +481,24 @@ service cloud.firestore {
 
     match /puntos_reaccion/{puntoId} {
       // Reaction zones contain zero PII and are bounded to <= 100 docs so clients can auto-promote alerts inside active zones
+      allow get: if isValidId(puntoId);
+      allow list: if request.query.limit != null && request.query.limit <= 100;
+      allow create: if isAdmin()
+        && isValidId(puntoId)
+        && isValidPuntoReaccion(incoming())
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(puntoId)
+        && isValidPuntoReaccion(incoming())
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['nombre', 'lat', 'lng', 'radioMetros']);
+      allow delete: if isAdmin() && isValidId(puntoId);
+    }
+
+    match /puntos_reaccion_inmediata/{puntoId} {
+      // Immediate reaction zones contain zero PII and are bounded to <= 100 docs so clients can auto-promote alerts inside active zones
       allow get: if isValidId(puntoId);
       allow list: if request.query.limit != null && request.query.limit <= 100;
       allow create: if isAdmin()
