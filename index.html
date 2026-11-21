@@ -9,9 +9,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="ANTHI" />
   <title>ANTHI | Radar Vial Antitodo</title>
-  <meta name="description" content="ANTHI (Andrés y Thiago): radar vial antitodo en tiempo real (anti-retenes, anti-grúas, anti-cepos y anti-accidentes) con mapa OpenStreetMap, GPS continuo y alertas sónar." />
+  <meta name="description" content="ANTHI (Andrés y Thiago): radar vial antitodo en tiempo real (anti-retenes, anti-agentes de tránsito, anti-cepos y anti-accidentes) con mapa OpenStreetMap, GPS continuo y alertas sónar." />
   <meta property="og:title" content="ANTHI | Radar Vial Antitodo" />
-  <meta property="og:description" content="ANTHI: radar vial antitodo en tiempo real para prevenir retenes, grúas, cepos y accidentes con GPS en vivo y notificaciones." />
+  <meta property="og:description" content="ANTHI: radar vial antitodo en tiempo real para prevenir retenes, agentes de tránsito, cepos y accidentes con GPS en vivo y notificaciones." />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/icon.svg" />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
@@ -1577,7 +1577,7 @@
     .cat-option[data-type="Cepos"] { border-color: rgba(168, 85, 247, 0.5); }
     .cat-option[data-type="Vía Cerrada / Obras"] { border-color: rgba(220, 38, 38, 0.45); }
     .cat-option[data-type="Peligro en Vía"] { border-color: rgba(234, 179, 8, 0.45); }
-    .cat-option[data-type="Grúa"] { border-color: rgba(14, 165, 233, 0.5); }
+    .cat-option[data-type="Agente de Tránsito"] { border-color: rgba(14, 165, 233, 0.55); }
 
     .cat-option.active {
       background: rgba(16, 185, 129, 0.18);
@@ -2379,7 +2379,7 @@
 
     <div class="manual-pin-bar" id="manualPinBar">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <span style="font-size:12px;font-weight:800;color:#f8fafc;">🗺️ Mueve el mapa hasta la ubicación exacta</span>
+        <span id="manualPinTitleLabel" style="font-size:12px;font-weight:800;color:#f8fafc;">🗺️ Mueve el mapa hasta la ubicación exacta</span>
         <span id="manualPinCoordsLabel" style="font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#67e8f9;">7.1193, -73.1227</span>
       </div>
       <div class="manual-pin-actions">
@@ -2473,19 +2473,42 @@
               <span class="cat-option-badge" style="background:rgba(234,179,8,0.22);border:1px solid #eab308;">⚠️</span>
               <span>Peligro</span>
             </button>
-            <button type="button" class="cat-option" data-type="Grúa" data-color="#0ea5e9" data-emoji="🚛">
+            <button type="button" class="cat-option" data-type="Agente de Tránsito" data-color="#0ea5e9" data-emoji="🚦">
               <span class="cat-option-badge" style="background:rgba(14,165,233,0.24);border:1px solid #0ea5e9;" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bae6fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 16h12v-5H7l-3 2v3"></path>
-                  <path d="M14 16h6l2-3-2-3h-6v6"></path>
-                  <path d="M8 11V5l7 3"></path>
-                  <path d="M15 8v2"></path>
-                  <circle cx="6.5" cy="17.5" r="1.8"></circle>
-                  <circle cx="17.5" cy="17.5" r="1.8"></circle>
+                  <circle cx="12" cy="5.5" r="2.2"></circle>
+                  <path d="M8.5 11.5a3.5 3.5 0 0 1 7 0v4.5h-7v-4.5Z"></path>
+                  <path d="M5 10.5l3.5 1.5M15.5 12l4-2"></path>
+                  <path d="M10 16v5M14 16v5"></path>
                 </svg>
               </span>
-              <span>Grúa</span>
+              <span>Agente Tránsito</span>
             </button>
+          </div>
+
+          <div id="agentRadiusRow" style="display:none;margin-bottom:12px;padding:10px 12px;border-radius:12px;background:rgba(14,165,233,0.12);border:1px solid rgba(56,189,248,0.45);">
+            <div style="font-size:11.5px;font-weight:800;color:#7dd3fc;margin-bottom:4px;">
+              🚦 Regulación de vía (paso controlado, no retén)
+            </div>
+            <div style="font-size:10.5px;color:#cbd5e1;line-height:1.35;margin-bottom:8px;">
+              Radio corto puntual (50 m a 100 m): avisa solo en el sector regulado sin abarcar otras cuadras.
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <label for="reportAgentRadiusInput" style="font-size:11px;color:#e0f2fe;font-weight:700;">Radio (m):</label>
+              <input
+                type="number"
+                id="reportAgentRadiusInput"
+                class="text-input"
+                min="50"
+                max="100"
+                step="5"
+                value="75"
+                style="margin-bottom:0;width:78px;padding:6px 8px;font-size:12px;"
+              />
+              <button type="button" class="pico-cal-btn" data-report-agent-radius="50">50m</button>
+              <button type="button" class="pico-cal-btn active" data-report-agent-radius="75">75m</button>
+              <button type="button" class="pico-cal-btn" data-report-agent-radius="100">100m</button>
+            </div>
           </div>
 
           <label class="admin-pin-row" id="adminFixedRow">
@@ -2502,6 +2525,7 @@
             📍 Se capturará tu ubicación GPS actual.
           </div>
           <div class="duplicate-guard-banner" id="duplicateProximityNotice" role="alert"></div>
+          <div id="fastActivationBanner" style="display:none;margin-bottom:12px;padding:9px 11px;border-radius:11px;font-size:11.5px;font-weight:700;line-height:1.4;"></div>
 
           <label class="form-label" for="reportDesc">3. Indicación o referencia rápida (opcional)</label>
           <textarea
@@ -2527,6 +2551,7 @@
           <div class="media-preview-wrap" id="mediaPreviewWrap">
             <img id="previewImage" class="media-preview" alt="Vista previa" />
             <video id="previewVideo" class="media-preview" controls playsinline></video>
+            <div id="mediaSizeNote" style="font-size:11px;color:#34d399;font-weight:700;margin-top:6px;"></div>
             <button type="button" class="btn-clear-media" id="btnClearMedia">🗑️ Quitar foto</button>
           </div>
 
@@ -2786,7 +2811,7 @@
           <label class="form-label" for="adminEditTipo">Categoría de la novedad *</label>
           <select id="adminEditTipo" class="text-input select-input" required>
             <option value="Retén de Tránsito">🚧 Retén de Tránsito</option>
-            <option value="Grúa">🚛 Grúa</option>
+            <option value="Agente de Tránsito">🚦 Agente de Tránsito (Regulación 50-100m)</option>
             <option value="Cepos">🔒 Cepos</option>
             <option value="Accidente">💥 Accidente</option>
             <option value="Vía Cerrada / Obras">⛔ Vía Cerrada / Obras</option>
@@ -2795,13 +2820,34 @@
             <option value="Policía">👮 Policía</option>
           </select>
 
+          <div id="adminEditAgentRadiusRow" style="display:none;margin-bottom:12px;padding:9px 11px;border-radius:11px;background:rgba(14,165,233,0.12);border:1px solid rgba(56,189,248,0.45);">
+            <div style="font-size:11px;font-weight:800;color:#7dd3fc;margin-bottom:6px;">
+              🚦 Radio puntual de Agente de Tránsito (50 m – 100 m)
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <input
+                type="number"
+                id="adminEditAgentRadiusInput"
+                class="text-input"
+                min="50"
+                max="100"
+                step="5"
+                value="75"
+                style="margin-bottom:0;width:78px;padding:6px 8px;font-size:12px;"
+              />
+              <button type="button" class="pico-cal-btn" data-edit-agent-radius="50">50m</button>
+              <button type="button" class="pico-cal-btn active" data-edit-agent-radius="75">75m</button>
+              <button type="button" class="pico-cal-btn" data-edit-agent-radius="100">100m</button>
+            </div>
+          </div>
+
           <label class="form-label" for="adminEditDesc">Texto descriptivo / Referencia</label>
           <textarea
             id="adminEditDesc"
             class="text-input"
             rows="3"
             maxlength="400"
-            placeholder="Ej: Retén móvil frente al parque, grúa levantando vehículos..."
+            placeholder="Ej: Agente regulando en la Cra 27, paso controlado o retén móvil..."
           ></textarea>
 
           <label class="admin-pin-row visible" style="margin-bottom:12px;">
@@ -2855,6 +2901,117 @@
           <p style="font-size:11.5px;color:#cbd5e1;line-height:1.4;margin-bottom:10px;">
             Superpoderes activos: publicación fija oficial, edición y borrado global de alertas (incluidas 1/3 sin confirmar), excepción al radio de 300 m y gestión del Buzón.
           </p>
+          <div id="adminReactionPointsBox" style="background:rgba(2,6,23,0.78);border:1px solid rgba(6,182,212,0.42);border-radius:12px;padding:10px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:800;color:#67e8f9;margin-bottom:6px;">
+              ⚡ Puntos de Reacción (Activación Firme Inmediata)
+            </div>
+            <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
+              Los reportes enviados dentro de estas zonas se activan firmes al instante (sin esperar confirmaciones ni bloqueo de 300 m).
+            </p>
+            <form id="reactionPointForm" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
+              <input
+                type="text"
+                id="rpNameInput"
+                class="text-input"
+                maxlength="60"
+                minlength="2"
+                required
+                style="margin-bottom:0;"
+                placeholder="Nombre de zona (ej: Glorieta Estadio)"
+              />
+              <div style="display:flex;gap:6px;align-items:center;">
+                <label for="rpRadiusInput" style="font-size:11px;color:#cbd5e1;font-weight:700;white-space:nowrap;">Radio (m):</label>
+                <input
+                  type="number"
+                  id="rpRadiusInput"
+                  class="text-input"
+                  min="50"
+                  max="2000"
+                  step="25"
+                  value="200"
+                  required
+                  style="margin-bottom:0;flex:1;padding:7px 10px;"
+                />
+                <button type="button" class="pico-cal-btn" data-rp-radius="100">100m</button>
+                <button type="button" class="pico-cal-btn active" data-rp-radius="200">200m</button>
+                <button type="button" class="pico-cal-btn" data-rp-radius="300">300m</button>
+                <button type="button" class="pico-cal-btn" data-rp-radius="500">500m</button>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+                <span id="rpCoordsBadge" style="font-size:10.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#cbd5e1;">Ubicación: GPS / centro mapa</span>
+                <div style="display:flex;gap:5px;">
+                  <button type="button" class="alert-admin-btn edit" id="btnUseGpsForReactionPoint" style="padding:5px 8px;font-size:10.5px;">📍 Mi GPS</button>
+                  <button type="button" class="alert-admin-btn edit" id="btnPickReactionCoordsOnMap" style="padding:5px 8px;font-size:10.5px;">🎯 Elegir en mapa</button>
+                </div>
+              </div>
+              <button type="submit" class="btn-submit" id="btnSaveReactionPoint" style="min-height:38px;font-size:12px;">
+                ⚡ Guardar Punto de Reacción
+              </button>
+            </form>
+            <div id="adminReactionPointsList" style="display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;"></div>
+          </div>
+
+          <div id="adminAgentPointsBox" style="background:rgba(2,6,23,0.78);border:1px solid rgba(14,165,233,0.45);border-radius:12px;padding:10px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:800;color:#7dd3fc;margin-bottom:6px;">
+              🚦 Agentes de Tránsito (Regulación puntual 50–100 m)
+            </div>
+            <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
+              Ubica puntos de regulación en corredores como la Cra 27 (no es retén). Quedan firmes de inmediato con radio corto (50 m – 100 m).
+            </p>
+            <form id="adminAgentPointForm" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
+              <input
+                type="text"
+                id="agentSectorInput"
+                class="text-input"
+                maxlength="120"
+                minlength="2"
+                required
+                style="margin-bottom:0;"
+                placeholder="Sector / Corredor (ej: Cra 27 con Calle 36 - Regulación)"
+              />
+              <input
+                type="text"
+                id="agentDescInput"
+                class="text-input"
+                maxlength="240"
+                style="margin-bottom:0;"
+                placeholder="Horario o detalle opcional (ej: Hora pico 7am-9am, paso alterno)"
+              />
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <label for="agentRadiusInput" style="font-size:11px;color:#cbd5e1;font-weight:700;white-space:nowrap;">Radio (50–100m):</label>
+                <input
+                  type="number"
+                  id="agentRadiusInput"
+                  class="text-input"
+                  min="50"
+                  max="100"
+                  step="5"
+                  value="75"
+                  required
+                  style="margin-bottom:0;width:76px;padding:6px 8px;"
+                />
+                <button type="button" class="pico-cal-btn" data-admin-agent-radius="50">50m</button>
+                <button type="button" class="pico-cal-btn active" data-admin-agent-radius="75">75m</button>
+                <button type="button" class="pico-cal-btn" data-admin-agent-radius="100">100m</button>
+              </div>
+              <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#fde68a;font-weight:700;cursor:pointer;">
+                <input type="checkbox" id="agentIsFixedCheckbox" />
+                <span>👑 Fijar como regulación habitual (no expira en 3h)</span>
+              </label>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+                <span id="agentCoordsBadge" style="font-size:10.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#cbd5e1;">Ubicación: GPS / centro mapa</span>
+                <div style="display:flex;gap:5px;">
+                  <button type="button" class="alert-admin-btn edit" id="btnUseGpsForAgentPoint" style="padding:5px 8px;font-size:10.5px;">📍 Mi GPS</button>
+                  <button type="button" class="alert-admin-btn edit" id="btnPickAgentCoordsOnMap" style="padding:5px 8px;font-size:10.5px;">🎯 Elegir en mapa</button>
+                </div>
+              </div>
+              <button type="submit" class="btn-submit" id="btnSaveAgentPoint" style="min-height:38px;font-size:12px;background:linear-gradient(135deg,#0284c7,#0ea5e9);">
+                🚦 Guardar Agente de Tránsito (Firme)
+              </button>
+            </form>
+            <div id="adminAgentPointsList" style="display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;"></div>
+          </div>
+
           <div id="adminReportsModerationBox" style="background:rgba(2,6,23,0.72);border:1px solid rgba(51,65,85,0.85);border-radius:12px;padding:10px;margin-bottom:12px;">
             <div id="adminReportsSummaryStats" style="font-size:11.5px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">
               Cargando reportes activos...
@@ -3390,7 +3547,8 @@
       HV_NOTIF_STATE: 'anthi_hv_notif_v1',
       MAP_CONTROLS_COLLAPSED: 'anthi_map_controls_collapsed_v1',
       PICO_HUD_COLLAPSED: 'anthi_pico_hud_collapsed_v1',
-      PICO_CALIBRATION: 'anthi_pico_calibration_v1'
+      PICO_CALIBRATION: 'anthi_pico_calibration_v1',
+      REACTION_POINTS: 'anthi_reaction_points_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -3451,6 +3609,10 @@
         confirmations: getConfirmCount(rep),
         confirmaciones: getConfirmCount(rep),
         confirmadoPor: getConfirmedByList(rep),
+        puntoReaccionId: rep.puntoReaccionId || null,
+        puntoReaccionNombre: rep.puntoReaccionNombre || null,
+        activacionRapida: rep.activacionRapida || null,
+        radioMetros: rep.radioMetros != null ? clampAgentRadiusMeters(rep.radioMetros) : null,
         authorId: rep.authorId || null,
         denials: Number(rep.denials || 0)
       }));
@@ -3523,6 +3685,10 @@
 
     const markersLayer = L.layerGroup().addTo(map);
     const frequentPointsLayer = L.layerGroup().addTo(map);
+    const reactionZonesLayer = L.layerGroup().addTo(map);
+    const agentZonesLayer = L.layerGroup().addTo(map);
+    const REACTION_POINTS_COLLECTION = 'puntos_reaccion';
+    let activeReactionPoints = loadCachedReactionPoints();
     let userMarker = null;
     let latestGps = initialCachedGps
       ? { lat: initialCachedGps.lat, lng: initialCachedGps.lng, isDefault: false, isCached: true }
@@ -3626,6 +3792,12 @@
       }
       if (window.__anthiAdminBuzonReady && typeof syncAdminBuzonSubscription === 'function') {
         syncAdminBuzonSubscription();
+      }
+      if (typeof renderReactionZonesOnMap === 'function') {
+        renderReactionZonesOnMap();
+      }
+      if (window.__anthiReportModalReady && typeof updateFastActivationPreview === 'function') {
+        updateFastActivationPreview();
       }
     }
 
@@ -3824,11 +3996,45 @@
       'trancón / congestión': { emoji: '🚗', color: '#f59e0b', label: 'Trancón / Congestión' },
       'policia': { emoji: '👮', color: '#3b82f6', label: 'Policía' },
       'policía': { emoji: '👮', color: '#3b82f6', label: 'Policía' },
+      'agente': { emoji: '🚦', color: '#0ea5e9', label: 'Agente de Tránsito (Regulación)' },
+      'agente transito': { emoji: '🚦', color: '#0ea5e9', label: 'Agente de Tránsito (Regulación)' },
+      'agente tránsito': { emoji: '🚦', color: '#0ea5e9', label: 'Agente de Tránsito (Regulación)' },
+      'agente de transito': { emoji: '🚦', color: '#0ea5e9', label: 'Agente de Tránsito (Regulación)' },
+      'agente de tránsito': { emoji: '🚦', color: '#0ea5e9', label: 'Agente de Tránsito (Regulación)' },
       'grua': { emoji: '🚛', color: '#0ea5e9', label: 'Grúa de Tránsito' },
       'grúa': { emoji: '🚛', color: '#0ea5e9', label: 'Grúa de Tránsito' },
       'cepo': { emoji: '🔒', color: '#a855f7', label: 'Cepos (Inmovilizador)' },
       'cepos': { emoji: '🔒', color: '#a855f7', label: 'Cepos (Inmovilizador)' }
     };
+
+    const PROXIMITY_USER_RADIUS_METERS = 450;
+    const PROXIMITY_CORRIDOR_METERS = 700;
+    const PROXIMITY_DEST_RADIUS_METERS = 1050;
+    const DEFAULT_AGENT_RADIUS_METERS = 75;
+
+    function isAgenteTransitoTipo(tipo) {
+      const key = String(tipo || '').trim().toLowerCase();
+      return (
+        key === 'agente de tránsito' ||
+        key === 'agente de transito' ||
+        key === 'agente tránsito' ||
+        key === 'agente transito' ||
+        key === 'agente'
+      );
+    }
+
+    function clampAgentRadiusMeters(val) {
+      const n = Math.round(Number(val));
+      if (!Number.isFinite(n)) return DEFAULT_AGENT_RADIUS_METERS;
+      return Math.max(50, Math.min(100, n));
+    }
+
+    function getEffectiveAlertRadiusMeters(rep) {
+      if (rep && isAgenteTransitoTipo(rep.tipo || rep.type)) {
+        return clampAgentRadiusMeters(rep.radioMetros != null ? rep.radioMetros : DEFAULT_AGENT_RADIUS_METERS);
+      }
+      return PROXIMITY_USER_RADIUS_METERS;
+    }
 
     function getTipoMeta(tipo) {
       const key = String(tipo || '').trim().toLowerCase();
@@ -3970,6 +4176,22 @@
       };
     }
 
+    function getFastActivationTag(rep) {
+      if (!rep) return '';
+      if (rep.activacionRapida === 'punto_reaccion' || rep.puntoReaccionId) {
+        return rep.puntoReaccionNombre
+          ? `⚡ Punto de Reacción: ${rep.puntoReaccionNombre}`
+          : '⚡ Punto de Reacción';
+      }
+      if (rep.activacionRapida === 'foto') {
+        return '📸 Firme inmediata por foto';
+      }
+      if (rep.activacionRapida === 'admin') {
+        return '👑 Activación directa Admin';
+      }
+      return '';
+    }
+
     function isReportAudibleForCurrentUser(rep) {
       if (!rep) return false;
       if (hasValidatedAdminPermission()) return true;
@@ -4072,6 +4294,9 @@
         const denials = Number(rep.denials || 0);
         const confirmations = getConfirmCount(rep);
         const consensusInfo = getConsensusBadgeInfo(rep);
+        const fastTag = getFastActivationTag(rep);
+        const isAgente = isAgenteTransitoTipo(rep.tipo || rep.type);
+        const agenteRadiusM = isAgente ? clampAgentRadiusMeters(rep.radioMetros) : null;
         const remainingLabel = formatRemainingTimeLabel(rep, nowMs);
         const resolvedTag = userRole === 'admin' && !isFixed && denials >= 3 && denials > confirmations
           ? ' · ⚖️ Marcado por votos (solo Admin)'
@@ -4092,6 +4317,8 @@
             </div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:3px 0;">
               <span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
+              ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
               <span style="font-size:10.5px;color:#94a3b8;font-weight:700;">⏱ ${escapeHtml(remainingLabel)}</span>
             </div>
             <div class="alert-list-meta">
@@ -4151,6 +4378,7 @@
         }
       });
       markersLayer.clearLayers();
+      if (agentZonesLayer) agentZonesLayer.clearLayers();
       const nowMs = Date.now();
       lastRenderedReports = (Array.isArray(reportsList) ? reportsList : []).filter(
         (rep) => rep && !isReportExpired(rep, nowMs)
@@ -4163,8 +4391,10 @@
 
         const tipoTexto = rep.tipo || rep.type || 'Novedad';
         const meta = getTipoMeta(tipoTexto);
+        const isAgente = isAgenteTransitoTipo(tipoTexto);
+        const agenteRadiusM = isAgente ? clampAgentRadiusMeters(rep.radioMetros) : null;
         const rawDescText = String(rep.descripcion || rep.description || '').trim();
-        const descripcionTexto = rawDescText || 'Sin referencia adicional (ver ubicación en el mapa).';
+        const descripcionTexto = rawDescText || (isAgente ? 'Regulación puntual de tránsito en la vía (no retén).' : 'Sin referencia adicional (ver ubicación en el mapa).');
         const fotoUrl = rep.urlFoto || rep.mediaUrl || rep.mediaDataUrl || null;
         const timeMs = extractTimestampMs(rep);
         const isPending = Boolean(rep.isPending);
@@ -4172,6 +4402,19 @@
         const confirmations = getConfirmCount(rep);
         const consensusInfo = getConsensusBadgeInfo(rep);
         const remainingLabel = formatRemainingTimeLabel(rep, nowMs);
+
+        if (isAgente && agentZonesLayer) {
+          L.circle([lat, lng], {
+            radius: agenteRadiusM,
+            color: '#0ea5e9',
+            weight: 1.6,
+            opacity: 0.72,
+            dashArray: '4, 4',
+            fillColor: '#38bdf8',
+            fillOpacity: 0.14,
+            interactive: false
+          }).addTo(agentZonesLayer);
+        }
 
         const marker = L.marker([lat, lng], {
           icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed, confirmations),
@@ -4221,14 +4464,17 @@
 
         const badgeColor = isFixed ? '#d97706' : meta.color;
         const badgePrefix = isFixed ? '👑 Fija · ' : '';
+        const fastTag = getFastActivationTag(rep);
 
         marker.bindPopup(`
           <div class="popup-card">
             <span class="popup-badge" style="background:${escapeHtml(badgeColor)}">
               ${badgePrefix}${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
             </span>
-            <div style="margin:5px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+            <div style="margin:5px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;">
               <span style="font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación / paso (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
+              ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
             </div>
             <div>${escapeHtml(descripcionTexto)}</div>
             ${mediaHtml}
@@ -5087,6 +5333,36 @@
     const btnCancelAdminEdit = document.getElementById('btnCancelAdminEdit');
     const btnSaveAdminEdit = document.getElementById('btnSaveAdminEdit');
 
+    const adminEditAgentRadiusRow = document.getElementById('adminEditAgentRadiusRow');
+    const adminEditAgentRadiusInput = document.getElementById('adminEditAgentRadiusInput');
+
+    function syncAdminEditRadiusUI(tipoVal, radiusVal) {
+      const isAgente = isAgenteTransitoTipo(tipoVal);
+      if (adminEditAgentRadiusRow) {
+        adminEditAgentRadiusRow.style.display = isAgente ? 'block' : 'none';
+      }
+      if (adminEditAgentRadiusInput) {
+        const clamped = clampAgentRadiusMeters(radiusVal);
+        adminEditAgentRadiusInput.value = String(clamped);
+        document.querySelectorAll('[data-edit-agent-radius]').forEach((b) => {
+          b.classList.toggle('active', Number(b.dataset.editAgentRadius) === clamped);
+        });
+      }
+    }
+
+    if (adminEditTipo) {
+      adminEditTipo.addEventListener('change', () => {
+        syncAdminEditRadiusUI(adminEditTipo.value, adminEditAgentRadiusInput ? adminEditAgentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS);
+      });
+    }
+    document.querySelectorAll('[data-edit-agent-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = clampAgentRadiusMeters(btn.dataset.editAgentRadius);
+        if (adminEditAgentRadiusInput) adminEditAgentRadiusInput.value = String(val);
+        document.querySelectorAll('[data-edit-agent-radius]').forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+
     function closeAdminEditModal() {
       if (adminEditModal) adminEditModal.classList.remove('open');
     }
@@ -5120,6 +5396,7 @@
       adminEditTipo.value = currentTipo;
       adminEditDesc.value = String(rep.descripcion || rep.description || '');
       adminEditIsFixed.checked = Boolean(rep.isFixed);
+      syncAdminEditRadiusUI(currentTipo, rep.radioMetros != null ? rep.radioMetros : DEFAULT_AGENT_RADIUS_METERS);
       adminEditModal.classList.add('open');
       setTimeout(() => adminEditDesc.focus(), 120);
     };
@@ -5135,6 +5412,9 @@
         const newTipo = adminEditTipo.value.trim().slice(0, 40);
         const newDesc = adminEditDesc.value.trim().slice(0, 400);
         const newFixed = Boolean(adminEditIsFixed.checked);
+        const newRadioMetros = isAgenteTransitoTipo(newTipo)
+          ? clampAgentRadiusMeters(adminEditAgentRadiusInput ? adminEditAgentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS)
+          : null;
         if (!reportId || newTipo.length < 2) {
           showToast('Selecciona una categoría válida.');
           return;
@@ -5150,14 +5430,15 @@
             updateDoc(doc(db, COLLECTION_NAME, reportId), {
               tipo: newTipo,
               descripcion: newDesc,
-              isFixed: newFixed
+              isFixed: newFixed,
+              radioMetros: newRadioMetros
             }),
             15000
           );
 
           allNonExpiredServerReports = allNonExpiredServerReports.map((item) =>
             String(item.id) === String(reportId)
-              ? { ...item, tipo: newTipo, descripcion: newDesc, isFixed: newFixed }
+              ? { ...item, tipo: newTipo, descripcion: newDesc, isFixed: newFixed, radioMetros: newRadioMetros }
               : item
           );
           refreshReportsForRole();
@@ -5289,6 +5570,153 @@
         renderAlertsCenterList(lastRenderedReports);
       }
     }, 30000);
+
+    // =========================================================================
+    // 6B. PUNTOS DE REACCIÓN (GEOCERCAS ADMIN CON ACTIVACIÓN FIRME INMEDIATA)
+    // =========================================================================
+    function loadCachedReactionPoints() {
+      const parsed = safeReadJson(STORAGE_KEYS.REACTION_POINTS, []);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+
+    function saveCachedReactionPoints(list) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.REACTION_POINTS, JSON.stringify((list || []).slice(0, 100)));
+      } catch (e) {}
+    }
+
+    function findMatchingReactionPoint(lat, lng) {
+      const targetLat = Number(lat);
+      const targetLng = Number(lng);
+      if (!Number.isFinite(targetLat) || !Number.isFinite(targetLng)) return null;
+      const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
+      let closest = null;
+      let closestDist = Infinity;
+      for (const rp of list) {
+        if (!rp || !rp.id) continue;
+        const rLat = Number(rp.lat);
+        const rLng = Number(rp.lng);
+        const radiusM = Math.max(50, Math.min(2000, Number(rp.radioMetros || 200)));
+        if (!Number.isFinite(rLat) || !Number.isFinite(rLng)) continue;
+        const dist = calcularDistanciaMetros(targetLat, targetLng, rLat, rLng);
+        if (dist <= radiusM && dist < closestDist) {
+          closestDist = dist;
+          closest = { point: rp, distanceMeters: Math.round(dist), radiusMeters: radiusM };
+        }
+      }
+      return closest;
+    }
+
+    function renderReactionZonesOnMap() {
+      if (!reactionZonesLayer) return;
+      reactionZonesLayer.clearLayers();
+      if (userRole !== 'admin') return;
+
+      const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
+      list.forEach((rp) => {
+        const lat = Number(rp.lat);
+        const lng = Number(rp.lng);
+        const radiusM = Math.max(50, Math.min(2000, Number(rp.radioMetros || 200)));
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const circle = L.circle([lat, lng], {
+          radius: radiusM,
+          color: '#06b6d4',
+          weight: 1.8,
+          opacity: 0.78,
+          dashArray: '6, 5',
+          fillColor: '#06b6d4',
+          fillOpacity: 0.11,
+          interactive: true
+        });
+
+        const popupHtml = `
+          <div class="popup-card">
+            <span class="popup-badge" style="background:#0891b2;">⚡ Punto de Reacción</span>
+            <div style="font-weight:800;margin-bottom:4px;">${escapeHtml(rp.nombre || 'Zona de Reacción')}</div>
+            <div class="popup-meta">Radio: ${radiusM} m · 📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+            <div class="popup-meta" style="color:#67e8f9;margin-top:4px;">Los reportes dentro de este círculo quedan FIRMES al instante.</div>
+            ${hasValidatedAdminPermission() ? `<div class="popup-admin-bar"><button type="button" class="popup-vote-btn delete" onclick="deleteReactionPointFromFirestore('${escapeHtml(rp.id)}')">🗑️ Eliminar Punto de Reacción</button></div>` : ''}
+          </div>
+        `;
+        circle.bindPopup(popupHtml);
+        circle.addTo(reactionZonesLayer);
+
+        const labelMarker = L.marker([lat, lng], {
+          zIndexOffset: 240,
+          icon: L.divIcon({
+            className: 'custom-reaction-zone-pin',
+            html: `<div style="padding:2px 7px;border-radius:999px;background:rgba(8,47,73,0.92);border:1.5px solid #22d3ee;color:#a5f3fc;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.45);">⚡ ${escapeHtml(rp.nombre || 'Zona')} (${radiusM}m)</div>`,
+            iconSize: [140, 22],
+            iconAnchor: [70, 11]
+          })
+        });
+        labelMarker.bindPopup(popupHtml);
+        labelMarker.addTo(reactionZonesLayer);
+      });
+    }
+
+    window.deleteReactionPointFromFirestore = async function(puntoId) {
+      if (!puntoId || userRole !== 'admin') return;
+      const path = `${REACTION_POINTS_COLLECTION}/${puntoId}`;
+      try {
+        await ensureAuthenticated();
+        if (!isAuthorizedAdminEmail(auth.currentUser)) {
+          showToast(`⛔ Inicia sesión como Administrador (${ADMIN_EMAILS.join(' o ')}) para eliminar Puntos de Reacción.`);
+          return;
+        }
+        await withTimeout(deleteDoc(doc(db, REACTION_POINTS_COLLECTION, puntoId)), 15000);
+        activeReactionPoints = activeReactionPoints.filter((item) => String(item.id) !== String(puntoId));
+        saveCachedReactionPoints(activeReactionPoints);
+        renderReactionZonesOnMap();
+        if (typeof window.__anthiRefreshReactionPointsUI === 'function') {
+          window.__anthiRefreshReactionPointsUI();
+        }
+        if (typeof updateDuplicateGuardPreview === 'function') {
+          updateDuplicateGuardPreview();
+        }
+        showToast('🗑️ Punto de Reacción eliminado.');
+      } catch (err) {
+        if (err && err.message === 'AUTH_CANCELLED') return;
+        showToast('No se pudo eliminar el Punto de Reacción.');
+        handleFirestoreError(err, OperationType.DELETE, path);
+      }
+    };
+
+    function startReactionPointsListener() {
+      const rpQuery = query(collection(db, REACTION_POINTS_COLLECTION), limit(100));
+      onSnapshot(
+        rpQuery,
+        (snapshot) => {
+          const items = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data() || {};
+            items.push({
+              id: docSnap.id,
+              nombre: String(data.nombre || 'Zona de Reacción'),
+              lat: Number(data.lat),
+              lng: Number(data.lng),
+              radioMetros: Number(data.radioMetros || 200),
+              createdBy: String(data.createdBy || ''),
+              _sortMs: extractTimestampMs(data)
+            });
+          });
+          items.sort((a, b) => b._sortMs - a._sortMs);
+          activeReactionPoints = items;
+          saveCachedReactionPoints(items);
+          renderReactionZonesOnMap();
+          if (typeof window.__anthiRefreshReactionPointsUI === 'function') {
+            window.__anthiRefreshReactionPointsUI();
+          }
+          if (typeof updateDuplicateGuardPreview === 'function') {
+            updateDuplicateGuardPreview();
+          }
+        },
+        (err) => {
+          console.warn('Error escuchando puntos_reaccion:', err && err.message ? err.message : err);
+        }
+      );
+    }
 
     // =========================================================================
     // 7. MOTOR DE RASTREO GPS POR SONDEO ACTIVO + FILTRO QUIRÚRGICO ANTI-REBOTES
@@ -5919,22 +6347,106 @@
       duplicateProximityNotice.appendChild(viewBtn);
     }
 
+    const fastActivationBanner = document.getElementById('fastActivationBanner');
+    const mediaSizeNote = document.getElementById('mediaSizeNote');
+    const manualPinTitleLabel = document.getElementById('manualPinTitleLabel');
+    const agentRadiusRow = document.getElementById('agentRadiusRow');
+    const reportAgentRadiusInput = document.getElementById('reportAgentRadiusInput');
+    let manualPinPickerTarget = 'report'; // 'report' | 'reactionPoint' | 'agentPoint'
+    let pendingReactionCoords = null;
+    let pendingAgentCoords = null;
+
+    function updateAgentRadiusRowVisibility() {
+      const isAgente = Boolean(selectedCategory && isAgenteTransitoTipo(selectedCategory.type));
+      if (agentRadiusRow) {
+        agentRadiusRow.style.display = isAgente ? 'block' : 'none';
+      }
+      if (isAgente && reportAgentRadiusInput) {
+        const clamped = clampAgentRadiusMeters(reportAgentRadiusInput.value);
+        reportAgentRadiusInput.value = String(clamped);
+        document.querySelectorAll('[data-report-agent-radius]').forEach((b) => {
+          b.classList.toggle('active', Number(b.dataset.reportAgentRadius) === clamped);
+        });
+      }
+    }
+
+    document.querySelectorAll('[data-report-agent-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = clampAgentRadiusMeters(btn.dataset.reportAgentRadius);
+        if (reportAgentRadiusInput) reportAgentRadiusInput.value = String(val);
+        document.querySelectorAll('[data-report-agent-radius]').forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+    if (reportAgentRadiusInput) {
+      reportAgentRadiusInput.addEventListener('change', () => {
+        const val = clampAgentRadiusMeters(reportAgentRadiusInput.value);
+        reportAgentRadiusInput.value = String(val);
+        document.querySelectorAll('[data-report-agent-radius]').forEach((b) => {
+          b.classList.toggle('active', Number(b.dataset.reportAgentRadius) === val);
+        });
+      });
+    }
+
+    function getCurrentReportPreviewCoords() {
+      if (manualReportCoords) return manualReportCoords;
+      if (latestGps && !latestGps.isDefault) return latestGps;
+      return loadCachedGps();
+    }
+
+    function updateFastActivationPreview() {
+      if (!window.__anthiReportModalReady) return;
+      const bannerEl = fastActivationBanner || document.getElementById('fastActivationBanner');
+      if (!bannerEl) return;
+      const previewCoords = getCurrentReportPreviewCoords();
+      const matchedRP = previewCoords ? findMatchingReactionPoint(previewCoords.lat, previewCoords.lng) : null;
+      const hasPhoto = Boolean(pendingImageDataUrl && String(pendingImageDataUrl).length > 100);
+      const isAdminMode = hasValidatedAdminPermission();
+
+      if (matchedRP) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = 'rgba(6, 182, 212, 0.14)';
+        bannerEl.style.border = '1px solid rgba(34, 211, 238, 0.5)';
+        bannerEl.style.color = '#a5f3fc';
+        bannerEl.innerHTML = `⚡ <strong>Punto de Reacción «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> tu reporte quedará <strong>FIRME de inmediato</strong> (sin espera de confirmaciones ni bloqueo de 300 m).`;
+        return;
+      }
+      if (hasPhoto) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = 'rgba(16, 185, 129, 0.14)';
+        bannerEl.style.border = '1px solid rgba(52, 211, 153, 0.5)';
+        bannerEl.style.color = '#a7f3d0';
+        bannerEl.innerHTML = '📸 <strong>Foto adjunta lista:</strong> al publicar, la alerta quedará <strong>FIRME y activa de inmediato</strong> para toda la comunidad (3 horas).';
+        return;
+      }
+      if (isAdminMode) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = 'rgba(245, 158, 11, 0.14)';
+        bannerEl.style.border = '1px solid rgba(251, 191, 36, 0.5)';
+        bannerEl.style.color = '#fde68a';
+        bannerEl.innerHTML = '👑 <strong>Modo Administrador:</strong> tu reporte se activará <strong>FIRME de inmediato</strong> para toda la comunidad.';
+        return;
+      }
+      bannerEl.style.display = 'block';
+      bannerEl.style.background = 'rgba(15, 23, 42, 0.72)';
+      bannerEl.style.border = '1px solid rgba(100, 116, 139, 0.45)';
+      bannerEl.style.color = '#cbd5e1';
+      bannerEl.innerHTML = '⏳ <strong>Activación escalonada:</strong> inicia 1/3 (30 min) → 2/3 (1h con radar) → 3+ (Firme 3h). <em>Tip: adjunta una foto para activarla firme al instante.</em>';
+    }
+
     function updateDuplicateGuardPreview() {
-      if (!duplicateProximityNotice) return;
+      if (!window.__anthiReportModalReady || !duplicateProximityNotice) return;
+      updateFastActivationPreview();
       if (!selectedCategory || !selectedCategory.type) {
         renderDuplicateGuardBanner(null, false);
         return;
       }
-      let previewCoords = null;
-      if (manualReportCoords) {
-        previewCoords = manualReportCoords;
-      } else if (latestGps && !latestGps.isDefault) {
-        previewCoords = latestGps;
-      } else {
-        const cached = loadCachedGps();
-        if (cached) previewCoords = cached;
-      }
+      const previewCoords = getCurrentReportPreviewCoords();
       if (!previewCoords) {
+        renderDuplicateGuardBanner(null, false);
+        return;
+      }
+      const inReactionPoint = Boolean(findMatchingReactionPoint(previewCoords.lat, previewCoords.lng));
+      if (inReactionPoint && !hasValidatedAdminPermission()) {
         renderDuplicateGuardBanner(null, false);
         return;
       }
@@ -5967,33 +6479,99 @@
       manualPinCoordsLabel.textContent = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
     }
 
-    function openManualPinPicker() {
+    function openManualPinPicker(targetMode = 'report') {
+      manualPinPickerTarget =
+        targetMode === 'reactionPoint'
+          ? 'reactionPoint'
+          : targetMode === 'agentPoint'
+          ? 'agentPoint'
+          : 'report';
       isPickingReportPin = true;
       isFollowingUser = false;
       modal.classList.remove('open');
+      if (typeof adminPanelModal !== 'undefined' && adminPanelModal) {
+        adminPanelModal.classList.remove('open');
+      }
       if (bottomPanelEl) bottomPanelEl.style.display = 'none';
-      if (manualReportCoords) {
-        map.setView([manualReportCoords.lat, manualReportCoords.lng], Math.max(map.getZoom(), 16), { animate: false });
+      if (manualPinTitleLabel) {
+        manualPinTitleLabel.textContent =
+          manualPinPickerTarget === 'reactionPoint'
+            ? '⚡ Mueve el mapa al centro del Punto de Reacción'
+            : manualPinPickerTarget === 'agentPoint'
+            ? '🚦 Mueve el mapa al punto donde regula el Agente'
+            : '🗺️ Mueve el mapa hasta la ubicación exacta';
+      }
+      const targetCoords =
+        manualPinPickerTarget === 'reactionPoint'
+          ? pendingReactionCoords
+          : manualPinPickerTarget === 'agentPoint'
+          ? pendingAgentCoords
+          : manualReportCoords;
+      if (targetCoords) {
+        map.setView([targetCoords.lat, targetCoords.lng], Math.max(map.getZoom(), 16), { animate: false });
       }
       manualPinOverlay.classList.add('visible');
       manualPinBar.classList.add('visible');
       updateManualPinCenterDisplay();
-      showToast('Mueve o haz zoom en el mapa para ubicar el pin donde ocurrió la novedad.');
+      showToast(
+        manualPinPickerTarget === 'reactionPoint'
+          ? 'Ubica la mira en la esquina o glorieta para el Punto de Reacción.'
+          : manualPinPickerTarget === 'agentPoint'
+          ? 'Ubica la mira sobre el corredor o intersección (ej: Cra 27) donde regula el Agente.'
+          : 'Mueve o haz zoom en el mapa para ubicar el pin donde ocurrió la novedad.'
+      );
     }
 
     function closeManualPinPicker(confirmPoint = false) {
+      const targetWasReaction = manualPinPickerTarget === 'reactionPoint';
+      const targetWasAgent = manualPinPickerTarget === 'agentPoint';
       if (confirmPoint) {
         const center = map.getCenter();
-        manualReportCoords = {
+        const picked = {
           lat: Number(center.lat.toFixed(6)),
           lng: Number(center.lng.toFixed(6)),
           isManual: true
         };
+        if (targetWasReaction) {
+          pendingReactionCoords = picked;
+        } else if (targetWasAgent) {
+          pendingAgentCoords = picked;
+        } else {
+          manualReportCoords = picked;
+        }
       }
       isPickingReportPin = false;
+      manualPinPickerTarget = 'report';
       manualPinOverlay.classList.remove('visible');
       manualPinBar.classList.remove('visible');
       if (bottomPanelEl) bottomPanelEl.style.display = '';
+
+      if (targetWasReaction) {
+        if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') {
+          window.__anthiUpdateReactionCoordsBadge();
+        }
+        if (typeof openAdminPanelModal === 'function') {
+          openAdminPanelModal('control');
+        }
+        if (confirmPoint) {
+          showToast('⚡ Coordenadas del Punto de Reacción fijadas.');
+        }
+        return;
+      }
+
+      if (targetWasAgent) {
+        if (typeof window.__anthiUpdateAgentCoordsBadge === 'function') {
+          window.__anthiUpdateAgentCoordsBadge();
+        }
+        if (typeof openAdminPanelModal === 'function') {
+          openAdminPanelModal('control');
+        }
+        if (confirmPoint) {
+          showToast('🚦 Ubicación del Agente de Tránsito fijada.');
+        }
+        return;
+      }
+
       updateReportLocationUI();
       modal.classList.add('open');
       if (confirmPoint) {
@@ -6007,7 +6585,7 @@
       updateReportLocationUI();
       showToast('Se usará tu ubicación GPS en tiempo real.');
     });
-    btnModeManualPin.addEventListener('click', openManualPinPicker);
+    btnModeManualPin.addEventListener('click', () => openManualPinPicker('report'));
     btnConfirmManualPin.addEventListener('click', () => closeManualPinPicker(true));
     btnCancelManualPin.addEventListener('click', () => closeManualPinPicker(false));
 
@@ -6022,6 +6600,8 @@
           emoji: first.dataset.emoji
         };
       }
+      if (reportAgentRadiusInput) reportAgentRadiusInput.value = String(DEFAULT_AGENT_RADIUS_METERS);
+      updateAgentRadiusRowVisibility();
     }
 
     function resetMediaState() {
@@ -6035,10 +6615,12 @@
       previewVideo.style.display = 'none';
       previewImage.removeAttribute('src');
       previewVideo.removeAttribute('src');
+      if (mediaSizeNote) mediaSizeNote.textContent = '';
       pendingBlob = null;
       pendingImageDataUrl = null;
       pendingMediaType = null;
       pendingFileName = null;
+      updateFastActivationPreview();
     }
 
     document.getElementById('btnOpenReport').addEventListener('click', () => {
@@ -6064,11 +6646,15 @@
           color: btn.dataset.color,
           emoji: btn.dataset.emoji
         };
+        updateAgentRadiusRowVisibility();
         updateDuplicateGuardPreview();
         mediaInput.value = '';
         mediaInput.click();
       });
     });
+
+    window.__anthiReportModalReady = true;
+    updateFastActivationPreview();
 
     // =========================================================================
     // 10. RADAR DE PROXIMIDAD INTELIGENTE ("VOY PARA...") Y DESTINOS EDITABLES
@@ -6118,9 +6704,6 @@
     let isPickingDestOnMap = false;
     let selectedDestEmoji = '📍';
 
-    const PROXIMITY_USER_RADIUS_METERS = 450;
-    const PROXIMITY_CORRIDOR_METERS = 700;
-    const PROXIMITY_DEST_RADIUS_METERS = 1050;
     const SONAR_REPEAT_INTERVAL_MS = 30000;
     const BACKGROUND_PUSH_REPEAT_MS = 30000;
 
@@ -6304,8 +6887,9 @@
         const rLng = Number(rep.lng);
         if (Number.isNaN(rLat) || Number.isNaN(rLng)) return;
         const dist = calcularDistanciaMetros(origLat, origLng, rLat, rLng);
-        if (dist <= PROXIMITY_USER_RADIUS_METERS) {
-          nearbyHits.push({ rep, dist });
+        const effectiveRadius = getEffectiveAlertRadiusMeters(rep);
+        if (dist <= effectiveRadius) {
+          nearbyHits.push({ rep, dist, effectiveRadius });
         }
       });
 
@@ -6375,7 +6959,10 @@
           } catch (e) {}
         }
         if (!document.hidden) {
-          showToast(`📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`);
+          const toastMsg = isAgenteTransitoTipo(closest.rep.tipo || closest.rep.type)
+            ? `📡 ANTHI Sónar: 🚦 Agente de Tránsito regulando a ${Math.round(closest.dist)} m (radio ${closest.effectiveRadius} m)`
+            : `📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`;
+          showToast(toastMsg);
         }
       }
 
@@ -6818,10 +7405,12 @@
         const distFromUser = calcularDistanciaMetros(origLat, origLng, rLat, rLng);
         const distToDest = calcularDistanciaMetros(dest.lat, dest.lng, rLat, rLng);
         const corridorDist = distanciaPuntoASegmentoMetros(rLat, rLng, origLat, origLng, dest.lat, dest.lng);
+        const isAgente = isAgenteTransitoTipo(rep.tipo || rep.type);
+        const tightRadius = isAgente ? clampAgentRadiusMeters(rep.radioMetros) : null;
 
-        const isNearUser = distFromUser <= PROXIMITY_USER_RADIUS_METERS;
-        const isInZoneCorridor = corridorDist <= PROXIMITY_CORRIDOR_METERS;
-        const isNearDestination = distToDest <= PROXIMITY_DEST_RADIUS_METERS;
+        const isNearUser = distFromUser <= (tightRadius != null ? tightRadius : PROXIMITY_USER_RADIUS_METERS);
+        const isInZoneCorridor = corridorDist <= (tightRadius != null ? tightRadius : PROXIMITY_CORRIDOR_METERS);
+        const isNearDestination = distToDest <= (tightRadius != null ? tightRadius : PROXIMITY_DEST_RADIUS_METERS);
 
         if (isNearUser || isInZoneCorridor || isNearDestination) {
           alertsInProximity.push({
@@ -6830,7 +7419,7 @@
             distToDest,
             corridorDist,
             reason: isNearUser
-              ? 'cerca de tu posición'
+              ? (tightRadius != null ? `sector regulado ${tightRadius} m` : 'cerca de tu posición')
               : isNearDestination
               ? `en zona de ${dest.name}`
               : 'en tu zona de trayecto'
@@ -7059,38 +7648,44 @@
 
     poblarDestinosRuta();
 
-    function comprimirImagenACanvasBase64(file, maxWidth = 800, quality = 0.7) {
+    function comprimirImagenACanvasBase64(file, maxDimension = 720, quality = 0.64) {
       return new Promise((resolve, reject) => {
         const rawUrl = URL.createObjectURL(file);
         const img = new Image();
         img.onload = () => {
           try {
             URL.revokeObjectURL(rawUrl);
-            let w = img.naturalWidth || img.width;
-            let h = img.naturalHeight || img.height;
-            if (!w || !h) {
+            const origW = img.naturalWidth || img.width;
+            const origH = img.naturalHeight || img.height;
+            if (!origW || !origH) {
               reject(new Error('INVALID_IMAGE_DIMENSIONS'));
               return;
             }
-            if (w > maxWidth) {
-              h = Math.round((h * maxWidth) / w);
-              w = maxWidth;
+
+            const renderScaled = (maxDim, q) => {
+              let w = origW;
+              let h = origH;
+              if (w >= h && w > maxDim) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else if (h > w && h > maxDim) {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, w);
+              canvas.height = Math.max(1, h);
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              return canvas.toDataURL('image/jpeg', q);
+            };
+
+            let dataUrl = renderScaled(maxDimension, quality);
+            if (dataUrl.length > 180000) {
+              dataUrl = renderScaled(560, 0.52);
             }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-
-            let dataUrl = canvas.toDataURL('image/jpeg', quality);
-            if (dataUrl.length > 350000) {
-              const fallbackW = Math.min(w, 640);
-              const fallbackH = Math.round((h * fallbackW) / w);
-              canvas.width = fallbackW;
-              canvas.height = fallbackH;
-              ctx.drawImage(img, 0, 0, fallbackW, fallbackH);
-              dataUrl = canvas.toDataURL('image/jpeg', 0.55);
+            if (dataUrl.length > 180000) {
+              dataUrl = renderScaled(440, 0.42);
             }
             resolve(dataUrl);
           } catch (err) {
@@ -7116,7 +7711,7 @@
       }
 
       try {
-        const compressedBase64 = await comprimirImagenACanvasBase64(file, 800, 0.7);
+        const compressedBase64 = await comprimirImagenACanvasBase64(file, 720, 0.64);
         pendingImageDataUrl = compressedBase64;
         pendingBlob = null;
         pendingMediaType = 'image';
@@ -7124,6 +7719,11 @@
         previewImage.src = compressedBase64;
         previewImage.style.display = 'block';
         mediaPreviewWrap.style.display = 'block';
+        const approxKb = Math.max(1, Math.round((compressedBase64.length * 0.75) / 1024));
+        if (mediaSizeNote) {
+          mediaSizeNote.textContent = `📸 Foto optimizada (${approxKb} KB) · Alerta FIRME inmediata al enviar`;
+        }
+        updateFastActivationPreview();
       } catch (err) {
         console.error('Error comprimiendo imagen:', err);
         showToast('No se pudo procesar la foto. Intenta tomarla nuevamente.');
@@ -7189,21 +7789,39 @@
 
       const localId = `pending_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
       const nowMs = Date.now();
+      const matchedRP = findMatchingReactionPoint(coords.lat, coords.lng);
+      const hasPhoto = Boolean(mediaDataUrl && mediaDataUrl.length > 100);
+      const isImmediateFirm = hasValidatedAdminPermission() || Boolean(matchedRP) || hasPhoto;
+      const initialConfirm = isImmediateFirm ? 3 : 1;
+      const initialTtlMs = isImmediateFirm ? CONSENSUS_TTL_LEVEL3_MS : CONSENSUS_TTL_LEVEL1_MS;
+      const agentRadiusVal = isAgenteTransitoTipo(selectedCategory.type)
+        ? clampAgentRadiusMeters(reportAgentRadiusInput ? reportAgentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS)
+        : null;
       const queue = loadPendingReports();
       queue.push({
         localId,
         lat: coords.lat,
         lng: coords.lng,
         tipo: selectedCategory.type,
+        radioMetros: agentRadiusVal,
         descripcion: descripcion.slice(0, 400),
         isFixed,
         createdAtMs: nowMs,
-        expiresAtMs: nowMs + CONSENSUS_TTL_LEVEL1_MS,
+        expiresAtMs: nowMs + initialTtlMs,
         mediaDataUrl,
         mediaType: mediaDataUrl ? (mediaType || 'image') : null,
         fileName: mediaDataUrl ? fileName : null,
-        confirmations: 1,
-        confirmaciones: 1,
+        puntoReaccionId: matchedRP ? matchedRP.point.id : null,
+        puntoReaccionNombre: matchedRP ? matchedRP.point.nombre : null,
+        activacionRapida: hasValidatedAdminPermission()
+          ? 'admin'
+          : matchedRP
+          ? 'punto_reaccion'
+          : hasPhoto
+          ? 'foto'
+          : 'normal',
+        confirmations: initialConfirm,
+        confirmaciones: initialConfirm,
         confirmadoPor: auth.currentUser ? [auth.currentUser.uid] : [],
         denials: 0
       });
@@ -7326,12 +7944,14 @@
       try {
         const currentUser = auth.currentUser;
         const canFix = Boolean(isAuthorizedAdminEmail(currentUser) && currentUser.emailVerified);
+        const adminSyncBypass = hasValidatedAdminPermission() || canFix;
         let skippedDuplicates = 0;
         let autoConfirmedNearby = 0;
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
 
-          if (!hasValidatedAdminPermission()) {
+          const matchedRP = findMatchingReactionPoint(item.lat, item.lng);
+          if (!adminSyncBypass && !matchedRP) {
             const dupMatch = findNearbyDuplicateActiveReport(
               item.lat,
               item.lng,
@@ -7359,26 +7979,46 @@
           if (!urlFoto && item.blobDataUrl) {
             urlFoto = String(item.blobDataUrl).slice(0, 450000);
           }
-
-          await withTimeout(
-            addDoc(collection(db, COLLECTION_NAME), {
-              lat: Number(item.lat),
-              lng: Number(item.lng),
-              tipo: String(item.tipo || 'Retén').slice(0, 40),
-              descripcion: String(item.descripcion || '').trim().slice(0, 400),
-              isFixed: canFix && Boolean(item.isFixed),
-              timestamp: serverTimestamp(),
-              expiresAt: Timestamp.fromMillis(Date.now() + CONSENSUS_TTL_LEVEL1_MS),
-              urlFoto,
-              mediaType: urlFoto ? (item.mediaType || 'image') : null,
-              confirmations: 1,
-              confirmaciones: 1,
-              confirmadoPor: [currentUser.uid],
-              denials: 0,
-              authorId: currentUser.uid
-            }),
-            20000
+          const hasPhoto = Boolean(urlFoto && urlFoto.length > 100);
+          const isImmediateFirm = adminSyncBypass || Boolean(matchedRP) || hasPhoto;
+          const initialConfirm = isImmediateFirm ? 3 : 1;
+          const initialExpiresAt = Timestamp.fromMillis(
+            Date.now() + (isImmediateFirm ? CONSENSUS_TTL_LEVEL3_MS : CONSENSUS_TTL_LEVEL1_MS)
           );
+          const activacionRapida = adminSyncBypass
+            ? 'admin'
+            : matchedRP
+            ? 'punto_reaccion'
+            : hasPhoto
+            ? 'foto'
+            : 'normal';
+
+          const syncPayload = {
+            lat: Number(item.lat),
+            lng: Number(item.lng),
+            tipo: String(item.tipo || 'Retén').slice(0, 40),
+            descripcion: String(item.descripcion || '').trim().slice(0, 400),
+            isFixed: canFix && Boolean(item.isFixed),
+            timestamp: serverTimestamp(),
+            expiresAt: initialExpiresAt,
+            urlFoto,
+            mediaType: urlFoto ? (item.mediaType || 'image') : null,
+            confirmations: initialConfirm,
+            confirmaciones: initialConfirm,
+            confirmadoPor: [currentUser.uid],
+            activacionRapida,
+            denials: 0,
+            authorId: currentUser.uid
+          };
+          if (isAgenteTransitoTipo(item.tipo)) {
+            syncPayload.radioMetros = clampAgentRadiusMeters(item.radioMetros);
+          }
+          if (matchedRP) {
+            syncPayload.puntoReaccionId = matchedRP.point.id;
+            syncPayload.puntoReaccionNombre = String(matchedRP.point.nombre || '').slice(0, 80);
+          }
+
+          await withTimeout(addDoc(collection(db, COLLECTION_NAME), syncPayload), 20000);
 
           syncedCount += 1;
           const remaining = loadPendingReports().filter((q) => q.localId !== item.localId);
@@ -7434,8 +8074,10 @@
           ? { lat: manualReportCoords.lat, lng: manualReportCoords.lng, simulated: false, isManual: true }
           : await getReportCoordinates();
 
+        const matchedReactionPoint = findMatchingReactionPoint(coords.lat, coords.lng);
+
         if (!navigator.onLine) {
-          if (!hasValidatedAdminPermission()) {
+          if (!hasValidatedAdminPermission() && !matchedReactionPoint) {
             const offlineDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
             if (offlineDup) {
               renderDuplicateGuardBanner(offlineDup, false);
@@ -7453,7 +8095,7 @@
         const user = await ensureAuthenticated();
         const adminBypass = hasValidatedAdminPermission() || (wasSignedOutBeforeSubmit && isPrimaryAdminEmail(user));
 
-        if (!adminBypass) {
+        if (!adminBypass && !matchedReactionPoint) {
           const nearbyDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
           if (nearbyDup) {
             if (!nearbyDup.report.isPending && !hasUserConfirmedReport(nearbyDup.report, user)) {
@@ -7485,26 +8127,51 @@
         const urlFoto = pendingImageDataUrl && String(pendingImageDataUrl).length <= 450000
           ? String(pendingImageDataUrl)
           : null;
+        const hasPhotoEvidence = Boolean(urlFoto && urlFoto.length > 100);
+        const isImmediateFirm = adminBypass || Boolean(matchedReactionPoint) || hasPhotoEvidence;
+        const initialConfirmCount = isImmediateFirm ? 3 : 1;
+        const initialExpiresAt = Timestamp.fromMillis(
+          Date.now() + (isImmediateFirm ? CONSENSUS_TTL_LEVEL3_MS : CONSENSUS_TTL_LEVEL1_MS)
+        );
+        const activacionRapida = adminBypass
+          ? 'admin'
+          : matchedReactionPoint
+          ? 'punto_reaccion'
+          : hasPhotoEvidence
+          ? 'foto'
+          : 'normal';
 
-        btnSubmit.textContent = urlFoto ? 'Subiendo foto y reporte a Firestore...' : 'Guardando en Firestore...';
+        btnSubmit.textContent = urlFoto ? 'Subiendo foto y reporte FIRME...' : 'Guardando en Firestore...';
+
+        const reportPayload = {
+          lat: Number(coords.lat),
+          lng: Number(coords.lng),
+          tipo: String(selectedCategory.type).slice(0, 40),
+          descripcion,
+          isFixed,
+          timestamp: serverTimestamp(),
+          expiresAt: initialExpiresAt,
+          urlFoto,
+          mediaType: urlFoto ? 'image' : null,
+          confirmations: initialConfirmCount,
+          confirmaciones: initialConfirmCount,
+          confirmadoPor: [user.uid],
+          activacionRapida,
+          denials: 0,
+          authorId: user.uid
+        };
+        if (isAgenteTransitoTipo(selectedCategory.type)) {
+          reportPayload.radioMetros = clampAgentRadiusMeters(
+            reportAgentRadiusInput ? reportAgentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS
+          );
+        }
+        if (matchedReactionPoint) {
+          reportPayload.puntoReaccionId = matchedReactionPoint.point.id;
+          reportPayload.puntoReaccionNombre = String(matchedReactionPoint.point.nombre || '').slice(0, 80);
+        }
 
         const docRef = await withTimeout(
-          addDoc(collection(db, COLLECTION_NAME), {
-            lat: Number(coords.lat),
-            lng: Number(coords.lng),
-            tipo: String(selectedCategory.type).slice(0, 40),
-            descripcion,
-            isFixed,
-            timestamp: serverTimestamp(),
-            expiresAt: Timestamp.fromMillis(Date.now() + CONSENSUS_TTL_LEVEL1_MS),
-            urlFoto,
-            mediaType: urlFoto ? 'image' : null,
-            confirmations: 1,
-            confirmaciones: 1,
-            confirmadoPor: [user.uid],
-            denials: 0,
-            authorId: user.uid
-          }),
+          addDoc(collection(db, COLLECTION_NAME), reportPayload),
           20000
         );
 
@@ -7524,6 +8191,12 @@
         showToast(
           isFixed
             ? '👑 ¡Alerta oficial fija publicada en Firestore!'
+            : activacionRapida === 'punto_reaccion'
+            ? `⚡ ¡Alerta FIRME activada al instante en Punto de Reacción «${matchedReactionPoint.point.nombre}»!`
+            : activacionRapida === 'foto'
+            ? '📸 ¡Foto verificada: alerta FIRME y activa de inmediato para todos!'
+            : activacionRapida === 'admin'
+            ? '👑 ¡Alerta FIRME publicada de inmediato por el Administrador!'
             : '⏳ Alerta publicada (1/3 · 30 min). Se activará el radar masivo al llegar a 2 confirmaciones.'
         );
       } catch (err) {
@@ -7577,6 +8250,8 @@
     }, 15000);
 
     startFirestoreListener();
+    startReactionPointsListener();
+    renderReactionZonesOnMap();
     if (navigator.onLine) {
       sincronizarReportesPendientes();
     }
@@ -8014,7 +8689,389 @@
         row.appendChild(actions);
         adminQuickReportsList.appendChild(row);
       });
+      if (typeof window.__anthiRefreshAgentPointsUI === 'function') {
+        window.__anthiRefreshAgentPointsUI();
+      }
     };
+
+    const reactionPointForm = document.getElementById('reactionPointForm');
+    const rpNameInput = document.getElementById('rpNameInput');
+    const rpRadiusInput = document.getElementById('rpRadiusInput');
+    const rpCoordsBadge = document.getElementById('rpCoordsBadge');
+    const btnUseGpsForReactionPoint = document.getElementById('btnUseGpsForReactionPoint');
+    const btnPickReactionCoordsOnMap = document.getElementById('btnPickReactionCoordsOnMap');
+    const btnSaveReactionPoint = document.getElementById('btnSaveReactionPoint');
+    const adminReactionPointsList = document.getElementById('adminReactionPointsList');
+
+    window.__anthiUpdateReactionCoordsBadge = function updateReactionCoordsBadge() {
+      if (!rpCoordsBadge) return;
+      if (pendingReactionCoords) {
+        rpCoordsBadge.textContent = `📌 ${pendingReactionCoords.lat.toFixed(5)}, ${pendingReactionCoords.lng.toFixed(5)}`;
+        rpCoordsBadge.style.color = '#67e8f9';
+      } else if (latestGps && !latestGps.isDefault) {
+        rpCoordsBadge.textContent = `📍 GPS: ${latestGps.lat.toFixed(5)}, ${latestGps.lng.toFixed(5)}`;
+        rpCoordsBadge.style.color = '#6ee7b7';
+      } else {
+        const c = map.getCenter();
+        rpCoordsBadge.textContent = `🗺️ Centro mapa: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+        rpCoordsBadge.style.color = '#cbd5e1';
+      }
+    };
+
+    window.__anthiRefreshReactionPointsUI = function renderAdminReactionPointsList() {
+      if (!adminReactionPointsList) return;
+      adminReactionPointsList.innerHTML = '';
+      const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
+      if (list.length === 0) {
+        adminReactionPointsList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay Puntos de Reacción configurados.</div>';
+        return;
+      }
+
+      list.forEach((rp) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:9px;background:rgba(15,23,42,0.88);border:1px solid rgba(6,182,212,0.38);';
+
+        const info = document.createElement('div');
+        info.style.cssText = 'min-width:0;flex:1;';
+        info.innerHTML = `
+          <div style="font-size:11.5px;font-weight:800;color:#e0f2fe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ⚡ ${escapeHtml(rp.nombre)}
+          </div>
+          <div style="font-size:10px;color:#67e8f9;font-weight:700;">
+            Radio ${Number(rp.radioMetros || 200)} m · ${Number(rp.lat).toFixed(4)}, ${Number(rp.lng).toFixed(4)}
+          </div>
+        `;
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:4px;flex-shrink:0;';
+
+        const goBtn = document.createElement('button');
+        goBtn.type = 'button';
+        goBtn.textContent = '📍';
+        goBtn.title = 'Ver círculo en el mapa';
+        goBtn.style.cssText = 'border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        goBtn.addEventListener('click', () => {
+          if (adminPanelModal) adminPanelModal.classList.remove('open');
+          isFollowingUser = false;
+          map.setView([Number(rp.lat), Number(rp.lng)], 16, { animate: true });
+        });
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.textContent = '🗑️';
+        delBtn.title = 'Eliminar Punto de Reacción';
+        delBtn.style.cssText = 'border:1px solid rgba(239,68,68,0.55);background:rgba(127,29,29,0.55);color:#fecaca;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        delBtn.addEventListener('click', () => {
+          window.deleteReactionPointFromFirestore(rp.id);
+        });
+
+        actions.appendChild(goBtn);
+        actions.appendChild(delBtn);
+        row.appendChild(info);
+        row.appendChild(actions);
+        adminReactionPointsList.appendChild(row);
+      });
+    };
+
+    document.querySelectorAll('[data-rp-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (rpRadiusInput) rpRadiusInput.value = btn.dataset.rpRadius || '200';
+        document.querySelectorAll('[data-rp-radius]').forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+
+    if (btnUseGpsForReactionPoint) {
+      btnUseGpsForReactionPoint.addEventListener('click', async () => {
+        const gpsCoords = await getReportCoordinates();
+        pendingReactionCoords = { lat: Number(gpsCoords.lat.toFixed(6)), lng: Number(gpsCoords.lng.toFixed(6)) };
+        window.__anthiUpdateReactionCoordsBadge();
+        showToast('📍 Coordenadas GPS cargadas para el Punto de Reacción.');
+      });
+    }
+
+    if (btnPickReactionCoordsOnMap) {
+      btnPickReactionCoordsOnMap.addEventListener('click', () => {
+        if (userRole !== 'admin') return;
+        openManualPinPicker('reactionPoint');
+      });
+    }
+
+    if (reactionPointForm) {
+      reactionPointForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (userRole !== 'admin') {
+          showToast('⛔ Solo los administradores pueden crear Puntos de Reacción.');
+          return;
+        }
+        const nombre = (rpNameInput ? rpNameInput.value : '').trim().slice(0, 60);
+        const radioMetros = Math.max(50, Math.min(2000, Math.round(Number(rpRadiusInput ? rpRadiusInput.value : 200) || 200)));
+        if (nombre.length < 2) {
+          showToast('Escribe un nombre válido (mínimo 2 letras).');
+          return;
+        }
+        let coords = pendingReactionCoords;
+        if (!coords) {
+          if (latestGps && !latestGps.isDefault) {
+            coords = { lat: Number(latestGps.lat.toFixed(6)), lng: Number(latestGps.lng.toFixed(6)) };
+          } else {
+            const c = map.getCenter();
+            coords = { lat: Number(c.lat.toFixed(6)), lng: Number(c.lng.toFixed(6)) };
+          }
+        }
+
+        if (btnSaveReactionPoint) {
+          btnSaveReactionPoint.disabled = true;
+          btnSaveReactionPoint.textContent = 'Guardando Punto de Reacción...';
+        }
+        try {
+          const user = await ensureAuthenticated();
+          if (!isAuthorizedAdminEmail(user)) {
+            showToast(`⛔ Requiere sesión con cuenta Administrador autorizada (${ADMIN_EMAILS.join(' o ')}).`);
+            return;
+          }
+          await withTimeout(
+            addDoc(collection(db, REACTION_POINTS_COLLECTION), {
+              nombre,
+              lat: Number(coords.lat),
+              lng: Number(coords.lng),
+              radioMetros,
+              createdBy: user.uid,
+              createdAt: serverTimestamp()
+            }),
+            15000
+          );
+          if (rpNameInput) rpNameInput.value = '';
+          pendingReactionCoords = null;
+          window.__anthiUpdateReactionCoordsBadge();
+          showToast(`⚡ Punto de Reacción «${nombre}» (${radioMetros} m) guardado y activo.`);
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') return;
+          if (err && err.code === 'permission-denied') {
+            showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+          } else {
+            showToast('No se pudo guardar el Punto de Reacción.');
+          }
+          handleFirestoreError(err, OperationType.CREATE, REACTION_POINTS_COLLECTION);
+        } finally {
+          if (btnSaveReactionPoint) {
+            btnSaveReactionPoint.disabled = false;
+            btnSaveReactionPoint.textContent = '⚡ Guardar Punto de Reacción';
+          }
+        }
+      });
+    }
+
+    const adminAgentPointForm = document.getElementById('adminAgentPointForm');
+    const agentSectorInput = document.getElementById('agentSectorInput');
+    const agentDescInput = document.getElementById('agentDescInput');
+    const agentRadiusInput = document.getElementById('agentRadiusInput');
+    const agentIsFixedCheckbox = document.getElementById('agentIsFixedCheckbox');
+    const agentCoordsBadge = document.getElementById('agentCoordsBadge');
+    const btnUseGpsForAgentPoint = document.getElementById('btnUseGpsForAgentPoint');
+    const btnPickAgentCoordsOnMap = document.getElementById('btnPickAgentCoordsOnMap');
+    const btnSaveAgentPoint = document.getElementById('btnSaveAgentPoint');
+    const adminAgentPointsList = document.getElementById('adminAgentPointsList');
+
+    window.__anthiUpdateAgentCoordsBadge = function updateAgentCoordsBadge() {
+      if (!agentCoordsBadge) return;
+      if (pendingAgentCoords) {
+        agentCoordsBadge.textContent = `📌 ${pendingAgentCoords.lat.toFixed(5)}, ${pendingAgentCoords.lng.toFixed(5)}`;
+        agentCoordsBadge.style.color = '#7dd3fc';
+      } else if (latestGps && !latestGps.isDefault) {
+        agentCoordsBadge.textContent = `📍 GPS: ${latestGps.lat.toFixed(5)}, ${latestGps.lng.toFixed(5)}`;
+        agentCoordsBadge.style.color = '#6ee7b7';
+      } else {
+        const c = map.getCenter();
+        agentCoordsBadge.textContent = `🗺️ Centro mapa: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+        agentCoordsBadge.style.color = '#cbd5e1';
+      }
+    };
+
+    window.__anthiRefreshAgentPointsUI = function renderAdminAgentPointsList() {
+      if (!adminAgentPointsList) return;
+      adminAgentPointsList.innerHTML = '';
+      const nowMs = Date.now();
+      const agentList = (Array.isArray(allNonExpiredServerReports) ? allNonExpiredServerReports : [])
+        .filter((rep) => rep && !isReportExpired(rep, nowMs) && isAgenteTransitoTipo(rep.tipo || rep.type));
+
+      if (agentList.length === 0) {
+        adminAgentPointsList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">No hay puntos de Agente de Tránsito activos.</div>';
+        return;
+      }
+
+      agentList.forEach((rep) => {
+        const radM = clampAgentRadiusMeters(rep.radioMetros);
+        const remText = formatRemainingTimeLabel(rep, nowMs);
+        const descText = String(rep.descripcion || '').trim() || 'Regulación de tránsito';
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:9px;background:rgba(15,23,42,0.88);border:1px solid rgba(14,165,233,0.42);';
+
+        const info = document.createElement('div');
+        info.style.cssText = 'min-width:0;flex:1;';
+        info.innerHTML = `
+          <div style="font-size:11.5px;font-weight:800;color:#e0f2fe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            🚦 ${escapeHtml(descText)}
+          </div>
+          <div style="font-size:10px;color:#7dd3fc;font-weight:700;">
+            Radio ${radM} m · ${rep.isFixed ? '👑 Habitual' : escapeHtml(remText)} · ${Number(rep.lat).toFixed(4)}, ${Number(rep.lng).toFixed(4)}
+          </div>
+        `;
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:4px;flex-shrink:0;';
+
+        const goBtn = document.createElement('button');
+        goBtn.type = 'button';
+        goBtn.textContent = '📍';
+        goBtn.title = 'Ubicar en mapa';
+        goBtn.style.cssText = 'border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        goBtn.addEventListener('click', () => {
+          if (adminPanelModal) adminPanelModal.classList.remove('open');
+          focusAlertOnMap(rep);
+        });
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.textContent = '✏️';
+        editBtn.title = 'Editar Agente de Tránsito';
+        editBtn.style.cssText = 'border:1px solid rgba(56,189,248,0.5);background:rgba(14,165,233,0.18);color:#bae6fd;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        editBtn.addEventListener('click', () => {
+          if (adminPanelModal) adminPanelModal.classList.remove('open');
+          window.openAdminEditModal(rep.id);
+        });
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.textContent = '🗑️';
+        delBtn.title = 'Eliminar Agente de Tránsito';
+        delBtn.style.cssText = 'border:1px solid rgba(239,68,68,0.55);background:rgba(127,29,29,0.55);color:#fecaca;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        delBtn.addEventListener('click', () => {
+          window.deleteReportFromFirestore(rep.id);
+        });
+
+        actions.appendChild(goBtn);
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        row.appendChild(info);
+        row.appendChild(actions);
+        adminAgentPointsList.appendChild(row);
+      });
+    };
+
+    document.querySelectorAll('[data-admin-agent-radius]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = clampAgentRadiusMeters(btn.dataset.adminAgentRadius);
+        if (agentRadiusInput) agentRadiusInput.value = String(val);
+        document.querySelectorAll('[data-admin-agent-radius]').forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+    if (agentRadiusInput) {
+      agentRadiusInput.addEventListener('change', () => {
+        const val = clampAgentRadiusMeters(agentRadiusInput.value);
+        agentRadiusInput.value = String(val);
+        document.querySelectorAll('[data-admin-agent-radius]').forEach((b) => {
+          b.classList.toggle('active', Number(b.dataset.adminAgentRadius) === val);
+        });
+      });
+    }
+
+    if (btnUseGpsForAgentPoint) {
+      btnUseGpsForAgentPoint.addEventListener('click', async () => {
+        const gpsCoords = await getReportCoordinates();
+        pendingAgentCoords = { lat: Number(gpsCoords.lat.toFixed(6)), lng: Number(gpsCoords.lng.toFixed(6)) };
+        window.__anthiUpdateAgentCoordsBadge();
+        showToast('📍 Coordenadas GPS cargadas para el Agente de Tránsito.');
+      });
+    }
+
+    if (btnPickAgentCoordsOnMap) {
+      btnPickAgentCoordsOnMap.addEventListener('click', () => {
+        if (userRole !== 'admin') return;
+        openManualPinPicker('agentPoint');
+      });
+    }
+
+    if (adminAgentPointForm) {
+      adminAgentPointForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (userRole !== 'admin') {
+          showToast('⛔ Solo los administradores pueden crear puntos de Agente de Tránsito.');
+          return;
+        }
+        const sector = (agentSectorInput ? agentSectorInput.value : '').trim();
+        const extraDesc = (agentDescInput ? agentDescInput.value : '').trim();
+        const fullDesc = (extraDesc ? `${sector} · ${extraDesc}` : sector).slice(0, 400);
+        const radioMetros = clampAgentRadiusMeters(agentRadiusInput ? agentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS);
+        const wantsFixed = Boolean(agentIsFixedCheckbox && agentIsFixedCheckbox.checked);
+
+        if (sector.length < 2) {
+          showToast('Escribe el sector o corredor (ej: Cra 27 con Calle 36).');
+          return;
+        }
+
+        let coords = pendingAgentCoords;
+        if (!coords) {
+          if (latestGps && !latestGps.isDefault) {
+            coords = { lat: Number(latestGps.lat.toFixed(6)), lng: Number(latestGps.lng.toFixed(6)) };
+          } else {
+            const c = map.getCenter();
+            coords = { lat: Number(c.lat.toFixed(6)), lng: Number(c.lng.toFixed(6)) };
+          }
+        }
+
+        if (btnSaveAgentPoint) {
+          btnSaveAgentPoint.disabled = true;
+          btnSaveAgentPoint.textContent = 'Guardando Agente...';
+        }
+        try {
+          const user = await ensureAuthenticated();
+          if (!isAuthorizedAdminEmail(user) || !user.emailVerified) {
+            showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+            return;
+          }
+          await withTimeout(
+            addDoc(collection(db, COLLECTION_NAME), {
+              lat: Number(coords.lat),
+              lng: Number(coords.lng),
+              tipo: 'Agente de Tránsito',
+              radioMetros,
+              descripcion: fullDesc,
+              isFixed: wantsFixed,
+              timestamp: serverTimestamp(),
+              expiresAt: Timestamp.fromMillis(Date.now() + CONSENSUS_TTL_LEVEL3_MS),
+              urlFoto: null,
+              mediaType: null,
+              confirmations: 3,
+              confirmaciones: 3,
+              confirmadoPor: [user.uid],
+              activacionRapida: 'admin',
+              denials: 0,
+              authorId: user.uid
+            }),
+            15000
+          );
+          if (agentSectorInput) agentSectorInput.value = '';
+          if (agentDescInput) agentDescInput.value = '';
+          if (agentIsFixedCheckbox) agentIsFixedCheckbox.checked = false;
+          pendingAgentCoords = null;
+          window.__anthiUpdateAgentCoordsBadge();
+          showToast(`🚦 Agente de Tránsito (${radioMetros} m) publicado FIRME en el mapa.`);
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') return;
+          if (err && err.code === 'permission-denied') {
+            showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+          } else {
+            showToast('No se pudo guardar el punto de Agente de Tránsito.');
+          }
+          handleFirestoreError(err, OperationType.CREATE, COLLECTION_NAME);
+        } finally {
+          if (btnSaveAgentPoint) {
+            btnSaveAgentPoint.disabled = false;
+            btnSaveAgentPoint.textContent = '🚦 Guardar Agente de Tránsito (Firme)';
+          }
+        }
+      });
+    }
 
     function setAdminPanelTab(tabName = 'buzon') {
       activeAdminPanelTab = tabName === 'control' ? 'control' : 'buzon';
@@ -8022,8 +9079,12 @@
       if (tabAdminControl) tabAdminControl.classList.toggle('active', activeAdminPanelTab === 'control');
       if (adminBuzonSection) adminBuzonSection.style.display = activeAdminPanelTab === 'buzon' ? '' : 'none';
       if (adminControlSection) adminControlSection.style.display = activeAdminPanelTab === 'control' ? '' : 'none';
-      if (activeAdminPanelTab === 'control' && typeof window.__anthiRefreshAdminReportsUI === 'function') {
-        window.__anthiRefreshAdminReportsUI();
+      if (activeAdminPanelTab === 'control') {
+        if (typeof window.__anthiRefreshAdminReportsUI === 'function') window.__anthiRefreshAdminReportsUI();
+        if (typeof window.__anthiRefreshReactionPointsUI === 'function') window.__anthiRefreshReactionPointsUI();
+        if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') window.__anthiUpdateReactionCoordsBadge();
+        if (typeof window.__anthiRefreshAgentPointsUI === 'function') window.__anthiRefreshAgentPointsUI();
+        if (typeof window.__anthiUpdateAgentCoordsBadge === 'function') window.__anthiUpdateAgentCoordsBadge();
       }
     }
 
@@ -8040,6 +9101,18 @@
       renderAdminBuzonList();
       if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
         window.__anthiRefreshAdminReportsUI();
+      }
+      if (typeof window.__anthiRefreshReactionPointsUI === 'function') {
+        window.__anthiRefreshReactionPointsUI();
+      }
+      if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') {
+        window.__anthiUpdateReactionCoordsBadge();
+      }
+      if (typeof window.__anthiRefreshAgentPointsUI === 'function') {
+        window.__anthiRefreshAgentPointsUI();
+      }
+      if (typeof window.__anthiUpdateAgentCoordsBadge === 'function') {
+        window.__anthiUpdateAgentCoordsBadge();
       }
       if (adminPanelModal) adminPanelModal.classList.add('open');
     }

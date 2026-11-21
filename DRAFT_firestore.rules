@@ -44,7 +44,8 @@ service cloud.firestore {
         && data.keys().hasOnly([
           'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
           'timestamp', 'urlFoto', 'mediaType', 'confirmations', 'denials', 'authorId',
-          'confirmaciones', 'confirmadoPor', 'expiresAt'
+          'confirmaciones', 'confirmadoPor', 'expiresAt',
+          'puntoReaccionId', 'puntoReaccionNombre', 'activacionRapida', 'radioMetros'
         ])
         && data.lat is number && data.lat >= -90 && data.lat <= 90
         && data.lng is number && data.lng >= -180 && data.lng <= 180
@@ -65,7 +66,33 @@ service cloud.firestore {
           && data.confirmadoPor[0] is string
           && data.confirmadoPor[0].size() <= 128
         ))
-        && (!('expiresAt' in data) || data.expiresAt is timestamp);
+        && (!('expiresAt' in data) || data.expiresAt is timestamp)
+        && (!('puntoReaccionId' in data) || data.puntoReaccionId == null || (data.puntoReaccionId is string && isValidId(data.puntoReaccionId)))
+        && (!('puntoReaccionNombre' in data) || data.puntoReaccionNombre == null || (data.puntoReaccionNombre is string && data.puntoReaccionNombre.size() <= 80))
+        && (!('activacionRapida' in data) || data.activacionRapida == 'normal' || data.activacionRapida == 'foto' || data.activacionRapida == 'punto_reaccion' || data.activacionRapida == 'admin')
+        && (!('radioMetros' in data) || data.radioMetros == null || (data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 100));
+    }
+
+    function hasAttachedPhoto(data) {
+      return 'urlFoto' in data && data.urlFoto is string && data.urlFoto.size() > 100 && data.urlFoto.size() <= 450000;
+    }
+
+    function hasValidReactionPoint(data) {
+      return 'puntoReaccionId' in data
+        && data.puntoReaccionId is string
+        && isValidId(data.puntoReaccionId)
+        && exists(/databases/$(database)/documents/puntos_reaccion/$(data.puntoReaccionId));
+    }
+
+    function isValidPuntoReaccion(data) {
+      return data.keys().hasAll(['nombre', 'lat', 'lng', 'radioMetros', 'createdBy', 'createdAt'])
+        && data.keys().hasOnly(['nombre', 'lat', 'lng', 'radioMetros', 'createdBy', 'createdAt'])
+        && data.nombre is string && data.nombre.size() >= 2 && data.nombre.size() <= 60
+        && data.lat is number && data.lat >= -90 && data.lat <= 90
+        && data.lng is number && data.lng >= -180 && data.lng <= 180
+        && data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 2000
+        && data.createdBy is string && isValidId(data.createdBy)
+        && data.createdAt is timestamp;
     }
 
     function isValidVoto(data) {
@@ -141,9 +168,16 @@ service cloud.firestore {
         && isValidReporte(incoming())
         && incoming().authorId == request.auth.uid
         && incoming().timestamp == request.time
-        && incoming().confirmations == 1
         && incoming().denials == 0
-        && (!('confirmaciones' in incoming()) || incoming().confirmaciones == 1)
+        && (
+          (incoming().confirmations == 1 && (!('confirmaciones' in incoming()) || incoming().confirmaciones == 1)) ||
+          (
+            incoming().confirmations == 3
+            && 'confirmaciones' in incoming()
+            && incoming().confirmaciones == 3
+            && (isAdmin() || hasAttachedPhoto(incoming()) || hasValidReactionPoint(incoming()))
+          )
+        )
         && (!('confirmadoPor' in incoming()) || (
           incoming().confirmadoPor.size() == 1
           && incoming().confirmadoPor[0] == request.auth.uid
@@ -187,7 +221,7 @@ service cloud.firestore {
           (
             existing().authorId == request.auth.uid
             && incoming().isFixed == existing().isFixed
-            && incoming().diff(existing()).affectedKeys().hasOnly(['tipo', 'descripcion', 'urlFoto', 'mediaType'])
+            && incoming().diff(existing()).affectedKeys().hasOnly(['tipo', 'descripcion', 'urlFoto', 'mediaType', 'radioMetros'])
           )
         );
 
@@ -328,6 +362,24 @@ service cloud.firestore {
         && incoming().keys().hasOnly(['email', 'role'])
         && incoming().email is string && incoming().email.size() <= 200
         && incoming().role == 'admin';
+    }
+
+    match /puntos_reaccion/{puntoId} {
+      // Reaction zones contain zero PII and are bounded to <= 100 docs so clients can auto-promote alerts inside active zones
+      allow get: if isValidId(puntoId);
+      allow list: if request.query.limit != null && request.query.limit <= 100;
+      allow create: if isAdmin()
+        && isValidId(puntoId)
+        && isValidPuntoReaccion(incoming())
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(puntoId)
+        && isValidPuntoReaccion(incoming())
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['nombre', 'lat', 'lng', 'radioMetros']);
+      allow delete: if isAdmin() && isValidId(puntoId);
     }
   }
 }

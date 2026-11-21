@@ -15,9 +15,13 @@
         },
         "tipo": {
           "type": "string",
-          "description": "Categoría de novedad vial (Retén / Control, Accidente, Trancón, Peligro / Hueco, Vía Cerrada).",
+          "description": "Categoría de novedad vial (Retén de Tránsito, Accidente, Cepos, Vía Cerrada / Obras, Peligro en Vía, Agente de Tránsito).",
           "minLength": 2,
           "maxLength": 40
+        },
+        "radioMetros": {
+          "type": "integer",
+          "description": "Radio corto puntual en metros (50 a 100 m) para reportes de Agente de Tránsito."
         },
         "descripcion": {
           "type": "string",
@@ -70,6 +74,22 @@
           "description": "UID de Firebase Auth del conductor que creó el reporte.",
           "pattern": "^[a-zA-Z0-9_\\-]+$",
           "maxLength": 128
+        },
+        "puntoReaccionId": {
+          "type": "string",
+          "description": "ID del Punto de Reacción que activó este reporte como firme de inmediato.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "puntoReaccionNombre": {
+          "type": "string",
+          "description": "Nombre del Punto de Reacción asociado (opcional).",
+          "maxLength": 80
+        },
+        "activacionRapida": {
+          "type": "string",
+          "enum": ["normal", "foto", "punto_reaccion", "admin"],
+          "description": "Motivo de activación rápida cuando inicia firme de inmediato."
         }
       },
       "required": [
@@ -275,6 +295,43 @@
         }
       },
       "required": ["mensaje", "usuario", "uid", "fecha", "leido"]
+    },
+    "PuntoReaccion": {
+      "title": "Punto de Reacción ANTHI",
+      "description": "Zona configurada por un Administrador donde los reportes ciudadanos se activan firmes de inmediato.",
+      "type": "object",
+      "properties": {
+        "nombre": {
+          "type": "string",
+          "description": "Nombre de la zona o intersección del Punto de Reacción.",
+          "minLength": 2,
+          "maxLength": 60
+        },
+        "lat": {
+          "type": "number",
+          "description": "Latitud central del Punto de Reacción."
+        },
+        "lng": {
+          "type": "number",
+          "description": "Longitud central del Punto de Reacción."
+        },
+        "radioMetros": {
+          "type": "integer",
+          "description": "Radio de cobertura en metros (ej. 200)."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "UID del Administrador que creó el Punto de Reacción.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha de creación asignada por el servidor."
+        }
+      },
+      "required": ["nombre", "lat", "lng", "radioMetros", "createdBy", "createdAt"]
     }
   },
   "firestore": {
@@ -305,6 +362,10 @@
     "/admins/{adminId}": {
       "schema": { "$ref": "#/entities/AdminUser" },
       "description": "Documentos de administradores autorizados."
+    },
+    "/puntos_reaccion/{puntoId}": {
+      "schema": { "$ref": "#/entities/PuntoReaccion" },
+      "description": "Geocercas configuradas por Administradores para activar reportes como firmes al instante."
     }
   }
 }
