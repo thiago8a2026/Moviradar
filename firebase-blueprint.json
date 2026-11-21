@@ -88,8 +88,13 @@
         },
         "activacionRapida": {
           "type": "string",
-          "enum": ["normal", "foto", "punto_reaccion", "admin"],
+          "enum": ["normal", "foto", "punto_reaccion", "admin", "vip_fundador", "vip_estandar", "vip_cepos"],
           "description": "Motivo de activación rápida cuando inicia firme de inmediato."
+        },
+        "vipNivel": {
+          "type": "string",
+          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "description": "Nivel VIP activo del autor al momento de publicar (opcional, verificado por reglas)."
         }
       },
       "required": [
@@ -122,8 +127,8 @@
       "required": ["email", "role"]
     },
     "UserSession": {
-      "title": "Sesión Única de Usuario ANTHI",
-      "description": "Control de sesión única por dispositivo para impedir múltiples sesiones simultáneas con la misma cuenta.",
+      "title": "Sesión Única y Perfil VIP de Usuario ANTHI",
+      "description": "Control de sesión única por dispositivo y estado VIP verificado por código para usuarios autenticados.",
       "type": "object",
       "properties": {
         "activeSessionId": {
@@ -137,6 +142,32 @@
           "type": "string",
           "format": "date-time",
           "description": "Marca de tiempo asignada por el servidor de Firestore al iniciar sesión."
+        },
+        "vipTipo": {
+          "type": "string",
+          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "description": "Nivel VIP activo asignado al canjear un código válido."
+        },
+        "vipActivo": {
+          "type": "boolean",
+          "description": "Indica si el perfil VIP fue activado mediante código válido."
+        },
+        "vipCodigo": {
+          "type": "string",
+          "description": "Código VIP canjeado por el usuario.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "minLength": 4,
+          "maxLength": 32
+        },
+        "vipExpiraAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha de expiración VIP (null para VIP Fundador permanente)."
+        },
+        "vipActivadoAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha de activación asignada por el servidor."
         }
       },
       "required": ["activeSessionId", "lastLoginAt"]
@@ -332,6 +363,96 @@
         }
       },
       "required": ["nombre", "lat", "lng", "radioMetros", "createdBy", "createdAt"]
+    },
+    "CodigoVip": {
+      "title": "Código VIP ANTHI",
+      "description": "Código promocional/operativo generado exclusivamente por Administradores Generales para activar niveles VIP.",
+      "type": "object",
+      "properties": {
+        "codigo": {
+          "type": "string",
+          "description": "Código alfanumérico único normalizado en mayúsculas.",
+          "pattern": "^[A-Z0-9_\\-]+$",
+          "minLength": 4,
+          "maxLength": 32
+        },
+        "tipoVip": {
+          "type": "string",
+          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "description": "Nivel VIP asignado por este código."
+        },
+        "activo": {
+          "type": "boolean",
+          "description": "Indica si el código está habilitado para canje."
+        },
+        "maxUsos": {
+          "type": "integer",
+          "description": "Límite máximo de canjes permitidos (1 a 500)."
+        },
+        "usosActuales": {
+          "type": "integer",
+          "description": "Cantidad de usuarios que ya han canjeado este código."
+        },
+        "expiraAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha de vencimiento del VIP/código (null para VIP Fundador permanente)."
+        },
+        "nota": {
+          "type": "string",
+          "description": "Referencia opcional para el administrador (ej. destinatario o campaña).",
+          "maxLength": 120
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "UID del Administrador General que creó el código.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha de creación asignada por el servidor."
+        }
+      },
+      "required": ["codigo", "tipoVip", "activo", "maxUsos", "usosActuales", "expiraAt", "createdBy", "createdAt"]
+    },
+    "CanjeVip": {
+      "title": "Registro de Canje VIP ANTHI",
+      "description": "Registro único por UID/código para impedir doble canje y auditar qué usuario activó el código.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "UID de Firebase Auth del usuario que canjeó el código.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "usuario": {
+          "type": "string",
+          "description": "Correo o indicativo del usuario que canjeó el código.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "codigo": {
+          "type": "string",
+          "description": "Código VIP canjeado.",
+          "pattern": "^[A-Z0-9_\\-]+$",
+          "minLength": 4,
+          "maxLength": 32
+        },
+        "tipoVip": {
+          "type": "string",
+          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "description": "Nivel VIP otorgado por el código."
+        },
+        "canjeadoAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha exacta del canje asignada por el servidor."
+        }
+      },
+      "required": ["uid", "usuario", "codigo", "tipoVip", "canjeadoAt"]
     }
   },
   "firestore": {
@@ -353,7 +474,7 @@
     },
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserSession" },
-      "description": "Estado de sesión única activa por usuario autenticado."
+      "description": "Estado de sesión única activa y perfil VIP por usuario autenticado."
     },
     "/users/{userId}/hojaVida/{docId}": {
       "schema": { "$ref": "#/entities/HojaVidaVehiculo" },
@@ -366,6 +487,14 @@
     "/puntos_reaccion/{puntoId}": {
       "schema": { "$ref": "#/entities/PuntoReaccion" },
       "description": "Geocercas configuradas por Administradores para activar reportes como firmes al instante."
+    },
+    "/codigos_vip/{codeId}": {
+      "schema": { "$ref": "#/entities/CodigoVip" },
+      "description": "Códigos VIP creados y controlados exclusivamente por Administradores Generales."
+    },
+    "/codigos_vip/{codeId}/canjes/{userId}": {
+      "schema": { "$ref": "#/entities/CanjeVip" },
+      "description": "Auditoría de canjes por usuario para cada código VIP."
     }
   }
 }

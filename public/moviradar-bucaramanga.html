@@ -822,6 +822,35 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
     }
 
+    .map-btn.vip-btn {
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      background: rgba(15, 23, 42, 0.96);
+      color: #fde68a;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 16px;
+      line-height: 1;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .map-btn.vip-btn.vip-fundador {
+      border-color: rgba(251, 191, 36, 0.9);
+      background: rgba(120, 53, 15, 0.48);
+      color: #fcd34d;
+    }
+
+    .map-btn.vip-btn.vip-cepos {
+      border-color: rgba(192, 132, 252, 0.9);
+      background: rgba(88, 28, 135, 0.48);
+      color: #e9d5ff;
+    }
+
+    .map-btn.vip-btn.vip-estandar {
+      border-color: rgba(56, 189, 248, 0.85);
+      background: rgba(12, 74, 110, 0.48);
+      color: #bae6fd;
+    }
+
     #suggestionModal .modal-card {
       background: #000000;
       border-color: rgba(148, 163, 184, 0.38);
@@ -2293,6 +2322,76 @@
       gap: 8px;
       margin-top: 2px;
     }
+
+    .vip-status-card {
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(100, 116, 139, 0.45);
+      background: rgba(15, 23, 42, 0.85);
+      margin-bottom: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #e2e8f0;
+    }
+
+    .vip-status-card.fundador {
+      border-color: rgba(251, 191, 36, 0.72);
+      background: rgba(120, 53, 15, 0.25);
+    }
+
+    .vip-status-card.rastreo_cepos {
+      border-color: rgba(192, 132, 252, 0.72);
+      background: rgba(88, 28, 135, 0.28);
+    }
+
+    .vip-status-card.estandar {
+      border-color: rgba(56, 189, 248, 0.72);
+      background: rgba(12, 74, 110, 0.25);
+    }
+
+    .vip-level-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      border: 1px solid currentColor;
+      white-space: nowrap;
+    }
+
+    .vip-level-pill.fundador {
+      color: #fcd34d;
+      background: rgba(245, 158, 11, 0.18);
+    }
+
+    .vip-level-pill.rastreo_cepos {
+      color: #e9d5ff;
+      background: rgba(168, 85, 247, 0.22);
+    }
+
+    .vip-level-pill.estandar {
+      color: #7dd3fc;
+      background: rgba(14, 165, 233, 0.18);
+    }
+
+    .vip-tiers-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .vip-tier-desc {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(2, 6, 23, 0.75);
+      border: 1px solid rgba(51, 65, 85, 0.75);
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.38;
+    }
   </style>
 </head>
 <body>
@@ -2396,6 +2495,9 @@
         <button type="button" class="map-btn" id="btnLocateMe" title="Centrar mi ubicación GPS">🎯</button>
         <button type="button" class="map-btn buzon-btn" id="btnOpenSuggestionBox" title="Buzón de Sugerencias y Consejos">
           <span>📮</span><span class="sonar-btn-sub">Buzón</span>
+        </button>
+        <button type="button" class="map-btn vip-btn" id="btnOpenVipCodeModal" title="Canjear Código VIP y ver beneficios">
+          <span id="btnVipIcon">🎟️</span><span class="sonar-btn-sub" id="btnVipSubLabel">VIP</span>
         </button>
         <button type="button" class="map-btn count-chip" id="reportCountChip" title="Ver todas las alertas activas" aria-label="0 alertas">
           <span class="alerts-chip-count" id="reportCountNum">0</span>
@@ -2645,6 +2747,57 @@
       </div>
     </div>
 
+    <!-- Modal Canjear Código VIP y Niveles VIP -->
+    <div class="modal-backdrop" id="vipModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>🎟️ Activación y Nivel VIP</h2>
+          <button type="button" class="btn-close" id="btnCloseVipModal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="vip-status-card" id="vipModalStatusBox">
+          Estado actual: Usuario estándar. Ingresa un código VIP para activar beneficios de publicación en primera instancia.
+        </div>
+
+        <form id="vipRedeemForm" style="margin-bottom:12px;">
+          <label class="form-label" for="vipCodeRedeemInput">Canjear Código VIP</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input
+              type="text"
+              id="vipCodeRedeemInput"
+              class="text-input"
+              maxlength="32"
+              minlength="4"
+              required
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              style="margin-bottom:0;flex:1;text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;letter-spacing:0.06em;"
+              placeholder="Ej: ANTHI-FUND-01"
+            />
+            <button type="submit" class="btn-submit" id="btnSubmitVipCode" style="width:auto;padding:0 14px;min-height:42px;font-size:12.5px;">
+              Activar
+            </button>
+          </div>
+          <div id="vipRedeemFeedback" style="font-size:11px;margin-top:6px;color:#94a3b8;line-height:1.35;">
+            El código es asignado por un Administrador General y vincula el nivel VIP directamente a tu cuenta.
+          </div>
+        </form>
+
+        <div class="vip-tiers-legend">
+          <div class="vip-tier-desc">
+            <strong style="color:#fcd34d;">🏅 VIP Fundador (Intocable):</strong> Permanente y sin vencimiento. Reporte firme en primera instancia, mayor peso de credibilidad y excepción al bloqueo de 300 m.
+          </div>
+          <div class="vip-tier-desc">
+            <strong style="color:#e9d5ff;">🛡️ VIP Operativo Cepos y Fotomultas:</strong> Nivel operativo superior con vigencia configurable, distintivo de alto valor y prioridad para seguimiento de unidades móviles de cepos y fotomultas.
+          </div>
+          <div class="vip-tier-desc">
+            <strong style="color:#7dd3fc;">⭐ VIP Estándar / Suscripción:</strong> Vigencia configurable, reporte firme en primera instancia, peso de credibilidad mejorado y excepción de 300 m mientras esté activo.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de Acceso / Registro con Correo y Contraseña (Firebase Auth) -->
     <div class="modal-backdrop" id="authModal">
       <div class="modal-card">
@@ -2723,6 +2876,19 @@
               />
               <button type="button" class="btn-submit" id="btnSaveAuthApodo" style="width:auto;padding:0 14px;min-height:42px;font-size:12px;">
                 Guardar
+              </button>
+            </div>
+          </div>
+
+          <div class="vip-status-card" id="authVipStatusCard">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:10.5px;color:#94a3b8;">Nivel de cuenta</div>
+                <div id="authVipStatusLabel" style="font-size:12.5px;font-weight:800;color:#e2e8f0;">👤 Conductor estándar</div>
+                <div id="authVipExpiryLabel" style="font-size:10.5px;color:#cbd5e1;margin-top:2px;"></div>
+              </div>
+              <button type="button" class="btn-submit" id="btnAuthRedeemVip" style="width:auto;min-height:36px;padding:0 11px;font-size:11.5px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#020617;">
+                🎟️ Código VIP
               </button>
             </div>
           </div>
@@ -2902,11 +3068,17 @@
             Superpoderes activos: publicación fija oficial, edición y borrado global de alertas (incluidas 1/3 sin confirmar), excepción al radio de 300 m y gestión del Buzón.
           </p>
           <div id="adminReactionPointsBox" style="background:rgba(2,6,23,0.78);border:1px solid rgba(6,182,212,0.42);border-radius:12px;padding:10px;margin-bottom:12px;">
-            <div style="font-size:12px;font-weight:800;color:#67e8f9;margin-bottom:6px;">
-              ⚡ Puntos de Reacción (Activación Firme Inmediata)
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+              <div style="font-size:12px;font-weight:800;color:#67e8f9;">
+                ⚡ Puntos Críticos (Reacción Inmediata)
+              </div>
+              <label style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#a5f3fc;font-weight:700;cursor:pointer;">
+                <input type="checkbox" id="chkShowCriticalZonesAdmin" checked />
+                <span>👁️ Ver en mapa</span>
+              </label>
             </div>
             <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
-              Los reportes enviados dentro de estas zonas se activan firmes al instante (sin esperar confirmaciones ni bloqueo de 300 m).
+              Los reportes enviados dentro de estas zonas quedan activos y FIRMES en primera opción de inmediato (sin espera de confirmaciones ni bloqueo de 300 m).
             </p>
             <form id="reactionPointForm" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
               <input
@@ -2917,9 +3089,9 @@
                 minlength="2"
                 required
                 style="margin-bottom:0;"
-                placeholder="Nombre de zona (ej: Glorieta Estadio)"
+                placeholder="Nombre del Punto Crítico (ej: Glorieta Estadio)"
               />
-              <div style="display:flex;gap:6px;align-items:center;">
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                 <label for="rpRadiusInput" style="font-size:11px;color:#cbd5e1;font-weight:700;white-space:nowrap;">Radio (m):</label>
                 <input
                   type="number"
@@ -2930,7 +3102,7 @@
                   step="25"
                   value="200"
                   required
-                  style="margin-bottom:0;flex:1;padding:7px 10px;"
+                  style="margin-bottom:0;width:82px;padding:7px 10px;"
                 />
                 <button type="button" class="pico-cal-btn" data-rp-radius="100">100m</button>
                 <button type="button" class="pico-cal-btn active" data-rp-radius="200">200m</button>
@@ -2944,9 +3116,14 @@
                   <button type="button" class="alert-admin-btn edit" id="btnPickReactionCoordsOnMap" style="padding:5px 8px;font-size:10.5px;">🎯 Elegir en mapa</button>
                 </div>
               </div>
-              <button type="submit" class="btn-submit" id="btnSaveReactionPoint" style="min-height:38px;font-size:12px;">
-                ⚡ Guardar Punto de Reacción
-              </button>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button type="submit" class="btn-submit" id="btnSaveReactionPoint" style="min-height:38px;font-size:12px;flex:1;">
+                  ⚡ Guardar Punto Crítico
+                </button>
+                <button type="button" class="btn-logout" id="btnCancelEditReactionPoint" style="display:none;width:auto;min-height:38px;padding:0 12px;font-size:11.5px;">
+                  Cancelar
+                </button>
+              </div>
             </form>
             <div id="adminReactionPointsList" style="display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;"></div>
           </div>
@@ -3010,6 +3187,76 @@
               </button>
             </form>
             <div id="adminAgentPointsList" style="display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;"></div>
+          </div>
+
+          <div id="adminVipCodesBox" style="background:rgba(2,6,23,0.78);border:1px solid rgba(251,191,36,0.48);border-radius:12px;padding:10px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:800;color:#fcd34d;margin-bottom:6px;">
+              🎟️ Códigos VIP y Niveles (Solo Admin General)
+            </div>
+            <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
+              Genera, activa o desactiva códigos VIP. Ningún código VIP otorga acceso al panel de Administración General.
+            </p>
+            <form id="adminVipCodeForm" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input
+                  type="text"
+                  id="vipAdminCodeInput"
+                  class="text-input"
+                  maxlength="32"
+                  minlength="4"
+                  required
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  style="margin-bottom:0;flex:1;text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;"
+                  placeholder="Código (ej: ANTHI-VIP-01)"
+                />
+                <button type="button" class="alert-admin-btn edit" id="btnGenerateVipCode" style="padding:8px 10px;font-size:11px;white-space:nowrap;">
+                  🎲 Generar
+                </button>
+              </div>
+              <select id="vipAdminTipoSelect" class="text-input select-input" style="margin-bottom:0;" required>
+                <option value="fundador">🏅 VIP Fundador (Intocable · Permanente)</option>
+                <option value="estandar">⭐ VIP Estándar / Suscripción (Con vencimiento)</option>
+                <option value="rastreo_cepos">🛡️ VIP Operativo Cepos y Fotomultas (Alto nivel)</option>
+              </select>
+              <div id="vipAdminExpiryRow" style="display:none;flex-direction:column;gap:6px;padding:8px;border-radius:10px;background:rgba(15,23,42,0.85);border:1px solid rgba(51,65,85,0.8);">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+                  <label for="vipAdminExpiryDate" style="font-size:11px;color:#cbd5e1;font-weight:700;">Vence el:</label>
+                  <input type="date" id="vipAdminExpiryDate" class="text-input" style="margin-bottom:0;width:155px;padding:6px 8px;font-size:11.5px;" />
+                </div>
+                <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                  <button type="button" class="pico-cal-btn" data-vip-expiry-days="7">+7 días</button>
+                  <button type="button" class="pico-cal-btn active" data-vip-expiry-days="30">+30 días</button>
+                  <button type="button" class="pico-cal-btn" data-vip-expiry-days="90">+90 días</button>
+                  <button type="button" class="pico-cal-btn" data-vip-expiry-days="365">+1 año</button>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <label for="vipAdminMaxUsesInput" style="font-size:11px;color:#cbd5e1;font-weight:700;white-space:nowrap;">Límite usos:</label>
+                <input
+                  type="number"
+                  id="vipAdminMaxUsesInput"
+                  class="text-input"
+                  min="1"
+                  max="500"
+                  value="1"
+                  required
+                  style="margin-bottom:0;width:72px;padding:6px 8px;font-size:12px;"
+                />
+                <input
+                  type="text"
+                  id="vipAdminNotaInput"
+                  class="text-input"
+                  maxlength="120"
+                  style="margin-bottom:0;flex:1;min-width:130px;padding:6px 8px;font-size:11.5px;"
+                  placeholder="Nota opcional (ej: Taxi placa XYZ)"
+                />
+              </div>
+              <button type="submit" class="btn-submit" id="btnCreateVipCode" style="min-height:38px;font-size:12px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#020617;">
+                🎟️ Crear Código VIP
+              </button>
+            </form>
+            <div id="adminVipCodesList" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"></div>
           </div>
 
           <div id="adminReportsModerationBox" style="background:rgba(2,6,23,0.72);border:1px solid rgba(51,65,85,0.85);border-radius:12px;padding:10px;margin-bottom:12px;">
@@ -3432,6 +3679,7 @@
         doc,
         addDoc,
         getDoc,
+        getDocs,
         setDoc,
         updateDoc,
         deleteDoc,
@@ -3548,7 +3796,8 @@
       MAP_CONTROLS_COLLAPSED: 'anthi_map_controls_collapsed_v1',
       PICO_HUD_COLLAPSED: 'anthi_pico_hud_collapsed_v1',
       PICO_CALIBRATION: 'anthi_pico_calibration_v1',
-      REACTION_POINTS: 'anthi_reaction_points_v1'
+      REACTION_POINTS: 'anthi_reaction_points_v1',
+      VIP_PROFILE: 'anthi_vip_profile_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -3612,6 +3861,7 @@
         puntoReaccionId: rep.puntoReaccionId || null,
         puntoReaccionNombre: rep.puntoReaccionNombre || null,
         activacionRapida: rep.activacionRapida || null,
+        vipNivel: rep.vipNivel || null,
         radioMetros: rep.radioMetros != null ? clampAgentRadiusMeters(rep.radioMetros) : null,
         authorId: rep.authorId || null,
         denials: Number(rep.denials || 0)
@@ -3747,6 +3997,249 @@
         const isResolved = !isFixed && denials >= 3 && denials > confirmations;
         return !isResolved;
       });
+    }
+
+    const VIP_CODES_COLLECTION = 'codigos_vip';
+    const VIP_LEVEL_META = {
+      fundador: {
+        tipo: 'fundador',
+        badge: '🏅 VIP Fundador',
+        shortLabel: 'Fundador',
+        activacionKey: 'vip_fundador',
+        voteWeight: 3,
+        pillClass: 'fundador',
+        color: '#fcd34d',
+        bg: 'rgba(245,158,11,0.2)',
+        border: 'rgba(251,191,36,0.6)',
+        permanent: true
+      },
+      estandar: {
+        tipo: 'estandar',
+        badge: '⭐ VIP Estándar',
+        shortLabel: 'Estándar',
+        activacionKey: 'vip_estandar',
+        voteWeight: 2,
+        pillClass: 'estandar',
+        color: '#7dd3fc',
+        bg: 'rgba(14,165,233,0.18)',
+        border: 'rgba(56,189,248,0.55)',
+        permanent: false
+      },
+      rastreo_cepos: {
+        tipo: 'rastreo_cepos',
+        badge: '🛡️ VIP Cepos/Fotomultas',
+        shortLabel: 'Cepos/Fotomultas',
+        activacionKey: 'vip_cepos',
+        voteWeight: 3,
+        pillClass: 'cepos',
+        color: '#e9d5ff',
+        bg: 'rgba(168,85,247,0.22)',
+        border: 'rgba(192,132,252,0.62)',
+        permanent: false
+      }
+    };
+
+    let currentVipProfile = null;
+
+    function isValidVipTipoKey(tipo) {
+      return tipo === 'fundador' || tipo === 'estandar' || tipo === 'rastreo_cepos';
+    }
+
+    function normalizeVipCodeInput(raw) {
+      return String(raw || '')
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9_-]/g, '')
+        .slice(0, 32);
+    }
+
+    function extractOptionalTimestampMs(val) {
+      if (!val) return null;
+      if (typeof val.toMillis === 'function') return val.toMillis();
+      if (typeof val.seconds === 'number') return val.seconds * 1000;
+      if (typeof val === 'number' && Number.isFinite(val)) return val;
+      return null;
+    }
+
+    function formatVipDateShort(ms) {
+      if (!ms || !Number.isFinite(ms)) return 'Sin vencimiento';
+      try {
+        return new Date(ms).toLocaleDateString('es-CO', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      } catch (e) {
+        return new Date(ms).toISOString().slice(0, 10);
+      }
+    }
+
+    function loadCachedVipProfile(uid) {
+      if (!uid) return null;
+      const saved = safeReadJson(STORAGE_KEYS.VIP_PROFILE, null);
+      if (!saved || saved.uid !== uid || !isValidVipTipoKey(saved.tipoVip)) return null;
+      return saved;
+    }
+
+    function saveCachedVipProfile(profile) {
+      try {
+        if (!profile || !profile.uid) {
+          localStorage.removeItem(STORAGE_KEYS.VIP_PROFILE);
+          return;
+        }
+        localStorage.setItem(STORAGE_KEYS.VIP_PROFILE, JSON.stringify(profile));
+      } catch (e) {}
+    }
+
+    function clearCurrentVipProfile(uid = null) {
+      currentVipProfile = null;
+      if (uid) {
+        const saved = safeReadJson(STORAGE_KEYS.VIP_PROFILE, null);
+        if (saved && saved.uid === uid) saveCachedVipProfile(null);
+      }
+    }
+
+    function getActiveVipProfile(user = auth.currentUser) {
+      if (!user || !user.uid) return null;
+      let profile = currentVipProfile && currentVipProfile.uid === user.uid
+        ? currentVipProfile
+        : loadCachedVipProfile(user.uid);
+      if (!profile || !profile.activo || !isValidVipTipoKey(profile.tipoVip)) return null;
+      if (profile.tipoVip !== 'fundador') {
+        const expMs = Number(profile.expiraAtMs);
+        if (!Number.isFinite(expMs) || expMs <= Date.now() + 5000) {
+          return null;
+        }
+      }
+      return {
+        ...profile,
+        meta: VIP_LEVEL_META[profile.tipoVip]
+      };
+    }
+
+    function hasValidatedVipPermission(user = auth.currentUser) {
+      return Boolean(getActiveVipProfile(user));
+    }
+
+    function isVipCeposOperativo(user = auth.currentUser) {
+      const p = getActiveVipProfile(user);
+      return Boolean(p && p.tipoVip === 'rastreo_cepos');
+    }
+
+    function getVipReportBadgeHtml(rep) {
+      if (!rep || !isValidVipTipoKey(rep.vipNivel)) return '';
+      const meta = VIP_LEVEL_META[rep.vipNivel];
+      if (!meta) return '';
+      const tipoStr = String(rep.tipo || rep.type || '').toLowerCase();
+      const extraOperativo = rep.vipNivel === 'rastreo_cepos' && (tipoStr.includes('cepo') || tipoStr.includes('fotomulta'))
+        ? ' · Prioridad operativa'
+        : '';
+      return `<span class="vip-level-pill ${meta.pillClass}">${escapeHtml(meta.badge)}${escapeHtml(extraOperativo)}</span>`;
+    }
+
+    function refreshVipUIEverywhere() {
+      const user = auth.currentUser;
+      const activeVip = getActiveVipProfile(user);
+      const rawProfile = currentVipProfile && user && currentVipProfile.uid === user.uid
+        ? currentVipProfile
+        : (user ? loadCachedVipProfile(user.uid) : null);
+
+      const btnOpenVipCodeModal = document.getElementById('btnOpenVipCodeModal');
+      const btnVipIcon = document.getElementById('btnVipIcon');
+      const btnVipSubLabel = document.getElementById('btnVipSubLabel');
+      if (btnOpenVipCodeModal) {
+        btnOpenVipCodeModal.classList.remove('vip-active', 'vip-cepos');
+        if (activeVip) {
+          btnOpenVipCodeModal.classList.add('vip-active');
+          if (activeVip.tipoVip === 'rastreo_cepos') {
+            btnOpenVipCodeModal.classList.add('vip-cepos');
+          }
+          if (btnVipIcon) {
+            btnVipIcon.textContent = activeVip.tipoVip === 'fundador' ? '🏅' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️' : '⭐';
+          }
+          if (btnVipSubLabel) {
+            btnVipSubLabel.textContent = activeVip.tipoVip === 'fundador' ? 'Fundador' : activeVip.tipoVip === 'rastreo_cepos' ? 'Cepos' : 'VIP';
+          }
+        } else {
+          if (btnVipIcon) btnVipIcon.textContent = '🎟️';
+          if (btnVipSubLabel) btnVipSubLabel.textContent = 'VIP';
+        }
+      }
+
+      const authVipStatusCard = document.getElementById('authVipStatusCard');
+      const authVipStatusLabel = document.getElementById('authVipStatusLabel');
+      const authVipExpiryLabel = document.getElementById('authVipExpiryLabel');
+      if (authVipStatusCard && authVipStatusLabel && authVipExpiryLabel) {
+        authVipStatusCard.classList.remove('is-vip', 'is-cepos');
+        if (activeVip) {
+          authVipStatusCard.classList.add('is-vip');
+          if (activeVip.tipoVip === 'rastreo_cepos') authVipStatusCard.classList.add('is-cepos');
+          authVipStatusLabel.innerHTML = `<span class="vip-level-pill ${activeVip.meta.pillClass}">${escapeHtml(activeVip.meta.badge)}</span>`;
+          authVipExpiryLabel.textContent = activeVip.tipoVip === 'fundador'
+            ? `Permanente e intocable · Peso +${activeVip.meta.voteWeight} · Código: ${activeVip.codigo || '--'}`
+            : `Vigente hasta ${formatVipDateShort(activeVip.expiraAtMs)} · Peso +${activeVip.meta.voteWeight} · Código: ${activeVip.codigo || '--'}`;
+        } else if (rawProfile && rawProfile.activo && rawProfile.expiraAtMs && rawProfile.expiraAtMs <= Date.now()) {
+          authVipStatusLabel.textContent = `⏳ Nivel ${VIP_LEVEL_META[rawProfile.tipoVip]?.badge || 'VIP'} vencido`;
+          authVipExpiryLabel.textContent = `Expiró el ${formatVipDateShort(rawProfile.expiraAtMs)}. Ingresa un nuevo código VIP para renovar.`;
+        } else {
+          authVipStatusLabel.textContent = '👤 Conductor estándar';
+          authVipExpiryLabel.textContent = 'Canjea un código VIP para publicar alertas firmes en primera instancia.';
+        }
+      }
+
+      const vipModalStatusBox = document.getElementById('vipModalStatusBox');
+      if (vipModalStatusBox) {
+        vipModalStatusBox.classList.remove('is-vip', 'is-cepos');
+        if (!user) {
+          vipModalStatusBox.innerHTML = '🔐 <strong>Inicia sesión primero</strong> (o ingresa el código para iniciar sesión y activarlo directo en tu cuenta).';
+        } else if (activeVip) {
+          vipModalStatusBox.classList.add('is-vip');
+          if (activeVip.tipoVip === 'rastreo_cepos') vipModalStatusBox.classList.add('is-cepos');
+          const detail = activeVip.tipoVip === 'fundador'
+            ? 'Nivel permanente sin vencimiento (intocable por otros códigos temporales).'
+            : activeVip.tipoVip === 'rastreo_cepos'
+            ? `Vigente hasta ${formatVipDateShort(activeVip.expiraAtMs)}. Distintivo operativo de alto valor en alertas y seguimiento móvil de cepos/fotomultas.`
+            : `Vigente hasta ${formatVipDateShort(activeVip.expiraAtMs)}. Reportes firmes en primera instancia y mayor peso en confirmaciones.`;
+          vipModalStatusBox.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+              <span class="vip-level-pill ${activeVip.meta.pillClass}">${escapeHtml(activeVip.meta.badge)}</span>
+              <span style="font-size:10.5px;color:#94a3b8;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">${escapeHtml(activeVip.codigo || '')}</span>
+            </div>
+            <div style="font-size:11.5px;color:#e2e8f0;line-height:1.4;">${escapeHtml(detail)}</div>
+          `;
+        } else if (rawProfile && rawProfile.activo && rawProfile.expiraAtMs && rawProfile.expiraAtMs <= Date.now()) {
+          vipModalStatusBox.innerHTML = `⏳ Tu suscripción <strong>${escapeHtml(VIP_LEVEL_META[rawProfile.tipoVip]?.badge || 'VIP')}</strong> venció el <strong>${escapeHtml(formatVipDateShort(rawProfile.expiraAtMs))}</strong>. Canjea un nuevo código para reactivarla.`;
+        } else {
+          vipModalStatusBox.innerHTML = '👤 <strong>Estado actual:</strong> Conductor estándar. Ingresa tu código VIP asignado para activar publicación firme en primera instancia.';
+        }
+      }
+
+      if (typeof updateAuthUI === 'function') {
+        updateAuthUI(user);
+      }
+      if (window.__anthiReportModalReady && typeof updateDuplicateGuardPreview === 'function') {
+        updateDuplicateGuardPreview();
+      }
+    }
+
+    function syncVipStateFromUserDoc(uid, data) {
+      if (!uid) return;
+      if (!data || !isValidVipTipoKey(data.vipTipo) || data.vipActivo !== true) {
+        clearCurrentVipProfile(uid);
+        refreshVipUIEverywhere();
+        return;
+      }
+      const nextProfile = {
+        uid,
+        tipoVip: data.vipTipo,
+        activo: true,
+        codigo: String(data.vipCodigo || ''),
+        expiraAtMs: data.vipTipo === 'fundador' ? null : extractOptionalTimestampMs(data.vipExpiraAt),
+        activadoAtMs: extractOptionalTimestampMs(data.vipActivadoAt) || Date.now()
+      };
+      currentVipProfile = nextProfile;
+      saveCachedVipProfile(nextProfile);
+      refreshVipUIEverywhere();
     }
 
     function refreshReportsForRole() {
@@ -4180,8 +4673,17 @@
       if (!rep) return '';
       if (rep.activacionRapida === 'punto_reaccion' || rep.puntoReaccionId) {
         return rep.puntoReaccionNombre
-          ? `⚡ Punto de Reacción: ${rep.puntoReaccionNombre}`
-          : '⚡ Punto de Reacción';
+          ? `⚡ Punto Crítico: ${rep.puntoReaccionNombre}`
+          : '⚡ Punto Crítico';
+      }
+      if (rep.activacionRapida === 'vip_fundador') {
+        return '🏅 Primera instancia · VIP Fundador';
+      }
+      if (rep.activacionRapida === 'vip_cepos') {
+        return '🛡️ Primera instancia · VIP Cepos/Fotomultas';
+      }
+      if (rep.activacionRapida === 'vip_estandar') {
+        return '⭐ Primera instancia · VIP';
       }
       if (rep.activacionRapida === 'foto') {
         return '📸 Firme inmediata por foto';
@@ -4317,6 +4819,7 @@
             </div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:3px 0;">
               <span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              ${getVipReportBadgeHtml(rep)}
               ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
               ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
               <span style="font-size:10.5px;color:#94a3b8;font-weight:700;">⏱ ${escapeHtml(remainingLabel)}</span>
@@ -4473,6 +4976,7 @@
             </span>
             <div style="margin:5px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;">
               <span style="font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              ${getVipReportBadgeHtml(rep)}
               ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación / paso (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
               ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
             </div>
@@ -4651,6 +5155,7 @@
         if (authApodoInput) {
           authApodoInput.value = getUserApodo(user);
         }
+        refreshVipUIEverywhere();
       } else {
         authModalTitle.textContent = 'Acceso a ANTHI';
         authSignedOutView.style.display = 'block';
@@ -4673,12 +5178,20 @@
       if (user && user.email) {
         const apodo = getUserApodo(user);
         const alias = (apodo || user.email.split('@')[0]).slice(0, 12);
-        btnAuth.textContent = `✓ ${alias}`;
+        const activeVip = getActiveVipProfile(user);
+        const vipMark = activeVip
+          ? (activeVip.tipoVip === 'fundador' ? '🏅 ' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️ ' : '⭐ ')
+          : '✓ ';
+        btnAuth.textContent = `${vipMark}${alias}`;
         btnAuth.classList.add('signed-in');
-        btnAuth.title = `Conectado como ${apodo ? `${apodo} (${user.email})` : user.email} (clic para ver cuenta, editar apodo o cerrar sesión)`;
+        btnAuth.title = `Conectado como ${apodo ? `${apodo} (${user.email})` : user.email}${activeVip ? ` · ${activeVip.meta.badge}` : ''} (clic para ver cuenta, editar apodo o cerrar sesión)`;
       } else if (user) {
         const apodo = getUserApodo(user);
-        btnAuth.textContent = apodo ? `✓ ${apodo.slice(0, 12)}` : '✓ Cuenta';
+        const activeVip = getActiveVipProfile(user);
+        const vipMark = activeVip
+          ? (activeVip.tipoVip === 'fundador' ? '🏅 ' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️ ' : '⭐ ')
+          : '✓ ';
+        btnAuth.textContent = apodo ? `${vipMark}${apodo.slice(0, 12)}` : `${vipMark}Cuenta`;
         btnAuth.classList.add('signed-in');
         btnAuth.title = 'Sesión activa (clic para ver cuenta o cerrar sesión)';
       } else {
@@ -4848,6 +5361,10 @@
       userSessionUnsubscribe = onSnapshot(
         userDocRef,
         async (docSnap) => {
+          if (docSnap.exists()) {
+            const snapData = docSnap.data();
+            syncVipStateFromUserDoc(user.uid, snapData);
+          }
           if (expectedSeq !== sessionClaimSeq) return;
           if (!sessionListenerArmed || isClaimingSingleSession || isHandlingSessionConflict) return;
           if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
@@ -4988,13 +5505,15 @@
     });
 
     onAuthStateChanged(auth, async (user) => {
-      updateAuthUI(user);
       if (!user) {
         detachUserSessionListener(true);
         if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
+        if (typeof detachAdminVipCodesListener === 'function') detachAdminVipCodesListener();
         currentSessionId = null;
         currentMonitoredUid = null;
         pendingOfflineRetryUid = null;
+        currentVipProfile = null;
+        refreshVipUIEverywhere();
         if (userRole === 'admin') {
           userRole = 'citizen';
           try {
@@ -5007,6 +5526,9 @@
         }
         return;
       }
+
+      currentVipProfile = loadCachedVipProfile(user.uid);
+      refreshVipUIEverywhere();
 
       if (isAuthorizedAdminEmail(user)) {
         if (userRole !== 'admin') {
@@ -5045,6 +5567,15 @@
 
       if (!isHandlingSessionConflict) {
         await claimExclusiveSessionForUser(user);
+      }
+
+      if (navigator.onLine && auth.currentUser && auth.currentUser.uid === user.uid) {
+        try {
+          const uSnap = await withTimeout(getDoc(doc(db, USERS_COLLECTION, user.uid)), 8000);
+          if (uSnap.exists() && auth.currentUser && auth.currentUser.uid === user.uid) {
+            syncVipStateFromUserDoc(user.uid, uSnap.data());
+          }
+        } catch (vipSyncErr) {}
       }
 
       if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
@@ -5229,6 +5760,8 @@
 
         let nextConfirmCount = 1;
         let nextExpiresAt = null;
+        const activeVip = getActiveVipProfile(user);
+        const voteWeight = activeVip ? (activeVip.meta.voteWeight || 2) : 1;
         if (voteType === 'confirm') {
           const reportSnap = await withTimeout(getDoc(reportRef), 10000);
           if (!reportSnap.exists()) {
@@ -5253,7 +5786,7 @@
               )
             )
           );
-          nextConfirmCount = baseServerCount + 1;
+          nextConfirmCount = baseServerCount + voteWeight;
           nextExpiresAt = Timestamp.fromMillis(Date.now() + getConsensusTtlMs(nextConfirmCount));
         }
 
@@ -5267,7 +5800,7 @@
           reportRef,
           voteType === 'confirm'
             ? {
-                confirmations: increment(1),
+                confirmations: increment(voteWeight),
                 confirmaciones: nextConfirmCount,
                 confirmadoPor: arrayUnion(user.uid),
                 expiresAt: nextExpiresAt
@@ -5296,11 +5829,12 @@
         }
 
         if (voteType === 'confirm') {
+          const vipBoostTxt = activeVip ? ` (${activeVip.meta.badge}: +${voteWeight} credibilidad)` : '';
           showToast(
             nextConfirmCount >= 3
-              ? `🛡️ ¡Alerta FIRME (${nextConfirmCount} conf. · vigencia extendida a 3 horas)!`
+              ? `🛡️ ¡Alerta FIRME (${nextConfirmCount} conf. · vigencia extendida a 3 horas)${vipBoostTxt}!`
               : nextConfirmCount === 2
-              ? '🟠 Confirmación 2/3 sumada (alerta activa 1 hora y sonar habilitado).'
+              ? `🟠 Confirmación 2/3 sumada (alerta activa 1 hora y sonar habilitado)${vipBoostTxt}.`
               : '✓ Confirmaste que la novedad sigue activa.'
           );
         } else {
@@ -5607,10 +6141,31 @@
       return closest;
     }
 
+    const CRITICAL_ZONES_VISIBILITY_KEY = 'anthi_show_critical_zones_v1';
+
+    function isCriticalZonesMapVisible() {
+      try {
+        return localStorage.getItem(CRITICAL_ZONES_VISIBILITY_KEY) !== 'false';
+      } catch (e) {
+        return true;
+      }
+    }
+
+    window.toggleCriticalZonesMapVisibility = function(forceVal) {
+      const next = typeof forceVal === 'boolean' ? forceVal : !isCriticalZonesMapVisible();
+      try {
+        localStorage.setItem(CRITICAL_ZONES_VISIBILITY_KEY, next ? 'true' : 'false');
+      } catch (e) {}
+      const chk = document.getElementById('chkShowCriticalZonesAdmin');
+      if (chk) chk.checked = next;
+      renderReactionZonesOnMap();
+      return next;
+    };
+
     function renderReactionZonesOnMap() {
       if (!reactionZonesLayer) return;
       reactionZonesLayer.clearLayers();
-      if (userRole !== 'admin') return;
+      if (userRole !== 'admin' || !isCriticalZonesMapVisible()) return;
 
       const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
       list.forEach((rp) => {
@@ -5623,20 +6178,23 @@
           radius: radiusM,
           color: '#06b6d4',
           weight: 1.8,
-          opacity: 0.78,
+          opacity: 0.82,
           dashArray: '6, 5',
           fillColor: '#06b6d4',
-          fillOpacity: 0.11,
+          fillOpacity: 0.12,
           interactive: true
         });
 
         const popupHtml = `
           <div class="popup-card">
-            <span class="popup-badge" style="background:#0891b2;">⚡ Punto de Reacción</span>
-            <div style="font-weight:800;margin-bottom:4px;">${escapeHtml(rp.nombre || 'Zona de Reacción')}</div>
+            <span class="popup-badge" style="background:#0891b2;">⚡ Punto Crítico (Reacción Inmediata)</span>
+            <div style="font-weight:800;margin-bottom:4px;">${escapeHtml(rp.nombre || 'Punto Crítico')}</div>
             <div class="popup-meta">Radio: ${radiusM} m · 📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
-            <div class="popup-meta" style="color:#67e8f9;margin-top:4px;">Los reportes dentro de este círculo quedan FIRMES al instante.</div>
-            ${hasValidatedAdminPermission() ? `<div class="popup-admin-bar"><button type="button" class="popup-vote-btn delete" onclick="deleteReactionPointFromFirestore('${escapeHtml(rp.id)}')">🗑️ Eliminar Punto de Reacción</button></div>` : ''}
+            <div class="popup-meta" style="color:#67e8f9;margin-top:4px;">Reportes dentro de esta zona quedan FIRMES en primera opción al instante.</div>
+            ${hasValidatedAdminPermission() ? `<div class="popup-admin-bar">
+              <button type="button" class="popup-vote-btn edit" onclick="startEditReactionPoint('${escapeHtml(rp.id)}')">✏️ Ajustar radio / punto</button>
+              <button type="button" class="popup-vote-btn delete" onclick="deleteReactionPointFromFirestore('${escapeHtml(rp.id)}')">🗑️ Eliminar</button>
+            </div>` : ''}
           </div>
         `;
         circle.bindPopup(popupHtml);
@@ -5646,9 +6204,9 @@
           zIndexOffset: 240,
           icon: L.divIcon({
             className: 'custom-reaction-zone-pin',
-            html: `<div style="padding:2px 7px;border-radius:999px;background:rgba(8,47,73,0.92);border:1.5px solid #22d3ee;color:#a5f3fc;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.45);">⚡ ${escapeHtml(rp.nombre || 'Zona')} (${radiusM}m)</div>`,
-            iconSize: [140, 22],
-            iconAnchor: [70, 11]
+            html: `<div style="padding:2px 7px;border-radius:999px;background:rgba(8,47,73,0.92);border:1.5px solid #22d3ee;color:#a5f3fc;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.45);">⚡ ${escapeHtml(rp.nombre || 'Crítico')} (${radiusM}m)</div>`,
+            iconSize: [148, 22],
+            iconAnchor: [74, 11]
           })
         });
         labelMarker.bindPopup(popupHtml);
@@ -6401,21 +6959,15 @@
       const matchedRP = previewCoords ? findMatchingReactionPoint(previewCoords.lat, previewCoords.lng) : null;
       const hasPhoto = Boolean(pendingImageDataUrl && String(pendingImageDataUrl).length > 100);
       const isAdminMode = hasValidatedAdminPermission();
+      const activeVip = getActiveVipProfile(auth.currentUser);
 
       if (matchedRP) {
         bannerEl.style.display = 'block';
         bannerEl.style.background = 'rgba(6, 182, 212, 0.14)';
         bannerEl.style.border = '1px solid rgba(34, 211, 238, 0.5)';
         bannerEl.style.color = '#a5f3fc';
-        bannerEl.innerHTML = `⚡ <strong>Punto de Reacción «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> tu reporte quedará <strong>FIRME de inmediato</strong> (sin espera de confirmaciones ni bloqueo de 300 m).`;
-        return;
-      }
-      if (hasPhoto) {
-        bannerEl.style.display = 'block';
-        bannerEl.style.background = 'rgba(16, 185, 129, 0.14)';
-        bannerEl.style.border = '1px solid rgba(52, 211, 153, 0.5)';
-        bannerEl.style.color = '#a7f3d0';
-        bannerEl.innerHTML = '📸 <strong>Foto adjunta lista:</strong> al publicar, la alerta quedará <strong>FIRME y activa de inmediato</strong> para toda la comunidad (3 horas).';
+        bannerEl.innerHTML = `⚡ <strong>Punto Crítico «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> activación <strong>FIRME en primera opción</strong> de inmediato (sin espera ni bloqueo de 300 m).`;
+        if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = '⚡ Publicar FIRME en primera opción';
         return;
       }
       if (isAdminMode) {
@@ -6424,13 +6976,42 @@
         bannerEl.style.border = '1px solid rgba(251, 191, 36, 0.5)';
         bannerEl.style.color = '#fde68a';
         bannerEl.innerHTML = '👑 <strong>Modo Administrador:</strong> tu reporte se activará <strong>FIRME de inmediato</strong> para toda la comunidad.';
+        if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = '👑 Publicar FIRME (Admin)';
+        return;
+      }
+      if (activeVip) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = activeVip.meta.bg;
+        bannerEl.style.border = `1px solid ${activeVip.meta.border}`;
+        bannerEl.style.color = activeVip.meta.color;
+        const isCeposFocus = activeVip.tipoVip === 'rastreo_cepos' && selectedCategory && String(selectedCategory.type || '').toLowerCase().includes('cepo');
+        bannerEl.innerHTML = isCeposFocus
+          ? `🛡️ <strong>${escapeHtml(activeVip.meta.badge)}:</strong> prioridad operativa de seguimiento de Cepos/Fotomultas. Publicación <strong>FIRME en primera instancia</strong> (3 horas).`
+          : `${escapeHtml(activeVip.meta.badge)}: publicación <strong>FIRME en primera instancia</strong> de inmediato (sin espera ni bloqueo de 300 m).`;
+        if (btnSubmit && !btnSubmit.disabled) {
+          btnSubmit.textContent = activeVip.tipoVip === 'rastreo_cepos'
+            ? '🛡️ Publicar FIRME (VIP Cepos)'
+            : activeVip.tipoVip === 'fundador'
+            ? '🏅 Publicar FIRME (VIP Fundador)'
+            : '⭐ Publicar FIRME (VIP)';
+        }
+        return;
+      }
+      if (hasPhoto) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = 'rgba(16, 185, 129, 0.14)';
+        bannerEl.style.border = '1px solid rgba(52, 211, 153, 0.5)';
+        bannerEl.style.color = '#a7f3d0';
+        bannerEl.innerHTML = '📸 <strong>Foto adjunta lista:</strong> al publicar, la alerta quedará <strong>FIRME y activa de inmediato</strong> para toda la comunidad (3 horas).';
+        if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = '📸 Publicar FIRME al instante';
         return;
       }
       bannerEl.style.display = 'block';
       bannerEl.style.background = 'rgba(15, 23, 42, 0.72)';
       bannerEl.style.border = '1px solid rgba(100, 116, 139, 0.45)';
       bannerEl.style.color = '#cbd5e1';
-      bannerEl.innerHTML = '⏳ <strong>Activación escalonada:</strong> inicia 1/3 (30 min) → 2/3 (1h con radar) → 3+ (Firme 3h). <em>Tip: adjunta una foto para activarla firme al instante.</em>';
+      bannerEl.innerHTML = '⏳ <strong>Activación escalonada:</strong> inicia 1/3 (30 min) → 2/3 (1h con radar) → 3+ (Firme 3h). <em>Tip: adjunta una foto, usa código VIP o reporta en un Punto Crítico para activación inmediata.</em>';
+      if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = 'Publicar reporte en vivo';
     }
 
     function updateDuplicateGuardPreview() {
@@ -6446,7 +7027,8 @@
         return;
       }
       const inReactionPoint = Boolean(findMatchingReactionPoint(previewCoords.lat, previewCoords.lng));
-      if (inReactionPoint && !hasValidatedAdminPermission()) {
+      const vipPrivilege = hasValidatedVipPermission(auth.currentUser);
+      if ((inReactionPoint || vipPrivilege) && !hasValidatedAdminPermission()) {
         renderDuplicateGuardBanner(null, false);
         return;
       }
@@ -7791,12 +8373,22 @@
       const nowMs = Date.now();
       const matchedRP = findMatchingReactionPoint(coords.lat, coords.lng);
       const hasPhoto = Boolean(mediaDataUrl && mediaDataUrl.length > 100);
-      const isImmediateFirm = hasValidatedAdminPermission() || Boolean(matchedRP) || hasPhoto;
+      const activeVip = getActiveVipProfile(auth.currentUser);
+      const isImmediateFirm = hasValidatedAdminPermission() || Boolean(matchedRP) || Boolean(activeVip) || hasPhoto;
       const initialConfirm = isImmediateFirm ? 3 : 1;
       const initialTtlMs = isImmediateFirm ? CONSENSUS_TTL_LEVEL3_MS : CONSENSUS_TTL_LEVEL1_MS;
       const agentRadiusVal = isAgenteTransitoTipo(selectedCategory.type)
         ? clampAgentRadiusMeters(reportAgentRadiusInput ? reportAgentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS)
         : null;
+      const activacionRapida = hasValidatedAdminPermission()
+        ? 'admin'
+        : matchedRP
+        ? 'punto_reaccion'
+        : activeVip
+        ? activeVip.meta.activacionKey
+        : hasPhoto
+        ? 'foto'
+        : 'normal';
       const queue = loadPendingReports();
       queue.push({
         localId,
@@ -7813,13 +8405,8 @@
         fileName: mediaDataUrl ? fileName : null,
         puntoReaccionId: matchedRP ? matchedRP.point.id : null,
         puntoReaccionNombre: matchedRP ? matchedRP.point.nombre : null,
-        activacionRapida: hasValidatedAdminPermission()
-          ? 'admin'
-          : matchedRP
-          ? 'punto_reaccion'
-          : hasPhoto
-          ? 'foto'
-          : 'normal',
+        activacionRapida,
+        vipNivel: activeVip ? activeVip.tipoVip : null,
         confirmations: initialConfirm,
         confirmaciones: initialConfirm,
         confirmadoPor: auth.currentUser ? [auth.currentUser.uid] : [],
@@ -7894,7 +8481,9 @@
           )
         )
       );
-      const nextConfirmCount = baseServerCount + 1;
+      const activeVip = getActiveVipProfile(user);
+      const voteWeight = activeVip ? (activeVip.meta.voteWeight || 2) : 1;
+      const nextConfirmCount = baseServerCount + voteWeight;
       const nextExpiresAt = Timestamp.fromMillis(Date.now() + getConsensusTtlMs(nextConfirmCount));
 
       const batch = writeBatch(db);
@@ -7904,7 +8493,7 @@
         createdAt: serverTimestamp()
       });
       batch.update(reportRef, {
-        confirmations: increment(1),
+        confirmations: increment(voteWeight),
         confirmaciones: nextConfirmCount,
         confirmadoPor: arrayUnion(user.uid),
         expiresAt: nextExpiresAt
@@ -7945,13 +8534,14 @@
         const currentUser = auth.currentUser;
         const canFix = Boolean(isAuthorizedAdminEmail(currentUser) && currentUser.emailVerified);
         const adminSyncBypass = hasValidatedAdminPermission() || canFix;
+        const activeVip = getActiveVipProfile(currentUser);
         let skippedDuplicates = 0;
         let autoConfirmedNearby = 0;
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
 
           const matchedRP = findMatchingReactionPoint(item.lat, item.lng);
-          if (!adminSyncBypass && !matchedRP) {
+          if (!adminSyncBypass && !matchedRP && !activeVip) {
             const dupMatch = findNearbyDuplicateActiveReport(
               item.lat,
               item.lng,
@@ -7980,7 +8570,7 @@
             urlFoto = String(item.blobDataUrl).slice(0, 450000);
           }
           const hasPhoto = Boolean(urlFoto && urlFoto.length > 100);
-          const isImmediateFirm = adminSyncBypass || Boolean(matchedRP) || hasPhoto;
+          const isImmediateFirm = adminSyncBypass || Boolean(matchedRP) || Boolean(activeVip) || hasPhoto;
           const initialConfirm = isImmediateFirm ? 3 : 1;
           const initialExpiresAt = Timestamp.fromMillis(
             Date.now() + (isImmediateFirm ? CONSENSUS_TTL_LEVEL3_MS : CONSENSUS_TTL_LEVEL1_MS)
@@ -7989,6 +8579,8 @@
             ? 'admin'
             : matchedRP
             ? 'punto_reaccion'
+            : activeVip
+            ? activeVip.meta.activacionKey
             : hasPhoto
             ? 'foto'
             : 'normal';
@@ -8010,6 +8602,9 @@
             denials: 0,
             authorId: currentUser.uid
           };
+          if (activeVip) {
+            syncPayload.vipNivel = activeVip.tipoVip;
+          }
           if (isAgenteTransitoTipo(item.tipo)) {
             syncPayload.radioMetros = clampAgentRadiusMeters(item.radioMetros);
           }
@@ -8077,7 +8672,7 @@
         const matchedReactionPoint = findMatchingReactionPoint(coords.lat, coords.lng);
 
         if (!navigator.onLine) {
-          if (!hasValidatedAdminPermission() && !matchedReactionPoint) {
+          if (!hasValidatedAdminPermission() && !matchedReactionPoint && !hasValidatedVipPermission(auth.currentUser)) {
             const offlineDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
             if (offlineDup) {
               renderDuplicateGuardBanner(offlineDup, false);
@@ -8094,8 +8689,10 @@
         btnSubmit.textContent = 'Verificando cuenta...';
         const user = await ensureAuthenticated();
         const adminBypass = hasValidatedAdminPermission() || (wasSignedOutBeforeSubmit && isPrimaryAdminEmail(user));
+        const activeVip = getActiveVipProfile(user);
+        const vipBypass = Boolean(activeVip);
 
-        if (!adminBypass && !matchedReactionPoint) {
+        if (!adminBypass && !matchedReactionPoint && !vipBypass) {
           const nearbyDup = findNearbyDuplicateActiveReport(coords.lat, coords.lng, selectedCategory.type);
           if (nearbyDup) {
             if (!nearbyDup.report.isPending && !hasUserConfirmedReport(nearbyDup.report, user)) {
@@ -8128,7 +8725,7 @@
           ? String(pendingImageDataUrl)
           : null;
         const hasPhotoEvidence = Boolean(urlFoto && urlFoto.length > 100);
-        const isImmediateFirm = adminBypass || Boolean(matchedReactionPoint) || hasPhotoEvidence;
+        const isImmediateFirm = adminBypass || Boolean(matchedReactionPoint) || vipBypass || hasPhotoEvidence;
         const initialConfirmCount = isImmediateFirm ? 3 : 1;
         const initialExpiresAt = Timestamp.fromMillis(
           Date.now() + (isImmediateFirm ? CONSENSUS_TTL_LEVEL3_MS : CONSENSUS_TTL_LEVEL1_MS)
@@ -8137,6 +8734,8 @@
           ? 'admin'
           : matchedReactionPoint
           ? 'punto_reaccion'
+          : activeVip
+          ? activeVip.meta.activacionKey
           : hasPhotoEvidence
           ? 'foto'
           : 'normal';
@@ -8160,6 +8759,9 @@
           denials: 0,
           authorId: user.uid
         };
+        if (activeVip) {
+          reportPayload.vipNivel = activeVip.tipoVip;
+        }
         if (isAgenteTransitoTipo(selectedCategory.type)) {
           reportPayload.radioMetros = clampAgentRadiusMeters(
             reportAgentRadiusInput ? reportAgentRadiusInput.value : DEFAULT_AGENT_RADIUS_METERS
@@ -8192,7 +8794,13 @@
           isFixed
             ? '👑 ¡Alerta oficial fija publicada en Firestore!'
             : activacionRapida === 'punto_reaccion'
-            ? `⚡ ¡Alerta FIRME activada al instante en Punto de Reacción «${matchedReactionPoint.point.nombre}»!`
+            ? `⚡ ¡Alerta FIRME en primera opción activada al instante en Punto Crítico «${matchedReactionPoint.point.nombre}»!`
+            : activacionRapida === 'vip_fundador'
+            ? '🏅 ¡Alerta FIRME publicada en primera instancia (VIP Fundador)!'
+            : activacionRapida === 'vip_cepos'
+            ? '🛡️ ¡Alerta FIRME publicada en primera instancia (VIP Cepos/Fotomultas)!'
+            : activacionRapida === 'vip_estandar'
+            ? '⭐ ¡Alerta FIRME publicada en primera instancia (VIP Estándar)!'
             : activacionRapida === 'foto'
             ? '📸 ¡Foto verificada: alerta FIRME y activa de inmediato para todos!'
             : activacionRapida === 'admin'
@@ -8219,6 +8827,9 @@
       } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Publicar reporte en vivo';
+        if (typeof updateFastActivationPreview === 'function') {
+          updateFastActivationPreview();
+        }
       }
     }
 
@@ -8701,7 +9312,74 @@
     const btnUseGpsForReactionPoint = document.getElementById('btnUseGpsForReactionPoint');
     const btnPickReactionCoordsOnMap = document.getElementById('btnPickReactionCoordsOnMap');
     const btnSaveReactionPoint = document.getElementById('btnSaveReactionPoint');
+    const btnCancelEditReactionPoint = document.getElementById('btnCancelEditReactionPoint');
+    const chkShowCriticalZonesAdmin = document.getElementById('chkShowCriticalZonesAdmin');
     const adminReactionPointsList = document.getElementById('adminReactionPointsList');
+    let editingReactionPointId = null;
+
+    if (chkShowCriticalZonesAdmin) {
+      chkShowCriticalZonesAdmin.checked = isCriticalZonesMapVisible();
+      chkShowCriticalZonesAdmin.addEventListener('change', () => {
+        const visible = window.toggleCriticalZonesMapVisibility(chkShowCriticalZonesAdmin.checked);
+        showToast(visible ? '👁️ Puntos Críticos visibles en tu mapa.' : '🙈 Puntos Críticos ocultos en el mapa (siguen activos).');
+      });
+    }
+
+    function syncReactionRadiusPresets(radiusVal) {
+      const clamped = Math.max(50, Math.min(2000, Math.round(Number(radiusVal) || 200)));
+      if (rpRadiusInput) rpRadiusInput.value = String(clamped);
+      document.querySelectorAll('[data-rp-radius]').forEach((b) => {
+        b.classList.toggle('active', Number(b.dataset.rpRadius) === clamped);
+      });
+    }
+
+    function resetReactionPointFormMode() {
+      editingReactionPointId = null;
+      if (rpNameInput) rpNameInput.value = '';
+      syncReactionRadiusPresets(200);
+      pendingReactionCoords = null;
+      if (btnSaveReactionPoint) btnSaveReactionPoint.textContent = '⚡ Guardar Punto Crítico';
+      if (btnCancelEditReactionPoint) btnCancelEditReactionPoint.style.display = 'none';
+      if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') {
+        window.__anthiUpdateReactionCoordsBadge();
+      }
+    }
+
+    window.startEditReactionPoint = function(puntoId) {
+      if (!puntoId || userRole !== 'admin') return;
+      const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
+      const rp = list.find((item) => String(item.id) === String(puntoId));
+      if (!rp) {
+        showToast('No se encontró ese Punto Crítico.');
+        return;
+      }
+      editingReactionPointId = String(rp.id);
+      if (rpNameInput) rpNameInput.value = String(rp.nombre || '');
+      syncReactionRadiusPresets(rp.radioMetros || 200);
+      pendingReactionCoords = {
+        lat: Number(Number(rp.lat).toFixed(6)),
+        lng: Number(Number(rp.lng).toFixed(6)),
+        isManual: true
+      };
+      if (btnSaveReactionPoint) btnSaveReactionPoint.textContent = '💾 Actualizar Punto Crítico';
+      if (btnCancelEditReactionPoint) btnCancelEditReactionPoint.style.display = 'inline-flex';
+      if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') {
+        window.__anthiUpdateReactionCoordsBadge();
+      }
+      if (typeof openAdminPanelModal === 'function') {
+        openAdminPanelModal('control');
+      }
+      setTimeout(() => {
+        if (rpRadiusInput) rpRadiusInput.focus();
+      }, 120);
+    };
+
+    if (btnCancelEditReactionPoint) {
+      btnCancelEditReactionPoint.addEventListener('click', () => {
+        resetReactionPointFormMode();
+        showToast('Edición cancelada.');
+      });
+    }
 
     window.__anthiUpdateReactionCoordsBadge = function updateReactionCoordsBadge() {
       if (!rpCoordsBadge) return;
@@ -8719,11 +9397,14 @@
     };
 
     window.__anthiRefreshReactionPointsUI = function renderAdminReactionPointsList() {
+      if (chkShowCriticalZonesAdmin) {
+        chkShowCriticalZonesAdmin.checked = isCriticalZonesMapVisible();
+      }
       if (!adminReactionPointsList) return;
       adminReactionPointsList.innerHTML = '';
       const list = Array.isArray(activeReactionPoints) ? activeReactionPoints : [];
       if (list.length === 0) {
-        adminReactionPointsList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay Puntos de Reacción configurados.</div>';
+        adminReactionPointsList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay Puntos Críticos configurados.</div>';
         return;
       }
 
@@ -8751,21 +9432,37 @@
         goBtn.title = 'Ver círculo en el mapa';
         goBtn.style.cssText = 'border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
         goBtn.addEventListener('click', () => {
+          if (!isCriticalZonesMapVisible()) {
+            window.toggleCriticalZonesMapVisibility(true);
+          }
           if (adminPanelModal) adminPanelModal.classList.remove('open');
           isFollowingUser = false;
           map.setView([Number(rp.lat), Number(rp.lng)], 16, { animate: true });
         });
 
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.textContent = '✏️';
+        editBtn.title = 'Ajustar radio, nombre o ubicación';
+        editBtn.style.cssText = 'border:1px solid rgba(6,182,212,0.5);background:rgba(8,145,178,0.22);color:#a5f3fc;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        editBtn.addEventListener('click', () => {
+          window.startEditReactionPoint(rp.id);
+        });
+
         const delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.textContent = '🗑️';
-        delBtn.title = 'Eliminar Punto de Reacción';
+        delBtn.title = 'Eliminar Punto Crítico';
         delBtn.style.cssText = 'border:1px solid rgba(239,68,68,0.55);background:rgba(127,29,29,0.55);color:#fecaca;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
         delBtn.addEventListener('click', () => {
+          if (editingReactionPointId === rp.id) {
+            resetReactionPointFormMode();
+          }
           window.deleteReactionPointFromFirestore(rp.id);
         });
 
         actions.appendChild(goBtn);
+        actions.appendChild(editBtn);
         actions.appendChild(delBtn);
         row.appendChild(info);
         row.appendChild(actions);
@@ -8775,17 +9472,21 @@
 
     document.querySelectorAll('[data-rp-radius]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (rpRadiusInput) rpRadiusInput.value = btn.dataset.rpRadius || '200';
-        document.querySelectorAll('[data-rp-radius]').forEach((b) => b.classList.toggle('active', b === btn));
+        syncReactionRadiusPresets(btn.dataset.rpRadius || '200');
       });
     });
+    if (rpRadiusInput) {
+      rpRadiusInput.addEventListener('change', () => {
+        syncReactionRadiusPresets(rpRadiusInput.value);
+      });
+    }
 
     if (btnUseGpsForReactionPoint) {
       btnUseGpsForReactionPoint.addEventListener('click', async () => {
         const gpsCoords = await getReportCoordinates();
         pendingReactionCoords = { lat: Number(gpsCoords.lat.toFixed(6)), lng: Number(gpsCoords.lng.toFixed(6)) };
         window.__anthiUpdateReactionCoordsBadge();
-        showToast('📍 Coordenadas GPS cargadas para el Punto de Reacción.');
+        showToast('📍 Coordenadas GPS cargadas para el Punto Crítico.');
       });
     }
 
@@ -8800,7 +9501,7 @@
       reactionPointForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (userRole !== 'admin') {
-          showToast('⛔ Solo los administradores pueden crear Puntos de Reacción.');
+          showToast('⛔ Solo los administradores pueden gestionar Puntos Críticos.');
           return;
         }
         const nombre = (rpNameInput ? rpNameInput.value : '').trim().slice(0, 60);
@@ -8819,9 +9520,10 @@
           }
         }
 
+        const isEditing = Boolean(editingReactionPointId);
         if (btnSaveReactionPoint) {
           btnSaveReactionPoint.disabled = true;
-          btnSaveReactionPoint.textContent = 'Guardando Punto de Reacción...';
+          btnSaveReactionPoint.textContent = isEditing ? 'Actualizando Punto Crítico...' : 'Guardando Punto Crítico...';
         }
         try {
           const user = await ensureAuthenticated();
@@ -8829,33 +9531,55 @@
             showToast(`⛔ Requiere sesión con cuenta Administrador autorizada (${ADMIN_EMAILS.join(' o ')}).`);
             return;
           }
-          await withTimeout(
-            addDoc(collection(db, REACTION_POINTS_COLLECTION), {
-              nombre,
-              lat: Number(coords.lat),
-              lng: Number(coords.lng),
-              radioMetros,
-              createdBy: user.uid,
-              createdAt: serverTimestamp()
-            }),
-            15000
-          );
-          if (rpNameInput) rpNameInput.value = '';
-          pendingReactionCoords = null;
-          window.__anthiUpdateReactionCoordsBadge();
-          showToast(`⚡ Punto de Reacción «${nombre}» (${radioMetros} m) guardado y activo.`);
+          if (isEditing) {
+            const targetId = editingReactionPointId;
+            await withTimeout(
+              updateDoc(doc(db, REACTION_POINTS_COLLECTION, targetId), {
+                nombre,
+                lat: Number(coords.lat),
+                lng: Number(coords.lng),
+                radioMetros
+              }),
+              15000
+            );
+            activeReactionPoints = activeReactionPoints.map((item) =>
+              String(item.id) === String(targetId)
+                ? { ...item, nombre, lat: Number(coords.lat), lng: Number(coords.lng), radioMetros }
+                : item
+            );
+            saveCachedReactionPoints(activeReactionPoints);
+            renderReactionZonesOnMap();
+            window.__anthiRefreshReactionPointsUI();
+            if (typeof updateDuplicateGuardPreview === 'function') updateDuplicateGuardPreview();
+            resetReactionPointFormMode();
+            showToast(`💾 Punto Crítico «${nombre}» actualizado (${radioMetros} m).`);
+          } else {
+            await withTimeout(
+              addDoc(collection(db, REACTION_POINTS_COLLECTION), {
+                nombre,
+                lat: Number(coords.lat),
+                lng: Number(coords.lng),
+                radioMetros,
+                createdBy: user.uid,
+                createdAt: serverTimestamp()
+              }),
+              15000
+            );
+            resetReactionPointFormMode();
+            showToast(`⚡ Punto Crítico «${nombre}» (${radioMetros} m) guardado y activo.`);
+          }
         } catch (err) {
           if (err && err.message === 'AUTH_CANCELLED') return;
           if (err && err.code === 'permission-denied') {
             showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
           } else {
-            showToast('No se pudo guardar el Punto de Reacción.');
+            showToast(isEditing ? 'No se pudo actualizar el Punto Crítico.' : 'No se pudo guardar el Punto Crítico.');
           }
-          handleFirestoreError(err, OperationType.CREATE, REACTION_POINTS_COLLECTION);
+          handleFirestoreError(err, isEditing ? OperationType.UPDATE : OperationType.CREATE, REACTION_POINTS_COLLECTION);
         } finally {
           if (btnSaveReactionPoint) {
             btnSaveReactionPoint.disabled = false;
-            btnSaveReactionPoint.textContent = '⚡ Guardar Punto de Reacción';
+            btnSaveReactionPoint.textContent = editingReactionPointId ? '💾 Actualizar Punto Crítico' : '⚡ Guardar Punto Crítico';
           }
         }
       });
@@ -9073,6 +9797,571 @@
       });
     }
 
+    // =========================================================================
+    // 11B. SISTEMA VIP POR CÓDIGO Y NIVELES DIFERENCIADOS (ADMIN GENERAL INTOCABLE)
+    // =========================================================================
+    const vipModal = document.getElementById('vipModal');
+    const btnOpenVipCodeModal = document.getElementById('btnOpenVipCodeModal');
+    const btnAuthRedeemVip = document.getElementById('btnAuthRedeemVip');
+    const btnCloseVipModal = document.getElementById('btnCloseVipModal');
+    const vipRedeemForm = document.getElementById('vipRedeemForm');
+    const vipCodeRedeemInput = document.getElementById('vipCodeRedeemInput');
+    const btnSubmitVipCode = document.getElementById('btnSubmitVipCode');
+    const vipRedeemFeedback = document.getElementById('vipRedeemFeedback');
+
+    const adminVipCodeForm = document.getElementById('adminVipCodeForm');
+    const vipAdminCodeInput = document.getElementById('vipAdminCodeInput');
+    const btnGenerateVipCode = document.getElementById('btnGenerateVipCode');
+    const vipAdminTipoSelect = document.getElementById('vipAdminTipoSelect');
+    const vipAdminExpiryRow = document.getElementById('vipAdminExpiryRow');
+    const vipAdminExpiryDate = document.getElementById('vipAdminExpiryDate');
+    const vipAdminMaxUsesInput = document.getElementById('vipAdminMaxUsesInput');
+    const vipAdminNotaInput = document.getElementById('vipAdminNotaInput');
+    const btnCreateVipCode = document.getElementById('btnCreateVipCode');
+    const adminVipCodesList = document.getElementById('adminVipCodesList');
+
+    let adminVipCodesCache = [];
+    let adminVipCodesUnsubscribe = null;
+    let adminVipCodesSubscribedUid = null;
+    let adminVipCanjesCache = {};
+
+    function openVipCodeModal() {
+      if (vipRedeemFeedback) {
+        vipRedeemFeedback.textContent = 'El código es asignado por un Administrador General y vincula el nivel VIP directamente a tu cuenta.';
+        vipRedeemFeedback.style.color = '#94a3b8';
+      }
+      refreshVipUIEverywhere();
+      if (vipModal) vipModal.classList.add('open');
+      setTimeout(() => {
+        if (vipCodeRedeemInput) vipCodeRedeemInput.focus();
+      }, 120);
+    }
+
+    if (btnOpenVipCodeModal) {
+      btnOpenVipCodeModal.addEventListener('click', openVipCodeModal);
+    }
+    if (btnAuthRedeemVip) {
+      btnAuthRedeemVip.addEventListener('click', () => {
+        if (authModal) authModal.classList.remove('open');
+        openVipCodeModal();
+      });
+    }
+    if (btnCloseVipModal && vipModal) {
+      btnCloseVipModal.addEventListener('click', () => vipModal.classList.remove('open'));
+      vipModal.addEventListener('click', (e) => {
+        if (e.target === vipModal) vipModal.classList.remove('open');
+      });
+    }
+
+    async function redeemVipCode(rawCode) {
+      const codeId = normalizeVipCodeInput(rawCode);
+      if (codeId.length < 4 || codeId.length > 32) {
+        showToast('Ingresa un código VIP válido (4 a 32 caracteres alfanuméricos).');
+        return false;
+      }
+      if (!navigator.onLine) {
+        showToast('Sin internet. Conéctate para validar y activar tu código VIP.');
+        return false;
+      }
+
+      let user;
+      try {
+        user = await ensureAuthenticated();
+      } catch (authErr) {
+        if (authErr && authErr.message === 'AUTH_CANCELLED') {
+          showToast('Inicia sesión para vincular el código VIP a tu cuenta.');
+          return false;
+        }
+        throw authErr;
+      }
+
+      if (vipRedeemFeedback) {
+        vipRedeemFeedback.textContent = `Validando código ${codeId}...`;
+        vipRedeemFeedback.style.color = '#cbd5e1';
+      }
+
+      const currentActive = getActiveVipProfile(user);
+      if (currentActive && currentActive.tipoVip === 'fundador') {
+        const msg = '🏅 Tu cuenta ya es VIP Fundador (Intocable) permanente; no requiere ni acepta sobrescritura temporal.';
+        if (vipRedeemFeedback) {
+          vipRedeemFeedback.textContent = msg;
+          vipRedeemFeedback.style.color = '#fcd34d';
+        }
+        showToast(msg);
+        return false;
+      }
+
+      const codeRef = doc(db, VIP_CODES_COLLECTION, codeId);
+      const canjeRef = doc(db, VIP_CODES_COLLECTION, codeId, 'canjes', user.uid);
+      const userDocRef = doc(db, USERS_COLLECTION, user.uid);
+
+      const [codeSnap, canjeSnap, userSnapInitial] = await Promise.all([
+        withTimeout(getDoc(codeRef), 10000),
+        withTimeout(getDoc(canjeRef), 10000),
+        withTimeout(getDoc(userDocRef), 10000)
+      ]);
+
+      if (!codeSnap.exists()) {
+        const msg = `⛔ El código "${codeId}" no existe o fue eliminado.`;
+        if (vipRedeemFeedback) {
+          vipRedeemFeedback.textContent = msg;
+          vipRedeemFeedback.style.color = '#fca5a5';
+        }
+        showToast(msg);
+        return false;
+      }
+
+      const codeData = codeSnap.data() || {};
+      if (codeData.activo !== true) {
+        const msg = `⛔ El código "${codeId}" se encuentra desactivado por el Administrador.`;
+        if (vipRedeemFeedback) {
+          vipRedeemFeedback.textContent = msg;
+          vipRedeemFeedback.style.color = '#fca5a5';
+        }
+        showToast(msg);
+        return false;
+      }
+
+      if (!isValidVipTipoKey(codeData.tipoVip)) {
+        showToast('⛔ Código con nivel VIP inválido.');
+        return false;
+      }
+
+      const maxUsos = Math.max(1, Number(codeData.maxUsos || 1));
+      const usosActuales = Math.max(0, Number(codeData.usosActuales || 0));
+      if (usosActuales >= maxUsos) {
+        const msg = `⛔ El código "${codeId}" alcanzó el límite máximo de usos (${usosActuales}/${maxUsos}).`;
+        if (vipRedeemFeedback) {
+          vipRedeemFeedback.textContent = msg;
+          vipRedeemFeedback.style.color = '#fca5a5';
+        }
+        showToast(msg);
+        return false;
+      }
+
+      const expiraAtMs = codeData.tipoVip === 'fundador' ? null : extractOptionalTimestampMs(codeData.expiraAt);
+      if (codeData.tipoVip !== 'fundador' && (!expiraAtMs || expiraAtMs <= Date.now() + 5000)) {
+        const msg = `⏳ El código "${codeId}" ya venció el ${formatVipDateShort(expiraAtMs)}.`;
+        if (vipRedeemFeedback) {
+          vipRedeemFeedback.textContent = msg;
+          vipRedeemFeedback.style.color = '#fca5a5';
+        }
+        showToast(msg);
+        return false;
+      }
+
+      if (canjeSnap.exists()) {
+        const msg = `✓ Ya habías canjeado el código "${codeId}" en esta cuenta.`;
+        if (vipRedeemFeedback) {
+          vipRedeemFeedback.textContent = msg;
+          vipRedeemFeedback.style.color = '#fde68a';
+        }
+        showToast(msg);
+        return false;
+      }
+
+      if (!userSnapInitial.exists()) {
+        const claimed = await claimExclusiveSessionForUser(user, { forceNew: false });
+        if (!claimed) {
+          showToast('No se pudo inicializar el perfil de usuario en Firestore. Reintenta.');
+          return false;
+        }
+      }
+
+      const apodo = getUserApodo(user);
+      const userLabel = (user.email ? (apodo ? `${apodo} · ${user.email}` : user.email) : (apodo || user.uid)).slice(0, 200);
+
+      const batch = writeBatch(db);
+      batch.set(canjeRef, {
+        uid: user.uid,
+        usuario: userLabel,
+        codigo: codeId,
+        tipoVip: codeData.tipoVip,
+        canjeadoAt: serverTimestamp()
+      });
+      batch.update(codeRef, {
+        usosActuales: increment(1)
+      });
+      batch.update(userDocRef, {
+        vipTipo: codeData.tipoVip,
+        vipActivo: true,
+        vipCodigo: codeId,
+        vipExpiraAt: codeData.tipoVip === 'fundador' ? null : codeData.expiraAt,
+        vipActivadoAt: serverTimestamp()
+      });
+
+      await withTimeout(batch.commit(), 15000);
+
+      syncVipStateFromUserDoc(user.uid, {
+        vipTipo: codeData.tipoVip,
+        vipActivo: true,
+        vipCodigo: codeId,
+        vipExpiraAt: codeData.tipoVip === 'fundador' ? null : expiraAtMs,
+        vipActivadoAt: Date.now()
+      });
+
+      const meta = VIP_LEVEL_META[codeData.tipoVip];
+      if (vipRedeemFeedback) {
+        vipRedeemFeedback.textContent = `✅ ¡${meta.badge} activado correctamente en tu cuenta!`;
+        vipRedeemFeedback.style.color = '#6ee7b7';
+      }
+      if (vipCodeRedeemInput) vipCodeRedeemInput.value = '';
+      showToast(`🎉 ¡${meta.badge} activado! Ya publicas en primera instancia.`);
+      return true;
+    }
+
+    if (vipRedeemForm) {
+      vipRedeemForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!vipCodeRedeemInput) return;
+        const raw = vipCodeRedeemInput.value;
+        if (btnSubmitVipCode) {
+          btnSubmitVipCode.disabled = true;
+          btnSubmitVipCode.textContent = 'Activando...';
+        }
+        try {
+          await redeemVipCode(raw);
+        } catch (err) {
+          console.error('Error canjeando código VIP:', err);
+          if (err && err.code === 'permission-denied') {
+            showToast('⛔ No se pudo validar el código VIP (verifica vigencia, usos o si ya eres Fundador).');
+          } else {
+            showToast('No se pudo activar el código VIP. Verifica tu conexión e inténtalo de nuevo.');
+          }
+        } finally {
+          if (btnSubmitVipCode) {
+            btnSubmitVipCode.disabled = false;
+            btnSubmitVipCode.textContent = 'Activar';
+          }
+        }
+      });
+    }
+
+    function setAdminVipExpiryDays(daysCount) {
+      if (!vipAdminExpiryDate) return;
+      const target = new Date(Date.now() + Math.max(1, Number(daysCount || 30)) * 86400000);
+      const col = getColombiaClockParts(target);
+      const mm = String(col.month).padStart(2, '0');
+      const dd = String(col.day).padStart(2, '0');
+      vipAdminExpiryDate.value = `${col.year}-${mm}-${dd}`;
+      document.querySelectorAll('[data-vip-expiry-days]').forEach((b) => {
+        b.classList.toggle('active', Number(b.dataset.vipExpiryDays) === Number(daysCount));
+      });
+    }
+
+    function updateAdminVipExpiryRowVisibility() {
+      const tipo = vipAdminTipoSelect ? vipAdminTipoSelect.value : 'fundador';
+      const needsExpiry = tipo === 'estandar' || tipo === 'rastreo_cepos';
+      if (vipAdminExpiryRow) {
+        vipAdminExpiryRow.style.display = needsExpiry ? 'flex' : 'none';
+      }
+      if (needsExpiry && vipAdminExpiryDate && !vipAdminExpiryDate.value) {
+        setAdminVipExpiryDays(30);
+      }
+    }
+
+    if (vipAdminTipoSelect) {
+      vipAdminTipoSelect.addEventListener('change', updateAdminVipExpiryRowVisibility);
+      updateAdminVipExpiryRowVisibility();
+    }
+
+    document.querySelectorAll('[data-vip-expiry-days]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setAdminVipExpiryDays(Number(btn.dataset.vipExpiryDays || 30));
+      });
+    });
+
+    if (btnGenerateVipCode && vipAdminCodeInput) {
+      btnGenerateVipCode.addEventListener('click', () => {
+        const tipo = vipAdminTipoSelect ? vipAdminTipoSelect.value : 'estandar';
+        const prefix = tipo === 'fundador' ? 'FUND' : tipo === 'rastreo_cepos' ? 'CEPOS' : 'VIP';
+        const token = Math.random().toString(36).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5).padEnd(5, 'X');
+        vipAdminCodeInput.value = `ANTHI-${prefix}-${token}`;
+      });
+    }
+
+    async function fetchVipCanjesForCode(codeId) {
+      const user = auth.currentUser;
+      if (!codeId || userRole !== 'admin' || !isAuthorizedAdminEmail(user)) return;
+      try {
+        const snap = await withTimeout(
+          getDocs(query(collection(db, VIP_CODES_COLLECTION, codeId, 'canjes'), limit(25))),
+          10000
+        );
+        const rows = [];
+        snap.forEach((d) => rows.push({ id: d.id, ...(d.data() || {}) }));
+        adminVipCanjesCache[codeId] = rows;
+        renderAdminVipCodesList();
+      } catch (err) {
+        showToast('No se pudo cargar la lista de usuarios que canjearon este código.');
+      }
+    }
+
+    function renderAdminVipCodesList() {
+      if (!adminVipCodesList) return;
+      adminVipCodesList.innerHTML = '';
+      const user = auth.currentUser;
+      if (userRole !== 'admin' || !isAuthorizedAdminEmail(user)) {
+        adminVipCodesList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Solo Administradores Generales autorizados pueden gestionar códigos VIP.</div>';
+        return;
+      }
+      if (!Array.isArray(adminVipCodesCache) || adminVipCodesCache.length === 0) {
+        adminVipCodesList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no has creado códigos VIP.</div>';
+        return;
+      }
+
+      adminVipCodesCache.forEach((item) => {
+        const meta = VIP_LEVEL_META[item.tipoVip] || VIP_LEVEL_META.estandar;
+        const isExpired = item.tipoVip !== 'fundador' && item.expiraAtMs && item.expiraAtMs <= Date.now();
+        const isActive = item.activo === true && !isExpired;
+        const row = document.createElement('div');
+        row.style.cssText = `display:flex;flex-direction:column;gap:5px;padding:7px 9px;border-radius:10px;background:rgba(15,23,42,0.9);border:1px solid ${isActive ? meta.border : 'rgba(100,116,139,0.45)'};`;
+
+        const top = document.createElement('div');
+        top.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;';
+        top.innerHTML = `
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;">
+            <strong style="font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#f8fafc;">${escapeHtml(item.codigo)}</strong>
+            <span class="vip-level-pill ${meta.pillClass}">${escapeHtml(meta.badge)}</span>
+          </div>
+          <span style="font-size:10px;font-weight:800;color:${isActive ? '#6ee7b7' : '#fca5a5'};">
+            ${item.activo !== true ? '⏸ Desactivado' : isExpired ? '⏳ Vencido' : '● Activo'}
+          </span>
+        `;
+
+        const sub = document.createElement('div');
+        sub.style.cssText = 'font-size:10.5px;color:#cbd5e1;line-height:1.35;';
+        const expLabel = item.tipoVip === 'fundador' ? 'Permanente' : `Vence ${formatVipDateShort(item.expiraAtMs)}`;
+        sub.textContent = `Usos: ${item.usosActuales}/${item.maxUsos} · ${expLabel}${item.nota ? ` · ${item.nota}` : ''}`;
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:5px;flex-wrap:wrap;';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'alert-admin-btn edit';
+        copyBtn.style.cssText = 'padding:4px 8px;font-size:10.5px;';
+        copyBtn.textContent = '📋 Copiar';
+        copyBtn.addEventListener('click', () => {
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(item.codigo).then(() => showToast(`📋 Código ${item.codigo} copiado.`)).catch(() => {});
+          } else {
+            showToast(`Código: ${item.codigo}`);
+          }
+        });
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'alert-admin-btn edit';
+        toggleBtn.style.cssText = 'padding:4px 8px;font-size:10.5px;';
+        toggleBtn.textContent = item.activo === true ? '⏸ Desactivar' : '▶ Activar';
+        toggleBtn.addEventListener('click', async () => {
+          toggleBtn.disabled = true;
+          try {
+            await withTimeout(
+              updateDoc(doc(db, VIP_CODES_COLLECTION, item.codigo), { activo: item.activo !== true }),
+              12000
+            );
+            showToast(item.activo === true ? `⏸ Código ${item.codigo} desactivado.` : `▶ Código ${item.codigo} reactivado.`);
+          } catch (err) {
+            showToast('No se pudo actualizar el estado del código VIP.');
+            toggleBtn.disabled = false;
+          }
+        });
+
+        const auditBtn = document.createElement('button');
+        auditBtn.type = 'button';
+        auditBtn.className = 'alert-admin-btn edit';
+        auditBtn.style.cssText = 'padding:4px 8px;font-size:10.5px;';
+        auditBtn.textContent = '👥 Canjes';
+        auditBtn.addEventListener('click', () => fetchVipCanjesForCode(item.codigo));
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'alert-admin-btn delete';
+        delBtn.style.cssText = 'padding:4px 8px;font-size:10.5px;';
+        delBtn.textContent = '🗑️';
+        delBtn.title = 'Eliminar código VIP';
+        delBtn.addEventListener('click', async () => {
+          delBtn.disabled = true;
+          try {
+            await withTimeout(deleteDoc(doc(db, VIP_CODES_COLLECTION, item.codigo)), 12000);
+            showToast(`🗑️ Código ${item.codigo} eliminado.`);
+          } catch (err) {
+            showToast('No se pudo eliminar el código VIP.');
+            delBtn.disabled = false;
+          }
+        });
+
+        actions.appendChild(copyBtn);
+        actions.appendChild(toggleBtn);
+        actions.appendChild(auditBtn);
+        actions.appendChild(delBtn);
+
+        row.appendChild(top);
+        row.appendChild(sub);
+        row.appendChild(actions);
+
+        const cachedCanjes = adminVipCanjesCache[item.codigo];
+        if (Array.isArray(cachedCanjes)) {
+          const auditBox = document.createElement('div');
+          auditBox.style.cssText = 'margin-top:3px;padding-top:4px;border-top:1px solid rgba(51,65,85,0.7);font-size:10px;color:#94a3b8;';
+          auditBox.textContent = cachedCanjes.length === 0
+            ? 'Sin canjes registrados todavía.'
+            : `Canjeado por: ${cachedCanjes.map((c) => c.usuario || c.uid).join(', ')}`;
+          row.appendChild(auditBox);
+        }
+
+        adminVipCodesList.appendChild(row);
+      });
+    }
+
+    function detachAdminVipCodesListener() {
+      if (typeof adminVipCodesUnsubscribe === 'function') {
+        try {
+          adminVipCodesUnsubscribe();
+        } catch (e) {}
+      }
+      adminVipCodesUnsubscribe = null;
+      adminVipCodesSubscribedUid = null;
+      adminVipCodesCache = [];
+      adminVipCanjesCache = {};
+      renderAdminVipCodesList();
+    }
+
+    function syncAdminVipCodesSubscription() {
+      const user = auth.currentUser;
+      const canManage = userRole === 'admin' && isAuthorizedAdminEmail(user);
+      if (!canManage) {
+        detachAdminVipCodesListener();
+        return;
+      }
+      if (adminVipCodesUnsubscribe && adminVipCodesSubscribedUid === user.uid) {
+        renderAdminVipCodesList();
+        return;
+      }
+      detachAdminVipCodesListener();
+      adminVipCodesSubscribedUid = user.uid;
+
+      const vipQuery = query(
+        collection(db, VIP_CODES_COLLECTION),
+        orderBy('createdAt', 'desc'),
+        limit(100)
+      );
+      adminVipCodesUnsubscribe = onSnapshot(
+        vipQuery,
+        (snapshot) => {
+          const list = [];
+          snapshot.forEach((d) => {
+            const data = d.data() || {};
+            list.push({
+              codigo: d.id,
+              tipoVip: isValidVipTipoKey(data.tipoVip) ? data.tipoVip : 'estandar',
+              activo: data.activo === true,
+              maxUsos: Number(data.maxUsos || 1),
+              usosActuales: Number(data.usosActuales || 0),
+              expiraAtMs: data.tipoVip === 'fundador' ? null : extractOptionalTimestampMs(data.expiraAt),
+              nota: String(data.nota || ''),
+              _sortMs: extractOptionalTimestampMs(data.createdAt) || 0
+            });
+          });
+          list.sort((a, b) => b._sortMs - a._sortMs);
+          adminVipCodesCache = list;
+          renderAdminVipCodesList();
+        },
+        (err) => {
+          console.warn('Error escuchando codigos_vip:', err && err.message ? err.message : err);
+        }
+      );
+    }
+
+    if (adminVipCodeForm) {
+      adminVipCodeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (userRole !== 'admin' || !isAuthorizedAdminEmail(auth.currentUser)) {
+          showToast('⛔ Solo los Administradores Generales autorizados pueden crear códigos VIP.');
+          return;
+        }
+
+        const codigo = normalizeVipCodeInput(vipAdminCodeInput ? vipAdminCodeInput.value : '');
+        const tipoVip = vipAdminTipoSelect ? vipAdminTipoSelect.value : 'estandar';
+        const maxUsos = Math.max(1, Math.min(500, Math.round(Number(vipAdminMaxUsesInput ? vipAdminMaxUsesInput.value : 1) || 1)));
+        const nota = (vipAdminNotaInput ? vipAdminNotaInput.value : '').trim().slice(0, 120);
+
+        if (codigo.length < 4 || codigo.length > 32) {
+          showToast('El código VIP debe tener entre 4 y 32 caracteres (A-Z, 0-9, -, _).');
+          return;
+        }
+        if (!isValidVipTipoKey(tipoVip)) {
+          showToast('Selecciona un nivel VIP válido.');
+          return;
+        }
+
+        let expiraAtVal = null;
+        if (tipoVip !== 'fundador') {
+          const rawDate = vipAdminExpiryDate ? vipAdminExpiryDate.value.trim() : '';
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+            showToast('Selecciona la fecha de vencimiento del código VIP.');
+            return;
+          }
+          const [yy, mm, dd] = rawDate.split('-').map(Number);
+          const endOfDayColMs = Date.UTC(yy, mm - 1, dd + 1, 4, 59, 59, 0);
+          if (endOfDayColMs <= Date.now() + 60000) {
+            showToast('La fecha de vencimiento debe ser posterior al momento actual.');
+            return;
+          }
+          expiraAtVal = Timestamp.fromMillis(endOfDayColMs);
+        }
+
+        if (btnCreateVipCode) {
+          btnCreateVipCode.disabled = true;
+          btnCreateVipCode.textContent = 'Creando código VIP...';
+        }
+        try {
+          const user = await ensureAuthenticated();
+          if (!isAuthorizedAdminEmail(user)) {
+            showToast(`⛔ Requiere sesión con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+            return;
+          }
+          const codeRef = doc(db, VIP_CODES_COLLECTION, codigo);
+          const existsSnap = await withTimeout(getDoc(codeRef), 10000);
+          if (existsSnap.exists()) {
+            showToast(`⚠️ Ya existe un código VIP llamado "${codigo}". Elige otro nombre.`);
+            return;
+          }
+          await withTimeout(
+            setDoc(codeRef, {
+              codigo,
+              tipoVip,
+              activo: true,
+              maxUsos,
+              usosActuales: 0,
+              expiraAt: expiraAtVal,
+              nota,
+              createdBy: user.uid,
+              createdAt: serverTimestamp()
+            }),
+            15000
+          );
+          if (vipAdminCodeInput) vipAdminCodeInput.value = '';
+          if (vipAdminNotaInput) vipAdminNotaInput.value = '';
+          showToast(`🎟️ Código ${codigo} (${VIP_LEVEL_META[tipoVip].badge}) creado y activo.`);
+        } catch (err) {
+          console.error('Error creando código VIP:', err);
+          if (err && err.code === 'permission-denied') {
+            showToast('⛔ Solo los Administradores Generales verificados pueden crear códigos VIP.');
+          } else {
+            showToast('No se pudo crear el código VIP.');
+          }
+        } finally {
+          if (btnCreateVipCode) {
+            btnCreateVipCode.disabled = false;
+            btnCreateVipCode.textContent = '🎟️ Crear Código VIP';
+          }
+        }
+      });
+    }
+
     function setAdminPanelTab(tabName = 'buzon') {
       activeAdminPanelTab = tabName === 'control' ? 'control' : 'buzon';
       if (tabAdminBuzon) tabAdminBuzon.classList.toggle('active', activeAdminPanelTab === 'buzon');
@@ -9085,6 +10374,7 @@
         if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') window.__anthiUpdateReactionCoordsBadge();
         if (typeof window.__anthiRefreshAgentPointsUI === 'function') window.__anthiRefreshAgentPointsUI();
         if (typeof window.__anthiUpdateAgentCoordsBadge === 'function') window.__anthiUpdateAgentCoordsBadge();
+        syncAdminVipCodesSubscription();
       }
     }
 
@@ -9098,6 +10388,7 @@
       }
       setAdminPanelTab(initialTab);
       syncAdminBuzonSubscription();
+      syncAdminVipCodesSubscription();
       renderAdminBuzonList();
       if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
         window.__anthiRefreshAdminReportsUI();
@@ -9159,8 +10450,10 @@
     }
 
     window.__anthiAdminBuzonReady = true;
+    refreshVipUIEverywhere();
     if (userRole === 'admin' && isAuthorizedAdminEmail(auth.currentUser)) {
       syncAdminBuzonSubscription();
+      syncAdminVipCodesSubscription();
       updateAdminRoleButtonBadge();
     }
 

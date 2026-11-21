@@ -36,6 +36,34 @@ service cloud.firestore {
       );
     }
 
+    function isValidVipTipo(t) {
+      return t == 'fundador' || t == 'estandar' || t == 'rastreo_cepos';
+    }
+
+    function hasUserDoc() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function userData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isActiveVip() {
+      return hasUserDoc()
+        && 'vipActivo' in userData()
+        && userData().vipActivo == true
+        && 'vipTipo' in userData()
+        && (
+          userData().vipTipo == 'fundador' ||
+          (
+            (userData().vipTipo == 'estandar' || userData().vipTipo == 'rastreo_cepos') &&
+            'vipExpiraAt' in userData() &&
+            userData().vipExpiraAt is timestamp &&
+            userData().vipExpiraAt > request.time
+          )
+        );
+    }
+
     function isValidReporte(data) {
       return data.keys().hasAll([
           'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
@@ -45,7 +73,7 @@ service cloud.firestore {
           'lat', 'lng', 'tipo', 'descripcion', 'isFixed',
           'timestamp', 'urlFoto', 'mediaType', 'confirmations', 'denials', 'authorId',
           'confirmaciones', 'confirmadoPor', 'expiresAt',
-          'puntoReaccionId', 'puntoReaccionNombre', 'activacionRapida', 'radioMetros'
+          'puntoReaccionId', 'puntoReaccionNombre', 'activacionRapida', 'radioMetros', 'vipNivel'
         ])
         && data.lat is number && data.lat >= -90 && data.lat <= 90
         && data.lng is number && data.lng >= -180 && data.lng <= 180
@@ -69,8 +97,17 @@ service cloud.firestore {
         && (!('expiresAt' in data) || data.expiresAt is timestamp)
         && (!('puntoReaccionId' in data) || data.puntoReaccionId == null || (data.puntoReaccionId is string && isValidId(data.puntoReaccionId)))
         && (!('puntoReaccionNombre' in data) || data.puntoReaccionNombre == null || (data.puntoReaccionNombre is string && data.puntoReaccionNombre.size() <= 80))
-        && (!('activacionRapida' in data) || data.activacionRapida == 'normal' || data.activacionRapida == 'foto' || data.activacionRapida == 'punto_reaccion' || data.activacionRapida == 'admin')
-        && (!('radioMetros' in data) || data.radioMetros == null || (data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 100));
+        && (!('activacionRapida' in data) || (
+          data.activacionRapida == 'normal' ||
+          data.activacionRapida == 'foto' ||
+          data.activacionRapida == 'punto_reaccion' ||
+          data.activacionRapida == 'admin' ||
+          data.activacionRapida == 'vip_fundador' ||
+          data.activacionRapida == 'vip_estandar' ||
+          data.activacionRapida == 'vip_cepos'
+        ))
+        && (!('radioMetros' in data) || data.radioMetros == null || (data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 100))
+        && (!('vipNivel' in data) || data.vipNivel == null || isValidVipTipo(data.vipNivel));
     }
 
     function hasAttachedPhoto(data) {
@@ -93,6 +130,33 @@ service cloud.firestore {
         && data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 2000
         && data.createdBy is string && isValidId(data.createdBy)
         && data.createdAt is timestamp;
+    }
+
+    function isValidCodigoVip(data) {
+      return data.keys().hasAll(['codigo', 'tipoVip', 'activo', 'maxUsos', 'usosActuales', 'expiraAt', 'createdBy', 'createdAt'])
+        && data.keys().hasOnly(['codigo', 'tipoVip', 'activo', 'maxUsos', 'usosActuales', 'expiraAt', 'nota', 'createdBy', 'createdAt'])
+        && data.codigo is string && data.codigo.size() >= 4 && data.codigo.size() <= 32 && data.codigo.matches('^[A-Z0-9_\\-]+$')
+        && isValidVipTipo(data.tipoVip)
+        && data.activo is bool
+        && data.maxUsos is int && data.maxUsos >= 1 && data.maxUsos <= 500
+        && data.usosActuales is int && data.usosActuales >= 0 && data.usosActuales <= data.maxUsos
+        && (
+          (data.tipoVip == 'fundador' && data.expiraAt == null) ||
+          ((data.tipoVip == 'estandar' || data.tipoVip == 'rastreo_cepos') && data.expiraAt is timestamp)
+        )
+        && (!('nota' in data) || (data.nota is string && data.nota.size() <= 120))
+        && data.createdBy is string && isValidId(data.createdBy)
+        && data.createdAt is timestamp;
+    }
+
+    function isValidCanjeVip(data) {
+      return data.keys().hasAll(['uid', 'usuario', 'codigo', 'tipoVip', 'canjeadoAt'])
+        && data.keys().hasOnly(['uid', 'usuario', 'codigo', 'tipoVip', 'canjeadoAt'])
+        && data.uid is string && isValidId(data.uid)
+        && data.usuario is string && data.usuario.size() >= 1 && data.usuario.size() <= 200
+        && data.codigo is string && data.codigo.size() >= 4 && data.codigo.size() <= 32 && data.codigo.matches('^[A-Z0-9_\\-]+$')
+        && isValidVipTipo(data.tipoVip)
+        && data.canjeadoAt is timestamp;
     }
 
     function isValidVoto(data) {
@@ -123,14 +187,22 @@ service cloud.firestore {
         && data.leido is bool;
     }
 
-    function isValidUserSession(data) {
+    function isValidUserDoc(data) {
       return data.keys().hasAll(['activeSessionId', 'lastLoginAt'])
-        && data.keys().hasOnly(['activeSessionId', 'lastLoginAt'])
+        && data.keys().hasOnly([
+          'activeSessionId', 'lastLoginAt',
+          'vipTipo', 'vipActivo', 'vipCodigo', 'vipExpiraAt', 'vipActivadoAt'
+        ])
         && data.activeSessionId is string
         && data.activeSessionId.size() >= 8
         && data.activeSessionId.size() <= 128
         && data.activeSessionId.matches('^[a-zA-Z0-9_\\-]+$')
-        && data.lastLoginAt is timestamp;
+        && data.lastLoginAt is timestamp
+        && (!('vipTipo' in data) || isValidVipTipo(data.vipTipo))
+        && (!('vipActivo' in data) || data.vipActivo is bool)
+        && (!('vipCodigo' in data) || (data.vipCodigo is string && data.vipCodigo.size() >= 4 && data.vipCodigo.size() <= 32 && data.vipCodigo.matches('^[A-Z0-9_\\-]+$')))
+        && (!('vipExpiraAt' in data) || data.vipExpiraAt == null || data.vipExpiraAt is timestamp)
+        && (!('vipActivadoAt' in data) || data.vipActivadoAt is timestamp);
     }
 
     function isValidHojaVida(data) {
@@ -175,9 +247,19 @@ service cloud.firestore {
             incoming().confirmations == 3
             && 'confirmaciones' in incoming()
             && incoming().confirmaciones == 3
-            && (isAdmin() || hasAttachedPhoto(incoming()) || hasValidReactionPoint(incoming()))
+            && (isAdmin() || hasAttachedPhoto(incoming()) || hasValidReactionPoint(incoming()) || isActiveVip())
           )
         )
+        && (!('vipNivel' in incoming()) || incoming().vipNivel == null || (isActiveVip() && userData().vipTipo == incoming().vipNivel))
+        && (!('activacionRapida' in incoming()) || (
+          incoming().activacionRapida == 'normal' ||
+          incoming().activacionRapida == 'foto' ||
+          incoming().activacionRapida == 'punto_reaccion' ||
+          (incoming().activacionRapida == 'admin' && isAdmin()) ||
+          (incoming().activacionRapida == 'vip_fundador' && isActiveVip() && userData().vipTipo == 'fundador') ||
+          (incoming().activacionRapida == 'vip_estandar' && isActiveVip() && userData().vipTipo == 'estandar') ||
+          (incoming().activacionRapida == 'vip_cepos' && isActiveVip() && userData().vipTipo == 'rastreo_cepos')
+        ))
         && (!('confirmadoPor' in incoming()) || (
           incoming().confirmadoPor.size() == 1
           && incoming().confirmadoPor[0] == request.auth.uid
@@ -199,11 +281,11 @@ service cloud.firestore {
           ) ||
           (
             incoming().diff(existing()).affectedKeys().hasOnly(['confirmations', 'confirmaciones', 'confirmadoPor', 'expiresAt'])
-            && incoming().confirmations == existing().confirmations + 1
-            && (!('confirmaciones' in incoming()) || (
-              (!('confirmaciones' in existing()) && incoming().confirmaciones == existing().confirmations + 1) ||
-              ('confirmaciones' in existing() && incoming().confirmaciones == existing().confirmaciones + 1)
-            ))
+            && (
+              incoming().confirmations == existing().confirmations + 1 ||
+              (isActiveVip() && (incoming().confirmations == existing().confirmations + 2 || incoming().confirmations == existing().confirmations + 3))
+            )
+            && (!('confirmaciones' in incoming()) || incoming().confirmaciones == incoming().confirmations)
             && (!('confirmadoPor' in incoming()) || (
               (!('confirmadoPor' in existing()) && request.auth.uid in incoming().confirmadoPor && incoming().confirmadoPor.size() == 1) ||
               ('confirmadoPor' in existing() && !(request.auth.uid in existing().confirmadoPor) && request.auth.uid in incoming().confirmadoPor && incoming().confirmadoPor.size() == existing().confirmadoPor.size() + 1)
@@ -301,14 +383,44 @@ service cloud.firestore {
       allow create: if isSignedIn()
         && isValidId(userId)
         && request.auth.uid == userId
-        && isValidUserSession(incoming())
+        && isValidUserDoc(incoming())
+        && incoming().keys().hasOnly(['activeSessionId', 'lastLoginAt'])
         && incoming().lastLoginAt == request.time;
       allow update: if isSignedIn()
         && isValidId(userId)
         && request.auth.uid == userId
-        && isValidUserSession(incoming())
-        && incoming().diff(existing()).affectedKeys().hasOnly(['activeSessionId', 'lastLoginAt'])
-        && incoming().lastLoginAt == request.time;
+        && isValidUserDoc(incoming())
+        && (
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['activeSessionId', 'lastLoginAt'])
+            && incoming().lastLoginAt == request.time
+          ) ||
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['vipTipo', 'vipActivo', 'vipCodigo', 'vipExpiraAt', 'vipActivadoAt'])
+            && !('vipTipo' in existing() && existing().vipTipo == 'fundador' && 'vipActivo' in existing() && existing().vipActivo == true)
+            && 'vipTipo' in incoming()
+            && 'vipActivo' in incoming()
+            && 'vipCodigo' in incoming()
+            && 'vipActivadoAt' in incoming()
+            && incoming().vipActivo == true
+            && incoming().vipActivadoAt == request.time
+            && exists(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo))
+            && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.activo == true
+            && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.usosActuales < get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.maxUsos
+            && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.tipoVip == incoming().vipTipo
+            && (
+              (incoming().vipTipo == 'fundador' && incoming().vipExpiraAt == null) ||
+              (
+                (incoming().vipTipo == 'estandar' || incoming().vipTipo == 'rastreo_cepos')
+                && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt is timestamp
+                && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt > request.time
+                && incoming().vipExpiraAt == get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt
+              )
+            )
+            && !exists(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)/canjes/$(userId))
+            && existsAfter(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)/canjes/$(userId))
+          )
+        );
       allow delete: if isSignedIn()
         && isValidId(userId)
         && (request.auth.uid == userId || isAdmin());
@@ -380,6 +492,72 @@ service cloud.firestore {
         && incoming().createdAt == existing().createdAt
         && incoming().diff(existing()).affectedKeys().hasOnly(['nombre', 'lat', 'lng', 'radioMetros']);
       allow delete: if isAdmin() && isValidId(puntoId);
+    }
+
+    match /codigos_vip/{codeId} {
+      // Zero-PII code lookup by exact code ID only; listing is strictly restricted to General Admins
+      allow get: if isSignedIn() && isValidId(codeId);
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && isValidId(codeId)
+        && isValidCodigoVip(incoming())
+        && incoming().codigo == codeId
+        && incoming().usosActuales == 0
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if isSignedIn()
+        && isValidId(codeId)
+        && isValidCodigoVip(incoming())
+        && incoming().codigo == existing().codigo
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && (
+          (
+            isAdmin()
+            && incoming().diff(existing()).affectedKeys().hasOnly(['activo', 'maxUsos', 'expiraAt', 'tipoVip', 'nota'])
+          ) ||
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['usosActuales'])
+            && existing().activo == true
+            && existing().usosActuales < existing().maxUsos
+            && incoming().usosActuales == existing().usosActuales + 1
+            && (
+              (existing().tipoVip == 'fundador' && existing().expiraAt == null) ||
+              (existing().expiraAt is timestamp && existing().expiraAt > request.time)
+            )
+            && !exists(/databases/$(database)/documents/codigos_vip/$(codeId)/canjes/$(request.auth.uid))
+            && existsAfter(/databases/$(database)/documents/codigos_vip/$(codeId)/canjes/$(request.auth.uid))
+          )
+        );
+      allow delete: if isAdmin() && isValidId(codeId);
+
+      match /canjes/{userId} {
+        allow get: if isSignedIn()
+          && isValidId(codeId)
+          && isValidId(userId)
+          && (request.auth.uid == userId || isAdmin());
+        allow list: if isAdmin();
+        allow create: if isSignedIn()
+          && isValidId(codeId)
+          && isValidId(userId)
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/codigos_vip/$(codeId))
+          && !exists(/databases/$(database)/documents/codigos_vip/$(codeId)/canjes/$(userId))
+          && isValidCanjeVip(incoming())
+          && incoming().uid == request.auth.uid
+          && incoming().codigo == codeId
+          && incoming().tipoVip == get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.tipoVip
+          && incoming().canjeadoAt == request.time
+          && get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.activo == true
+          && get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.usosActuales < get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.maxUsos
+          && (
+            (get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.tipoVip == 'fundador' && get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.expiraAt == null) ||
+            (get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.expiraAt is timestamp && get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.expiraAt > request.time)
+          )
+          && getAfter(/databases/$(database)/documents/codigos_vip/$(codeId)).data.usosActuales == get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.usosActuales + 1;
+        allow update: if false;
+        allow delete: if isAdmin() && isValidId(codeId) && isValidId(userId);
+      }
     }
   }
 }
