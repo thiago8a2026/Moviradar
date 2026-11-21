@@ -513,6 +513,7 @@
     .gps-hud.pico-collapsed .hud-divider,
     .gps-hud.pico-collapsed .hud-pico-head-row,
     .gps-hud.pico-collapsed .hud-pico-sync-btn,
+    .gps-hud.pico-collapsed .hud-pico-vehicle-btn,
     .gps-hud.pico-collapsed .hud-pico-calibrator {
       display: none !important;
     }
@@ -660,6 +661,28 @@
     .hud-pico-sync-btn.active {
       background: rgba(250, 204, 21, 0.2);
       border-color: rgba(250, 204, 21, 0.85);
+    }
+
+    .hud-pico-vehicle-btn {
+      margin-top: 3px;
+      align-self: flex-start;
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid rgba(56, 189, 248, 0.42);
+      color: #93c5fd;
+      border-radius: 7px;
+      font-size: 9.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      padding: 2px 7px;
+      cursor: pointer;
+      max-width: 175px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hud-pico-vehicle-btn:active {
+      transform: scale(0.97);
     }
 
     .hud-pico-calibrator {
@@ -1037,53 +1060,15 @@
       pointer-events: none;
     }
 
-    .admin-quick-bar {
-      display: none;
-      pointer-events: auto;
-      width: 100%;
-      max-width: 460px;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .admin-quick-bar.visible {
-      display: flex;
-    }
-
-    .btn-admin-reaction-quick {
-      width: 100%;
-      min-height: 40px;
-      padding: 6px 12px;
-      border-radius: 13px;
-      border: 1.5px solid rgba(34, 211, 238, 0.78);
-      background: linear-gradient(135deg, rgba(8, 47, 73, 0.96), rgba(15, 23, 42, 0.96));
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: #a5f3fc;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.01em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.25);
-      transition: transform 0.15s ease, border-color 0.15s ease;
-    }
-
-    .btn-admin-reaction-quick:active {
-      transform: scale(0.97);
-    }
-
     .admin-rp-count-badge {
-      padding: 2px 8px;
+      padding: 1px 6px;
       border-radius: 999px;
-      background: rgba(6, 182, 212, 0.24);
-      border: 1px solid rgba(34, 211, 238, 0.72);
+      background: rgba(6, 182, 212, 0.26);
+      border: 1px solid rgba(34, 211, 238, 0.78);
       color: #ecfeff;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 900;
+      line-height: 1.25;
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -1132,7 +1117,7 @@
       width: 100%;
       max-width: 460px;
       display: grid;
-      grid-template-columns: 1fr 0.84fr 1.18fr 1fr;
+      grid-template-columns: 1.14fr 0.78fr 1.12fr 0.96fr;
       gap: 6px;
     }
 
@@ -1170,6 +1155,22 @@
       border-color: rgba(59, 130, 246, 0.62);
       color: #93c5fd;
       box-shadow: 0 6px 16px rgba(59, 130, 246, 0.14);
+    }
+
+    .quick-btn.reaction-points-bottom {
+      position: relative;
+      border-color: rgba(34, 211, 238, 0.78);
+      background: linear-gradient(135deg, rgba(8, 47, 73, 0.95), rgba(15, 23, 42, 0.95));
+      color: #a5f3fc;
+      box-shadow: 0 6px 16px rgba(6, 182, 212, 0.24);
+      padding: 0 4px;
+    }
+
+    .bottom-rp-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
     }
 
     .quick-btn.hoja-vida.has-alerts {
@@ -2542,6 +2543,9 @@
           <span class="hud-pico-digits" id="hudPicoDigits" title="Plegar o abrir Pico y Placa">--</span>
           <button type="button" class="hud-pico-sync-btn" id="btnOpenPicoCalibrator" title="Ajustar rotación manualmente" aria-expanded="false">⚙️</button>
         </div>
+        <button type="button" class="hud-pico-vehicle-btn" id="btnHudOpenVehicle" title="Cambiar vehículo (Particular / Moto / Taxi / Camioneta), placa y Hoja de Vida">
+          <span id="hudPicoVehicleSummary">🚗 Particular · Placa</span>
+        </button>
         <div class="hud-pico-calibrator" id="hudPicoCalibrator" style="display:none;">
           <div class="hud-pico-cal-title" id="hudPicoCalTitle">Calibrar dígitos de hoy:</div>
           <div class="hud-pico-cal-grid" id="hudPicoCalGrid">
@@ -2569,7 +2573,7 @@
         </p>
 
         <button type="button" class="btn-submit" id="btnStartReactionMapMode" style="min-height:42px;font-size:12.5px;margin-bottom:10px;">
-          🎯 Tocar mapa para colocar múltiples puntos
+          🎯 Tocar mapa para colocar Punto de Reacción Inmediata
         </button>
 
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:8px 10px;border-radius:10px;background:rgba(2,6,23,0.72);border:1px solid rgba(6,182,212,0.35);">
@@ -2728,17 +2732,14 @@
         <button type="button" class="route-banner-close" id="btnClearRouteBanner" title="Quitar ruta">✕</button>
       </div>
 
-      <div class="admin-quick-bar" id="adminQuickActionBar" aria-hidden="true">
-        <button type="button" class="btn-admin-reaction-quick" id="adminReactionQuickBtn" title="Crear, ver y administrar Puntos de Reacción Inmediata en el mapa">
-          <span>⚡ Puntos de reacción inmediata</span>
-          <span class="admin-rp-count-badge" id="adminReactionQuickCount">0</span>
-        </button>
-      </div>
-
       <div class="quick-actions-bar">
         <button type="button" class="quick-btn hoja-vida" id="btnOpenHojaVida" title="Hoja de vida del vehículo, documentos y Pico y Placa AMB">
           <span>📋 Hoja de Vida</span>
           <span class="hv-alert-dot" id="hvAlertDot"></span>
+        </button>
+        <button type="button" class="quick-btn reaction-points-bottom" id="btnBottomReactionPoints" style="display:none;" aria-hidden="true" title="Crear, ver y administrar Puntos de Reacción Inmediata en el mapa">
+          <span class="bottom-rp-label">⚡ Puntos Reacción</span>
+          <span class="admin-rp-count-badge" id="bottomReactionPointsCount">0</span>
         </button>
         <button type="button" class="quick-btn route" id="btnOpenRouteAssistant" title="Activar Radar de Proximidad hacia tu destino">
           📡 Ruta
@@ -3101,6 +3102,10 @@
               </button>
             </div>
           </div>
+
+          <button type="button" class="btn-submit" id="btnAuthOpenHojaVida" style="margin-bottom:12px;min-height:40px;font-size:12px;background:linear-gradient(135deg,#1d4ed8,#0284c7);">
+            <span id="btnAuthHojaVidaLabel">📋 Vehículo y Placa (Hoja de Vida)</span>
+          </button>
 
           <div class="vip-status-card" id="authVipStatusCard">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
@@ -5392,6 +5397,9 @@
         authUserEmailLabel.textContent = user.email || 'Usuario conectado';
         if (authApodoInput) {
           authApodoInput.value = getUserApodo(user);
+        }
+        if (typeof window.__anthiSyncVehicleEntryLabels === 'function') {
+          window.__anthiSyncVehicleEntryLabels();
         }
         refreshVipUIEverywhere();
       } else {
@@ -9599,9 +9607,8 @@
     const adminReactionPointsList = document.getElementById('adminReactionPointsList');
     const btnLaunchMapReactionModeFromAdmin = document.getElementById('btnLaunchMapReactionModeFromAdmin');
 
-    const adminQuickActionBar = document.getElementById('adminQuickActionBar');
-    const adminReactionQuickBtn = document.getElementById('adminReactionQuickBtn');
-    const adminReactionQuickCount = document.getElementById('adminReactionQuickCount');
+    const btnBottomReactionPoints = document.getElementById('btnBottomReactionPoints');
+    const bottomReactionPointsCount = document.getElementById('bottomReactionPointsCount');
 
     const reactionPointsModal = document.getElementById('reactionPointsModal');
     const btnCloseReactionPointsModal = document.getElementById('btnCloseReactionPointsModal');
@@ -9728,12 +9735,17 @@
     window.__anthiUpdateAdminReactionQuickBar = function updateAdminReactionQuickBar() {
       const canUseAdminQuick = hasValidatedAdminPermission();
       const count = Array.isArray(activeReactionPoints) ? activeReactionPoints.length : 0;
-      if (adminReactionQuickCount) {
-        adminReactionQuickCount.textContent = `${count} ${count === 1 ? 'punto' : 'puntos'}`;
+      const hojaVidaBtn = document.getElementById('btnOpenHojaVida');
+      if (bottomReactionPointsCount) {
+        bottomReactionPointsCount.textContent = String(count);
       }
-      if (adminQuickActionBar) {
-        adminQuickActionBar.classList.toggle('visible', canUseAdminQuick);
-        adminQuickActionBar.setAttribute('aria-hidden', canUseAdminQuick ? 'false' : 'true');
+      if (btnBottomReactionPoints) {
+        btnBottomReactionPoints.style.display = canUseAdminQuick ? 'flex' : 'none';
+        btnBottomReactionPoints.setAttribute('aria-hidden', canUseAdminQuick ? 'false' : 'true');
+      }
+      if (hojaVidaBtn) {
+        hojaVidaBtn.style.display = canUseAdminQuick ? 'none' : 'flex';
+        hojaVidaBtn.setAttribute('aria-hidden', canUseAdminQuick ? 'true' : 'false');
       }
       if (!canUseAdminQuick) {
         if (reactionPointsModal) reactionPointsModal.classList.remove('open');
@@ -10033,8 +10045,8 @@
       if (reactionPointsModal) reactionPointsModal.classList.add('open');
     }
 
-    if (adminReactionQuickBtn) {
-      adminReactionQuickBtn.addEventListener('click', () => {
+    if (btnBottomReactionPoints) {
+      btnBottomReactionPoints.addEventListener('click', () => {
         openReactionPointsModal();
       });
     }
@@ -11349,6 +11361,10 @@
     const hudPicoCalTitleEl = document.getElementById('hudPicoCalTitle');
     const hudPicoCalGridEl = document.getElementById('hudPicoCalGrid');
     const btnResetPicoCalibration = document.getElementById('btnResetPicoCalibration');
+    const btnHudOpenVehicle = document.getElementById('btnHudOpenVehicle');
+    const hudPicoVehicleSummary = document.getElementById('hudPicoVehicleSummary');
+    const btnAuthOpenHojaVida = document.getElementById('btnAuthOpenHojaVida');
+    const btnAuthHojaVidaLabel = document.getElementById('btnAuthHojaVidaLabel');
 
     const btnOpenHojaVida = document.getElementById('btnOpenHojaVida');
     const hojaVidaModal = document.getElementById('hojaVidaModal');
@@ -11580,6 +11596,10 @@
         hudVehicleGraphicEl.innerHTML = VEHICLE_SVG_MAP[hojaVidaState.tipoVehiculo] || VEHICLE_SVG_MAP.particular;
         hudVehicleGraphicEl.classList.remove('particular', 'moto', 'taxi', 'camioneta');
         hudVehicleGraphicEl.classList.add(hojaVidaState.tipoVehiculo || 'particular');
+      }
+
+      if (typeof window.__anthiSyncVehicleEntryLabels === 'function') {
+        window.__anthiSyncVehicleEntryLabels();
       }
 
       if (gpsHudEl) {
@@ -11997,9 +12017,47 @@
       });
     }
 
+    window.__anthiSyncVehicleEntryLabels = function syncVehicleEntryLabels() {
+      const tipoLabel = VEHICLE_LABELS[hojaVidaState.tipoVehiculo] || 'Particular';
+      const iconEmoji = hojaVidaState.tipoVehiculo === 'taxi'
+        ? '🚕'
+        : hojaVidaState.tipoVehiculo === 'moto'
+        ? '🏍️'
+        : hojaVidaState.tipoVehiculo === 'camioneta'
+        ? '🚙'
+        : '🚗';
+      const placaClean = String(hojaVidaState.placa || '').trim();
+      const summary = placaClean ? `${iconEmoji} ${tipoLabel} · ${placaClean}` : `${iconEmoji} ${tipoLabel} · Placa`;
+      if (hudPicoVehicleSummary) {
+        hudPicoVehicleSummary.textContent = summary;
+      }
+      if (btnAuthHojaVidaLabel) {
+        btnAuthHojaVidaLabel.textContent = placaClean
+          ? `📋 Vehículo y Placa (${tipoLabel} · ${placaClean})`
+          : `📋 Vehículo y Placa (${tipoLabel})`;
+      }
+    };
+    window.__anthiSyncVehicleEntryLabels();
+
     if (hudVehicleBlockEl && hojaVidaModal) {
       hudVehicleBlockEl.addEventListener('click', (e) => {
         e.stopPropagation();
+        renderHojaVidaUI(false, false);
+        hojaVidaModal.classList.add('open');
+      });
+    }
+
+    if (btnHudOpenVehicle && hojaVidaModal) {
+      btnHudOpenVehicle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renderHojaVidaUI(false, false);
+        hojaVidaModal.classList.add('open');
+      });
+    }
+
+    if (btnAuthOpenHojaVida && hojaVidaModal) {
+      btnAuthOpenHojaVida.addEventListener('click', () => {
+        if (authModal) authModal.classList.remove('open');
         renderHojaVidaUI(false, false);
         hojaVidaModal.classList.add('open');
       });
