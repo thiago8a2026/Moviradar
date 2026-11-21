@@ -488,6 +488,10 @@
       "schema": { "$ref": "#/entities/PuntoReaccion" },
       "description": "Geocercas configuradas por Administradores para activar reportes como firmes al instante."
     },
+    "/puntos_reaccion_inmediata/{puntoId}": {
+      "schema": { "$ref": "#/entities/PuntoReaccion" },
+      "description": "Puntos de reacción inmediata configurados por Administradores para activar reportes como firmes al instante."
+    },
     "/codigos_vip/{codeId}": {
       "schema": { "$ref": "#/entities/CodigoVip" },
       "description": "Códigos VIP creados y controlados exclusivamente por Administradores Generales."
