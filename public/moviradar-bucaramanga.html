@@ -1100,11 +1100,11 @@
     @keyframes anthiCeposMotion {
       0%, 100% {
         transform: translateY(0px) scale(1);
-        box-shadow: 0 4px 14px rgba(168, 85, 247, 0.55);
+        box-shadow: 0 0 0 2px #0f172a, 0 4px 14px rgba(250, 204, 21, 0.72);
       }
       50% {
-        transform: translateY(-2.5px) scale(1.04);
-        box-shadow: 0 8px 20px rgba(192, 132, 252, 0.8);
+        transform: translateY(-2.5px) scale(1.05);
+        box-shadow: 0 0 0 2.5px #0f172a, 0 8px 22px rgba(253, 224, 71, 0.92);
       }
     }
 
@@ -1694,12 +1694,12 @@
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
     }
 
-    .cat-option[data-type="Retén de Tránsito"] { border-color: rgba(249, 115, 22, 0.45); }
-    .cat-option[data-type="Accidente"] { border-color: rgba(239, 68, 68, 0.45); }
-    .cat-option[data-type="Cepos"] { border-color: rgba(168, 85, 247, 0.5); }
-    .cat-option[data-type="Vía Cerrada / Obras"] { border-color: rgba(220, 38, 38, 0.45); }
-    .cat-option[data-type="Peligro en Vía"] { border-color: rgba(234, 179, 8, 0.45); }
-    .cat-option[data-type="Agente de Tránsito"] { border-color: rgba(14, 165, 233, 0.55); }
+    .cat-option[data-type="Retén de Tránsito"] { border-color: rgba(249, 115, 22, 0.52); }
+    .cat-option[data-type="Accidente"] { border-color: rgba(239, 68, 68, 0.48); }
+    .cat-option[data-type="Cepos"] { border-color: rgba(250, 204, 21, 0.78); }
+    .cat-option[data-type="Vía Cerrada / Obras"] { border-color: rgba(220, 38, 38, 0.48); }
+    .cat-option[data-type="Peligro en Vía"] { border-color: rgba(234, 179, 8, 0.5); }
+    .cat-option[data-type="Agente de Tránsito"] { border-color: rgba(14, 165, 233, 0.58); }
 
     .cat-option.active {
       background: rgba(16, 185, 129, 0.18);
@@ -2058,7 +2058,8 @@
     }
 
     .hv-service-tab {
-      min-height: 42px;
+      min-height: 44px;
+      padding: 6px 10px;
       border-radius: 12px;
       border: 1px solid var(--border);
       background: var(--bg-dark);
@@ -2069,7 +2070,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 7px;
+    }
+
+    .hv-tab-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .hv-service-tab.active {
@@ -2772,39 +2780,73 @@
           <span class="form-label">1. Toca la novedad (abre cámara al instante) *</span>
           <div class="category-grid" id="categoryGrid">
             <button type="button" class="cat-option active" data-type="Retén de Tránsito" data-color="#f97316" data-emoji="🚧">
-              <span class="cat-option-badge" style="background:rgba(249,115,22,0.22);border:1px solid #f97316;">🚧</span>
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(249,115,22,0.34),rgba(234,88,12,0.22));border:1.5px solid #fb923c;" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                  <ellipse cx="14" cy="23.5" rx="10.5" ry="2.2" fill="#0f172a" fill-opacity="0.55"/>
+                  <path d="M16.5 22L19.4 9.5C19.6 8.7 20.8 8.7 21 9.5L23.8 22H16.5Z" fill="#ea580c" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+                  <path d="M18.2 15.2H22.1L22.5 17.2H17.8L18.2 15.2Z" fill="#f8fafc"/>
+                  <rect x="15.2" y="21.2" width="9.8" height="2.2" rx="1" fill="#0f172a"/>
+                  <path d="M6.4 22.2L10.3 5.2C10.5 4.2 12.1 4.2 12.3 5.2L16.2 22.2H6.4Z" fill="#f97316" stroke="#0f172a" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M9.1 10.6H13.5L14.1 13.2H8.5L9.1 10.6Z" fill="#ffffff"/>
+                  <path d="M7.9 15.8H14.7L15.3 18.4H7.3L7.9 15.8Z" fill="#ffffff"/>
+                  <rect x="4.6" y="21.4" width="13.4" height="2.6" rx="1.2" fill="#1e293b" stroke="#0f172a" stroke-width="1.2"/>
+                </svg>
+              </span>
               <span>Retén</span>
             </button>
             <button type="button" class="cat-option" data-type="Accidente" data-color="#ef4444" data-emoji="💥">
-              <span class="cat-option-badge" style="background:rgba(239,68,68,0.22);border:1px solid #ef4444;">💥</span>
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(239,68,68,0.32),rgba(185,28,28,0.22));border:1.5px solid #f87171;" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                  <path d="M14 3L17 9L23.5 6.5L20 12.5L26 15.5L19.5 18L22 24.5L15.5 21L13 26L11 20L4.5 22.5L8 16.5L2 13L8.5 10.5L6.5 4.5L12.5 8L14 3Z" fill="#ef4444" stroke="#fecaca" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M14 8.5L15.6 12.2L19.5 11L17.2 14.5L20.5 16.5L16.2 17.5L17 21L13.8 18.4L11 21L11.8 17.2L8 16L11.4 14L9.8 10.5L13 12L14 8.5Z" fill="#fde047"/>
+                </svg>
+              </span>
               <span>Accidente</span>
             </button>
-            <button type="button" class="cat-option" data-type="Cepos" data-color="#a855f7" data-emoji="🔒">
-              <span class="cat-option-badge" style="background:rgba(168,85,247,0.24);border:1px solid #a855f7;" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e9d5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="14" r="6"></circle>
-                  <circle cx="12" cy="14" r="2"></circle>
-                  <path d="M9 8V5a3 3 0 0 1 6 0v3"></path>
-                  <path d="M5 14h2M17 14h2"></path>
+            <button type="button" class="cat-option" data-type="Cepos" data-color="#eab308" data-emoji="🔒">
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,#fef08a,#eab308);border:2px solid #0f172a;" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="15.5" r="8.2" fill="#facc15" stroke="#0f172a" stroke-width="2.1"/>
+                  <circle cx="14" cy="15.5" r="3.2" fill="#0f172a"/>
+                  <path d="M10.2 8.2V6C10.2 3.9 11.9 2.4 14 2.4C16.1 2.4 17.8 3.9 17.8 6V8.2" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>
+                  <rect x="4" y="13.5" width="4.4" height="4" rx="1.2" fill="#fde047" stroke="#0f172a" stroke-width="1.8"/>
+                  <rect x="19.6" y="13.5" width="4.4" height="4" rx="1.2" fill="#fde047" stroke="#0f172a" stroke-width="1.8"/>
+                  <circle cx="14" cy="15.5" r="1.3" fill="#fef08a"/>
                 </svg>
               </span>
               <span>Cepos</span>
             </button>
             <button type="button" class="cat-option" data-type="Vía Cerrada / Obras" data-color="#dc2626" data-emoji="⛔">
-              <span class="cat-option-badge" style="background:rgba(220,38,38,0.22);border:1px solid #dc2626;">⛔</span>
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(220,38,38,0.32),rgba(153,27,27,0.22));border:1.5px solid #f87171;" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                  <rect x="3.5" y="7" width="21" height="8" rx="2" fill="#dc2626" stroke="#0f172a" stroke-width="1.5"/>
+                  <path d="M7.5 7L5 15H8.5L11 7H7.5ZM14 7L11.5 15H15L17.5 7H14ZM20.5 7L18 15H21.5L24 7H20.5Z" fill="#f8fafc"/>
+                  <path d="M7.5 15V23.5M20.5 15V23.5" stroke="#cbd5e1" stroke-width="2.4" stroke-linecap="round"/>
+                </svg>
+              </span>
               <span>Vía cerrada</span>
             </button>
             <button type="button" class="cat-option" data-type="Peligro en Vía" data-color="#eab308" data-emoji="⚠️">
-              <span class="cat-option-badge" style="background:rgba(234,179,8,0.22);border:1px solid #eab308;">⚠️</span>
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(234,179,8,0.32),rgba(202,138,4,0.22));border:1.5px solid #facc15;" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                  <path d="M14 3.5L25 23H3L14 3.5Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M14 10V16.2" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>
+                  <circle cx="14" cy="19.6" r="1.4" fill="#0f172a"/>
+                </svg>
+              </span>
               <span>Peligro</span>
             </button>
             <button type="button" class="cat-option" data-type="Agente de Tránsito" data-color="#0ea5e9" data-emoji="🚦">
-              <span class="cat-option-badge" style="background:rgba(14,165,233,0.24);border:1px solid #0ea5e9;" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bae6fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="5.5" r="2.2"></circle>
-                  <path d="M8.5 11.5a3.5 3.5 0 0 1 7 0v4.5h-7v-4.5Z"></path>
-                  <path d="M5 10.5l3.5 1.5M15.5 12l4-2"></path>
-                  <path d="M10 16v5M14 16v5"></path>
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(14,165,233,0.34),rgba(2,132,199,0.22));border:1.5px solid #38bdf8;" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                  <path d="M9.5 6.2H18.5L17.6 3.5H10.4L9.5 6.2Z" fill="#0f172a" stroke="#7dd3fc" stroke-width="1.1" stroke-linejoin="round"/>
+                  <rect x="8.5" y="6" width="11" height="1.8" rx="0.9" fill="#0284c7"/>
+                  <circle cx="14" cy="10.2" r="2.7" fill="#fde68a" stroke="#0f172a" stroke-width="1.1"/>
+                  <path d="M8.5 16C8.5 13.9 10.2 12.8 14 12.8C17.8 12.8 19.5 13.9 19.5 16V22.5H16.2V25.5H11.8V22.5H8.5V16Z" fill="#0284c7" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+                  <path d="M10.2 15.2H17.8V17.4H10.2V15.2ZM10.2 18.8H17.8V20.5H10.2V18.8Z" fill="#bef264"/>
+                  <path d="M8.5 15L4 12.2" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round"/>
+                  <circle cx="3.6" cy="11.6" r="2.1" fill="#ef4444" stroke="#f8fafc" stroke-width="1"/>
+                  <path d="M19.5 15L23.6 17.5" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round"/>
                 </svg>
               </span>
               <span>Agente Tránsito</span>
@@ -3009,13 +3051,13 @@
 
         <div class="vip-tiers-legend">
           <div class="vip-tier-desc">
-            <strong style="color:#fcd34d;">🏅 VIP Fundador (Intocable):</strong> Permanente y sin vencimiento. Reporte firme en primera instancia, mayor peso de credibilidad y excepción al bloqueo de 300 m.
+            <strong style="color:#fcd34d;">🏅 VIP Fundador (Intocable):</strong> Permanente y sin vencimiento. Reporte firme en primera instancia, mayor peso de credibilidad, excepción de 300 m y eliminación directa de alertas ya levantadas (con trazabilidad).
           </div>
           <div class="vip-tier-desc">
-            <strong style="color:#e9d5ff;">🛡️ VIP Operativo Cepos y Fotomultas:</strong> Nivel operativo superior con vigencia configurable, distintivo de alto valor y prioridad para seguimiento de unidades móviles de cepos y fotomultas.
+            <strong style="color:#e9d5ff;">🛡️ VIP Operativo Cepos y Fotomultas:</strong> Nivel operativo superior con vigencia configurable, prioridad para seguimiento móvil de cepos/fotomultas y depuración de reportes en vía.
           </div>
           <div class="vip-tier-desc">
-            <strong style="color:#7dd3fc;">⭐ VIP Estándar / Suscripción:</strong> Vigencia configurable, reporte firme en primera instancia, peso de credibilidad mejorado y excepción de 300 m mientras esté activo.
+            <strong style="color:#7dd3fc;">⭐ VIP Estándar / Suscripción:</strong> Vigencia configurable, reporte firme en primera instancia, excepción de 300 m y eliminación directa de alertas que ya no aplican en vía.
           </div>
         </div>
       </div>
@@ -3495,6 +3537,13 @@
               Cargando reportes activos...
             </div>
             <div id="adminQuickReportsList" style="display:flex;flex-direction:column;gap:6px;max-height:210px;overflow-y:auto;"></div>
+            <div id="adminDeletedReportsAuditSection" style="margin-top:10px;padding-top:9px;border-top:1px dashed rgba(71,85,105,0.75);">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;">
+                <span style="font-size:11px;font-weight:800;color:#fcd34d;">🕵️ Trazabilidad de eliminaciones (VIP / Admin)</span>
+                <span id="adminDeletedReportsAuditStats" style="font-size:10px;color:#94a3b8;font-weight:700;">0 registros</span>
+              </div>
+              <div id="adminDeletedReportsAuditList" style="display:flex;flex-direction:column;gap:5px;max-height:170px;overflow-y:auto;"></div>
+            </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <button type="button" class="btn-submit" id="btnAdminOpenAlertsCenter" style="min-height:42px;font-size:13px;">
@@ -3520,16 +3569,64 @@
 
         <div class="hv-service-tabs">
           <button type="button" class="hv-service-tab active" id="hvTipoParticular" data-vehicle-type="particular">
-            🚗 Particular
+            <span class="hv-tab-icon" aria-hidden="true">
+              <svg width="26" height="17" viewBox="0 0 40 24" fill="none">
+                <path d="M5.5 14.2L9.8 6.8C10.4 5.8 11.4 5.2 12.6 5.2H24.8C26.1 5.2 27.3 5.9 28 7L31.4 12.6L35.4 13.8C36.4 14.1 37 15 37 16V18.2H32.6A3.6 3.6 0 0 1 25.4 18.2H13.6A3.6 3.6 0 0 1 6.4 18.2H3V15.4C3 14.6 3.6 14.2 4.4 14.2H5.5Z" fill="#0ea5e9" stroke="#e0f2fe" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M11.6 7.4H24.4L27.5 12H9.2L11.6 7.4Z" fill="#0f172a"/>
+                <path d="M19.2 7.4V12" stroke="#38bdf8" stroke-width="1.2"/>
+                <rect x="33.5" y="14.5" width="3" height="1.6" rx="0.8" fill="#fef08a"/>
+                <circle cx="10" cy="18.2" r="3.1" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/>
+                <circle cx="10" cy="18.2" r="1.1" fill="#38bdf8"/>
+                <circle cx="29" cy="18.2" r="3.1" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/>
+                <circle cx="29" cy="18.2" r="1.1" fill="#38bdf8"/>
+              </svg>
+            </span>
+            <span>Particular</span>
           </button>
           <button type="button" class="hv-service-tab" id="hvTipoMoto" data-vehicle-type="moto">
-            🏍️ Moto
+            <span class="hv-tab-icon" aria-hidden="true">
+              <svg width="26" height="17" viewBox="0 0 40 24" fill="none">
+                <circle cx="8.8" cy="17" r="4.5" fill="#0f172a" stroke="#34d399" stroke-width="1.9"/>
+                <circle cx="8.8" cy="17" r="1.4" fill="#a7f3d0"/>
+                <circle cx="31.2" cy="17" r="4.5" fill="#0f172a" stroke="#34d399" stroke-width="1.9"/>
+                <circle cx="31.2" cy="17" r="1.4" fill="#a7f3d0"/>
+                <path d="M8.8 17L15.2 10.8H22.2L25.5 6.4L29.6 7.6M26.6 8.8L31.2 17" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M13 10.6C14.8 8.6 18.6 8.4 21.6 10.4L25.4 11.4L21.5 15.8H14.5L13 10.6Z" fill="#10b981" stroke="#0f172a" stroke-width="1.1" stroke-linejoin="round"/>
+                <circle cx="29.5" cy="9.8" r="1.3" fill="#fef08a"/>
+              </svg>
+            </span>
+            <span>Moto</span>
           </button>
           <button type="button" class="hv-service-tab" id="hvTipoTaxi" data-vehicle-type="taxi">
-            🚕 Taxi
+            <span class="hv-tab-icon" aria-hidden="true">
+              <svg width="26" height="17" viewBox="0 0 40 24" fill="none">
+                <rect x="14.8" y="1.8" width="9.2" height="3.4" rx="1" fill="#fef08a" stroke="#0f172a" stroke-width="1.2"/>
+                <path d="M5.5 14.2L9.8 6.8C10.4 5.8 11.4 5.2 12.6 5.2H24.8C26.1 5.2 27.3 5.9 28 7L31.4 12.6L35.4 13.8C36.4 14.1 37 15 37 16V18.2H32.6A3.6 3.6 0 0 1 25.4 18.2H13.6A3.6 3.6 0 0 1 6.4 18.2H3V15.4C3 14.6 3.6 14.2 4.4 14.2H5.5Z" fill="#facc15" stroke="#0f172a" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M11.6 7.4H24.4L27.5 12H9.2L11.6 7.4Z" fill="#0f172a"/>
+                <path d="M13 14.3H15.2V15.6H13V14.3ZM17.4 14.3H19.6V15.6H17.4V14.3ZM21.8 14.3H24V15.6H21.8V14.3Z" fill="#0f172a"/>
+                <circle cx="10" cy="18.2" r="3.1" fill="#0f172a" stroke="#fef08a" stroke-width="1.6"/>
+                <circle cx="10" cy="18.2" r="1.1" fill="#facc15"/>
+                <circle cx="29" cy="18.2" r="3.1" fill="#0f172a" stroke="#fef08a" stroke-width="1.6"/>
+                <circle cx="29" cy="18.2" r="1.1" fill="#facc15"/>
+              </svg>
+            </span>
+            <span>Taxi</span>
           </button>
           <button type="button" class="hv-service-tab" id="hvTipoCamioneta" data-vehicle-type="camioneta">
-            🚙 Camioneta
+            <span class="hv-tab-icon" aria-hidden="true">
+              <svg width="26" height="17" viewBox="0 0 40 24" fill="none">
+                <path d="M9 4.5H23.5" stroke="#ddd6fe" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M4 13.4L6.8 6.4C7.2 5.6 8 5.2 9 5.2H23.2C24.4 5.2 25.4 5.8 26 6.8L28.6 11.4L34.8 12.6C36 12.9 37 13.9 37 15.2V18.2H32.6A3.6 3.6 0 0 1 25.4 18.2H13.6A3.6 3.6 0 0 1 6.4 18.2H3V14.6C3 13.9 3.4 13.5 4 13.4Z" fill="#8b5cf6" stroke="#ede9fe" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M8.8 7.2H23.2L25.6 11.2H7.6L8.8 7.2Z" fill="#0f172a"/>
+                <path d="M16 7.2V11.2" stroke="#a78bfa" stroke-width="1.2"/>
+                <rect x="33.8" y="14.2" width="2.8" height="1.6" rx="0.8" fill="#fef08a"/>
+                <circle cx="10" cy="18.2" r="3.2" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/>
+                <circle cx="10" cy="18.2" r="1.1" fill="#c4b5fd"/>
+                <circle cx="29" cy="18.2" r="3.2" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/>
+                <circle cx="29" cy="18.2" r="1.1" fill="#c4b5fd"/>
+              </svg>
+            </span>
+            <span>Camioneta</span>
           </button>
         </div>
 
@@ -4035,6 +4132,7 @@
     const BUCARAMANGA_DEFAULT = { lat: 7.1193, lng: -73.1227 };
     const INITIAL_ZOOM = 14;
     const COLLECTION_NAME = 'reportes';
+    const DELETED_REPORTS_AUDIT_COLLECTION = 'reportes_eliminados';
 
     function safeReadJson(key, fallback) {
       try {
@@ -4463,6 +4561,9 @@
       if (!data || !isValidVipTipoKey(data.vipTipo) || data.vipActivo !== true) {
         clearCurrentVipProfile(uid);
         refreshVipUIEverywhere();
+        if (typeof refreshReportsForRole === 'function' && Array.isArray(allNonExpiredServerReports)) {
+          refreshReportsForRole();
+        }
         return;
       }
       const nextProfile = {
@@ -4476,6 +4577,9 @@
       currentVipProfile = nextProfile;
       saveCachedVipProfile(nextProfile);
       refreshVipUIEverywhere();
+      if (typeof refreshReportsForRole === 'function' && Array.isArray(allNonExpiredServerReports)) {
+        refreshReportsForRole();
+      }
     }
 
     function refreshReportsForRole() {
@@ -4521,6 +4625,9 @@
       }
       if (window.__anthiAdminBuzonReady && typeof syncAdminBuzonSubscription === 'function') {
         syncAdminBuzonSubscription();
+      }
+      if (window.__anthiAdminBuzonReady && typeof syncAdminDeletedReportsAuditSubscription === 'function') {
+        syncAdminDeletedReportsAuditSubscription();
       }
       if (typeof window.__anthiUpdateAdminReactionQuickBar === 'function') {
         window.__anthiUpdateAdminReactionQuickBar();
@@ -4738,9 +4845,72 @@
       'agente de tránsito': { emoji: '🚦', color: '#0ea5e9', label: 'Agente de Tránsito (Regulación)' },
       'grua': { emoji: '🚛', color: '#0ea5e9', label: 'Grúa de Tránsito' },
       'grúa': { emoji: '🚛', color: '#0ea5e9', label: 'Grúa de Tránsito' },
-      'cepo': { emoji: '🔒', color: '#a855f7', label: 'Cepos (Inmovilizador)' },
-      'cepos': { emoji: '🔒', color: '#a855f7', label: 'Cepos (Inmovilizador)' }
+      'cepo': { emoji: '🔒', color: '#eab308', label: 'Cepos (Inmovilizador)' },
+      'cepos': { emoji: '🔒', color: '#eab308', label: 'Cepos (Inmovilizador)' }
     };
+
+    function getReportCategorySvg(tipoTexto, size = 22) {
+      const key = String(tipoTexto || '').trim().toLowerCase();
+      const s = Number(size) || 22;
+      if (key.includes('reten') || key.includes('retén')) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <ellipse cx="14" cy="23.5" rx="10.5" ry="2.2" fill="#0f172a" fill-opacity="0.52"/>
+          <path d="M16.5 22L19.4 9.5C19.6 8.7 20.8 8.7 21 9.5L23.8 22H16.5Z" fill="#ea580c" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M18.2 15.2H22.1L22.5 17.2H17.8L18.2 15.2Z" fill="#f8fafc"/>
+          <rect x="15.2" y="21.2" width="9.8" height="2.2" rx="1" fill="#0f172a"/>
+          <path d="M6.4 22.2L10.3 5.2C10.5 4.2 12.1 4.2 12.3 5.2L16.2 22.2H6.4Z" fill="#f97316" stroke="#0f172a" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M9.1 10.6H13.5L14.1 13.2H8.5L9.1 10.6Z" fill="#ffffff"/>
+          <path d="M7.9 15.8H14.7L15.3 18.4H7.3L7.9 15.8Z" fill="#ffffff"/>
+          <rect x="4.6" y="21.4" width="13.4" height="2.6" rx="1.2" fill="#1e293b" stroke="#0f172a" stroke-width="1.2"/>
+        </svg>`;
+      }
+      if (key.includes('agente')) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="M9.5 6.2H18.5L17.6 3.5H10.4L9.5 6.2Z" fill="#0f172a" stroke="#7dd3fc" stroke-width="1.1" stroke-linejoin="round"/>
+          <rect x="8.5" y="6" width="11" height="1.8" rx="0.9" fill="#0284c7"/>
+          <circle cx="14" cy="10.2" r="2.7" fill="#fde68a" stroke="#0f172a" stroke-width="1.1"/>
+          <path d="M8.5 16C8.5 13.9 10.2 12.8 14 12.8C17.8 12.8 19.5 13.9 19.5 16V22.5H16.2V25.5H11.8V22.5H8.5V16Z" fill="#0284c7" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M10.2 15.2H17.8V17.4H10.2V15.2ZM10.2 18.8H17.8V20.5H10.2V18.8Z" fill="#bef264"/>
+          <path d="M8.5 15L4 12.2" stroke="#e0f2fe" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="3.6" cy="11.6" r="2.1" fill="#ef4444" stroke="#f8fafc" stroke-width="1"/>
+          <path d="M19.5 15L23.6 17.5" stroke="#e0f2fe" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>`;
+      }
+      if (key.includes('cepo')) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="14" cy="15.5" r="8.2" fill="#facc15" stroke="#0f172a" stroke-width="2.1"/>
+          <circle cx="14" cy="15.5" r="3.2" fill="#0f172a"/>
+          <path d="M10.2 8.2V6C10.2 3.9 11.9 2.4 14 2.4C16.1 2.4 17.8 3.9 17.8 6V8.2" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>
+          <rect x="4" y="13.5" width="4.4" height="4" rx="1.2" fill="#fde047" stroke="#0f172a" stroke-width="1.8"/>
+          <rect x="19.6" y="13.5" width="4.4" height="4" rx="1.2" fill="#fde047" stroke="#0f172a" stroke-width="1.8"/>
+          <circle cx="14" cy="15.5" r="1.3" fill="#fef08a"/>
+        </svg>`;
+      }
+      if (key.includes('accidente')) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="M14 3L17 9L23.5 6.5L20 12.5L26 15.5L19.5 18L22 24.5L15.5 21L13 26L11 20L4.5 22.5L8 16.5L2 13L8.5 10.5L6.5 4.5L12.5 8L14 3Z" fill="#ef4444" stroke="#fecaca" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M14 8.5L15.6 12.2L19.5 11L17.2 14.5L20.5 16.5L16.2 17.5L17 21L13.8 18.4L11 21L11.8 17.2L8 16L11.4 14L9.8 10.5L13 12L14 8.5Z" fill="#fde047"/>
+        </svg>`;
+      }
+      if (key.includes('cerrada') || key.includes('obra')) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect x="3.5" y="7" width="21" height="8" rx="2" fill="#dc2626" stroke="#0f172a" stroke-width="1.5"/>
+          <path d="M7.5 7L5 15H8.5L11 7H7.5ZM14 7L11.5 15H15L17.5 7H14ZM20.5 7L18 15H21.5L24 7H20.5Z" fill="#f8fafc"/>
+          <path d="M7.5 15V23.5M20.5 15V23.5" stroke="#e2e8f0" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>`;
+      }
+      if (key.includes('peligro') || key.includes('hueco')) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="M14 3.5L25 23H3L14 3.5Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M14 10V16.2" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="14" cy="19.6" r="1.4" fill="#0f172a"/>
+        </svg>`;
+      }
+      return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M14 3C9.6 3 6 6.6 6 11C6 16.8 14 25 14 25C14 25 22 16.8 22 11C22 6.6 18.4 3 14 3Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.6"/>
+        <circle cx="14" cy="11" r="3" fill="#0f172a"/>
+      </svg>`;
+    }
 
     const PROXIMITY_USER_RADIUS_METERS = 450;
     const PROXIMITY_CORRIDOR_METERS = 700;
@@ -4946,13 +5116,34 @@
     function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false, confirmCount = 1, tipoTexto = '') {
       const count = Math.max(1, Number(confirmCount || 1));
       const isUnvalidated = !isPending && !isFixed && count < 2;
-      const isCeposMarker = String(tipoTexto || '').trim().toLowerCase().includes('cepo');
-      const bg = isFixed
+      const tipoNorm = String(tipoTexto || '').trim().toLowerCase();
+      const isCeposMarker = tipoNorm.includes('cepo');
+      const isRetenMarker = tipoNorm.includes('reten') || tipoNorm.includes('retén');
+      const isAgenteMarker = tipoNorm.includes('agente');
+
+      const bg = isCeposMarker
+        ? (isUnvalidated ? '#fde047' : 'linear-gradient(135deg,#fef08a,#eab308)')
+        : isFixed
         ? 'linear-gradient(135deg,#fcd34d,#d97706)'
         : isUnvalidated
-        ? 'rgba(30,41,59,0.92)'
+        ? 'rgba(30,41,59,0.94)'
+        : isRetenMarker
+        ? 'linear-gradient(135deg,#fb923c,#ea580c)'
+        : isAgenteMarker
+        ? 'linear-gradient(135deg,#38bdf8,#0284c7)'
         : (color || '#ef4444');
-      const borderColor = isPending ? '#fbbf24' : isUnvalidated ? '#eab308' : '#ffffff';
+      const borderColor = isCeposMarker
+        ? '#0f172a'
+        : isPending
+        ? '#fbbf24'
+        : isUnvalidated
+        ? '#eab308'
+        : '#ffffff';
+      const borderWidth = isCeposMarker ? '2.5px' : '2px';
+      const markerShadow = isCeposMarker
+        ? '0 0 0 2px #facc15, 0 5px 15px rgba(0,0,0,0.68)'
+        : '0 4px 14px rgba(0,0,0,0.55)';
+      const iconSvg = getReportCategorySvg(tipoTexto || (emoji === '🚧' ? 'reten' : ''), 23);
       const badge = isPending
         ? `<span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#020617;border:1.5px solid #020617;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:900;">⏳</span>`
         : isFixed
@@ -4967,15 +5158,15 @@
         className: 'custom-pin',
         html: `<div class="${isCeposMarker ? 'cepos-marker-motion' : ''}" style="
           position:relative;
-          width:38px;height:38px;border-radius:50%;
-          background:${bg};border:2px solid ${borderColor};
+          width:40px;height:40px;border-radius:50%;
+          background:${bg};border:${borderWidth} solid ${borderColor};
           display:flex;align-items:center;justify-content:center;
-          font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,0.55);
-          opacity:${isUnvalidated ? '0.88' : '1'};
-        ">${emoji || '📍'}${badge}</div>`,
-        iconSize: [38, 38],
-        iconAnchor: [19, 19],
-        popupAnchor: [0, -18]
+          box-shadow:${markerShadow};
+          opacity:${isUnvalidated ? '0.9' : '1'};
+        ">${iconSvg}${badge}</div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
       });
     }
 
@@ -5029,23 +5220,31 @@
         const lng = Number(rep.lng);
         if (Number.isNaN(lat) || Number.isNaN(lng)) return;
 
-        const meta = getTipoMeta(rep.tipo || rep.type || 'Novedad');
+        const tipoStr = rep.tipo || rep.type || 'Novedad';
+        const meta = getTipoMeta(tipoStr);
+        const isCeposItem = String(tipoStr).trim().toLowerCase().includes('cepo');
         const timeMs = extractTimestampMs(rep);
         const rawDesc = String(rep.descripcion || rep.description || '').trim();
         const isFixed = Boolean(rep.isFixed);
         const isPending = Boolean(rep.isPending);
-        const badgeBg = isFixed ? 'linear-gradient(135deg,#fcd34d,#d97706)' : meta.color;
+        const badgeBg = isCeposItem
+          ? 'linear-gradient(135deg,#fef08a,#eab308)'
+          : isFixed
+          ? 'linear-gradient(135deg,#fcd34d,#d97706)'
+          : meta.color;
+        const badgeExtraStyle = isCeposItem ? 'border:2px solid #0f172a;' : '';
         const prefix = isFixed ? '👑 ' : isPending ? '⏳ ' : '';
         const denials = Number(rep.denials || 0);
         const confirmations = getConfirmCount(rep);
         const consensusInfo = getConsensusBadgeInfo(rep);
         const fastTag = getFastActivationTag(rep);
-        const isAgente = isAgenteTransitoTipo(rep.tipo || rep.type);
+        const isAgente = isAgenteTransitoTipo(tipoStr);
         const agenteRadiusM = isAgente ? clampAgentRadiusMeters(rep.radioMetros) : null;
         const remainingLabel = formatRemainingTimeLabel(rep, nowMs);
         const resolvedTag = userRole === 'admin' && !isFixed && denials >= 3 && denials > confirmations
           ? ' · ⚖️ Marcado por votos (solo Admin)'
           : '';
+        const categorySvgHtml = getReportCategorySvg(tipoStr, 22);
 
         const itemCard = document.createElement('div');
         itemCard.className = 'alert-list-item';
@@ -5054,7 +5253,7 @@
         mainBtn.type = 'button';
         mainBtn.className = 'alert-list-main';
         mainBtn.innerHTML = `
-          <div class="alert-list-icon" style="background:${escapeHtml(badgeBg)};">${escapeHtml(meta.emoji)}</div>
+          <div class="alert-list-icon" style="background:${escapeHtml(badgeBg)};${badgeExtraStyle}">${categorySvgHtml}</div>
           <div class="alert-list-body">
             <div class="alert-list-title">
               <span>${prefix}${escapeHtml(meta.label)}</span>
@@ -5101,6 +5300,21 @@
           adminActions.appendChild(editBtn);
           adminActions.appendChild(delBtn);
           itemCard.appendChild(adminActions);
+        } else if (!isPending && !isFixed && hasValidatedVipPermission(auth.currentUser)) {
+          const vipActions = document.createElement('div');
+          vipActions.className = 'alert-list-admin-actions';
+
+          const vipDelBtn = document.createElement('button');
+          vipDelBtn.type = 'button';
+          vipDelBtn.className = 'alert-admin-btn delete';
+          vipDelBtn.textContent = '🗑️ Ya no aplica · Eliminar (VIP)';
+          vipDelBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            window.deleteReportFromFirestore(rep.id);
+          });
+
+          vipActions.appendChild(vipDelBtn);
+          itemCard.appendChild(vipActions);
         }
 
         alertsCenterList.appendChild(itemCard);
@@ -5194,10 +5408,15 @@
           : alreadyConfirmed
           ? `<div class="popup-voted-note">✓ Ya aportaste tu confirmación a esta alerta</div>`
           : '';
+        const canVipDelete = userRole !== 'admin' && !isPending && !isFixed && hasValidatedVipPermission(auth.currentUser);
         const adminModerationBar = userRole === 'admin' && !isPending
           ? `<div class="popup-admin-bar">
               <button type="button" class="popup-vote-btn edit" onclick="openAdminEditModal('${escapeHtml(rep.id)}')">✏️ Editar Novedad (Admin)</button>
               <button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Eliminar Definitivamente (Admin)</button>
+            </div>`
+          : canVipDelete
+          ? `<div class="popup-admin-bar">
+              <button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Ya no aplica · Eliminar (VIP)</button>
             </div>`
           : '';
 
@@ -5208,14 +5427,19 @@
               <button type="button" class="${denyCls}" ${denyDisabledAttr} onclick="voteReport('${escapeHtml(rep.id)}', 'deny')">${denyLabel}</button>
             </div>${votedHint}${adminModerationBar}`;
 
+        const isCeposPopup = String(tipoTexto).trim().toLowerCase().includes('cepo');
         const badgeColor = isFixed ? '#d97706' : meta.color;
+        const badgeTextStyle = isCeposPopup && !isFixed
+          ? 'background:#facc15;color:#0f172a;border:1.5px solid #0f172a;'
+          : `background:${escapeHtml(badgeColor)};`;
         const badgePrefix = isFixed ? '👑 Fija · ' : '';
         const fastTag = getFastActivationTag(rep);
+        const popupSvg = getReportCategorySvg(tipoTexto, 15);
 
         marker.bindPopup(`
           <div class="popup-card">
-            <span class="popup-badge" style="background:${escapeHtml(badgeColor)}">
-              ${badgePrefix}${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
+            <span class="popup-badge" style="${badgeTextStyle}display:inline-flex;align-items:center;gap:5px;">
+              ${popupSvg}<span>${badgePrefix}${escapeHtml(meta.label)}</span>
             </span>
             <div style="margin:5px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;">
               <span style="font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
@@ -5754,6 +5978,7 @@
       if (!user) {
         detachUserSessionListener(true);
         if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
+        if (window.__anthiAdminBuzonReady && typeof detachAdminDeletedReportsAuditListener === 'function') detachAdminDeletedReportsAuditListener();
         if (typeof detachAdminVipCodesListener === 'function') detachAdminVipCodesListener();
         currentSessionId = null;
         currentMonitoredUid = null;
@@ -6243,25 +6468,85 @@
     }
 
     window.deleteReportFromFirestore = async function(reportId) {
-      if (!reportId || userRole !== 'admin') return;
+      if (!reportId) return;
+      const isAdminMode = userRole === 'admin';
+      const activeVipPre = getActiveVipProfile(auth.currentUser);
+      if (!isAdminMode && !activeVipPre) return;
+
       const path = `${COLLECTION_NAME}/${reportId}`;
       try {
         await ensureAuthenticated();
-        await withTimeout(deleteDoc(doc(db, COLLECTION_NAME, reportId)), 15000);
+        const currentUser = auth.currentUser;
+        if (!currentUser || !currentUser.uid) {
+          showToast('Inicia sesión para eliminar reportes.');
+          return;
+        }
+        const isValidatedAdmin = isAdminMode && isAuthorizedAdminEmail(currentUser);
+        const activeVip = getActiveVipProfile(currentUser);
+        if (!isValidatedAdmin && !activeVip) {
+          showToast('⛔ Solo un usuario VIP activo o Administrador autorizado puede eliminar reportes.');
+          return;
+        }
+
+        const targetReport = (allNonExpiredServerReports || []).find(
+          (item) => String(item.id) === String(reportId)
+        ) || (lastRenderedReports || []).find(
+          (item) => String(item.id) === String(reportId)
+        ) || null;
+
+        if (!isValidatedAdmin && targetReport && Boolean(targetReport.isFixed)) {
+          showToast('👑 Las alertas fijas oficiales solo pueden ser eliminadas por un Administrador.');
+          return;
+        }
+
+        const apodo = getUserApodo(currentUser);
+        const userEmail = currentUser.email ? String(currentUser.email).trim() : '';
+        const usuarioAudit = (
+          apodo && userEmail ? `${apodo} (${userEmail})` : (userEmail || apodo || currentUser.uid)
+        ).slice(0, 200);
+        const auditRole = isValidatedAdmin
+          ? 'admin'
+          : (activeVip && activeVip.meta && activeVip.meta.activacionKey ? activeVip.meta.activacionKey : 'vip_estandar');
+
+        const auditPayload = {
+          reportId: String(reportId),
+          tipo: String((targetReport && (targetReport.tipo || targetReport.type)) || 'Novedad').trim().slice(0, 40) || 'Novedad',
+          descripcion: String((targetReport && (targetReport.descripcion || targetReport.description)) || '').trim().slice(0, 400),
+          lat: Number.isFinite(Number(targetReport && targetReport.lat)) ? Number(targetReport.lat) : BUCARAMANGA_DEFAULT.lat,
+          lng: Number.isFinite(Number(targetReport && targetReport.lng)) ? Number(targetReport.lng) : BUCARAMANGA_DEFAULT.lng,
+          authorId: String((targetReport && targetReport.authorId) || currentUser.uid).slice(0, 128),
+          eliminadoPorUid: String(currentUser.uid).slice(0, 128),
+          eliminadoPorUsuario: usuarioAudit,
+          eliminadoPorRol: auditRole,
+          eliminadoAt: serverTimestamp()
+        };
+
+        const batch = writeBatch(db);
+        batch.set(doc(db, DELETED_REPORTS_AUDIT_COLLECTION, reportId), auditPayload);
+        batch.delete(doc(db, COLLECTION_NAME, reportId));
+        await withTimeout(batch.commit(), 15000);
+
         allNonExpiredServerReports = allNonExpiredServerReports.filter(
           (item) => String(item.id) !== String(reportId)
         );
         refreshReportsForRole();
-        showToast('🗑️ Alerta eliminada definitivamente de Firestore por el Administrador.');
+        if (alertsCenterModal && alertsCenterModal.classList.contains('open')) {
+          renderAlertsCenterList(lastRenderedReports);
+        }
+        showToast(
+          isValidatedAdmin
+            ? '🗑️ Alerta eliminada definitivamente (registrada en trazabilidad).'
+            : '🗑️ Reporte eliminado de la vía y registrado en trazabilidad VIP.'
+        );
       } catch (err) {
         if (err && err.message === 'AUTH_CANCELLED') {
-          showToast('Inicia sesión con el correo Administrador para eliminar reportes.');
+          showToast('Inicia sesión para eliminar reportes.');
           return;
         }
         if (err && err.code === 'permission-denied') {
-          showToast(`⛔ Firestore exige sesión con un correo Administrador autorizado (${ADMIN_EMAILS.join(' o ')}) para eliminar reportes de otros usuarios.`);
+          showToast('⛔ Tu sesión no tiene permiso VIP vigente ni de Administrador para eliminar este reporte.');
         } else {
-          showToast('No se pudo eliminar definitivamente este reporte.');
+          showToast('No se pudo eliminar el reporte en Firestore.');
         }
         handleFirestoreError(err, OperationType.DELETE, path);
       }
@@ -9523,6 +9808,113 @@
 
     const adminReportsSummaryStats = document.getElementById('adminReportsSummaryStats');
     const adminQuickReportsList = document.getElementById('adminQuickReportsList');
+    const adminDeletedReportsAuditStats = document.getElementById('adminDeletedReportsAuditStats');
+    const adminDeletedReportsAuditList = document.getElementById('adminDeletedReportsAuditList');
+
+    let adminDeletedReportsAuditItems = [];
+    let adminDeletedReportsAuditUnsubscribe = null;
+    let adminDeletedReportsAuditSubscribedUid = null;
+
+    function formatAuditRoleLabel(rol) {
+      if (rol === 'admin') return '👑 Admin';
+      if (rol === 'vip_fundador') return '🏅 VIP Fundador';
+      if (rol === 'vip_cepos') return '🛡️ VIP Cepos';
+      if (rol === 'vip_estandar') return '⭐ VIP Estándar';
+      if (rol === 'autor') return '👤 Autor';
+      return '👤 Usuario';
+    }
+
+    function renderAdminDeletedReportsAuditList() {
+      if (!adminDeletedReportsAuditList || !adminDeletedReportsAuditStats) return;
+      const items = Array.isArray(adminDeletedReportsAuditItems) ? adminDeletedReportsAuditItems : [];
+      adminDeletedReportsAuditStats.textContent = `${items.length} ${items.length === 1 ? 'registro' : 'registros'}`;
+      adminDeletedReportsAuditList.innerHTML = '';
+
+      if (items.length === 0) {
+        adminDeletedReportsAuditList.innerHTML = '<div style="font-size:10.5px;color:#94a3b8;">Sin eliminaciones registradas recientemente.</div>';
+        return;
+      }
+
+      items.slice(0, 25).forEach((entry) => {
+        const card = document.createElement('div');
+        card.style.cssText = 'padding:6px 8px;border-radius:8px;background:rgba(15,23,42,0.85);border:1px solid rgba(51,65,85,0.7);font-size:10.5px;line-height:1.35;';
+        const whenStr = entry._sortMs ? formatTimeLabel(entry._sortMs) : 'Reciente';
+        const dateStr = entry._sortMs ? formatVipDateShort(entry._sortMs) : '';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:6px;align-items:center;margin-bottom:2px;">
+            <strong style="color:#f8fafc;">${escapeHtml(entry.tipo || 'Novedad')}</strong>
+            <span style="color:#94a3b8;font-size:10px;">${escapeHtml(dateStr)} · ${escapeHtml(whenStr)}</span>
+          </div>
+          <div style="color:#cbd5e1;">
+            <span style="color:#fcd34d;font-weight:800;">${escapeHtml(formatAuditRoleLabel(entry.eliminadoPorRol))}</span>
+            · ${escapeHtml(entry.eliminadoPorUsuario || entry.eliminadoPorUid || 'Usuario')}
+          </div>
+          ${entry.descripcion ? `<div style="color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">"${escapeHtml(entry.descripcion)}"</div>` : ''}
+        `;
+        adminDeletedReportsAuditList.appendChild(card);
+      });
+    }
+
+    function detachAdminDeletedReportsAuditListener() {
+      if (adminDeletedReportsAuditUnsubscribe) {
+        try {
+          adminDeletedReportsAuditUnsubscribe();
+        } catch (e) {}
+      }
+      adminDeletedReportsAuditUnsubscribe = null;
+      adminDeletedReportsAuditSubscribedUid = null;
+      adminDeletedReportsAuditItems = [];
+      renderAdminDeletedReportsAuditList();
+    }
+
+    function syncAdminDeletedReportsAuditSubscription() {
+      const user = auth.currentUser;
+      const canReadAudit = userRole === 'admin' && isAuthorizedAdminEmail(user);
+      if (!canReadAudit) {
+        detachAdminDeletedReportsAuditListener();
+        return;
+      }
+
+      if (adminDeletedReportsAuditUnsubscribe && adminDeletedReportsAuditSubscribedUid === user.uid) {
+        renderAdminDeletedReportsAuditList();
+        return;
+      }
+
+      detachAdminDeletedReportsAuditListener();
+      adminDeletedReportsAuditSubscribedUid = user.uid;
+
+      const auditQuery = query(
+        collection(db, DELETED_REPORTS_AUDIT_COLLECTION),
+        orderBy('eliminadoAt', 'desc'),
+        limit(25)
+      );
+
+      adminDeletedReportsAuditUnsubscribe = onSnapshot(
+        auditQuery,
+        (snapshot) => {
+          const items = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data() || {};
+            items.push({
+              id: docSnap.id,
+              reportId: String(data.reportId || docSnap.id),
+              tipo: String(data.tipo || 'Novedad'),
+              descripcion: String(data.descripcion || ''),
+              eliminadoPorUid: String(data.eliminadoPorUid || ''),
+              eliminadoPorUsuario: String(data.eliminadoPorUsuario || ''),
+              eliminadoPorRol: String(data.eliminadoPorRol || ''),
+              _sortMs: extractOptionalTimestampMs(data.eliminadoAt) || 0
+            });
+          });
+          items.sort((a, b) => b._sortMs - a._sortMs);
+          adminDeletedReportsAuditItems = items;
+          renderAdminDeletedReportsAuditList();
+        },
+        (err) => {
+          console.warn('Error escuchando trazabilidad de eliminaciones:', err && err.message ? err.message : err);
+        }
+      );
+    }
 
     window.__anthiRefreshAdminReportsUI = function renderAdminControlReportsModeration() {
       if (!adminReportsSummaryStats || !adminQuickReportsList) return;
@@ -9545,17 +9937,19 @@
       }
 
       activeList.slice(0, 25).forEach((rep) => {
-        const meta = getTipoMeta(rep.tipo || rep.type || 'Novedad');
+        const tipoStr = rep.tipo || rep.type || 'Novedad';
+        const meta = getTipoMeta(tipoStr);
         const cBadge = getConsensusBadgeInfo(rep);
         const remText = formatRemainingTimeLabel(rep, nowMs);
+        const miniSvg = getReportCategorySvg(tipoStr, 16);
         const row = document.createElement('div');
         row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:9px;background:rgba(15,23,42,0.85);border:1px solid rgba(51,65,85,0.75);';
 
         const info = document.createElement('div');
         info.style.cssText = 'min-width:0;flex:1;';
         info.innerHTML = `
-          <div style="font-size:11.5px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            ${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}
+          <div style="font-size:11.5px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;">
+            ${miniSvg}<span style="overflow:hidden;text-overflow:ellipsis;">${escapeHtml(meta.label)}</span>
           </div>
           <div style="font-size:10px;color:${escapeHtml(cBadge.color)};font-weight:700;">
             ${escapeHtml(cBadge.shortLabel)} · ${escapeHtml(remText)}
@@ -11034,6 +11428,7 @@
       }
       setAdminPanelTab(initialTab);
       syncAdminBuzonSubscription();
+      syncAdminDeletedReportsAuditSubscription();
       syncAdminVipCodesSubscription();
       renderAdminBuzonList();
       if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
@@ -11099,6 +11494,7 @@
     refreshVipUIEverywhere();
     if (userRole === 'admin' && isAuthorizedAdminEmail(auth.currentUser)) {
       syncAdminBuzonSubscription();
+      syncAdminDeletedReportsAuditSubscription();
       syncAdminVipCodesSubscription();
       updateAdminRoleButtonBadge();
     }
@@ -11115,10 +11511,10 @@
       camioneta: 'Camioneta'
     };
     const VEHICLE_SVG_MAP = {
-      particular: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><path d="M5 14L9 7H25L30 14H33V18H30.5A3 3 0 0 1 24.5 18H11.5A3 3 0 0 1 5.5 18H3V14H5Z" fill="#38bdf8" fill-opacity="0.22" stroke="#67e8f9" stroke-width="2" stroke-linejoin="round"/><circle cx="8.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/><circle cx="27.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/></svg>`,
-      moto: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><circle cx="8" cy="17" r="4" stroke="#6ee7b7" stroke-width="2"/><circle cx="28" cy="17" r="4" stroke="#6ee7b7" stroke-width="2"/><path d="M8 17L14 11H21L24 7H28M17 11L20 17H28" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      taxi: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><rect x="14" y="3" width="8" height="3.5" rx="1" fill="#facc15"/><path d="M5 14L9 7H25L30 14H33V18H30.5A3 3 0 0 1 24.5 18H11.5A3 3 0 0 1 5.5 18H3V14H5Z" fill="#facc15" fill-opacity="0.26" stroke="#fde047" stroke-width="2" stroke-linejoin="round"/><circle cx="8.5" cy="18" r="2.5" fill="#0f172a" stroke="#fef08a" stroke-width="1.8"/><circle cx="27.5" cy="18" r="2.5" fill="#0f172a" stroke="#fef08a" stroke-width="1.8"/></svg>`,
-      camioneta: `<svg width="26" height="18" viewBox="0 0 36 24" fill="none"><path d="M3 13L6 6H21V11H31L33 14V18H30.5A3 3 0 0 1 24.5 18H11.5A3 3 0 0 1 5.5 18H3V13Z" fill="#a78bfa" fill-opacity="0.24" stroke="#c4b5fd" stroke-width="2" stroke-linejoin="round"/><circle cx="8.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/><circle cx="27.5" cy="18" r="2.5" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.8"/></svg>`
+      particular: `<svg width="28" height="19" viewBox="0 0 40 24" fill="none" aria-hidden="true"><path d="M5.5 14.2L9.8 6.8C10.4 5.8 11.4 5.2 12.6 5.2H24.8C26.1 5.2 27.3 5.9 28 7L31.4 12.6L35.4 13.8C36.4 14.1 37 15 37 16V18.2H32.6A3.6 3.6 0 0 1 25.4 18.2H13.6A3.6 3.6 0 0 1 6.4 18.2H3V15.4C3 14.6 3.6 14.2 4.4 14.2H5.5Z" fill="#0ea5e9" stroke="#e0f2fe" stroke-width="1.6" stroke-linejoin="round"/><path d="M11.6 7.4H24.4L27.5 12H9.2L11.6 7.4Z" fill="#0f172a"/><path d="M19.2 7.4V12" stroke="#38bdf8" stroke-width="1.2"/><rect x="33.5" y="14.5" width="3" height="1.6" rx="0.8" fill="#fef08a"/><circle cx="10" cy="18.2" r="3.1" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/><circle cx="10" cy="18.2" r="1.1" fill="#38bdf8"/><circle cx="29" cy="18.2" r="3.1" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/><circle cx="29" cy="18.2" r="1.1" fill="#38bdf8"/></svg>`,
+      moto: `<svg width="28" height="19" viewBox="0 0 40 24" fill="none" aria-hidden="true"><circle cx="8.8" cy="17" r="4.5" fill="#0f172a" stroke="#34d399" stroke-width="1.9"/><circle cx="8.8" cy="17" r="1.4" fill="#a7f3d0"/><circle cx="31.2" cy="17" r="4.5" fill="#0f172a" stroke="#34d399" stroke-width="1.9"/><circle cx="31.2" cy="17" r="1.4" fill="#a7f3d0"/><path d="M8.8 17L15.2 10.8H22.2L25.5 6.4L29.6 7.6M26.6 8.8L31.2 17" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 10.6C14.8 8.6 18.6 8.4 21.6 10.4L25.4 11.4L21.5 15.8H14.5L13 10.6Z" fill="#10b981" stroke="#0f172a" stroke-width="1.1" stroke-linejoin="round"/><circle cx="29.5" cy="9.8" r="1.3" fill="#fef08a"/></svg>`,
+      taxi: `<svg width="28" height="19" viewBox="0 0 40 24" fill="none" aria-hidden="true"><rect x="14.8" y="1.8" width="9.2" height="3.4" rx="1" fill="#fef08a" stroke="#0f172a" stroke-width="1.2"/><path d="M5.5 14.2L9.8 6.8C10.4 5.8 11.4 5.2 12.6 5.2H24.8C26.1 5.2 27.3 5.9 28 7L31.4 12.6L35.4 13.8C36.4 14.1 37 15 37 16V18.2H32.6A3.6 3.6 0 0 1 25.4 18.2H13.6A3.6 3.6 0 0 1 6.4 18.2H3V15.4C3 14.6 3.6 14.2 4.4 14.2H5.5Z" fill="#facc15" stroke="#0f172a" stroke-width="1.6" stroke-linejoin="round"/><path d="M11.6 7.4H24.4L27.5 12H9.2L11.6 7.4Z" fill="#0f172a"/><path d="M13 14.3H15.2V15.6H13V14.3ZM17.4 14.3H19.6V15.6H17.4V14.3ZM21.8 14.3H24V15.6H21.8V14.3Z" fill="#0f172a"/><circle cx="10" cy="18.2" r="3.1" fill="#0f172a" stroke="#fef08a" stroke-width="1.6"/><circle cx="10" cy="18.2" r="1.1" fill="#facc15"/><circle cx="29" cy="18.2" r="3.1" fill="#0f172a" stroke="#fef08a" stroke-width="1.6"/><circle cx="29" cy="18.2" r="1.1" fill="#facc15"/></svg>`,
+      camioneta: `<svg width="28" height="19" viewBox="0 0 40 24" fill="none" aria-hidden="true"><path d="M9 4.5H23.5" stroke="#ddd6fe" stroke-width="1.5" stroke-linecap="round"/><path d="M4 13.4L6.8 6.4C7.2 5.6 8 5.2 9 5.2H23.2C24.4 5.2 25.4 5.8 26 6.8L28.6 11.4L34.8 12.6C36 12.9 37 13.9 37 15.2V18.2H32.6A3.6 3.6 0 0 1 25.4 18.2H13.6A3.6 3.6 0 0 1 6.4 18.2H3V14.6C3 13.9 3.4 13.5 4 13.4Z" fill="#8b5cf6" stroke="#ede9fe" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.8 7.2H23.2L25.6 11.2H7.6L8.8 7.2Z" fill="#0f172a"/><path d="M16 7.2V11.2" stroke="#a78bfa" stroke-width="1.2"/><rect x="33.8" y="14.2" width="2.8" height="1.6" rx="0.8" fill="#fef08a"/><circle cx="10" cy="18.2" r="3.2" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/><circle cx="10" cy="18.2" r="1.1" fill="#c4b5fd"/><circle cx="29" cy="18.2" r="3.2" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.6"/><circle cx="29" cy="18.2" r="1.1" fill="#c4b5fd"/></svg>`
     };
     const HOJA_VIDA_ALERT_DAYS = 15;
     const HOJA_VIDA_ALERT_KM = 500;

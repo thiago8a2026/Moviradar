@@ -453,6 +453,78 @@
         }
       },
       "required": ["uid", "usuario", "codigo", "tipoVip", "canjeadoAt"]
+    },
+    "ReporteEliminado": {
+      "title": "Auditoría de Reporte Eliminado ANTHI",
+      "description": "Registro inmutable de trazabilidad creado atómicamente al eliminar un reporte activo desde usuario VIP o Administrador.",
+      "type": "object",
+      "properties": {
+        "reportId": {
+          "type": "string",
+          "description": "ID del reporte vial eliminado en la colección reportes.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "tipo": {
+          "type": "string",
+          "description": "Categoría del reporte eliminado.",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "descripcion": {
+          "type": "string",
+          "description": "Descripción o referencia del reporte eliminado.",
+          "maxLength": 400
+        },
+        "lat": {
+          "type": "number",
+          "description": "Latitud del reporte eliminado."
+        },
+        "lng": {
+          "type": "number",
+          "description": "Longitud del reporte eliminado."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID del autor original del reporte eliminado.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "eliminadoPorUid": {
+          "type": "string",
+          "description": "UID del usuario VIP o Administrador que eliminó el reporte.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "eliminadoPorUsuario": {
+          "type": "string",
+          "description": "Nombre, apodo o correo visible de quien ejecutó la eliminación.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "eliminadoPorRol": {
+          "type": "string",
+          "enum": ["admin", "vip_fundador", "vip_estandar", "vip_cepos", "autor"],
+          "description": "Rol o nivel VIP verificado de quien eliminó el reporte."
+        },
+        "eliminadoAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo exacta asignada por el servidor de Firestore."
+        }
+      },
+      "required": [
+        "reportId",
+        "tipo",
+        "descripcion",
+        "lat",
+        "lng",
+        "authorId",
+        "eliminadoPorUid",
+        "eliminadoPorUsuario",
+        "eliminadoPorRol",
+        "eliminadoAt"
+      ]
     }
   },
   "firestore": {
@@ -463,6 +535,10 @@
     "/reportes/{reportId}/votos/{userId}": {
       "schema": { "$ref": "#/entities/VotoReporte" },
       "description": "Subcolección anti-spam con un documento único por usuario votante."
+    },
+    "/reportes_eliminados/{reportId}": {
+      "schema": { "$ref": "#/entities/ReporteEliminado" },
+      "description": "Registro inmutable de trazabilidad (quién y cuándo) para reportes eliminados por VIP o Admin."
     },
     "/buzon/{sugerenciaId}": {
       "schema": { "$ref": "#/entities/SugerenciaBuzon" },

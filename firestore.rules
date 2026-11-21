@@ -162,6 +162,33 @@ service cloud.firestore {
         && data.canjeadoAt is timestamp;
     }
 
+    function isValidReporteEliminado(data) {
+      return data.keys().hasAll([
+          'reportId', 'tipo', 'descripcion', 'lat', 'lng', 'authorId',
+          'eliminadoPorUid', 'eliminadoPorUsuario', 'eliminadoPorRol', 'eliminadoAt'
+        ])
+        && data.keys().hasOnly([
+          'reportId', 'tipo', 'descripcion', 'lat', 'lng', 'authorId',
+          'eliminadoPorUid', 'eliminadoPorUsuario', 'eliminadoPorRol', 'eliminadoAt'
+        ])
+        && data.reportId is string && isValidId(data.reportId)
+        && data.tipo is string && data.tipo.size() >= 2 && data.tipo.size() <= 40
+        && data.descripcion is string && data.descripcion.size() <= 400
+        && data.lat is number && data.lat >= -90 && data.lat <= 90
+        && data.lng is number && data.lng >= -180 && data.lng <= 180
+        && data.authorId is string && isValidId(data.authorId)
+        && data.eliminadoPorUid is string && isValidId(data.eliminadoPorUid)
+        && data.eliminadoPorUsuario is string && data.eliminadoPorUsuario.size() >= 1 && data.eliminadoPorUsuario.size() <= 200
+        && (
+          data.eliminadoPorRol == 'admin' ||
+          data.eliminadoPorRol == 'vip_fundador' ||
+          data.eliminadoPorRol == 'vip_estandar' ||
+          data.eliminadoPorRol == 'vip_cepos' ||
+          data.eliminadoPorRol == 'autor'
+        )
+        && data.eliminadoAt is timestamp;
+    }
+
     function isValidVoto(data) {
       return data.keys().hasAll(['voteType', 'userId', 'createdAt'])
         && data.keys().hasOnly(['voteType', 'userId', 'createdAt'])
@@ -312,7 +339,15 @@ service cloud.firestore {
 
       allow delete: if isSignedIn()
         && isValidId(reportId)
-        && (existing().authorId == request.auth.uid || isAdmin());
+        && (
+          isAdmin() ||
+          existing().authorId == request.auth.uid ||
+          (
+            isActiveVip()
+            && existing().isFixed == false
+            && existsAfter(/databases/$(database)/documents/reportes_eliminados/$(reportId))
+          )
+        );
 
       match /votos/{userId} {
         allow get: if isSignedIn()
@@ -332,6 +367,33 @@ service cloud.firestore {
           && incoming().userId == request.auth.uid
           && incoming().createdAt == request.time;
       }
+    }
+
+    match /reportes_eliminados/{reportId} {
+      allow get: if isAdmin() && isValidId(reportId);
+      allow list: if isAdmin();
+      allow create: if isSignedIn()
+        && isValidId(reportId)
+        && isValidReporteEliminado(incoming())
+        && incoming().reportId == reportId
+        && incoming().eliminadoPorUid == request.auth.uid
+        && incoming().eliminadoAt == request.time
+        && exists(/databases/$(database)/documents/reportes/$(reportId))
+        && !existsAfter(/databases/$(database)/documents/reportes/$(reportId))
+        && (
+          (isAdmin() && incoming().eliminadoPorRol == 'admin') ||
+          (get(/databases/$(database)/documents/reportes/$(reportId)).data.authorId == request.auth.uid && incoming().eliminadoPorRol == 'autor') ||
+          (
+            isActiveVip()
+            && get(/databases/$(database)/documents/reportes/$(reportId)).data.isFixed == false
+            && (
+              (incoming().eliminadoPorRol == 'vip_fundador' && userData().vipTipo == 'fundador') ||
+              (incoming().eliminadoPorRol == 'vip_estandar' && userData().vipTipo == 'estandar') ||
+              (incoming().eliminadoPorRol == 'vip_cepos' && userData().vipTipo == 'rastreo_cepos')
+            )
+          )
+        );
+      allow update, delete: if false;
     }
 
     match /buzon/{sugerenciaId} {
