@@ -1862,6 +1862,168 @@
       flex-shrink: 0;
     }
 
+    .cierre-evento-banner {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      background: rgba(24, 15, 42, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(168, 85, 247, 0.78);
+      border-radius: 14px;
+      padding: 9px 11px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.56);
+    }
+
+    .cierre-evento-banner.visible {
+      display: flex;
+    }
+
+    .cierre-evento-banner-main {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .cierre-evento-banner-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #f3e8ff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cierre-evento-banner-msg {
+      font-size: 11px;
+      color: #e2e8f0;
+      line-height: 1.32;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .cierre-evento-banner-meta {
+      font-size: 10px;
+      font-weight: 700;
+      color: #c4b5fd;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cierre-banner-focus-btn {
+      border: 1px solid rgba(16, 185, 129, 0.72);
+      background: rgba(6, 78, 59, 0.78);
+      color: #a7f3d0;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .cierre-draw-dock {
+      position: fixed;
+      bottom: 14px;
+      left: 10px;
+      right: 10px;
+      max-width: 450px;
+      margin: 0 auto;
+      z-index: 1066;
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(168, 85, 247, 0.88);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.78);
+      display: none;
+      flex-direction: column;
+      gap: 7px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .cierre-draw-dock.visible {
+      display: flex;
+    }
+
+    .cierre-draw-mode-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .cierre-draw-mode-btn {
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(2, 6, 23, 0.88);
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 7px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .cierre-draw-mode-btn.cierre.active {
+      border-color: #ef4444;
+      background: rgba(153, 27, 27, 0.72);
+      color: #fecaca;
+    }
+
+    .cierre-draw-mode-btn.evac.active {
+      border-color: #10b981;
+      background: rgba(6, 78, 59, 0.82);
+      color: #a7f3d0;
+    }
+
+    .cierre-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .cierre-legend-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .cierre-legend-pill.cierre {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.7);
+      color: #fca5a5;
+    }
+
+    .cierre-legend-pill.evac {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.7);
+      color: #6ee7b7;
+    }
+
+    .cierre-legend-pill.nosonar {
+      background: rgba(168, 85, 247, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.65);
+      color: #e9d5ff;
+    }
+
     .select-input {
       min-height: 48px;
       font-weight: 700;
@@ -2273,7 +2435,7 @@
     .cat-option[data-type="Accidente"] { border-color: rgba(239, 68, 68, 0.48); }
     .cat-option[data-type="Cepos"] { border-color: rgba(250, 204, 21, 0.78); }
     .cat-option[data-type="Vía Cerrada / Obras"] { border-color: rgba(220, 38, 38, 0.48); }
-    .cat-option[data-type="Peligro en Vía"] { border-color: rgba(234, 179, 8, 0.5); }
+    .cat-option[data-type="Cierre Evento"] { border-color: rgba(168, 85, 247, 0.65); }
     .cat-option[data-type="Agente de Tránsito"] { border-color: rgba(14, 165, 233, 0.58); }
 
     .cat-option.active {
@@ -3403,6 +3565,32 @@
       </div>
     </div>
 
+    <!-- Barra flotante interactiva (Solo Admin) para trazar Cierre Evento (tramo/cuadrante + rutas de evacuación/paso) -->
+    <div class="cierre-draw-dock" id="cierreEventoDrawDock" aria-hidden="true">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="min-width:0;">
+          <div style="font-size:12px;font-weight:900;color:#e9d5ff;">🏟️ Trazado Cierre Evento (Solo Admin)</div>
+          <div id="ceDrawPlaceLabel" style="font-size:10.5px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Toca o desliza el dedo en el mapa para trazar</div>
+        </div>
+        <button type="button" class="btn-close" id="btnCeDrawExit" style="width:auto;padding:0 10px;height:29px;font-size:11px;font-weight:800;">✕ Salir</button>
+      </div>
+      <div class="cierre-draw-mode-row">
+        <button type="button" class="cierre-draw-mode-btn cierre active" id="btnCeDrawModeCierre">🔴 Cierre (Tramo/Cuadrante)</button>
+        <button type="button" class="cierre-draw-mode-btn evac" id="btnCeDrawModeEvac">🟢 + Ruta Evacuación/Paso</button>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+        <button type="button" class="pico-cal-btn active" id="btnCeShapeTramo" data-ce-draw-shape="tramo">〰️ Tramo</button>
+        <button type="button" class="pico-cal-btn" id="btnCeShapeCuadrante" data-ce-draw-shape="cuadrante">⬟ Cuadrante</button>
+        <button type="button" class="pico-cal-btn" id="btnCeNewEvacRoute" style="border-color:rgba(16,185,129,0.65);color:#6ee7b7;">➕ Nueva ruta salida</button>
+        <span id="ceDrawStatsPill" style="margin-left:auto;font-size:10px;font-weight:800;color:#c4b5fd;">0 pts cierre · 0 salidas</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button type="button" class="cepos-route-btn" id="btnCeDrawUndo" style="flex:0 0 auto;border-color:rgba(148,163,184,0.5);color:#e2e8f0;">↩️ Deshacer</button>
+        <button type="button" class="cepos-route-btn clear-icon" id="btnCeDrawClear" title="Limpiar trazo actual">🗑️</button>
+        <button type="button" class="btn-submit" id="btnCeDrawBackForm" style="min-height:36px;font-size:11.5px;flex:1;background:linear-gradient(135deg,#7e22ce,#db2777);">✅ Listo · Configurar horario y guardar</button>
+      </div>
+    </div>
+
     <!-- Controles rápidos del mapa (plegables desde la barra superior) -->
     <div class="map-controls" id="mapControlsWrapper">
       <div class="map-controls-group" id="mapControlsGroup">
@@ -3430,6 +3618,18 @@
 
     <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos / Ciudadano y botón "+ Reportar Novedad" -->
     <div class="bottom-panel">
+      <div class="cierre-evento-banner" id="cierreEventoBanner" aria-live="polite">
+        <div class="cierre-evento-banner-main" id="cierreEventoBannerMain" role="button" tabindex="0" title="Ver cierre y rutas de evacuación en el mapa">
+          <div class="cierre-evento-banner-title" id="cierreEventoBannerTitle"></div>
+          <div class="cierre-evento-banner-msg" id="cierreEventoBannerMsg"></div>
+          <div class="cierre-evento-banner-meta" id="cierreEventoBannerMeta"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">
+          <button type="button" class="cierre-banner-focus-btn" id="btnFocusCierreBanner">🗺️ Ver</button>
+          <button type="button" class="route-banner-close" id="btnDismissCierreBanner" title="Ocultar aviso">✕</button>
+        </div>
+      </div>
+
       <div class="route-alert-banner" id="routeAlertBanner">
         <div id="routeAlertBannerText" style="flex:1;font-weight:700;cursor:pointer;"></div>
         <button type="button" class="route-banner-close" id="btnClearRouteBanner" title="Quitar ruta">✕</button>
@@ -3528,15 +3728,19 @@
               </span>
               <span>Vía cerrada</span>
             </button>
-            <button type="button" class="cat-option" data-type="Peligro en Vía" data-color="#eab308" data-emoji="⚠️">
-              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(234,179,8,0.32),rgba(202,138,4,0.22));border:1.5px solid #facc15;" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
-                  <path d="M14 3.5L25 23H3L14 3.5Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round"/>
-                  <path d="M14 10V16.2" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>
-                  <circle cx="14" cy="19.6" r="1.4" fill="#0f172a"/>
+            <button type="button" class="cat-option" id="catOptionCierreEvento" data-type="Cierre Evento" data-color="#a855f7" data-emoji="🏟️" style="display:none;">
+              <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(168,85,247,0.34),rgba(236,72,153,0.24));border:1.5px solid #c084fc;" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                  <path d="M4.5 22.5V12.5C4.5 7.4 8.7 4 14 4C19.3 4 23.5 7.4 23.5 12.5V22.5" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M4.5 12.2H23.5" stroke="#f472b6" stroke-width="2" stroke-linecap="round"/>
+                  <rect x="7" y="7" width="14" height="4.4" rx="1.4" fill="#a855f7" stroke="#0f172a" stroke-width="1.2"/>
+                  <path d="M9.5 7.2L11 11.2M14 7.2V11.2M18.5 7.2L17 11.2" stroke="#fdf4ff" stroke-width="1.2"/>
+                  <path d="M3 22.5H25" stroke="#ef4444" stroke-width="2.4" stroke-linecap="round"/>
+                  <path d="M10.5 17.2L14 14.2L17.5 17.2" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 14.5V21" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span>Peligro</span>
+              <span>Cierre Evento</span>
             </button>
             <button type="button" class="cat-option" data-type="Agente de Tránsito" data-color="#0ea5e9" data-emoji="🚦">
               <span class="cat-option-badge" style="background:linear-gradient(135deg,rgba(14,165,233,0.34),rgba(2,132,199,0.22));border:1.5px solid #38bdf8;" aria-hidden="true">
@@ -4014,7 +4218,7 @@
             <option value="Cepos">🔒 Cepos</option>
             <option value="Accidente">💥 Accidente</option>
             <option value="Vía Cerrada / Obras">⛔ Vía Cerrada / Obras</option>
-            <option value="Peligro en Vía">⚠️ Peligro en Vía</option>
+            <option value="Cierre Evento">🏟️ Cierre Evento (Sin sónar)</option>
             <option value="Trancón">🚗 Trancón / Congestión</option>
             <option value="Policía">👮 Policía</option>
           </select>
@@ -4224,6 +4428,85 @@
               </button>
             </form>
             <div id="adminAgentPointsList" style="display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;"></div>
+          </div>
+
+          <div id="adminCierresEventoBox" style="background:rgba(2,6,23,0.82);border:1px solid rgba(168,85,247,0.52);border-radius:12px;padding:10px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+              <div style="font-size:12px;font-weight:800;color:#e9d5ff;">
+                🏟️ Cierre Evento y Evacuación (Solo Admin · Sin sónar)
+              </div>
+              <span class="cierre-legend-pill nosonar" style="font-size:9.5px;">🔕 Sin sónar</span>
+            </div>
+            <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
+              Traza en el mapa el cierre (<strong style="color:#fca5a5;">rojo/naranja</strong>) y las rutas de evacuación o paso (<strong style="color:#6ee7b7;">verde/cian</strong>) con horario programable. Ideal antes o al inicio de eventos deportivos.
+            </p>
+            <form id="adminCierreEventoForm" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
+              <input
+                type="text"
+                id="ceTituloInput"
+                class="text-input"
+                maxlength="80"
+                minlength="2"
+                required
+                style="margin-bottom:0;"
+                placeholder="Nombre del evento (ej: Carrera Atlética 10K)"
+              />
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span style="font-size:11px;color:#cbd5e1;font-weight:700;">Geometría:</span>
+                <button type="button" class="pico-cal-btn active" id="btnCeFormModeTramo" data-ce-form-shape="tramo">〰️ Tramo de vía</button>
+                <button type="button" class="pico-cal-btn" id="btnCeFormModeCuadrante" data-ce-form-shape="cuadrante">⬟ Cuadrante / Sector</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <button type="button" class="alert-admin-btn edit" id="btnCeTraceClosure" style="padding:7px 8px;font-size:11px;border-color:rgba(239,68,68,0.65);background:rgba(127,29,29,0.45);color:#fecaca;">
+                  🔴 Trazar cierre en mapa
+                </button>
+                <button type="button" class="alert-admin-btn edit" id="btnCeTraceEvac" style="padding:7px 8px;font-size:11px;border-color:rgba(16,185,129,0.65);background:rgba(6,78,59,0.55);color:#a7f3d0;">
+                  🟢 + Ruta evacuación/paso
+                </button>
+              </div>
+              <div id="ceGeometrySummaryBadge" style="font-size:10.5px;padding:6px 8px;border-radius:9px;background:rgba(15,23,42,0.85);border:1px solid rgba(71,85,105,0.7);color:#cbd5e1;">
+                Sin trazado aún · Usa los botones de arriba para dibujar cierre y salidas.
+              </div>
+              <textarea
+                id="ceMensajeInput"
+                class="text-input"
+                rows="2"
+                maxlength="320"
+                required
+                style="margin-bottom:0;"
+                placeholder="Mensaje informativo corto (ej: Evento deportivo: observa en el mapa los cierres en rojo y salidas en verde.)"
+              ></textarea>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                <button type="button" class="pico-cal-btn" data-ce-msg-preset="deportivo">🏃 Evento deportivo</button>
+                <button type="button" class="pico-cal-btn" data-ce-msg-preset="cultural">🎪 Evento cívico / cultural</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <div>
+                  <label for="ceStartInput" style="display:block;font-size:10px;color:#cbd5e1;font-weight:700;margin-bottom:3px;">Inicio cierre:</label>
+                  <input type="datetime-local" id="ceStartInput" class="text-input" style="margin-bottom:0;padding:6px 7px;font-size:11px;" required />
+                </div>
+                <div>
+                  <label for="ceEndInput" style="display:block;font-size:10px;color:#cbd5e1;font-weight:700;margin-bottom:3px;">Fin cierre:</label>
+                  <input type="datetime-local" id="ceEndInput" class="text-input" style="margin-bottom:0;padding:6px 7px;font-size:11px;" required />
+                </div>
+              </div>
+              <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+                <span style="font-size:10.5px;color:#94a3b8;font-weight:700;">Duración rápida:</span>
+                <button type="button" class="pico-cal-btn" data-ce-duration-hours="2">+2h</button>
+                <button type="button" class="pico-cal-btn active" data-ce-duration-hours="4">+4h</button>
+                <button type="button" class="pico-cal-btn" data-ce-duration-hours="6">+6h</button>
+                <button type="button" class="pico-cal-btn" data-ce-duration-hours="12">+12h</button>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button type="submit" class="btn-submit" id="btnSaveCierreEvento" style="min-height:38px;font-size:12px;flex:1;background:linear-gradient(135deg,#7e22ce,#db2777);">
+                  🏟️ Publicar Cierre Evento
+                </button>
+                <button type="button" class="btn-logout" id="btnCancelEditCierreEvento" style="display:none;width:auto;min-height:38px;padding:0 12px;font-size:11.5px;">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+            <div id="adminCierresEventoList" style="display:flex;flex-direction:column;gap:6px;max-height:190px;overflow-y:auto;"></div>
           </div>
 
           <div id="adminVipCodesBox" style="background:rgba(2,6,23,0.78);border:1px solid rgba(251,191,36,0.48);border-radius:12px;padding:10px;margin-bottom:12px;">
@@ -4977,7 +5260,8 @@
       VIP_PROFILE: 'anthi_vip_profile_v1',
       BG_NOTIFS: 'anthi_bg_notifs_v1',
       NOTIFIED_ALERTS: 'anthi_notified_alerts_v1',
-      GEO_PLACE_CACHE: 'anthi_geo_place_cache_v1'
+      GEO_PLACE_CACHE: 'anthi_geo_place_cache_v1',
+      CIERRES_EVENTO: 'anthi_cierres_evento_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -4985,6 +5269,7 @@
     const INITIAL_ZOOM = 14;
     const COLLECTION_NAME = 'reportes';
     const DELETED_REPORTS_AUDIT_COLLECTION = 'reportes_eliminados';
+    const CIERRES_EVENTO_COLLECTION = 'cierres_evento';
 
     function safeReadJson(key, fallback) {
       try {
@@ -5120,6 +5405,8 @@
     const reactionPreviewLayer = L.layerGroup().addTo(map);
     const agentZonesLayer = L.layerGroup().addTo(map);
     const ceposRouteLayer = L.layerGroup().addTo(map);
+    const cierreEventosLayer = L.layerGroup().addTo(map);
+    const cierreEventoDraftLayer = L.layerGroup().addTo(map);
     const REACTION_POINTS_COLLECTION = 'puntos_reaccion_inmediata';
     const LEGACY_REACTION_POINTS_COLLECTION = 'puntos_reaccion';
     let reactionPointsPrimary = [];
@@ -5500,6 +5787,16 @@
       if (userRole !== 'admin' && typeof window.closeCeposJoystick === 'function') {
         window.closeCeposJoystick(false);
       }
+      const catCierreBtn = document.getElementById('catOptionCierreEvento');
+      if (catCierreBtn) {
+        catCierreBtn.style.display = userRole === 'admin' ? '' : 'none';
+      }
+      if (typeof window.__anthiExitCierreDrawMode === 'function' && userRole !== 'admin') {
+        window.__anthiExitCierreDrawMode(false);
+      }
+      if (typeof window.__anthiRefreshCierresEventoUI === 'function') {
+        window.__anthiRefreshCierresEventoUI();
+      }
     }
 
     function openAdminPinModal() {
@@ -5690,6 +5987,9 @@
       'vía cerrada / obras': { emoji: '🚧', color: '#dc2626', label: 'Vía Cerrada / Obras' },
       'peligro en via': { emoji: '⚠️', color: '#eab308', label: 'Peligro en Vía' },
       'peligro en vía': { emoji: '⚠️', color: '#eab308', label: 'Peligro en Vía' },
+      'cierre evento': { emoji: '🏟️', color: '#a855f7', label: 'Cierre Evento' },
+      'cierre de evento': { emoji: '🏟️', color: '#a855f7', label: 'Cierre Evento' },
+      'cierres evento': { emoji: '🏟️', color: '#a855f7', label: 'Cierre Evento' },
       'hueco': { emoji: '🕳️', color: '#eab308', label: 'Hueco / Daño en Vía' },
       'trancon': { emoji: '🚗', color: '#f59e0b', label: 'Trancón / Congestión' },
       'trancón': { emoji: '🚗', color: '#f59e0b', label: 'Trancón / Congestión' },
@@ -5712,9 +6012,25 @@
       return String(tipoTexto || '').trim().toLowerCase().includes('cepo');
     }
 
+    function isCierreEventoTipo(tipoTexto) {
+      const key = String(tipoTexto || '').trim().toLowerCase();
+      return key.includes('cierre evento') || key.includes('cierre de evento') || key.includes('cierres evento');
+    }
+
     function getReportCategorySvg(tipoTexto, size = 22) {
       const key = String(tipoTexto || '').trim().toLowerCase();
       const s = Number(size) || 22;
+      if (isCierreEventoTipo(key)) {
+        return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="M4.5 22.5V12.5C4.5 7.4 8.7 4 14 4C19.3 4 23.5 7.4 23.5 12.5V22.5" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M4.5 12.2H23.5" stroke="#f472b6" stroke-width="2" stroke-linecap="round"/>
+          <rect x="7" y="7" width="14" height="4.4" rx="1.4" fill="#a855f7" stroke="#0f172a" stroke-width="1.2"/>
+          <path d="M9.5 7.2L11 11.2M14 7.2V11.2M18.5 7.2L17 11.2" stroke="#fdf4ff" stroke-width="1.2"/>
+          <path d="M3 22.5H25" stroke="#ef4444" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M10.5 17.2L14 14.2L17.5 17.2" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 14.5V21" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>`;
+      }
       if (key.includes('reten') || key.includes('retén')) {
         return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" fill="none" aria-hidden="true">
           <ellipse cx="14" cy="23.5" rx="10.5" ry="2.2" fill="#0f172a" fill-opacity="0.52"/>
@@ -5992,6 +6308,7 @@
 
     function isReportAudibleForCurrentUser(rep) {
       if (!rep) return false;
+      if (isCierreEventoTipo(rep.tipo || rep.type)) return false;
       if (hasValidatedAdminPermission()) return true;
       if (Boolean(rep.isFixed)) return true;
       return getConfirmCount(rep) >= 2;
@@ -6004,9 +6321,12 @@
       const isCeposMarker = tipoNorm.includes('cepo');
       const isRetenMarker = tipoNorm.includes('reten') || tipoNorm.includes('retén');
       const isAgenteMarker = tipoNorm.includes('agente');
+      const isCierreEventoMarker = isCierreEventoTipo(tipoNorm);
 
       const bg = isCeposMarker
         ? (isUnvalidated ? '#fde047' : 'linear-gradient(135deg,#fef08a,#eab308)')
+        : isCierreEventoMarker
+        ? 'linear-gradient(135deg,#9333ea,#db2777)'
         : isFixed
         ? 'linear-gradient(135deg,#fcd34d,#d97706)'
         : isUnvalidated
@@ -9141,6 +9461,19 @@
 
     document.querySelectorAll('.cat-option').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (isCierreEventoTipo(btn.dataset.type)) {
+          if (!hasValidatedAdminPermission()) {
+            showToast('⛔ Cierre Evento es exclusivo para administradores autorizados.');
+            return;
+          }
+          modal.classList.remove('open');
+          if (typeof window.openCierreEventoStudio === 'function') {
+            window.openCierreEventoStudio();
+          } else if (typeof openAdminPanelModal === 'function') {
+            openAdminPanelModal('control');
+          }
+          return;
+        }
         document.querySelectorAll('.cat-option').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         selectedCategory = {
@@ -9371,6 +9704,7 @@
     function isVipBackgroundPriorityAlert(rep, activeVip) {
       if (!rep || !activeVip) return false;
       const tipo = rep.tipo || rep.type || '';
+      if (isCierreEventoTipo(tipo)) return false;
       if (isReactionPointEligibleTipo(tipo) || isCeposTipo(tipo)) return true;
       return getReportAlertTier(rep) === 'firm';
     }
@@ -10138,6 +10472,17 @@
     });
 
     map.on('click', (e) => {
+      if (
+        hasValidatedAdminPermission() &&
+        typeof window.__anthiIsCierreDrawing === 'function' &&
+        window.__anthiIsCierreDrawing() &&
+        e && e.latlng
+      ) {
+        if (typeof window.__anthiAppendCierreDrawPoint === 'function') {
+          window.__anthiAppendCierreDrawPoint(e.latlng.lat, e.latlng.lng, false);
+        }
+        return;
+      }
       if (
         hasValidatedAdminPermission() &&
         typeof window.__anthiGetCeposRouteState === 'function' &&
@@ -11007,6 +11352,10 @@
         showToast('Toca una categoría visual para el reporte.');
         return;
       }
+      if (isCierreEventoTipo(selectedCategory.type) && !hasValidatedAdminPermission()) {
+        showToast('⛔ Cierre Evento es exclusivo para administradores autorizados.');
+        return;
+      }
       const rawDesc = document.getElementById('reportDesc').value.trim();
       const descripcion = rawDesc.slice(0, 400);
       const wantsFixed = userRole === 'admin' && document.getElementById('chkIsFixed').checked;
@@ -11215,6 +11564,9 @@
     startFirestoreListener();
     startReactionPointsListener();
     renderReactionZonesOnMap();
+    if (typeof window.__anthiStartCierresEventoListener === 'function') {
+      window.__anthiStartCierresEventoListener();
+    }
     if (navigator.onLine) {
       sincronizarReportesPendientes();
     }
@@ -13691,6 +14043,1172 @@
     }
 
     // =========================================================================
+    // 11A. MÓDULO CIERRE EVENTO (SOLO ADMIN · SIN SÓNAR · EVACUACIÓN Y HORARIO)
+    // =========================================================================
+    const cierreEventoBanner = document.getElementById('cierreEventoBanner');
+    const cierreEventoBannerMain = document.getElementById('cierreEventoBannerMain');
+    const cierreEventoBannerTitle = document.getElementById('cierreEventoBannerTitle');
+    const cierreEventoBannerMsg = document.getElementById('cierreEventoBannerMsg');
+    const cierreEventoBannerMeta = document.getElementById('cierreEventoBannerMeta');
+    const btnFocusCierreBanner = document.getElementById('btnFocusCierreBanner');
+    const btnDismissCierreBanner = document.getElementById('btnDismissCierreBanner');
+
+    const cierreEventoDrawDock = document.getElementById('cierreEventoDrawDock');
+    const ceDrawPlaceLabel = document.getElementById('ceDrawPlaceLabel');
+    const ceDrawStatsPill = document.getElementById('ceDrawStatsPill');
+    const btnCeDrawExit = document.getElementById('btnCeDrawExit');
+    const btnCeDrawModeCierre = document.getElementById('btnCeDrawModeCierre');
+    const btnCeDrawModeEvac = document.getElementById('btnCeDrawModeEvac');
+    const btnCeShapeTramo = document.getElementById('btnCeShapeTramo');
+    const btnCeShapeCuadrante = document.getElementById('btnCeShapeCuadrante');
+    const btnCeNewEvacRoute = document.getElementById('btnCeNewEvacRoute');
+    const btnCeDrawUndo = document.getElementById('btnCeDrawUndo');
+    const btnCeDrawClear = document.getElementById('btnCeDrawClear');
+    const btnCeDrawBackForm = document.getElementById('btnCeDrawBackForm');
+
+    const adminCierreEventoForm = document.getElementById('adminCierreEventoForm');
+    const ceTituloInput = document.getElementById('ceTituloInput');
+    const ceMensajeInput = document.getElementById('ceMensajeInput');
+    const ceStartInput = document.getElementById('ceStartInput');
+    const ceEndInput = document.getElementById('ceEndInput');
+    const btnCeFormModeTramo = document.getElementById('btnCeFormModeTramo');
+    const btnCeFormModeCuadrante = document.getElementById('btnCeFormModeCuadrante');
+    const btnCeTraceClosure = document.getElementById('btnCeTraceClosure');
+    const btnCeTraceEvac = document.getElementById('btnCeTraceEvac');
+    const ceGeometrySummaryBadge = document.getElementById('ceGeometrySummaryBadge');
+    const btnSaveCierreEvento = document.getElementById('btnSaveCierreEvento');
+    const btnCancelEditCierreEvento = document.getElementById('btnCancelEditCierreEvento');
+    const adminCierresEventoList = document.getElementById('adminCierresEventoList');
+
+    let allCierresEvento = safeReadJson(STORAGE_KEYS.CIERRES_EVENTO, []);
+    if (!Array.isArray(allCierresEvento)) allCierresEvento = [];
+    let cierresEventoUnsubscribe = null;
+    let dismissedCierreBannerId = null;
+    let activeBannerCierreId = null;
+    let editingCierreEventoId = null;
+
+    const cierreDrawState = {
+      isDrawing: false,
+      drawTarget: 'cierre', // 'cierre' | 'evac'
+      cierreModo: 'tramo', // 'tramo' | 'cuadrante'
+      cierrePuntos: [],
+      evacuacionRutas: [], // [{ nombre, puntos: [{lat, lng}] }]
+      activeEvacIndex: -1,
+      drawPointerId: null
+    };
+
+    function saveCachedCierresEvento(list) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.CIERRES_EVENTO, JSON.stringify((list || []).slice(0, 30)));
+      } catch (e) {}
+    }
+
+    function toLocalDatetimeInputValue(ms) {
+      const d = new Date(Number(ms) || Date.now());
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function formatCierreTimeShort(ms) {
+      if (!Number.isFinite(Number(ms))) return '--:--';
+      return new Date(Number(ms)).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function sanitizeCierrePointsList(rawPoints, maxLen = 80) {
+      if (!Array.isArray(rawPoints)) return [];
+      const out = [];
+      for (const p of rawPoints) {
+        if (!p) continue;
+        const lat = Number(p.lat);
+        const lng = Number(p.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) continue;
+        out.push({ lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) });
+        if (out.length >= maxLen) break;
+      }
+      return out;
+    }
+
+    function sanitizeEvacRoutesList(rawRoutes) {
+      if (!Array.isArray(rawRoutes)) return [];
+      const out = [];
+      for (let i = 0; i < rawRoutes.length && out.length < 8; i++) {
+        const r = rawRoutes[i];
+        if (!r) continue;
+        const pts = sanitizeCierrePointsList(r.puntos, 60);
+        if (pts.length >= 2) {
+          out.push({
+            nombre: String(r.nombre || `Ruta salida ${out.length + 1}`).trim().slice(0, 50) || `Ruta salida ${out.length + 1}`,
+            puntos: pts
+          });
+        }
+      }
+      return out;
+    }
+
+    function computePointsCentroid(points) {
+      const pts = Array.isArray(points) ? points : [];
+      if (pts.length === 0) {
+        return { lat: BUCARAMANGA_DEFAULT.lat, lng: BUCARAMANGA_DEFAULT.lng };
+      }
+      let sumLat = 0;
+      let sumLng = 0;
+      pts.forEach((p) => {
+        sumLat += Number(p.lat);
+        sumLng += Number(p.lng);
+      });
+      return {
+        lat: Number((sumLat / pts.length).toFixed(6)),
+        lng: Number((sumLng / pts.length).toFixed(6))
+      };
+    }
+
+    function isCierreEventoVisibleToDrivers(ev, nowMs = Date.now()) {
+      if (!ev || ev.activo === false) return false;
+      const startMs = Number(ev.startsAtMs || 0);
+      const endMs = Number(ev.endsAtMs || 0);
+      if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return false;
+      if (nowMs > endMs) return false;
+      // En curso o programado hasta 12 h antes (ideal antes o al inicio de eventos deportivos)
+      return nowMs >= startMs || (startMs - nowMs) <= 12 * 60 * 60 * 1000;
+    }
+
+    function getCierreScheduleLabel(ev, nowMs = Date.now()) {
+      const startMs = Number(ev && ev.startsAtMs);
+      const endMs = Number(ev && ev.endsAtMs);
+      if (!ev || ev.activo === false) return '⏸️ Pausado';
+      if (nowMs > endMs) return '⏹️ Finalizado';
+      if (nowMs >= startMs) return `🟢 En curso · hasta ${formatCierreTimeShort(endMs)}`;
+      return `⏳ Inicia ${formatCierreTimeShort(startMs)} · hasta ${formatCierreTimeShort(endMs)}`;
+    }
+
+    function ensureDefaultCierreScheduleInputs(durationHours = 4) {
+      const now = Date.now();
+      const startMs = Math.ceil(now / 60000) * 60000;
+      const endMs = startMs + Math.max(1, Number(durationHours || 4)) * 3600000;
+      if (ceStartInput && !ceStartInput.value) {
+        ceStartInput.value = toLocalDatetimeInputValue(startMs);
+      }
+      if (ceEndInput && !ceEndInput.value) {
+        ceEndInput.value = toLocalDatetimeInputValue(endMs);
+      }
+    }
+
+    function syncCierreShapeButtons() {
+      const modo = cierreDrawState.cierreModo === 'cuadrante' ? 'cuadrante' : 'tramo';
+      if (btnCeShapeTramo) btnCeShapeTramo.classList.toggle('active', modo === 'tramo');
+      if (btnCeShapeCuadrante) btnCeShapeCuadrante.classList.toggle('active', modo === 'cuadrante');
+      if (btnCeFormModeTramo) btnCeFormModeTramo.classList.toggle('active', modo === 'tramo');
+      if (btnCeFormModeCuadrante) btnCeFormModeCuadrante.classList.toggle('active', modo === 'cuadrante');
+    }
+
+    function syncCierreDrawDockUI() {
+      syncCierreShapeButtons();
+      if (btnCeDrawModeCierre) {
+        btnCeDrawModeCierre.classList.toggle('active', cierreDrawState.drawTarget === 'cierre');
+      }
+      if (btnCeDrawModeEvac) {
+        btnCeDrawModeEvac.classList.toggle('active', cierreDrawState.drawTarget === 'evac');
+      }
+      const cierreCount = cierreDrawState.cierrePuntos.length;
+      const validEvacs = cierreDrawState.evacuacionRutas.filter((r) => Array.isArray(r.puntos) && r.puntos.length >= 2).length;
+      const draftEvacs = cierreDrawState.evacuacionRutas.filter((r) => Array.isArray(r.puntos) && r.puntos.length > 0).length;
+      if (ceDrawStatsPill) {
+        ceDrawStatsPill.textContent = `${cierreCount} pts cierre · ${Math.max(validEvacs, draftEvacs)} salida(s)`;
+      }
+      if (ceDrawPlaceLabel) {
+        if (cierreCount > 0) {
+          const cent = computePointsCentroid(cierreDrawState.cierrePuntos);
+          const sectorLabel = formatGeoPlaceText(cent.lat, cent.lng, 'full');
+          ceDrawPlaceLabel.textContent = cierreDrawState.drawTarget === 'cierre'
+            ? `🔴 Trazando cierre (${cierreDrawState.cierreModo}) · ${sectorLabel}`
+            : `🟢 Trazando evacuación/paso #${Math.max(1, cierreDrawState.activeEvacIndex + 1)} · ${sectorLabel}`;
+        } else {
+          ceDrawPlaceLabel.textContent = cierreDrawState.drawTarget === 'cierre'
+            ? '🔴 Toca o desliza el dedo en el mapa para trazar el cierre'
+            : '🟢 Toca o desliza el dedo para trazar la ruta de evacuación/paso';
+        }
+      }
+      if (ceGeometrySummaryBadge) {
+        if (cierreCount < 2) {
+          ceGeometrySummaryBadge.innerHTML = 'Sin trazado válido aún · Dibuja al menos 2 puntos del cierre (<strong>rojo</strong>) y las rutas de salida (<strong>verde</strong>).';
+          ceGeometrySummaryBadge.style.borderColor = 'rgba(71,85,105,0.7)';
+        } else {
+          const cent = computePointsCentroid(cierreDrawState.cierrePuntos);
+          const sectorHtml = formatGeoPlaceHtml(cent.lat, cent.lng, 'full');
+          ceGeometrySummaryBadge.innerHTML = `🔴 <strong>${cierreCount} pts</strong> (${cierreDrawState.cierreModo}) · 🟢 <strong>${validEvacs} ruta(s) evacuación/paso</strong> · 📍 ${sectorHtml}`;
+          ceGeometrySummaryBadge.style.borderColor = 'rgba(168,85,247,0.72)';
+        }
+      }
+    }
+
+    function renderCierreDraftPreview() {
+      if (!cierreEventoDraftLayer) return;
+      cierreEventoDraftLayer.clearLayers();
+      if (cierreDrawState.cierrePuntos.length >= 2) {
+        const latlngs = cierreDrawState.cierrePuntos.map((p) => [p.lat, p.lng]);
+        if (cierreDrawState.cierreModo === 'cuadrante' && latlngs.length >= 3) {
+          L.polygon(latlngs, {
+            color: '#ef4444',
+            weight: 4,
+            opacity: 0.96,
+            dashArray: '8, 5',
+            fillColor: '#f97316',
+            fillOpacity: 0.28,
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+        } else {
+          L.polyline(latlngs, {
+            color: '#450a0a',
+            weight: 10,
+            opacity: 0.5,
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+          L.polyline(latlngs, {
+            color: '#ef4444',
+            weight: 6,
+            opacity: 0.95,
+            dashArray: '10, 6',
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+        }
+      } else if (cierreDrawState.cierrePuntos.length === 1) {
+        const p0 = cierreDrawState.cierrePuntos[0];
+        L.circleMarker([p0.lat, p0.lng], {
+          radius: 7,
+          color: '#ffffff',
+          weight: 2,
+          fillColor: '#ef4444',
+          fillOpacity: 0.95,
+          interactive: false
+        }).addTo(cierreEventoDraftLayer);
+      }
+
+      cierreDrawState.evacuacionRutas.forEach((route) => {
+        const pts = Array.isArray(route && route.puntos) ? route.puntos : [];
+        if (pts.length >= 2) {
+          const latlngs = pts.map((p) => [p.lat, p.lng]);
+          L.polyline(latlngs, {
+            color: '#022c22',
+            weight: 9,
+            opacity: 0.45,
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+          L.polyline(latlngs, {
+            color: '#10b981',
+            weight: 5,
+            opacity: 0.95,
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+          L.polyline(latlngs, {
+            color: '#22d3ee',
+            weight: 2.2,
+            opacity: 0.9,
+            dashArray: '6, 8',
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+        } else if (pts.length === 1) {
+          L.circleMarker([pts[0].lat, pts[0].lng], {
+            radius: 6,
+            color: '#ffffff',
+            weight: 2,
+            fillColor: '#10b981',
+            fillOpacity: 0.95,
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+        }
+      });
+    }
+
+    function appendCierreDrawPoint(lat, lng, isDrag = false) {
+      if (!hasValidatedAdminPermission() || !cierreDrawState.isDrawing) return false;
+      const latNum = Number(lat);
+      const lngNum = Number(lng);
+      if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) return false;
+
+      if (cierreDrawState.drawTarget === 'cierre') {
+        const pts = cierreDrawState.cierrePuntos;
+        if (pts.length > 0) {
+          const last = pts[pts.length - 1];
+          const dist = calcularDistanciaMetros(last.lat, last.lng, latNum, lngNum);
+          if (dist < (isDrag ? 18 : 6)) return false;
+        }
+        if (pts.length >= 80) return false;
+        pts.push({ lat: Number(latNum.toFixed(6)), lng: Number(lngNum.toFixed(6)) });
+      } else {
+        if (
+          cierreDrawState.activeEvacIndex < 0 ||
+          !cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex]
+        ) {
+          if (cierreDrawState.evacuacionRutas.length >= 8) {
+            showToast('Máximo 8 rutas de evacuación/paso por evento.');
+            return false;
+          }
+          cierreDrawState.evacuacionRutas.push({
+            nombre: `Ruta salida ${cierreDrawState.evacuacionRutas.length + 1}`,
+            puntos: []
+          });
+          cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+        }
+        const routeObj = cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex];
+        const pts = routeObj.puntos;
+        if (pts.length > 0) {
+          const last = pts[pts.length - 1];
+          const dist = calcularDistanciaMetros(last.lat, last.lng, latNum, lngNum);
+          if (dist < (isDrag ? 18 : 6)) return false;
+        }
+        if (pts.length >= 60) return false;
+        pts.push({ lat: Number(latNum.toFixed(6)), lng: Number(lngNum.toFixed(6)) });
+      }
+
+      renderCierreDraftPreview();
+      syncCierreDrawDockUI();
+      return true;
+    }
+
+    function enterCierreDrawMode(target = 'cierre') {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Cierre Evento es exclusivo para administradores autorizados.');
+        return false;
+      }
+      if (typeof window.closeCeposJoystick === 'function' && window.__anthiGetCeposJoystickState && window.__anthiGetCeposJoystickState().activeReportId) {
+        window.closeCeposJoystick(false);
+      }
+      if (isReactionMapModeActive && typeof stopReactionMapMode === 'function') {
+        stopReactionMapMode(false);
+      }
+      if (adminPanelModal) adminPanelModal.classList.remove('open');
+      if (modal) modal.classList.remove('open');
+
+      cierreDrawState.isDrawing = true;
+      cierreDrawState.drawTarget = target === 'evac' ? 'evac' : 'cierre';
+      if (
+        cierreDrawState.drawTarget === 'evac' &&
+        (cierreDrawState.activeEvacIndex < 0 ||
+          (cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex] &&
+            cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex].puntos.length >= 2))
+      ) {
+        if (cierreDrawState.evacuacionRutas.length < 8) {
+          cierreDrawState.evacuacionRutas.push({
+            nombre: `Ruta salida ${cierreDrawState.evacuacionRutas.length + 1}`,
+            puntos: []
+          });
+          cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+        }
+      }
+
+      if (bottomPanelEl) bottomPanelEl.style.display = 'none';
+      if (cierreEventoDrawDock) {
+        cierreEventoDrawDock.classList.add('visible');
+        cierreEventoDrawDock.setAttribute('aria-hidden', 'false');
+      }
+      if (map && map.dragging && typeof map.dragging.disable === 'function') {
+        map.dragging.disable();
+      }
+      if (map && typeof map.getContainer === 'function') {
+        map.getContainer().style.cursor = 'crosshair';
+      }
+      renderCierreDraftPreview();
+      syncCierreDrawDockUI();
+      showToast(
+        cierreDrawState.drawTarget === 'cierre'
+          ? '🔴 Traza con el dedo o tocando puntos el tramo o cuadrante cerrado.'
+          : '🟢 Traza con el dedo o tocando puntos la ruta de evacuación / paso.'
+      );
+      return true;
+    }
+
+    function exitCierreDrawMode(reopenAdminForm = false) {
+      cierreDrawState.isDrawing = false;
+      cierreDrawState.drawPointerId = null;
+      if (map && map.dragging && typeof map.dragging.enable === 'function') {
+        map.dragging.enable();
+      }
+      if (map && typeof map.getContainer === 'function') {
+        map.getContainer().style.cursor = '';
+      }
+      if (cierreEventoDrawDock) {
+        cierreEventoDrawDock.classList.remove('visible');
+        cierreEventoDrawDock.setAttribute('aria-hidden', 'true');
+      }
+      const ceposOpen = typeof window.__anthiGetCeposJoystickState === 'function' && window.__anthiGetCeposJoystickState().activeReportId;
+      if (bottomPanelEl && !ceposOpen) {
+        bottomPanelEl.style.display = '';
+      }
+      syncCierreDrawDockUI();
+      if (reopenAdminForm && hasValidatedAdminPermission() && typeof openAdminPanelModal === 'function') {
+        openAdminPanelModal('control');
+        setTimeout(() => {
+          const box = document.getElementById('adminCierresEventoBox');
+          if (box && typeof box.scrollIntoView === 'function') {
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 120);
+      }
+    }
+
+    function resetCierreEventoForm() {
+      editingCierreEventoId = null;
+      cierreDrawState.cierreModo = 'tramo';
+      cierreDrawState.cierrePuntos = [];
+      cierreDrawState.evacuacionRutas = [];
+      cierreDrawState.activeEvacIndex = -1;
+      if (ceTituloInput) ceTituloInput.value = '';
+      if (ceMensajeInput) ceMensajeInput.value = '';
+      if (ceStartInput) ceStartInput.value = '';
+      if (ceEndInput) ceEndInput.value = '';
+      ensureDefaultCierreScheduleInputs(4);
+      if (btnSaveCierreEvento) btnSaveCierreEvento.textContent = '🏟️ Publicar Cierre Evento';
+      if (btnCancelEditCierreEvento) btnCancelEditCierreEvento.style.display = 'none';
+      if (cierreEventoDraftLayer) cierreEventoDraftLayer.clearLayers();
+      syncCierreDrawDockUI();
+    }
+
+    function focusCierreEventoOnMap(ev) {
+      if (!ev) return;
+      const pts = [];
+      sanitizeCierrePointsList(ev.cierrePuntos).forEach((p) => pts.push([p.lat, p.lng]));
+      sanitizeEvacRoutesList(ev.evacuacionRutas).forEach((r) => {
+        r.puntos.forEach((p) => pts.push([p.lat, p.lng]));
+      });
+      isFollowingUser = false;
+      if (pts.length >= 2 && map && typeof map.fitBounds === 'function') {
+        try {
+          map.fitBounds(L.latLngBounds(pts), { padding: [48, 95], maxZoom: 17, animate: true });
+          return;
+        } catch (e) {}
+      }
+      const cLat = Number(ev.centerLat);
+      const cLng = Number(ev.centerLng);
+      if (Number.isFinite(cLat) && Number.isFinite(cLng) && map) {
+        map.setView([cLat, cLng], 16, { animate: true });
+      }
+    }
+
+    function renderCierreEventoBanner(visibleEvents) {
+      if (!cierreEventoBanner) return;
+      const list = Array.isArray(visibleEvents) ? visibleEvents : [];
+      if (list.length === 0) {
+        activeBannerCierreId = null;
+        cierreEventoBanner.classList.remove('visible');
+        return;
+      }
+      const nowMs = Date.now();
+      const sorted = [...list].sort((a, b) => {
+        const aLive = nowMs >= Number(a.startsAtMs) && nowMs <= Number(a.endsAtMs);
+        const bLive = nowMs >= Number(b.startsAtMs) && nowMs <= Number(b.endsAtMs);
+        if (aLive !== bLive) return aLive ? -1 : 1;
+        return Number(a.startsAtMs) - Number(b.startsAtMs);
+      });
+      const top = sorted[0];
+      if (!top || (dismissedCierreBannerId && String(dismissedCierreBannerId) === String(top.id))) {
+        activeBannerCierreId = top ? String(top.id) : null;
+        cierreEventoBanner.classList.remove('visible');
+        return;
+      }
+
+      activeBannerCierreId = String(top.id);
+      const placeLabel = top.sector && String(top.sector).trim()
+        ? String(top.sector).trim()
+        : formatGeoPlaceText(top.centerLat, top.centerLng, 'full');
+      const evacCount = sanitizeEvacRoutesList(top.evacuacionRutas).length;
+      const schedLabel = getCierreScheduleLabel(top, nowMs);
+
+      if (cierreEventoBannerTitle) {
+        cierreEventoBannerTitle.textContent = `🏟️ ${top.titulo || 'Cierre Evento'} · ${placeLabel}`;
+      }
+      if (cierreEventoBannerMsg) {
+        cierreEventoBannerMsg.textContent = top.mensaje || 'Observa en el mapa las rutas de cierre (rojo) y evacuación/paso (verde).';
+      }
+      if (cierreEventoBannerMeta) {
+        cierreEventoBannerMeta.innerHTML = `
+          <span>${escapeHtml(schedLabel)}</span>
+          <span class="cierre-legend-pill cierre">🔴 Cierre</span>
+          <span class="cierre-legend-pill evac">🟢 ${evacCount} salida(s)</span>
+          <span class="cierre-legend-pill nosonar">🔕 Sin sónar</span>
+        `;
+      }
+      cierreEventoBanner.classList.add('visible');
+    }
+
+    function renderCierresEventoOnMap() {
+      if (!cierreEventosLayer) return;
+      cierreEventosLayer.clearLayers();
+      const nowMs = Date.now();
+      const visibleEvents = (Array.isArray(allCierresEvento) ? allCierresEvento : []).filter((ev) =>
+        isCierreEventoVisibleToDrivers(ev, nowMs)
+      );
+
+      visibleEvents.forEach((ev) => {
+        const cierrePts = sanitizeCierrePointsList(ev.cierrePuntos);
+        const evacRoutes = sanitizeEvacRoutesList(ev.evacuacionRutas);
+        const isCuadrante = ev.cierreModo === 'cuadrante' && cierrePts.length >= 3;
+        const center = (Number.isFinite(Number(ev.centerLat)) && Number.isFinite(Number(ev.centerLng)))
+          ? { lat: Number(ev.centerLat), lng: Number(ev.centerLng) }
+          : computePointsCentroid(cierrePts);
+        const placeHtml = formatGeoPlaceHtml(center.lat, center.lng, 'full');
+        const schedLabel = getCierreScheduleLabel(ev, nowMs);
+
+        const popupHtml = `
+          <div class="popup-card">
+            <span class="popup-badge" style="background:linear-gradient(135deg,#9333ea,#db2777);display:inline-flex;align-items:center;gap:5px;">
+              ${getReportCategorySvg('Cierre Evento', 15)}<span>Cierre Evento · ${escapeHtml(ev.titulo || 'Evento')}</span>
+            </span>
+            <div style="margin:6px 0;display:flex;flex-wrap:wrap;gap:4px;">
+              <span class="cierre-legend-pill nosonar">${escapeHtml(schedLabel)}</span>
+              <span class="cierre-legend-pill nosonar">🔕 Sin sónar</span>
+            </div>
+            <div style="font-size:12px;color:#f8fafc;line-height:1.4;margin-bottom:6px;">
+              ${escapeHtml(ev.mensaje || '')}
+            </div>
+            <div class="cierre-legend-row" style="margin-bottom:6px;">
+              <span class="cierre-legend-pill cierre">🔴 ${isCuadrante ? 'Cuadrante cerrado' : 'Tramo cerrado'}</span>
+              <span class="cierre-legend-pill evac">🟢 ${evacRoutes.length} ruta(s) evacuación/paso</span>
+            </div>
+            <div class="popup-meta">📍 ${placeHtml}</div>
+            ${hasValidatedAdminPermission() ? `
+              <div class="popup-admin-bar" style="margin-top:8px;">
+                <button type="button" class="popup-vote-btn edit" onclick="window.startEditCierreEvento('${escapeHtml(ev.id)}')">✏️ Editar Cierre Evento (Admin)</button>
+                <button type="button" class="popup-vote-btn delete" onclick="window.deleteCierreEvento('${escapeHtml(ev.id)}')">🗑️ Eliminar Cierre Evento (Admin)</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        if (cierrePts.length >= 2) {
+          const latlngs = cierrePts.map((p) => [p.lat, p.lng]);
+          if (isCuadrante) {
+            const poly = L.polygon(latlngs, {
+              color: '#ef4444',
+              weight: 3.5,
+              opacity: 0.95,
+              fillColor: '#f97316',
+              fillOpacity: 0.25
+            });
+            poly.bindPopup(popupHtml);
+            poly.addTo(cierreEventosLayer);
+          } else {
+            L.polyline(latlngs, {
+              color: '#450a0a',
+              weight: 10,
+              opacity: 0.55,
+              interactive: false
+            }).addTo(cierreEventosLayer);
+            const line = L.polyline(latlngs, {
+              color: '#ef4444',
+              weight: 6,
+              opacity: 0.95,
+              dashArray: '10, 6'
+            });
+            line.bindPopup(popupHtml);
+            line.addTo(cierreEventosLayer);
+          }
+        }
+
+        evacRoutes.forEach((route, idx) => {
+          const latlngs = route.puntos.map((p) => [p.lat, p.lng]);
+          L.polyline(latlngs, {
+            color: '#022c22',
+            weight: 9,
+            opacity: 0.48,
+            interactive: false
+          }).addTo(cierreEventosLayer);
+          const evacLine = L.polyline(latlngs, {
+            color: '#10b981',
+            weight: 5,
+            opacity: 0.96
+          });
+          evacLine.bindPopup(`
+            <div class="popup-card">
+              <span class="popup-badge" style="background:#059669;">↪️ Evacuación / Paso Alterno</span>
+              <div style="font-size:12px;font-weight:800;color:#a7f3d0;margin:4px 0;">${escapeHtml(route.nombre || `Ruta salida ${idx + 1}`)}</div>
+              <div style="font-size:11px;color:#cbd5e1;">Corredor habilitado para salir o rodear el cierre de <strong>${escapeHtml(ev.titulo || 'Evento')}</strong>.</div>
+            </div>
+          `);
+          evacLine.addTo(cierreEventosLayer);
+          L.polyline(latlngs, {
+            color: '#22d3ee',
+            weight: 2.3,
+            opacity: 0.9,
+            dashArray: '6, 9',
+            interactive: false
+          }).addTo(cierreEventosLayer);
+
+          const midPt = route.puntos[Math.floor(route.puntos.length / 2)];
+          if (midPt) {
+            const evacBadge = L.marker([midPt.lat, midPt.lng], {
+              zIndexOffset: 410,
+              icon: L.divIcon({
+                className: 'custom-pin',
+                html: `<div style="padding:2px 6px;border-radius:999px;background:#059669;color:#ecfdf5;border:1.5px solid #a7f3d0;font-size:9.5px;font-weight:900;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.5);">↪️ Paso</div>`,
+                iconSize: [52, 20],
+                iconAnchor: [26, 10]
+              })
+            });
+            evacBadge.bindPopup(`
+              <div class="popup-card">
+                <span class="popup-badge" style="background:#059669;">↪️ Ruta de Evacuación / Paso</span>
+                <div style="font-size:12px;font-weight:800;color:#a7f3d0;">${escapeHtml(route.nombre || `Ruta salida ${idx + 1}`)}</div>
+              </div>
+            `);
+            evacBadge.addTo(cierreEventosLayer);
+          }
+        });
+
+        const iconPin = L.divIcon({
+          className: 'custom-pin',
+          html: `<div style="
+            position:relative;
+            width:42px;height:42px;border-radius:50%;
+            background:linear-gradient(135deg,#9333ea,#db2777);
+            border:2.5px solid #ffffff;
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 0 0 2px rgba(239,68,68,0.75), 0 5px 15px rgba(0,0,0,0.65);
+          ">${getReportCategorySvg('Cierre Evento', 24)}<span style="position:absolute;top:-6px;right:-6px;padding:1px 4px;border-radius:999px;background:#0f172a;color:#e9d5ff;border:1.5px solid #c084fc;font-size:8.5px;line-height:1.1;font-weight:900;">🔕</span></div>`,
+          iconSize: [42, 42],
+          iconAnchor: [21, 21],
+          popupAnchor: [0, -21]
+        });
+        const centerMarker = L.marker([center.lat, center.lng], {
+          icon: iconPin,
+          zIndexOffset: 620
+        });
+        centerMarker.bindPopup(popupHtml);
+        centerMarker.addTo(cierreEventosLayer);
+      });
+
+      renderCierreEventoBanner(visibleEvents);
+    }
+
+    function renderAdminCierresEventoList() {
+      if (!adminCierresEventoList) return;
+      adminCierresEventoList.innerHTML = '';
+      if (!hasValidatedAdminPermission()) {
+        adminCierresEventoList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Exclusivo para administradores autorizados.</div>';
+        return;
+      }
+      const list = Array.isArray(allCierresEvento) ? allCierresEvento : [];
+      if (list.length === 0) {
+        adminCierresEventoList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay cierres por eventos programados.</div>';
+        return;
+      }
+
+      const nowMs = Date.now();
+      list.forEach((ev) => {
+        const evacCount = sanitizeEvacRoutesList(ev.evacuacionRutas).length;
+        const sched = getCierreScheduleLabel(ev, nowMs);
+        const placeHtml = formatGeoPlaceHtml(ev.centerLat, ev.centerLng, 'full');
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-radius:9px;background:rgba(15,23,42,0.9);border:1px solid rgba(168,85,247,0.45);';
+
+        const info = document.createElement('div');
+        info.style.cssText = 'min-width:0;flex:1;';
+        info.innerHTML = `
+          <div style="font-size:11.5px;font-weight:800;color:#f3e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            🏟️ ${escapeHtml(ev.titulo || 'Evento')}
+          </div>
+          <div style="font-size:10px;color:#c4b5fd;font-weight:700;">
+            ${escapeHtml(sched)} · 🟢 ${evacCount} salida(s)
+          </div>
+          <div style="font-size:10px;color:#94a3b8;">
+            📍 ${placeHtml}
+          </div>
+        `;
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:4px;flex-shrink:0;';
+
+        const goBtn = document.createElement('button');
+        goBtn.type = 'button';
+        goBtn.textContent = '📍';
+        goBtn.title = 'Ver en mapa';
+        goBtn.style.cssText = 'border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        goBtn.addEventListener('click', () => {
+          if (adminPanelModal) adminPanelModal.classList.remove('open');
+          focusCierreEventoOnMap(ev);
+        });
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.textContent = ev.activo !== false ? '⏸️' : '▶️';
+        toggleBtn.title = ev.activo !== false ? 'Pausar / ocultar cierre' : 'Activar cierre';
+        toggleBtn.style.cssText = 'border:1px solid rgba(168,85,247,0.5);background:rgba(88,28,135,0.35);color:#e9d5ff;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        toggleBtn.addEventListener('click', () => {
+          window.toggleCierreEventoActive(ev.id, ev.activo === false);
+        });
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.textContent = '✏️';
+        editBtn.title = 'Editar cierre y rutas';
+        editBtn.style.cssText = 'border:1px solid rgba(56,189,248,0.5);background:rgba(14,165,233,0.18);color:#bae6fd;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        editBtn.addEventListener('click', () => {
+          window.startEditCierreEvento(ev.id);
+        });
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.textContent = '🗑️';
+        delBtn.title = 'Eliminar Cierre Evento';
+        delBtn.style.cssText = 'border:1px solid rgba(239,68,68,0.55);background:rgba(127,29,29,0.55);color:#fecaca;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
+        delBtn.addEventListener('click', () => {
+          window.deleteCierreEvento(ev.id);
+        });
+
+        actions.appendChild(goBtn);
+        actions.appendChild(toggleBtn);
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        row.appendChild(info);
+        row.appendChild(actions);
+        adminCierresEventoList.appendChild(row);
+      });
+    }
+
+    function refreshCierresEventoUI() {
+      ensureDefaultCierreScheduleInputs(4);
+      syncCierreDrawDockUI();
+      renderCierresEventoOnMap();
+      renderAdminCierresEventoList();
+    }
+
+    window.__anthiRefreshCierresEventoUI = refreshCierresEventoUI;
+    window.__anthiIsCierreEventoTipo = isCierreEventoTipo;
+    window.__anthiIsCierreEventoVisible = isCierreEventoVisibleToDrivers;
+    window.__anthiIsCierreDrawing = () => Boolean(cierreDrawState.isDrawing);
+    window.__anthiAppendCierreDrawPoint = appendCierreDrawPoint;
+    window.__anthiExitCierreDrawMode = exitCierreDrawMode;
+    window.__anthiFocusCierreEventoById = (eventoId) => {
+      const target = (allCierresEvento || []).find((e) => String(e.id) === String(eventoId));
+      if (target) focusCierreEventoOnMap(target);
+    };
+
+    window.openCierreEventoStudio = function openCierreEventoStudio() {
+      if (!hasValidatedAdminPermission()) {
+        showToast('⛔ Cierre Evento es exclusivo para administradores autorizados.');
+        return false;
+      }
+      if (typeof openAdminPanelModal === 'function') {
+        openAdminPanelModal('control');
+        setTimeout(() => {
+          const box = document.getElementById('adminCierresEventoBox');
+          if (box && typeof box.scrollIntoView === 'function') {
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          if (ceTituloInput) ceTituloInput.focus();
+        }, 120);
+      }
+      return true;
+    };
+
+    window.startEditCierreEvento = function startEditCierreEvento(eventoId) {
+      if (!hasValidatedAdminPermission() || !eventoId) return false;
+      const ev = (allCierresEvento || []).find((item) => String(item.id) === String(eventoId));
+      if (!ev) {
+        showToast('No se encontró ese Cierre Evento.');
+        return false;
+      }
+      editingCierreEventoId = String(ev.id);
+      cierreDrawState.cierreModo = ev.cierreModo === 'cuadrante' ? 'cuadrante' : 'tramo';
+      cierreDrawState.cierrePuntos = sanitizeCierrePointsList(ev.cierrePuntos);
+      cierreDrawState.evacuacionRutas = sanitizeEvacRoutesList(ev.evacuacionRutas);
+      cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+      if (ceTituloInput) ceTituloInput.value = String(ev.titulo || '');
+      if (ceMensajeInput) ceMensajeInput.value = String(ev.mensaje || '');
+      if (ceStartInput && Number.isFinite(Number(ev.startsAtMs))) {
+        ceStartInput.value = toLocalDatetimeInputValue(ev.startsAtMs);
+      }
+      if (ceEndInput && Number.isFinite(Number(ev.endsAtMs))) {
+        ceEndInput.value = toLocalDatetimeInputValue(ev.endsAtMs);
+      }
+      if (btnSaveCierreEvento) btnSaveCierreEvento.textContent = '💾 Actualizar Cierre Evento';
+      if (btnCancelEditCierreEvento) btnCancelEditCierreEvento.style.display = 'inline-flex';
+      renderCierreDraftPreview();
+      syncCierreDrawDockUI();
+      if (typeof openAdminPanelModal === 'function') {
+        openAdminPanelModal('control');
+        setTimeout(() => {
+          const box = document.getElementById('adminCierresEventoBox');
+          if (box && typeof box.scrollIntoView === 'function') {
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 120);
+      }
+      return true;
+    };
+
+    window.toggleCierreEventoActive = async function toggleCierreEventoActive(eventoId, nextActive) {
+      if (!hasValidatedAdminPermission() || !eventoId) return;
+      try {
+        const user = await ensureAuthenticated();
+        if (!isAuthorizedAdminEmail(user)) return;
+        await withTimeout(
+          updateDoc(doc(db, CIERRES_EVENTO_COLLECTION, eventoId), {
+            activo: Boolean(nextActive),
+            updatedAt: serverTimestamp()
+          }),
+          15000
+        );
+        showToast(nextActive ? '▶️ Cierre Evento activado en el mapa.' : '⏸️ Cierre Evento pausado.');
+      } catch (err) {
+        showToast('No se pudo cambiar el estado del Cierre Evento.');
+        handleFirestoreError(err, OperationType.UPDATE, `${CIERRES_EVENTO_COLLECTION}/${eventoId}`);
+      }
+    };
+
+    window.deleteCierreEvento = async function deleteCierreEvento(eventoId) {
+      if (!hasValidatedAdminPermission() || !eventoId) return;
+      try {
+        const user = await ensureAuthenticated();
+        if (!isAuthorizedAdminEmail(user)) return;
+        await withTimeout(deleteDoc(doc(db, CIERRES_EVENTO_COLLECTION, eventoId)), 15000);
+        if (editingCierreEventoId === String(eventoId)) {
+          resetCierreEventoForm();
+        }
+        allCierresEvento = allCierresEvento.filter((item) => String(item.id) !== String(eventoId));
+        saveCachedCierresEvento(allCierresEvento);
+        refreshCierresEventoUI();
+        showToast('🗑️ Cierre Evento eliminado definitivamente.');
+      } catch (err) {
+        showToast('No se pudo eliminar el Cierre Evento.');
+        handleFirestoreError(err, OperationType.DELETE, `${CIERRES_EVENTO_COLLECTION}/${eventoId}`);
+      }
+    };
+
+    function startCierresEventoListener() {
+      if (cierresEventoUnsubscribe) return;
+      try {
+        const q = query(collection(db, CIERRES_EVENTO_COLLECTION), limit(50));
+        cierresEventoUnsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const list = [];
+            snapshot.forEach((docSnap) => {
+              const data = docSnap.data() || {};
+              list.push({
+                id: docSnap.id,
+                ...data
+              });
+            });
+            list.sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+            allCierresEvento = list;
+            saveCachedCierresEvento(list);
+            refreshCierresEventoUI();
+          },
+          (error) => {
+            console.warn('Error escuchando cierres_evento:', error);
+            refreshCierresEventoUI();
+          }
+        );
+      } catch (e) {
+        refreshCierresEventoUI();
+      }
+    }
+    window.__anthiStartCierresEventoListener = startCierresEventoListener;
+
+    if (btnFocusCierreBanner) {
+      btnFocusCierreBanner.addEventListener('click', () => {
+        const ev = (allCierresEvento || []).find((e) => String(e.id) === String(activeBannerCierreId));
+        if (ev) focusCierreEventoOnMap(ev);
+      });
+    }
+    if (cierreEventoBannerMain) {
+      cierreEventoBannerMain.addEventListener('click', () => {
+        const ev = (allCierresEvento || []).find((e) => String(e.id) === String(activeBannerCierreId));
+        if (ev) focusCierreEventoOnMap(ev);
+      });
+    }
+    if (btnDismissCierreBanner) {
+      btnDismissCierreBanner.addEventListener('click', () => {
+        dismissedCierreBannerId = activeBannerCierreId;
+        if (cierreEventoBanner) cierreEventoBanner.classList.remove('visible');
+      });
+    }
+
+    document.querySelectorAll('[data-ce-form-shape], [data-ce-draw-shape]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const shape = btn.dataset.ceFormShape || btn.dataset.ceDrawShape;
+        cierreDrawState.cierreModo = shape === 'cuadrante' ? 'cuadrante' : 'tramo';
+        renderCierreDraftPreview();
+        syncCierreDrawDockUI();
+      });
+    });
+
+    if (btnCeTraceClosure) {
+      btnCeTraceClosure.addEventListener('click', () => enterCierreDrawMode('cierre'));
+    }
+    if (btnCeTraceEvac) {
+      btnCeTraceEvac.addEventListener('click', () => enterCierreDrawMode('evac'));
+    }
+    if (btnCeDrawModeCierre) {
+      btnCeDrawModeCierre.addEventListener('click', () => {
+        cierreDrawState.drawTarget = 'cierre';
+        syncCierreDrawDockUI();
+      });
+    }
+    if (btnCeDrawModeEvac) {
+      btnCeDrawModeEvac.addEventListener('click', () => {
+        cierreDrawState.drawTarget = 'evac';
+        if (
+          cierreDrawState.activeEvacIndex < 0 ||
+          (cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex] &&
+            cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex].puntos.length >= 2)
+        ) {
+          if (cierreDrawState.evacuacionRutas.length < 8) {
+            cierreDrawState.evacuacionRutas.push({
+              nombre: `Ruta salida ${cierreDrawState.evacuacionRutas.length + 1}`,
+              puntos: []
+            });
+            cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+          }
+        }
+        syncCierreDrawDockUI();
+      });
+    }
+    if (btnCeNewEvacRoute) {
+      btnCeNewEvacRoute.addEventListener('click', () => {
+        if (cierreDrawState.evacuacionRutas.length >= 8) {
+          showToast('Máximo 8 rutas de evacuación/paso por evento.');
+          return;
+        }
+        cierreDrawState.drawTarget = 'evac';
+        cierreDrawState.evacuacionRutas.push({
+          nombre: `Ruta salida ${cierreDrawState.evacuacionRutas.length + 1}`,
+          puntos: []
+        });
+        cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+        syncCierreDrawDockUI();
+        showToast(`🟢 Traza ahora la Ruta de salida #${cierreDrawState.activeEvacIndex + 1}.`);
+      });
+    }
+    if (btnCeDrawUndo) {
+      btnCeDrawUndo.addEventListener('click', () => {
+        if (cierreDrawState.drawTarget === 'cierre') {
+          cierreDrawState.cierrePuntos.pop();
+        } else if (cierreDrawState.activeEvacIndex >= 0 && cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex]) {
+          const r = cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex];
+          r.puntos.pop();
+          if (r.puntos.length === 0) {
+            cierreDrawState.evacuacionRutas.splice(cierreDrawState.activeEvacIndex, 1);
+            cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+          }
+        }
+        renderCierreDraftPreview();
+        syncCierreDrawDockUI();
+      });
+    }
+    if (btnCeDrawClear) {
+      btnCeDrawClear.addEventListener('click', () => {
+        if (cierreDrawState.drawTarget === 'cierre') {
+          cierreDrawState.cierrePuntos = [];
+        } else {
+          cierreDrawState.evacuacionRutas = [];
+          cierreDrawState.activeEvacIndex = -1;
+        }
+        renderCierreDraftPreview();
+        syncCierreDrawDockUI();
+      });
+    }
+    if (btnCeDrawExit) {
+      btnCeDrawExit.addEventListener('click', () => exitCierreDrawMode(false));
+    }
+    if (btnCeDrawBackForm) {
+      btnCeDrawBackForm.addEventListener('click', () => exitCierreDrawMode(true));
+    }
+
+    document.querySelectorAll('[data-ce-msg-preset]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!ceMensajeInput) return;
+        const tipo = btn.dataset.ceMsgPreset;
+        const cent = cierreDrawState.cierrePuntos.length > 0
+          ? computePointsCentroid(cierreDrawState.cierrePuntos)
+          : { lat: Number(map.getCenter().lat), lng: Number(map.getCenter().lng) };
+        const sectorLabel = formatGeoPlaceText(cent.lat, cent.lng, 'barrio');
+        ceMensajeInput.value = tipo === 'deportivo'
+          ? `Evento deportivo en ${sectorLabel}. Observa en el mapa los cierres (rojo) y rutas de evacuación o paso (verde).`
+          : `Evento cívico/cultural en ${sectorLabel}. Evita el tramo rojo y usa las salidas alternas en verde.`;
+      });
+    });
+
+    document.querySelectorAll('[data-ce-duration-hours]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const hrs = Math.max(1, Number(btn.dataset.ceDurationHours || 4));
+        document.querySelectorAll('[data-ce-duration-hours]').forEach((b) => b.classList.toggle('active', b === btn));
+        const startParsed = ceStartInput && ceStartInput.value ? new Date(ceStartInput.value).getTime() : Date.now();
+        const startMs = Number.isFinite(startParsed) ? startParsed : Date.now();
+        if (ceStartInput && !ceStartInput.value) ceStartInput.value = toLocalDatetimeInputValue(startMs);
+        if (ceEndInput) ceEndInput.value = toLocalDatetimeInputValue(startMs + hrs * 3600000);
+      });
+    });
+
+    if (btnCancelEditCierreEvento) {
+      btnCancelEditCierreEvento.addEventListener('click', () => {
+        resetCierreEventoForm();
+        showToast('Edición de Cierre Evento cancelada.');
+      });
+    }
+
+    if (map && typeof map.getContainer === 'function') {
+      const mapElForCierre = map.getContainer();
+      if (mapElForCierre && typeof mapElForCierre.addEventListener === 'function') {
+        const isCierreDrawBlockedTarget = (target) => {
+          if (!target || typeof target.closest !== 'function') return false;
+          return Boolean(target.closest('.cierre-draw-dock, .leaflet-popup, .map-controls, .top-bar, .gps-hud, .bottom-panel'));
+        };
+        const pointerToCierreLatLng = (ev) => {
+          const rect = mapElForCierre.getBoundingClientRect();
+          if (!rect || typeof map.containerPointToLatLng !== 'function') return null;
+          return map.containerPointToLatLng(L.point(ev.clientX - rect.left, ev.clientY - rect.top));
+        };
+        mapElForCierre.addEventListener('pointerdown', (ev) => {
+          if (!cierreDrawState.isDrawing || !hasValidatedAdminPermission()) return;
+          if (ev.isPrimary === false || isCierreDrawBlockedTarget(ev.target)) return;
+          const ll = pointerToCierreLatLng(ev);
+          if (!ll) return;
+          ev.preventDefault();
+          cierreDrawState.drawPointerId = ev.pointerId;
+          if (typeof mapElForCierre.setPointerCapture === 'function') {
+            try { mapElForCierre.setPointerCapture(ev.pointerId); } catch (e) {}
+          }
+          appendCierreDrawPoint(ll.lat, ll.lng, false);
+        });
+        mapElForCierre.addEventListener('pointermove', (ev) => {
+          if (!cierreDrawState.isDrawing || cierreDrawState.drawPointerId !== ev.pointerId) return;
+          if (!hasValidatedAdminPermission()) return;
+          const ll = pointerToCierreLatLng(ev);
+          if (!ll) return;
+          ev.preventDefault();
+          appendCierreDrawPoint(ll.lat, ll.lng, true);
+        });
+        const finishCierreStroke = (ev) => {
+          if (cierreDrawState.drawPointerId !== ev.pointerId) return;
+          cierreDrawState.drawPointerId = null;
+          renderCierreDraftPreview();
+          syncCierreDrawDockUI();
+        };
+        mapElForCierre.addEventListener('pointerup', finishCierreStroke);
+        mapElForCierre.addEventListener('pointercancel', finishCierreStroke);
+      }
+    }
+
+    if (adminCierreEventoForm) {
+      adminCierreEventoForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!hasValidatedAdminPermission()) {
+          showToast('⛔ Cierre Evento es exclusivo para administradores autorizados.');
+          return;
+        }
+        const titulo = (ceTituloInput ? ceTituloInput.value : '').trim().slice(0, 80);
+        const mensaje = (ceMensajeInput ? ceMensajeInput.value : '').trim().slice(0, 320);
+        const cierreModo = cierreDrawState.cierreModo === 'cuadrante' ? 'cuadrante' : 'tramo';
+        const cierrePuntos = sanitizeCierrePointsList(cierreDrawState.cierrePuntos, 80);
+        const evacuacionRutas = sanitizeEvacRoutesList(cierreDrawState.evacuacionRutas);
+        const startsAtMs = ceStartInput && ceStartInput.value ? Math.round(new Date(ceStartInput.value).getTime()) : 0;
+        const endsAtMs = ceEndInput && ceEndInput.value ? Math.round(new Date(ceEndInput.value).getTime()) : 0;
+
+        if (titulo.length < 2) {
+          showToast('Escribe el nombre corto del evento.');
+          return;
+        }
+        if (cierrePuntos.length < (cierreModo === 'cuadrante' ? 3 : 2)) {
+          showToast(
+            cierreModo === 'cuadrante'
+              ? '🔴 Traza al menos 3 puntos en el mapa para cerrar el cuadrante.'
+              : '🔴 Traza al menos 2 puntos en el mapa para marcar el tramo cerrado.'
+          );
+          return;
+        }
+        if (mensaje.length < 4) {
+          showToast('Escribe un mensaje informativo corto para los conductores.');
+          return;
+        }
+        if (!Number.isFinite(startsAtMs) || !Number.isFinite(endsAtMs) || endsAtMs <= startsAtMs) {
+          showToast('Configura un horario válido donde el fin sea posterior al inicio.');
+          return;
+        }
+
+        const center = computePointsCentroid(cierrePuntos);
+        const sector = String(formatGeoPlaceText(center.lat, center.lng, 'full') || 'Bucaramanga').slice(0, 120);
+        const isEditing = Boolean(editingCierreEventoId);
+
+        if (btnSaveCierreEvento) {
+          btnSaveCierreEvento.disabled = true;
+          btnSaveCierreEvento.textContent = isEditing ? 'Actualizando cierre...' : 'Publicando cierre...';
+        }
+        try {
+          const user = await ensureAuthenticated();
+          if (!isAuthorizedAdminEmail(user)) {
+            showToast(`⛔ Requiere sesión con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+            return;
+          }
+          if (isEditing) {
+            await withTimeout(
+              updateDoc(doc(db, CIERRES_EVENTO_COLLECTION, editingCierreEventoId), {
+                titulo,
+                sector,
+                mensaje,
+                cierreModo,
+                cierrePuntos,
+                evacuacionRutas,
+                centerLat: center.lat,
+                centerLng: center.lng,
+                startsAtMs,
+                endsAtMs,
+                activo: true,
+                sinSonar: true,
+                updatedAt: serverTimestamp()
+              }),
+              15000
+            );
+            showToast(`💾 Cierre Evento «${titulo}» actualizado (sin sónar).`);
+          } else {
+            await withTimeout(
+              addDoc(collection(db, CIERRES_EVENTO_COLLECTION), {
+                titulo,
+                sector,
+                mensaje,
+                cierreModo,
+                cierrePuntos,
+                evacuacionRutas,
+                centerLat: center.lat,
+                centerLng: center.lng,
+                startsAtMs,
+                endsAtMs,
+                activo: true,
+                sinSonar: true,
+                createdBy: user.uid,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+              }),
+              15000
+            );
+            showToast(`🏟️ Cierre Evento «${titulo}» publicado en el mapa (sin sónar).`);
+          }
+          dismissedCierreBannerId = null;
+          resetCierreEventoForm();
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') return;
+          if (err && err.code === 'permission-denied') {
+            showToast(`⛔ Firestore exige sesión verificada con correo Admin (${ADMIN_EMAILS.join(' o ')}).`);
+          } else {
+            showToast('No se pudo guardar el Cierre Evento.');
+          }
+          handleFirestoreError(err, isEditing ? OperationType.UPDATE : OperationType.CREATE, CIERRES_EVENTO_COLLECTION);
+        } finally {
+          if (btnSaveCierreEvento) {
+            btnSaveCierreEvento.disabled = false;
+            btnSaveCierreEvento.textContent = editingCierreEventoId ? '💾 Actualizar Cierre Evento' : '🏟️ Publicar Cierre Evento';
+          }
+        }
+      });
+    }
+
+    setInterval(() => {
+      renderCierresEventoOnMap();
+    }, 30000);
+    refreshCierresEventoUI();
+
+    // =========================================================================
     // 11B. SISTEMA VIP POR CÓDIGO Y NIVELES DIFERENCIADOS (ADMIN GENERAL INTOCABLE)
     // =========================================================================
     const vipModal = document.getElementById('vipModal');
@@ -14271,6 +15789,7 @@
         if (typeof window.__anthiUpdateReactionCoordsBadge === 'function') window.__anthiUpdateReactionCoordsBadge();
         if (typeof window.__anthiRefreshAgentPointsUI === 'function') window.__anthiRefreshAgentPointsUI();
         if (typeof window.__anthiUpdateAgentCoordsBadge === 'function') window.__anthiUpdateAgentCoordsBadge();
+        if (typeof window.__anthiRefreshCierresEventoUI === 'function') window.__anthiRefreshCierresEventoUI();
         syncAdminVipCodesSubscription();
       }
     }
@@ -14302,6 +15821,9 @@
       }
       if (typeof window.__anthiUpdateAgentCoordsBadge === 'function') {
         window.__anthiUpdateAgentCoordsBadge();
+      }
+      if (typeof window.__anthiRefreshCierresEventoUI === 'function') {
+        window.__anthiRefreshCierresEventoUI();
       }
       if (adminPanelModal) adminPanelModal.classList.add('open');
     }

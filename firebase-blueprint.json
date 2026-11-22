@@ -525,6 +525,101 @@
         "eliminadoPorRol",
         "eliminadoAt"
       ]
+    },
+    "CierreEvento": {
+      "title": "CierreEvento",
+      "description": "Cierre vial por evento deportivo o cívico con tramo/cuadrante cerrado, rutas de evacuación/paso y horario configurable (exclusivo Admin, sin sónar).",
+      "type": "object",
+      "properties": {
+        "titulo": {
+          "type": "string",
+          "description": "Nombre corto del evento o cierre (ej: Carrera Atlética 10K).",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "sector": {
+          "type": "string",
+          "description": "Barrio o sector legible donde ocurre el evento (sin coordenadas crudas).",
+          "maxLength": 120
+        },
+        "mensaje": {
+          "type": "string",
+          "description": "Aviso informativo corto para los conductores.",
+          "minLength": 4,
+          "maxLength": 320
+        },
+        "cierreModo": {
+          "type": "string",
+          "enum": ["tramo", "cuadrante"],
+          "description": "Tipo de geometría de cierre: tramo lineal o cuadrante poligonal."
+        },
+        "cierrePuntos": {
+          "type": "array",
+          "description": "Lista de puntos {lat, lng} del tramo o cuadrante cerrado.",
+          "minItems": 2,
+          "maxItems": 80
+        },
+        "evacuacionRutas": {
+          "type": "array",
+          "description": "Rutas de evacuación, cruce o paso alterno ({nombre, puntos}).",
+          "maxItems": 8
+        },
+        "centerLat": {
+          "type": "number",
+          "description": "Latitud central del cierre del evento."
+        },
+        "centerLng": {
+          "type": "number",
+          "description": "Longitud central del cierre del evento."
+        },
+        "startsAtMs": {
+          "type": "integer",
+          "description": "Inicio programado del cierre en milisegundos epoch."
+        },
+        "endsAtMs": {
+          "type": "integer",
+          "description": "Fin programado del cierre en milisegundos epoch."
+        },
+        "activo": {
+          "type": "boolean",
+          "description": "Estado de publicación del cierre evento."
+        },
+        "sinSonar": {
+          "type": "boolean",
+          "description": "Marca explícita de que el cierre de evento nunca dispara sónar."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "UID del administrador que creó el evento."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de creación del servidor."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de última actualización del servidor."
+        }
+      },
+      "required": [
+        "titulo",
+        "sector",
+        "mensaje",
+        "cierreModo",
+        "cierrePuntos",
+        "evacuacionRutas",
+        "centerLat",
+        "centerLng",
+        "startsAtMs",
+        "endsAtMs",
+        "activo",
+        "sinSonar",
+        "createdBy",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -575,6 +670,10 @@
     "/codigos_vip/{codeId}/canjes/{userId}": {
       "schema": { "$ref": "#/entities/CanjeVip" },
       "description": "Auditoría de canjes por usuario para cada código VIP."
+    },
+    "/cierres_evento/{eventoId}": {
+      "schema": { "$ref": "#/entities/CierreEvento" },
+      "description": "Cierres por eventos deportivos o cívicos con rutas de evacuación y horario configurable (solo Admin)."
     }
   }
 }

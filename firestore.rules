@@ -260,6 +260,39 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    function isValidCierreEvento(data) {
+      return data.keys().hasAll([
+          'titulo', 'sector', 'mensaje', 'cierreModo', 'cierrePuntos',
+          'evacuacionRutas', 'centerLat', 'centerLng', 'startsAtMs', 'endsAtMs',
+          'activo', 'sinSonar', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'titulo', 'sector', 'mensaje', 'cierreModo', 'cierrePuntos',
+          'evacuacionRutas', 'centerLat', 'centerLng', 'startsAtMs', 'endsAtMs',
+          'activo', 'sinSonar', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.titulo is string && data.titulo.size() >= 2 && data.titulo.size() <= 80
+        && data.sector is string && data.sector.size() <= 120
+        && data.mensaje is string && data.mensaje.size() >= 4 && data.mensaje.size() <= 320
+        && (data.cierreModo == 'tramo' || data.cierreModo == 'cuadrante')
+        && data.cierrePuntos is list
+        && data.cierrePuntos.size() >= 2
+        && data.cierrePuntos.size() <= 80
+        && data.cierrePuntos[0] is map
+        && data.evacuacionRutas is list
+        && data.evacuacionRutas.size() <= 8
+        && (data.evacuacionRutas.size() == 0 || data.evacuacionRutas[0] is map)
+        && data.centerLat is number && data.centerLat >= -90 && data.centerLat <= 90
+        && data.centerLng is number && data.centerLng >= -180 && data.centerLng <= 180
+        && data.startsAtMs is int && data.startsAtMs > 0
+        && data.endsAtMs is int && data.endsAtMs > data.startsAtMs
+        && data.activo is bool
+        && data.sinSonar == true
+        && data.createdBy is string && isValidId(data.createdBy)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
     match /reportes/{reportId} {
       // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
       allow get: if isValidId(reportId);
@@ -295,6 +328,7 @@ service cloud.firestore {
           && incoming().confirmadoPor[0] == request.auth.uid
         ))
         && (!('expiresAt' in incoming()) || incoming().expiresAt <= request.time + duration.value(12, 'h'))
+        && (incoming().tipo != 'Cierre Evento' || isAdmin())
         && (incoming().isFixed == false || isAdmin());
 
       allow update: if isSignedIn()
@@ -645,6 +679,30 @@ service cloud.firestore {
         allow update: if false;
         allow delete: if isAdmin() && isValidId(codeId) && isValidId(userId);
       }
+    }
+
+    match /cierres_evento/{eventoId} {
+      // Zero-PII public road closure & evacuation geometry for drivers; creation, tracing, schedule & deletion strictly restricted to Admins
+      allow get: if isValidId(eventoId);
+      allow list: if request.query.limit != null && request.query.limit <= 50;
+      allow create: if isAdmin()
+        && isValidId(eventoId)
+        && isValidCierreEvento(incoming())
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(eventoId)
+        && isValidCierreEvento(incoming())
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'titulo', 'sector', 'mensaje', 'cierreModo', 'cierrePuntos',
+          'evacuacionRutas', 'centerLat', 'centerLng', 'startsAtMs', 'endsAtMs',
+          'activo', 'sinSonar', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(eventoId);
     }
   }
 }
