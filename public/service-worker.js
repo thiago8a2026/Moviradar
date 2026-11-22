@@ -1,5 +1,5 @@
 /* Service Worker Oficial de ANTHI (Radar Vial Antitodo) */
-const CACHE_NAME = 'anthi-pwa-v1';
+const CACHE_NAME = 'anthi-pwa-v2';
 const PRECACHE_URLS = [
   '/',
   '/icon.svg',
@@ -32,6 +32,15 @@ self.addEventListener('activate', (event) => {
         )
       )
       .then(() => self.clients.claim())
+      .then(() =>
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+          clients.forEach((client) => {
+            try {
+              client.postMessage({ type: 'AN_THI_SW_READY', ts: Date.now() });
+            } catch (e) {}
+          });
+        })
+      )
   );
 });
 
@@ -58,10 +67,34 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
+function buildAlertFocusUrl(payload) {
+  try {
+    const base = new URL((payload && payload.url) || '/', self.location.origin);
+    if (payload && payload.reportId) {
+      base.searchParams.set('alertId', String(payload.reportId));
+    }
+    const latNum = payload && payload.lat != null ? Number(payload.lat) : NaN;
+    const lngNum = payload && payload.lng != null ? Number(payload.lng) : NaN;
+    if (Number.isFinite(latNum) && Number.isFinite(lngNum)) {
+      base.searchParams.set('lat', String(latNum));
+      base.searchParams.set('lng', String(lngNum));
+    }
+    return base.pathname + base.search;
+  } catch (e) {
+    return '/';
+  }
+}
+
 async function showAnthiNativeNotification(payload) {
+  if (typeof Notification !== 'undefined' && Notification.permission && Notification.permission !== 'granted') {
+    return;
+  }
   const title = (payload && payload.title) || '⚠️ ¡Alerta ANTHI!';
-  const body = (payload && payload.body) || 'Novedad vial detectada a pocos metros de tu ubicación.';
+  const body = (payload && payload.body) || 'Novedad vial detectada en tu sector.';
   const tag = (payload && payload.tag) || 'anthi-radar-alert';
+  const isVip = Boolean(payload && payload.isVip);
+  const latNum = payload && payload.lat != null ? Number(payload.lat) : NaN;
+  const lngNum = payload && payload.lng != null ? Number(payload.lng) : NaN;
 
   const options = {
     body,
@@ -69,24 +102,38 @@ async function showAnthiNativeNotification(payload) {
     badge: '/icon.svg',
     tag,
     renotify: true,
-    requireInteraction: true,
-    vibrate: [280, 120, 280, 120, 420],
+    requireInteraction: payload && payload.requireInteraction === false ? false : true,
+    silent: false,
+    vibrate: Array.isArray(payload && payload.vibrate)
+      ? payload.vibrate
+      : (isVip ? [320, 110, 320, 110, 480] : [280, 120, 280, 120, 420]),
     data: {
-      url: '/',
-      reportId: payload && payload.reportId ? payload.reportId : null,
-      lat: payload && payload.lat ? payload.lat : null,
-      lng: payload && payload.lng ? payload.lng : null
+      url: buildAlertFocusUrl(payload),
+      reportId: payload && payload.reportId ? String(payload.reportId) : null,
+      lat: Number.isFinite(latNum) ? latNum : null,
+      lng: Number.isFinite(lngNum) ? lngNum : null,
+      tipo: payload && payload.tipo ? String(payload.tipo) : null,
+      isVip
     }
   };
 
-  return self.registration.showNotification(title, options);
+  try {
+    return await self.registration.showNotification(title, options);
+  } catch (err) {
+    return undefined;
+  }
 }
 
 self.addEventListener('message', (event) => {
   const data = event.data;
   if (!data || typeof data !== 'object') return;
 
-  if (data.type === 'AN_THI_ALERT') {
+  if (data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    return;
+  }
+
+  if (data.type === 'AN_THI_SHOW_NOTIFICATION' || data.type === 'AN_THI_ALERT') {
     event.waitUntil(showAnthiNativeNotification(data));
     return;
   }
@@ -101,7 +148,8 @@ self.addEventListener('message', (event) => {
     if (event.source && typeof event.source.postMessage === 'function') {
       event.source.postMessage({
         type: 'AN_THI_SW_ALIVE',
-        state: latestRadarState
+        state: latestRadarState,
+        ts: Date.now()
       });
     }
   }
@@ -151,23 +199,34 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const notifData = (event.notification && event.notification.data) || {};
+  const targetUrl = notifData.url || '/';
+
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
-        if ('focus' in client) {
-          client.focus();
-          client.postMessage({
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (clientList) => {
+      const origin = self.location.origin;
+      const sameOriginClients = clientList.filter((c) => !c.url || c.url.startsWith(origin));
+      const targetClient = sameOriginClients.find((c) => c.focused) || sameOriginClients[0] || clientList[0];
+
+      if (targetClient && typeof targetClient.focus === 'function') {
+        try {
+          await targetClient.focus();
+        } catch (e) {}
+        try {
+          targetClient.postMessage({
             type: 'AN_THI_FOCUS_ALERT',
             reportId: notifData.reportId || null,
-            lat: notifData.lat || null,
-            lng: notifData.lng || null
+            lat: notifData.lat != null ? notifData.lat : null,
+            lng: notifData.lng != null ? notifData.lng : null,
+            tipo: notifData.tipo || null
           });
-          return;
-        }
+        } catch (e) {}
+        return targetClient;
       }
+
       if (self.clients.openWindow) {
-        return self.clients.openWindow(notifData.url || '/');
+        return self.clients.openWindow(targetUrl);
       }
+      return undefined;
     })
   );
 });

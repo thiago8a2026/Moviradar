@@ -1435,6 +1435,112 @@
       border-color: #0f172a;
     }
 
+    .cepos-route-box {
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid rgba(250, 204, 21, 0.36);
+      border-radius: 12px;
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cepos-route-status {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #fde68a;
+      line-height: 1.3;
+    }
+
+    .cepos-route-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .cepos-route-btn {
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      background: rgba(30, 41, 59, 0.94);
+      color: #fef08a;
+      border-radius: 9px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1 1 auto;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .cepos-route-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+
+    .cepos-route-btn.active {
+      background: #facc15;
+      color: #0f172a;
+      border-color: #0f172a;
+    }
+
+    .cepos-route-btn.play {
+      border-color: rgba(16, 185, 129, 0.58);
+      background: rgba(6, 78, 59, 0.78);
+      color: #a7f3d0;
+    }
+
+    .cepos-route-btn.play.playing {
+      border-color: rgba(245, 158, 11, 0.72);
+      background: rgba(120, 53, 15, 0.85);
+      color: #fde68a;
+    }
+
+    .cepos-route-btn.clear-icon {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+      background: rgba(127, 29, 29, 0.42);
+    }
+
+    .cepos-route-speed-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .cepos-speed-btn {
+      border: 1px solid rgba(100, 116, 139, 0.5);
+      background: rgba(15, 23, 42, 0.85);
+      color: #cbd5e1;
+      border-radius: 7px;
+      padding: 3px 7px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .cepos-speed-btn.active {
+      background: #10b981;
+      color: #022c22;
+      border-color: #34d399;
+    }
+
+    .cepos-manual-deck-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cepos-manual-deck-wrapper.hidden {
+      display: none;
+    }
+
     .quick-actions-bar {
       pointer-events: auto;
       width: 100%;
@@ -3095,41 +3201,63 @@
 
       <div class="cepos-joystick-meta-row">
         <span class="cepos-joystick-coords" id="ceposJoystickCoords">📍 0.00000, 0.00000</span>
-        <button type="button" class="alert-admin-btn edit" id="btnCenterCeposJoystick" style="padding:3px 8px;font-size:10.5px;">🎯 Centrar</button>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <button type="button" class="alert-admin-btn edit" id="btnToggleCeposManualDeck" style="padding:3px 8px;font-size:10.5px;" title="Mostrar u ocultar joystick manual">🕹️ Joystick</button>
+          <button type="button" class="alert-admin-btn edit" id="btnCenterCeposJoystick" style="padding:3px 8px;font-size:10.5px;">🎯 Centrar</button>
+        </div>
       </div>
 
-      <div class="cepos-joystick-deck">
-        <div class="cepos-stick-pad" id="ceposStickPad" title="Arrastra suavemente para mover la camionetica de Cepos">
-          <div class="cepos-stick-crosshair"></div>
-          <div class="cepos-stick-knob" id="ceposStickKnob">
-            <svg width="20" height="20" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <path d="M3.2 18.8V10.6C3.2 8.9 4.4 7.8 6.1 7.8H16.6C17.8 7.8 18.8 8.3 19.6 9.3L22.3 12.2H24C25 12.2 25.6 12.9 25.6 14V18.8C25.6 19.7 24.9 20.3 24 20.3H4.6C3.8 20.3 3.2 19.7 3.2 18.8Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round"/>
-              <path d="M16.8 9.4H18.4L21.3 12.5H16.8V9.4Z" fill="#38bdf8" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
-              <circle cx="8.2" cy="20.6" r="2.8" fill="#0f172a"/>
-              <circle cx="20.4" cy="20.6" r="2.8" fill="#0f172a"/>
-            </svg>
+      <div class="cepos-route-box" id="ceposRouteBox">
+        <div class="cepos-route-status" id="ceposRouteStatusText">🛣️ Sin ruta trazada · Toca "Trazar ruta" para dibujar con el dedo</div>
+        <div class="cepos-route-actions">
+          <button type="button" class="cepos-route-btn" id="btnCeposDrawRoute">✏️ Trazar ruta</button>
+          <button type="button" class="cepos-route-btn play" id="btnCeposPlayPauseRoute" disabled>▶ Iniciar</button>
+          <button type="button" class="cepos-route-btn" id="btnCeposChangeRoute" title="Borrar ruta actual y trazar una nueva">🔄 Cambiar ruta</button>
+          <button type="button" class="cepos-route-btn clear-icon" id="btnCeposClearRoute" title="Limpiar trazo" aria-label="Limpiar ruta">🗑️</button>
+        </div>
+        <div class="cepos-route-speed-row">
+          <span class="cepos-steps-label">Ritmo ruta:</span>
+          <button type="button" class="cepos-speed-btn" data-cepos-speed-kmh="6">6 km/h</button>
+          <button type="button" class="cepos-speed-btn active" data-cepos-speed-kmh="10">10 km/h</button>
+          <button type="button" class="cepos-speed-btn" data-cepos-speed-kmh="15">15 km/h</button>
+          <button type="button" class="cepos-speed-btn" data-cepos-speed-kmh="22">22 km/h</button>
+        </div>
+      </div>
+
+      <div class="cepos-manual-deck-wrapper" id="ceposManualDeckWrapper">
+        <div class="cepos-joystick-deck">
+          <div class="cepos-stick-pad" id="ceposStickPad" title="Arrastra suavemente para mover la camionetica de Cepos">
+            <div class="cepos-stick-crosshair"></div>
+            <div class="cepos-stick-knob" id="ceposStickKnob">
+              <svg width="20" height="20" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <path d="M3.2 18.8V10.6C3.2 8.9 4.4 7.8 6.1 7.8H16.6C17.8 7.8 18.8 8.3 19.6 9.3L22.3 12.2H24C25 12.2 25.6 12.9 25.6 14V18.8C25.6 19.7 24.9 20.3 24 20.3H4.6C3.8 20.3 3.2 19.7 3.2 18.8Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M16.8 9.4H18.4L21.3 12.5H16.8V9.4Z" fill="#38bdf8" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+                <circle cx="8.2" cy="20.6" r="2.8" fill="#0f172a"/>
+                <circle cx="20.4" cy="20.6" r="2.8" fill="#0f172a"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="cepos-dpad-grid" id="ceposDpadGrid" aria-label="Cruceta direccional de Cepos">
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="-0.707" data-cepos-dy="0.707" aria-label="Noroeste">↖</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0" data-cepos-dy="1" aria-label="Norte">↑</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0.707" data-cepos-dy="0.707" aria-label="Noreste">↗</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="-1" data-cepos-dy="0" aria-label="Oeste">←</button>
+            <button type="button" class="cepos-dpad-btn cepos-dpad-center" id="btnFlushCeposJoystick" title="Guardar posición ahora" aria-label="Guardar posición">💾</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="1" data-cepos-dy="0" aria-label="Este">→</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="-0.707" data-cepos-dy="-0.707" aria-label="Suroeste">↙</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0" data-cepos-dy="-1" aria-label="Sur">↓</button>
+            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0.707" data-cepos-dy="-0.707" aria-label="Sureste">↘</button>
           </div>
         </div>
 
-        <div class="cepos-dpad-grid" id="ceposDpadGrid" aria-label="Cruceta direccional de Cepos">
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="-0.707" data-cepos-dy="0.707" aria-label="Noroeste">↖</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="0" data-cepos-dy="1" aria-label="Norte">↑</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="0.707" data-cepos-dy="0.707" aria-label="Noreste">↗</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="-1" data-cepos-dy="0" aria-label="Oeste">←</button>
-          <button type="button" class="cepos-dpad-btn cepos-dpad-center" id="btnFlushCeposJoystick" title="Guardar posición ahora" aria-label="Guardar posición">💾</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="1" data-cepos-dy="0" aria-label="Este">→</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="-0.707" data-cepos-dy="-0.707" aria-label="Suroeste">↙</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="0" data-cepos-dy="-1" aria-label="Sur">↓</button>
-          <button type="button" class="cepos-dpad-btn" data-cepos-dx="0.707" data-cepos-dy="-0.707" aria-label="Sureste">↘</button>
+        <div class="cepos-steps-row">
+          <span class="cepos-steps-label">Paso joystick:</span>
+          <button type="button" class="cepos-step-btn" data-cepos-step="10">10 m</button>
+          <button type="button" class="cepos-step-btn active" data-cepos-step="25">25 m</button>
+          <button type="button" class="cepos-step-btn" data-cepos-step="50">50 m</button>
+          <button type="button" class="cepos-step-btn" data-cepos-step="100">100 m</button>
         </div>
-      </div>
-
-      <div class="cepos-steps-row">
-        <span class="cepos-steps-label">Paso / Velocidad:</span>
-        <button type="button" class="cepos-step-btn" data-cepos-step="10">10 m</button>
-        <button type="button" class="cepos-step-btn active" data-cepos-step="25">25 m</button>
-        <button type="button" class="cepos-step-btn" data-cepos-step="50">50 m</button>
-        <button type="button" class="cepos-step-btn" data-cepos-step="100">100 m</button>
       </div>
     </div>
 
@@ -3456,6 +3584,11 @@
           Estado actual: Usuario estándar. Ingresa un código VIP para activar beneficios de publicación en primera instancia.
         </div>
 
+        <button type="button" class="sonar-toggle-card sonar-on" id="btnToggleBgNotificationsVip" data-bg-notif-toggle="true" style="margin-bottom:10px;" title="Activar o silenciar notificaciones emergentes cuando ANTHI está en segundo plano">
+          <span>🔔 Alertas VIP en 2.º plano</span>
+          <span class="sonar-toggle-pill">Activas</span>
+        </button>
+
         <form id="vipRedeemForm" style="margin-bottom:12px;">
           <label class="form-label" for="vipCodeRedeemInput">Canjear Código VIP</label>
           <div style="display:flex;gap:8px;align-items:center;">
@@ -3641,6 +3774,10 @@
               <span id="btnVipIcon">🎟️</span><span id="btnVipSubLabel">VIP</span>
             </button>
           </div>
+          <button type="button" class="sonar-toggle-card sonar-on" id="btnToggleBgNotificationsAuth" data-bg-notif-toggle="true" style="margin-bottom:8px;" title="Activar o silenciar notificaciones emergentes cuando ANTHI está en segundo plano">
+            <span>🔔 Alertas en 2.º plano</span>
+            <span class="sonar-toggle-pill">Activas</span>
+          </button>
           <button type="button" class="btn-submit" id="btnAuthOpenQrModal" style="min-height:40px;font-size:12px;background:rgba(15,23,42,0.92);border:1px solid rgba(34,211,238,0.55);color:#67e8f9;display:flex;align-items:center;justify-content:center;gap:7px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -4388,30 +4525,92 @@
 
   <script>
     window.__anthiSwRegistration = null;
+    window.__anthiPendingFocusAlert = null;
 
-    window.requestAnthiNotificationPermission = function requestAnthiNotificationPermission() {
+    (function parseInitialDeepLinkAlert() {
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        var alertId = params.get('alertId');
+        var latRaw = params.get('lat');
+        var lngRaw = params.get('lng');
+        var latNum = latRaw != null ? Number(latRaw) : NaN;
+        var lngNum = lngRaw != null ? Number(lngRaw) : NaN;
+        if (alertId || (Number.isFinite(latNum) && Number.isFinite(lngNum))) {
+          window.__anthiPendingFocusAlert = {
+            reportId: alertId || null,
+            lat: Number.isFinite(latNum) ? latNum : null,
+            lng: Number.isFinite(lngNum) ? lngNum : null
+          };
+          params.delete('alertId');
+          params.delete('lat');
+          params.delete('lng');
+          var nextQuery = params.toString();
+          var cleanUrl = window.location.pathname + (nextQuery ? ('?' + nextQuery) : '') + (window.location.hash || '');
+          if (window.history && typeof window.history.replaceState === 'function') {
+            window.history.replaceState({}, document.title, cleanUrl);
+          }
+        }
+      } catch (e) {}
+    })();
+
+    window.requestAnthiNotificationPermission = function requestAnthiNotificationPermission(opts) {
       if (typeof window === 'undefined' || !('Notification' in window)) {
         return Promise.resolve('unsupported');
       }
       if (Notification.permission !== 'default') {
+        if (typeof window.__anthiUpdateBgNotifUI === 'function') {
+          window.__anthiUpdateBgNotifUI();
+        }
         return Promise.resolve(Notification.permission);
       }
       try {
-        return Notification.requestPermission().catch(function() { return 'default'; });
-      } catch (e) {
-        return Promise.resolve('default');
-      }
+        var resPromise = Notification.requestPermission();
+        if (resPromise && typeof resPromise.then === 'function') {
+          return resPromise.then(function(perm) {
+            if (typeof window.__anthiUpdateBgNotifUI === 'function') {
+              window.__anthiUpdateBgNotifUI();
+            }
+            return perm;
+          }).catch(function() {
+            return Notification.permission || 'default';
+          });
+        }
+      } catch (e) {}
+      return Promise.resolve(Notification.permission || 'default');
     };
 
-    if ('Notification' in window && Notification.permission === 'default') {
-      window.requestAnthiNotificationPermission();
-      var retryNotifOnGesture = function() {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+      var onFirstInteractiveClick = function() {
+        try {
+          if (sessionStorage.getItem('anthi_notif_prompted_once') === '1') return;
+          sessionStorage.setItem('anthi_notif_prompted_once', '1');
+        } catch (e) {}
         if ('Notification' in window && Notification.permission === 'default') {
-          window.requestAnthiNotificationPermission();
+          window.requestAnthiNotificationPermission({ interactive: true });
         }
       };
-      document.addEventListener('pointerdown', retryNotifOnGesture, { once: true, passive: true });
+      document.addEventListener('click', onFirstInteractiveClick, { once: true, passive: true });
     }
+
+    window.__anthiGetReadySwRegistration = async function getReadyAnthiSwRegistration() {
+      if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return null;
+      if (window.__anthiSwRegistration && window.__anthiSwRegistration.active) {
+        return window.__anthiSwRegistration;
+      }
+      try {
+        var readyPromise = navigator.serviceWorker.ready;
+        var timeoutPromise = new Promise(function(resolve) {
+          setTimeout(function() { resolve(window.__anthiSwRegistration || null); }, 2000);
+        });
+        var resolved = await Promise.race([readyPromise, timeoutPromise]);
+        if (resolved) {
+          window.__anthiSwRegistration = resolved;
+        }
+        return resolved || window.__anthiSwRegistration || null;
+      } catch (e) {
+        return window.__anthiSwRegistration || null;
+      }
+    };
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -4422,12 +4621,28 @@
         });
       }).catch(function() {});
 
-      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/', updateViaCache: 'none' })
         .then(function(reg) {
           window.__anthiSwRegistration = reg;
+          if (reg.waiting) {
+            try { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
+          }
+          reg.addEventListener('updatefound', function() {
+            var newWorker = reg.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener('statechange', function() {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                try { newWorker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
+              }
+            });
+          });
           if ('periodicSync' in reg && reg.periodicSync && typeof reg.periodicSync.register === 'function') {
             reg.periodicSync.register('anthi-radar-sync', { minInterval: 60000 }).catch(function() {});
           }
+          return navigator.serviceWorker.ready;
+        })
+        .then(function(readyReg) {
+          if (readyReg) window.__anthiSwRegistration = readyReg;
         })
         .catch(function(err) {
           console.warn('No se pudo registrar el Service Worker de ANTHI:', err);
@@ -4438,8 +4653,15 @@
         if (!msg || typeof msg !== 'object') return;
         if (msg.type === 'AN_THI_SW_TICK' && typeof window.__anthiOnBackgroundTick === 'function') {
           window.__anthiOnBackgroundTick();
-        } else if (msg.type === 'AN_THI_FOCUS_ALERT' && typeof window.__anthiFocusAlertById === 'function') {
-          window.__anthiFocusAlertById(msg.reportId, msg.lat, msg.lng);
+        } else if (msg.type === 'AN_THI_FOCUS_ALERT') {
+          window.__anthiPendingFocusAlert = {
+            reportId: msg.reportId || null,
+            lat: msg.lat != null ? Number(msg.lat) : null,
+            lng: msg.lng != null ? Number(msg.lng) : null
+          };
+          if (typeof window.__anthiFocusAlertById === 'function') {
+            window.__anthiFocusAlertById(msg.reportId, msg.lat, msg.lng, false);
+          }
         }
       });
     }
@@ -4610,7 +4832,9 @@
       PICO_HUD_COLLAPSED: 'anthi_pico_hud_collapsed_v1',
       PICO_CALIBRATION: 'anthi_pico_calibration_v1',
       REACTION_POINTS: 'anthi_reaction_points_v1',
-      VIP_PROFILE: 'anthi_vip_profile_v1'
+      VIP_PROFILE: 'anthi_vip_profile_v1',
+      BG_NOTIFS: 'anthi_bg_notifs_v1',
+      NOTIFIED_ALERTS: 'anthi_notified_alerts_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -4752,6 +4976,7 @@
     const reactionZonesLayer = L.layerGroup().addTo(map);
     const reactionPreviewLayer = L.layerGroup().addTo(map);
     const agentZonesLayer = L.layerGroup().addTo(map);
+    const ceposRouteLayer = L.layerGroup().addTo(map);
     const REACTION_POINTS_COLLECTION = 'puntos_reaccion_inmediata';
     const LEGACY_REACTION_POINTS_COLLECTION = 'puntos_reaccion';
     let reactionPointsPrimary = [];
@@ -5035,6 +5260,9 @@
 
       if (typeof updateAuthUI === 'function') {
         updateAuthUI(user);
+      }
+      if (typeof window.__anthiUpdateBgNotifUI === 'function') {
+        window.__anthiUpdateBgNotifUI();
       }
       if (window.__anthiReportModalReady && typeof updateDuplicateGuardPreview === 'function') {
         updateDuplicateGuardPreview();
@@ -5794,7 +6022,7 @@
           const adminActions = document.createElement('div');
           adminActions.className = 'alert-list-admin-actions';
 
-          if (isCeposTipo(tipoTexto)) {
+          if (isCeposTipo(tipoStr)) {
             const joystickBtn = document.createElement('button');
             joystickBtn.type = 'button';
             joystickBtn.className = 'alert-admin-btn edit';
@@ -6660,6 +6888,9 @@
         closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
+        if (typeof window.requestAnthiNotificationPermission === 'function') {
+          window.requestAnthiNotificationPermission({ interactive: true });
+        }
       } catch (err) {
         console.error('Error en Firebase Auth:', err);
         showAuthError(mapFirebaseAuthError(err));
@@ -6681,6 +6912,9 @@
         closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
+        if (typeof window.requestAnthiNotificationPermission === 'function') {
+          window.requestAnthiNotificationPermission({ interactive: true });
+        }
         showToast('¡Sesión única con Google activada en este dispositivo!');
       } catch (err) {
         console.error('Error en acceso rápido con Google:', err);
@@ -7167,6 +7401,13 @@
           updateNetworkAndSyncStatus();
           if (typeof window.__anthiRefreshAdminReportsUI === 'function') {
             window.__anthiRefreshAdminReportsUI();
+          }
+          if (typeof evaluarNotificacionesSegundoPlanoSnapshot === 'function') {
+            evaluarNotificacionesSegundoPlanoSnapshot(visibleReports);
+          }
+          if (window.__anthiPendingFocusAlert && typeof window.__anthiFocusAlertById === 'function') {
+            const pendingTarget = window.__anthiPendingFocusAlert;
+            window.__anthiFocusAlertById(pendingTarget.reportId, pendingTarget.lat, pendingTarget.lng, true);
           }
           if (activeRouteDestination && typeof evaluarAlertasEnRutaActual === 'function') {
             evaluarAlertasEnRutaActual(false);
@@ -8442,17 +8683,73 @@
     let selectedDestEmoji = '📍';
 
     const SONAR_REPEAT_INTERVAL_MS = 30000;
-    const BACKGROUND_PUSH_REPEAT_MS = 30000;
+    const BACKGROUND_PUSH_REPEAT_MS = 180000;
+    const NOTIFIED_ALERT_TTL_MS = 6 * 60 * 60 * 1000;
+    const VIP_BG_PROXIMITY_RADIUS_METERS = 1500;
+    const VIP_CEPOS_PROXIMITY_RADIUS_METERS = 2500;
+    const STANDARD_BG_SNAPSHOT_RADIUS_METERS = 1200;
 
-    // Sintetizador Web Audio API para el sonido de Sónar de Submarino
+    // Sintetizador Web Audio API para el sonido de Sónar de Submarino + Motor de Notificaciones en 2.º Plano
     const sonarToggleButtons = Array.from(document.querySelectorAll('[data-sonar-toggle="true"]'));
+    const bgNotifToggleButtons = Array.from(document.querySelectorAll('[data-bg-notif-toggle="true"]'));
     let sonarAudioCtx = null;
     let isSonarAudioEnabled = safeReadJson(STORAGE_KEYS.SONAR_AUDIO, true) !== false;
+    let isBgNotificationsEnabled = safeReadJson(STORAGE_KEYS.BG_NOTIFS, true) !== false;
     let lastSonarPingAt = 0;
     let lastNearbySonarAt = 0;
     let lastNearbySonarSignature = '';
-    let lastBackgroundPushAt = 0;
-    let lastBackgroundPushSignature = '';
+
+    const knownSnapshotReportStates = new Map();
+    let hasSeededInitialSnapshotStates = false;
+
+    function loadPersistedNotifiedAlertsMap() {
+      const raw = safeReadJson(STORAGE_KEYS.NOTIFIED_ALERTS, {});
+      const map = new Map();
+      const nowMs = Date.now();
+      if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+        Object.keys(raw).forEach((id) => {
+          const entry = raw[id];
+          if (!entry || typeof entry !== 'object') return;
+          const ts = Number(entry.ts || 0);
+          if (nowMs - ts <= NOTIFIED_ALERT_TTL_MS) {
+            map.set(String(id), {
+              tier: String(entry.tier || 'active'),
+              ts,
+              lat: Number.isFinite(Number(entry.lat)) ? Number(entry.lat) : null,
+              lng: Number.isFinite(Number(entry.lng)) ? Number(entry.lng) : null
+            });
+          }
+        });
+      }
+      return map;
+    }
+
+    const notifiedAlerts = loadPersistedNotifiedAlertsMap();
+
+    function savePersistedNotifiedAlertsMap() {
+      const nowMs = Date.now();
+      const entries = [];
+      notifiedAlerts.forEach((val, key) => {
+        if (val && nowMs - Number(val.ts || 0) <= NOTIFIED_ALERT_TTL_MS) {
+          entries.push([key, val]);
+        } else {
+          notifiedAlerts.delete(key);
+        }
+      });
+      entries.sort((a, b) => Number(b[1].ts || 0) - Number(a[1].ts || 0));
+      const trimmed = entries.slice(0, 220);
+      if (entries.length > 220) {
+        notifiedAlerts.clear();
+        trimmed.forEach(([k, v]) => notifiedAlerts.set(k, v));
+      }
+      const obj = {};
+      trimmed.forEach(([k, v]) => {
+        obj[k] = v;
+      });
+      try {
+        localStorage.setItem(STORAGE_KEYS.NOTIFIED_ALERTS, JSON.stringify(obj));
+      } catch (e) {}
+    }
 
     function ensureSonarAudioContext() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -8486,6 +8783,103 @@
           btn.title = 'Audio Sónar silenciado (toca para activar)';
         }
       });
+    }
+
+    function updateBgNotificationsButtonUI() {
+      const supported = typeof window !== 'undefined' && 'Notification' in window;
+      const perm = supported ? Notification.permission : 'unsupported';
+      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
+
+      bgNotifToggleButtons.forEach((btn) => {
+        const isVipBtn = btn.id === 'btnToggleBgNotificationsVip';
+        const baseLabel = isVipBtn || activeVip ? '🔔 Alertas VIP en 2.º plano' : '🔔 Alertas en 2.º plano';
+
+        if (!supported) {
+          btn.innerHTML = `<span>🔕 ${baseLabel.replace('🔔 ', '')}</span><span class="sonar-toggle-pill">No disp.</span>`;
+          btn.classList.remove('sonar-on');
+          btn.classList.add('sonar-muted');
+        } else if (perm === 'denied') {
+          btn.innerHTML = `<span>⛔ ${baseLabel.replace('🔔 ', '')}</span><span class="sonar-toggle-pill">Bloqueado</span>`;
+          btn.classList.remove('sonar-on');
+          btn.classList.add('sonar-muted');
+        } else if (perm === 'default') {
+          btn.innerHTML = `<span>🔔 ${baseLabel.replace('🔔 ', '')}</span><span class="sonar-toggle-pill">Activar</span>`;
+          btn.classList.remove('sonar-on');
+          btn.classList.remove('sonar-muted');
+        } else if (isBgNotificationsEnabled) {
+          btn.innerHTML = `<span>${baseLabel}</span><span class="sonar-toggle-pill">Activas</span>`;
+          btn.classList.add('sonar-on');
+          btn.classList.remove('sonar-muted');
+        } else {
+          btn.innerHTML = `<span>🔕 ${baseLabel.replace('🔔 ', '')}</span><span class="sonar-toggle-pill">Pausadas</span>`;
+          btn.classList.remove('sonar-on');
+          btn.classList.add('sonar-muted');
+        }
+      });
+    }
+    window.__anthiUpdateBgNotifUI = updateBgNotificationsButtonUI;
+
+    function isAppInBackground() {
+      if (typeof document === 'undefined') return false;
+      if (document.visibilityState === 'hidden' || document.hidden) return true;
+      if (typeof document.hasFocus === 'function' && !document.hasFocus()) return true;
+      return false;
+    }
+
+    function hasUsableUserGps() {
+      if (gpsPermissionDenied) return false;
+      return Boolean(hasKnownRealGps || (latestGps && !latestGps.isDefault));
+    }
+
+    function canDispatchBackgroundNotification() {
+      if (!isBgNotificationsEnabled) return false;
+      if (typeof window === 'undefined' || !('Notification' in window)) return false;
+      return Notification.permission === 'granted';
+    }
+
+    function getReportAlertTier(rep) {
+      if (!rep) return 'pending';
+      if (Boolean(rep.isFixed) || getConfirmCount(rep) >= 3) return 'firm';
+      if (getConfirmCount(rep) === 2) return 'active';
+      return 'pending';
+    }
+
+    function isVipBackgroundPriorityAlert(rep, activeVip) {
+      if (!rep || !activeVip) return false;
+      const tipo = rep.tipo || rep.type || '';
+      if (isReactionPointEligibleTipo(tipo) || isCeposTipo(tipo)) return true;
+      return getReportAlertTier(rep) === 'firm';
+    }
+
+    function shouldNotifyAlert(rep, tier, opts = {}) {
+      if (!rep || !rep.id) return false;
+      const key = String(rep.id);
+      const prev = notifiedAlerts.get(key);
+      if (!prev) return true;
+      if (tier === 'firm' && prev.tier !== 'firm') return true;
+      const rLat = Number(rep.lat);
+      const rLng = Number(rep.lng);
+      if (isCeposTipo(rep.tipo || rep.type) && Number.isFinite(rLat) && Number.isFinite(rLng) && Number.isFinite(prev.lat) && Number.isFinite(prev.lng)) {
+        const movedMeters = calcularDistanciaMetros(prev.lat, prev.lng, rLat, rLng);
+        if (movedMeters >= 120 && Date.now() - Number(prev.ts || 0) >= 20000) {
+          return true;
+        }
+      }
+      if (opts.allowCooldownRepeat && Date.now() - Number(prev.ts || 0) >= BACKGROUND_PUSH_REPEAT_MS) {
+        return true;
+      }
+      return false;
+    }
+
+    function markAlertNotified(rep, tier) {
+      if (!rep || !rep.id) return;
+      notifiedAlerts.set(String(rep.id), {
+        tier: tier || getReportAlertTier(rep),
+        ts: Date.now(),
+        lat: Number.isFinite(Number(rep.lat)) ? Number(rep.lat) : null,
+        lng: Number.isFinite(Number(rep.lng)) ? Number(rep.lng) : null
+      });
+      savePersistedNotifiedAlertsMap();
     }
 
     function scheduleSonarOscillators(ctx) {
@@ -8546,69 +8940,246 @@
       }
     }
 
-    function sendAnthiBackgroundPush(closestHit, totalNearbyCount) {
-      if (!closestHit || !closestHit.rep) return;
-      if (typeof window === 'undefined' || !('Notification' in window)) return;
-      if (Notification.permission !== 'granted') return;
+    async function dispatchAnthiBackgroundNotification(rep, context = {}) {
+      if (!rep || !canDispatchBackgroundNotification()) return false;
 
-      const rep = closestHit.rep;
-      const meta = getTipoMeta(rep.tipo || rep.type || 'Novedad');
-      const distMeters = Math.round(closestHit.dist);
-      const desc = String(rep.descripcion || '').trim();
-      const extraSuffix = totalNearbyCount > 1 ? ` (+${totalNearbyCount - 1} alerta(s) cerca)` : '';
-      const title = '⚠️ ¡Alerta ANTHI!';
-      const body = `${meta.emoji} ${meta.label} a ${distMeters} m de tu ubicación${desc ? ` · ${desc}` : ''}${extraSuffix}`;
+      const tipoStr = rep.tipo || rep.type || 'Novedad';
+      const meta = getTipoMeta(tipoStr);
+      const tier = getReportAlertTier(rep);
+      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
+      const isVipUser = Boolean(activeVip);
+
+      const distNum = Number(context.distMeters);
+      const distLabel = Number.isFinite(distNum)
+        ? (distNum >= 1000 ? `a ${(distNum / 1000).toFixed(1)} km` : `a ${Math.round(distNum)} m`)
+        : 'en tu sector';
+      const extraCount = Number(context.totalNearbyCount || 1) > 1
+        ? ` (+${Number(context.totalNearbyCount) - 1} alerta(s))`
+        : '';
+      const tierTag = Boolean(rep.isFixed)
+        ? 'Oficial Fija'
+        : tier === 'firm'
+        ? 'Firme'
+        : tier === 'active'
+        ? 'Activa 2/3'
+        : 'Reciente';
+      const desc = String(rep.descripcion || rep.description || '').trim();
+
+      const vipPrefix = isVipUser
+        ? (activeVip.tipoVip === 'fundador'
+            ? '🏅 Alerta VIP · '
+            : activeVip.tipoVip === 'rastreo_cepos' && isCeposTipo(tipoStr)
+            ? '🛡️ Alerta VIP Cepos · '
+            : '⭐ Alerta VIP · ')
+        : '⚠️ ¡Alerta ANTHI! · ';
+
+      const title = `${vipPrefix}${meta.emoji} ${meta.label}`;
+      const body = `${tierTag} ${distLabel}${desc ? ` · ${desc}` : ''}${extraCount}`;
+      const rLat = Number(rep.lat);
+      const rLng = Number(rep.lng);
+      const safeLat = Number.isFinite(rLat) ? rLat : null;
+      const safeLng = Number.isFinite(rLng) ? rLng : null;
+      const notifTag = `anthi-alert-${rep.id || 'nearby'}`;
 
       const payload = {
-        type: 'AN_THI_ALERT',
+        type: 'AN_THI_SHOW_NOTIFICATION',
         title,
         body,
-        tag: `anthi-alert-${rep.id || 'nearby'}`,
-        reportId: rep.id || null,
-        lat: Number(rep.lat) || null,
-        lng: Number(rep.lng) || null
+        tag: notifTag,
+        reportId: rep.id ? String(rep.id) : null,
+        lat: safeLat,
+        lng: safeLng,
+        tipo: tipoStr,
+        isVip: isVipUser,
+        requireInteraction: true,
+        vibrate: isVipUser ? [320, 110, 320, 110, 480] : [280, 120, 280, 120, 420]
       };
 
-      const swReg = window.__anthiSwRegistration;
-      if (swReg && typeof swReg.showNotification === 'function') {
-        swReg.showNotification(title, {
-          body,
-          icon: '/icon.svg',
-          badge: '/icon.svg',
-          tag: payload.tag,
-          renotify: true,
-          requireInteraction: true,
-          vibrate: [280, 120, 280, 120, 420],
-          data: {
-            url: '/',
-            reportId: payload.reportId,
-            lat: payload.lat,
-            lng: payload.lng
+      const notifOptions = {
+        body,
+        icon: '/icon.svg',
+        badge: '/icon.svg',
+        tag: notifTag,
+        renotify: true,
+        requireInteraction: true,
+        silent: false,
+        vibrate: payload.vibrate,
+        data: {
+          url: safeLat !== null && safeLng !== null
+            ? `/?alertId=${encodeURIComponent(String(rep.id || ''))}&lat=${encodeURIComponent(String(safeLat))}&lng=${encodeURIComponent(String(safeLng))}`
+            : '/',
+          reportId: payload.reportId,
+          lat: safeLat,
+          lng: safeLng,
+          tipo: tipoStr,
+          isVip: isVipUser
+        }
+      };
+
+      markAlertNotified(rep, tier);
+
+      let dispatched = false;
+      try {
+        const swReg = typeof window.__anthiGetReadySwRegistration === 'function'
+          ? await window.__anthiGetReadySwRegistration()
+          : window.__anthiSwRegistration;
+
+        if (swReg && typeof swReg.showNotification === 'function') {
+          await swReg.showNotification(title, notifOptions);
+          dispatched = true;
+        } else if (swReg && swReg.active && typeof swReg.active.postMessage === 'function') {
+          swReg.active.postMessage(payload);
+          dispatched = true;
+        }
+      } catch (err) {
+        try {
+          if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage(payload);
+            dispatched = true;
           }
-        }).catch(() => {});
-      } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        } catch (e2) {}
+      }
+
+      if (!dispatched && navigator.serviceWorker && navigator.serviceWorker.controller) {
         try {
           navigator.serviceWorker.controller.postMessage(payload);
+          dispatched = true;
         } catch (e) {}
-      } else {
+      }
+
+      if (!dispatched && !document.hidden) {
         try {
           new Notification(title, {
             body,
             icon: '/icon.svg',
-            tag: payload.tag
+            tag: notifTag
           });
+          dispatched = true;
         } catch (e) {}
       }
 
       if (navigator.vibrate) {
         try {
-          navigator.vibrate([260, 110, 260, 110, 380]);
+          navigator.vibrate(payload.vibrate);
         } catch (e) {}
+      }
+
+      return dispatched;
+    }
+
+    function sendAnthiBackgroundPush(closestHit, totalNearbyCount) {
+      if (!closestHit || !closestHit.rep) return;
+      const rep = closestHit.rep;
+      const tier = getReportAlertTier(rep);
+      if (!shouldNotifyAlert(rep, tier, { allowCooldownRepeat: true })) return;
+      dispatchAnthiBackgroundNotification(rep, {
+        distMeters: closestHit.dist,
+        totalNearbyCount
+      });
+    }
+
+    function evaluarNotificacionesSegundoPlanoSnapshot(visibleReports) {
+      const list = Array.isArray(visibleReports) ? visibleReports : [];
+      const currentIds = new Set();
+
+      if (!hasSeededInitialSnapshotStates) {
+        list.forEach((rep) => {
+          if (!rep || !rep.id) return;
+          const id = String(rep.id);
+          currentIds.add(id);
+          knownSnapshotReportStates.set(id, {
+            confirmCount: getConfirmCount(rep),
+            isFixed: Boolean(rep.isFixed)
+          });
+        });
+        hasSeededInitialSnapshotStates = true;
+        return;
+      }
+
+      const bgMode = isAppInBackground();
+      const canNotify = bgMode && canDispatchBackgroundNotification();
+      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
+      const hasGps = hasUsableUserGps();
+      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
+      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
+      const nowMs = Date.now();
+
+      const candidateAlerts = [];
+
+      list.forEach((rep) => {
+        if (!rep || !rep.id || isReportExpired(rep, nowMs)) return;
+        const id = String(rep.id);
+        currentIds.add(id);
+
+        const prev = knownSnapshotReportStates.get(id);
+        const confirmCount = getConfirmCount(rep);
+        const isFixed = Boolean(rep.isFixed);
+        const tier = getReportAlertTier(rep);
+
+        const isBrandNew = !prev;
+        const becameFirm = Boolean(prev && !prev.isFixed && prev.confirmCount < 3 && tier === 'firm');
+        const becameAudible = Boolean(prev && !prev.isFixed && prev.confirmCount < 2 && confirmCount >= 2);
+
+        knownSnapshotReportStates.set(id, { confirmCount, isFixed });
+
+        if (!canNotify || (!isBrandNew && !becameFirm && !becameAudible)) return;
+
+        // No auto-notificar por reportes propios recién creados
+        if (auth.currentUser && rep.authorId && String(rep.authorId) === String(auth.currentUser.uid) && isBrandNew) {
+          return;
+        }
+
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
+        const distMeters = (hasGps && Number.isFinite(rLat) && Number.isFinite(rLng))
+          ? calcularDistanciaMetros(origLat, origLng, rLat, rLng)
+          : null;
+
+        let eligible = false;
+        let priorityScore = 0;
+
+        if (activeVip && isVipBackgroundPriorityAlert(rep, activeVip)) {
+          const maxVipDist = isCeposTipo(rep.tipo || rep.type) && activeVip.tipoVip === 'rastreo_cepos'
+            ? VIP_CEPOS_PROXIMITY_RADIUS_METERS
+            : VIP_BG_PROXIMITY_RADIUS_METERS;
+          if (distMeters === null || distMeters <= maxVipDist || tier === 'firm' || activeRouteDestination) {
+            eligible = true;
+            priorityScore = isCeposTipo(rep.tipo || rep.type) ? 300 : tier === 'firm' ? 250 : 200;
+          }
+        } else if (isReportAudibleForCurrentUser(rep)) {
+          const maxStdDist = tier === 'firm' ? STANDARD_BG_SNAPSHOT_RADIUS_METERS : getEffectiveAlertRadiusMeters(rep);
+          if (distMeters !== null && distMeters <= maxStdDist) {
+            eligible = true;
+            priorityScore = tier === 'firm' ? 150 : 100;
+          }
+        }
+
+        if (eligible && shouldNotifyAlert(rep, tier, { allowCooldownRepeat: false })) {
+          candidateAlerts.push({ rep, distMeters, tier, priorityScore });
+        }
+      });
+
+      knownSnapshotReportStates.forEach((_, key) => {
+        if (!currentIds.has(key)) knownSnapshotReportStates.delete(key);
+      });
+
+      if (candidateAlerts.length > 0) {
+        candidateAlerts.sort((a, b) => {
+          if (b.priorityScore !== a.priorityScore) return b.priorityScore - a.priorityScore;
+          const dA = a.distMeters == null ? 99999 : a.distMeters;
+          const dB = b.distMeters == null ? 99999 : b.distMeters;
+          return dA - dB;
+        });
+        const top = candidateAlerts[0];
+        dispatchAnthiBackgroundNotification(top.rep, {
+          distMeters: top.distMeters,
+          totalNearbyCount: candidateAlerts.length
+        });
       }
     }
 
     function evaluarRadarProximidadCercana(allowRepeatInterval = true) {
-      if (!hasKnownRealGps || gpsPermissionDenied) return;
+      if (!hasUsableUserGps()) return;
       const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const nowMs = Date.now();
@@ -8618,7 +9189,10 @@
         ...(Array.isArray(lastServerReports) ? lastServerReports : [])
       ].filter((rep) => rep && !isReportExpired(rep, nowMs) && isReportAudibleForCurrentUser(rep));
 
+      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
       const nearbyHits = [];
+      const vipExtendedHits = [];
+
       allActiveAlerts.forEach((rep) => {
         const rLat = Number(rep.lat);
         const rLng = Number(rep.lng);
@@ -8627,6 +9201,13 @@
         const effectiveRadius = getEffectiveAlertRadiusMeters(rep);
         if (dist <= effectiveRadius) {
           nearbyHits.push({ rep, dist, effectiveRadius });
+        } else if (activeVip && isVipBackgroundPriorityAlert(rep, activeVip)) {
+          const vipRadius = isCeposTipo(rep.tipo || rep.type) && activeVip.tipoVip === 'rastreo_cepos'
+            ? VIP_CEPOS_PROXIMITY_RADIUS_METERS
+            : VIP_BG_PROXIMITY_RADIUS_METERS;
+          if (dist <= vipRadius) {
+            vipExtendedHits.push({ rep, dist, effectiveRadius: vipRadius });
+          }
         }
       });
 
@@ -8673,58 +9254,74 @@
         }
       }
 
-      if (nearbyHits.length === 0) {
+      if (nearbyHits.length > 0) {
+        nearbyHits.sort((a, b) => a.dist - b.dist);
+        const closest = nearbyHits[0];
+        const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
+        const sig = nearbyHits.map((h) => h.rep.id).join(',');
+        const isNewSignature = sig !== lastNearbySonarSignature;
+        const shouldRepeatSonar = allowRepeatInterval && (nowMs - lastNearbySonarAt >= SONAR_REPEAT_INTERVAL_MS);
+
+        if (isNewSignature || shouldRepeatSonar) {
+          lastNearbySonarSignature = sig;
+          lastNearbySonarAt = nowMs;
+          playSubmarineSonarPing(false);
+          if (navigator.vibrate) {
+            try {
+              navigator.vibrate([220, 100, 220]);
+            } catch (e) {}
+          }
+          if (!document.hidden) {
+            const toastMsg = isAgenteTransitoTipo(closest.rep.tipo || closest.rep.type)
+              ? `📡 ANTHI Sónar: 🚦 Agente de Tránsito regulando a ${Math.round(closest.dist)} m (radio ${closest.effectiveRadius} m)`
+              : `📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`;
+            showToast(toastMsg);
+          }
+        }
+      } else {
         lastNearbySonarSignature = '';
-        lastBackgroundPushSignature = '';
-        return;
       }
 
-      nearbyHits.sort((a, b) => a.dist - b.dist);
-      const closest = nearbyHits[0];
-      const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
-      const sig = nearbyHits.map((h) => h.rep.id).join(',');
-      const isNewSignature = sig !== lastNearbySonarSignature;
-      const shouldRepeatSonar = allowRepeatInterval && (nowMs - lastNearbySonarAt >= SONAR_REPEAT_INTERVAL_MS);
-
-      if (isNewSignature || shouldRepeatSonar) {
-        lastNearbySonarSignature = sig;
-        lastNearbySonarAt = nowMs;
-        playSubmarineSonarPing(false);
-        if (navigator.vibrate) {
-          try {
-            navigator.vibrate([220, 100, 220]);
-          } catch (e) {}
-        }
-        if (!document.hidden) {
-          const toastMsg = isAgenteTransitoTipo(closest.rep.tipo || closest.rep.type)
-            ? `📡 ANTHI Sónar: 🚦 Agente de Tránsito regulando a ${Math.round(closest.dist)} m (radio ${closest.effectiveRadius} m)`
-            : `📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`;
-          showToast(toastMsg);
-        }
-      }
-
-      const isBackgroundMode = document.hidden || (typeof document.hasFocus === 'function' && !document.hasFocus());
-      if (isBackgroundMode) {
-        const isNewPushSig = sig !== lastBackgroundPushSignature;
-        const shouldRepeatPush = nowMs - lastBackgroundPushAt >= BACKGROUND_PUSH_REPEAT_MS;
-        if (isNewPushSig || shouldRepeatPush) {
-          lastBackgroundPushSignature = sig;
-          lastBackgroundPushAt = nowMs;
-          sendAnthiBackgroundPush(closest, nearbyHits.length);
+      if (isAppInBackground() && canDispatchBackgroundNotification()) {
+        const bgCandidates = nearbyHits.length > 0 ? nearbyHits : vipExtendedHits;
+        if (bgCandidates.length > 0) {
+          bgCandidates.sort((a, b) => a.dist - b.dist);
+          const unnotifiedHit = bgCandidates.find((hit) =>
+            shouldNotifyAlert(hit.rep, getReportAlertTier(hit.rep), { allowCooldownRepeat: nearbyHits.length > 0 })
+          );
+          if (unnotifiedHit) {
+            dispatchAnthiBackgroundNotification(unnotifiedHit.rep, {
+              distMeters: unnotifiedHit.dist,
+              totalNearbyCount: bgCandidates.length
+            });
+          }
         }
       }
     }
 
-    window.__anthiFocusAlertById = function(reportId, lat, lng) {
+    window.__anthiFocusAlertById = function(reportId, lat, lng, fromDeepLink = false) {
       const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId }));
-      const allActive = [...pendingList, ...(Array.isArray(lastServerReports) ? lastServerReports : [])];
+      const allActive = [
+        ...pendingList,
+        ...(Array.isArray(lastServerReports) ? lastServerReports : []),
+        ...(Array.isArray(allNonExpiredServerReports) ? allNonExpiredServerReports : [])
+      ];
       const found = reportId ? allActive.find((r) => String(r.id) === String(reportId)) : null;
       if (found && typeof focusAlertOnMap === 'function') {
+        window.__anthiPendingFocusAlert = null;
         focusAlertOnMap(found);
-      } else if (lat && lng) {
-        isFollowingUser = false;
-        map.setView([Number(lat), Number(lng)], 16, { animate: true });
+        return true;
       }
+      const latNum = lat != null ? Number(lat) : NaN;
+      const lngNum = lng != null ? Number(lng) : NaN;
+      if (Number.isFinite(latNum) && Number.isFinite(lngNum)) {
+        isFollowingUser = false;
+        map.setView([latNum, lngNum], 16, { animate: true });
+        if (!reportId || !fromDeepLink) {
+          window.__anthiPendingFocusAlert = null;
+        }
+      }
+      return false;
     };
 
     setInterval(() => {
@@ -8744,11 +9341,56 @@
           } catch (e) {}
           updateSonarAudioButtonUI();
           if (isSonarAudioEnabled) {
+            if (typeof window.requestAnthiNotificationPermission === 'function') {
+              window.requestAnthiNotificationPermission({ interactive: true });
+            }
             playSubmarineSonarPing(true);
             showToast('🔊 Sonido de alerta Sónar activado (cada 30 s).');
           } else {
-            showToast('🔇 Sonido de alerta Sónar silenciado (Mute).');
+            showToast('🔇 Sonido Sónar silenciado (las alertas emergentes siguen configurables en tu cuenta).');
           }
+        });
+      });
+    }
+
+    if (bgNotifToggleButtons.length > 0) {
+      updateBgNotificationsButtonUI();
+      bgNotifToggleButtons.forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (typeof window === 'undefined' || !('Notification' in window)) {
+            showToast('Este navegador no soporta notificaciones del sistema.');
+            return;
+          }
+          if (Notification.permission === 'default') {
+            const perm = await window.requestAnthiNotificationPermission({ interactive: true });
+            if (perm === 'granted') {
+              isBgNotificationsEnabled = true;
+              try {
+                localStorage.setItem(STORAGE_KEYS.BG_NOTIFS, JSON.stringify(true));
+              } catch (e) {}
+              updateBgNotificationsButtonUI();
+              showToast('🔔 ¡Notificaciones en segundo plano activadas!');
+            } else if (perm === 'denied') {
+              updateBgNotificationsButtonUI();
+              showToast('⛔ Permiso denegado. Actívalo en los ajustes del navegador para recibir alertas minimizado.');
+            }
+            return;
+          }
+          if (Notification.permission === 'denied') {
+            updateBgNotificationsButtonUI();
+            showToast('⛔ Permiso bloqueado en el navegador. Habilita Notificaciones para ANTHI en Configuración del sitio.');
+            return;
+          }
+          isBgNotificationsEnabled = !isBgNotificationsEnabled;
+          try {
+            localStorage.setItem(STORAGE_KEYS.BG_NOTIFS, JSON.stringify(isBgNotificationsEnabled));
+          } catch (e) {}
+          updateBgNotificationsButtonUI();
+          showToast(
+            isBgNotificationsEnabled
+              ? '🔔 Notificaciones emergentes en 2.º plano activadas.'
+              : '🔕 Notificaciones emergentes en 2.º plano pausadas.'
+          );
         });
       });
     }
@@ -8970,6 +9612,17 @@
     });
 
     map.on('click', (e) => {
+      if (
+        hasValidatedAdminPermission() &&
+        typeof window.__anthiGetCeposRouteState === 'function' &&
+        window.__anthiGetCeposRouteState().isDrawing &&
+        e && e.latlng
+      ) {
+        if (typeof window.__anthiAppendCeposRoutePoint === 'function') {
+          window.__anthiAppendCeposRoutePoint(e.latlng.lat, e.latlng.lng, false);
+        }
+        return;
+      }
       if (isReactionMapModeActive && hasValidatedAdminPermission() && e && e.latlng) {
         if (typeof window.__anthiHandleReactionMapTap === 'function') {
           window.__anthiHandleReactionMapTap(e.latlng);
@@ -9299,7 +9952,20 @@
         if (shouldCenter || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
           playSubmarineSonarPing(false);
-          showToast(`⚠️ ${warningText}`);
+          if (!document.hidden) {
+            showToast(`⚠️ ${warningText}`);
+          }
+        }
+        if (isAppInBackground() && canDispatchBackgroundNotification()) {
+          const hitToNotify = alertsInProximity.find((hit) =>
+            shouldNotifyAlert(hit.rep, getReportAlertTier(hit.rep), { allowCooldownRepeat: false })
+          );
+          if (hitToNotify) {
+            dispatchAnthiBackgroundNotification(hitToNotify.rep, {
+              distMeters: hitToNotify.distFromUser,
+              totalNearbyCount: alertsInProximity.length
+            });
+          }
         }
       } else {
         const clearText = `📡 Radar activo hacia ${dest.name} (~${approxKm} km): zona despejada`;
@@ -10714,7 +11380,19 @@
     const ceposDpadGrid = document.getElementById('ceposDpadGrid');
 
     const CEPOS_SYNC_THROTTLE_MS = 800;
+    const CEPOS_AUTO_SYNC_THROTTLE_MS = 2500;
     const CEPOS_SYNC_DEBOUNCE_MS = 500;
+    const CEPOS_AUTO_TICK_MS = 120;
+    const CEPOS_DRAW_SAMPLE_METERS = 14;
+
+    const btnToggleCeposManualDeck = document.getElementById('btnToggleCeposManualDeck');
+    const ceposManualDeckWrapper = document.getElementById('ceposManualDeckWrapper');
+    const ceposRouteStatusText = document.getElementById('ceposRouteStatusText');
+    const btnCeposDrawRoute = document.getElementById('btnCeposDrawRoute');
+    const btnCeposPlayPauseRoute = document.getElementById('btnCeposPlayPauseRoute');
+    const btnCeposChangeRoute = document.getElementById('btnCeposChangeRoute');
+    const btnCeposClearRoute = document.getElementById('btnCeposClearRoute');
+
     const ceposJoystickState = {
       activeReportId: null,
       stepMeters: 25,
@@ -10729,6 +11407,23 @@
       stickTimer: null,
       stickVector: { x: 0, y: 0 },
       activePointerId: null
+    };
+
+    const ceposRouteState = {
+      isDrawing: false,
+      isPlaying: false,
+      isCompleted: false,
+      speedKmh: 10,
+      waypoints: [],
+      segments: [],
+      totalMeters: 0,
+      segmentIndex: 0,
+      segmentOffsetMeters: 0,
+      traveledMeters: 0,
+      timerId: null,
+      lastTickMs: 0,
+      manualDeckCollapsed: false,
+      drawPointerId: null
     };
 
     function updateCeposJoystickBadge(mode = 'saved') {
@@ -10862,25 +11557,386 @@
       return runPromise;
     }
 
-    function scheduleCeposFirestoreSync() {
+    function scheduleCeposFirestoreSync(throttleMs = CEPOS_SYNC_THROTTLE_MS) {
       if (!ceposJoystickState.activeReportId || !ceposJoystickState.dirty) return;
       if (ceposJoystickState.flushTimer) {
         clearTimeout(ceposJoystickState.flushTimer);
         ceposJoystickState.flushTimer = null;
       }
+      const effectiveThrottle = Math.max(400, Number(throttleMs) || CEPOS_SYNC_THROTTLE_MS);
       const elapsed = Date.now() - ceposJoystickState.lastWriteAt;
-      if (!ceposJoystickState.syncing && elapsed >= CEPOS_SYNC_THROTTLE_MS) {
-        flushCeposPositionToFirestore();
+      if (!ceposJoystickState.syncing && elapsed >= effectiveThrottle) {
+        flushCeposPositionToFirestore(false);
         return;
       }
-      const waitMs = Math.max(220, Math.min(CEPOS_SYNC_DEBOUNCE_MS, CEPOS_SYNC_THROTTLE_MS - elapsed));
+      const waitMs = Math.max(220, Math.min(Math.max(CEPOS_SYNC_DEBOUNCE_MS, effectiveThrottle), effectiveThrottle - elapsed));
       ceposJoystickState.flushTimer = setTimeout(() => {
-        flushCeposPositionToFirestore();
+        flushCeposPositionToFirestore(false);
       }, waitMs);
+    }
+
+    function syncCeposManualDeckVisibility() {
+      if (ceposManualDeckWrapper) {
+        const shouldHide = ceposRouteState.isDrawing || ceposRouteState.manualDeckCollapsed;
+        ceposManualDeckWrapper.classList.toggle('hidden', shouldHide);
+      }
+      if (btnToggleCeposManualDeck) {
+        btnToggleCeposManualDeck.textContent = ceposRouteState.manualDeckCollapsed ? '🕹️ Mostrar Joystick' : '🕹️ Ocultar Joystick';
+      }
+    }
+
+    function computeCeposRouteMetrics() {
+      const pts = ceposRouteState.waypoints;
+      const segs = [];
+      let total = 0;
+      for (let i = 0; i < pts.length - 1; i += 1) {
+        const len = calcularDistanciaMetros(pts[i].lat, pts[i].lng, pts[i + 1].lat, pts[i + 1].lng);
+        segs.push({ from: pts[i], to: pts[i + 1], lengthMeters: len });
+        total += len;
+      }
+      ceposRouteState.segments = segs;
+      ceposRouteState.totalMeters = total;
+    }
+
+    function renderCeposRoutePolyline() {
+      if (!ceposRouteLayer) return;
+      ceposRouteLayer.clearLayers();
+      const pts = ceposRouteState.waypoints;
+      if (!Array.isArray(pts) || pts.length === 0) return;
+
+      if (pts.length === 1) {
+        L.circleMarker([pts[0].lat, pts[0].lng], {
+          radius: 5,
+          color: '#0f172a',
+          weight: 2,
+          fillColor: '#facc15',
+          fillOpacity: 0.95,
+          interactive: false
+        }).addTo(ceposRouteLayer);
+        return;
+      }
+
+      const remainingCoords = [];
+      const cur = ceposJoystickState.pendingCoords;
+      if (ceposRouteState.isPlaying || ceposRouteState.traveledMeters > 0) {
+        const traveledCoords = [];
+        for (let i = 0; i <= Math.min(ceposRouteState.segmentIndex, pts.length - 1); i += 1) {
+          traveledCoords.push([pts[i].lat, pts[i].lng]);
+        }
+        if (cur) traveledCoords.push([cur.lat, cur.lng]);
+        if (traveledCoords.length >= 2) {
+          L.polyline(traveledCoords, {
+            color: '#fde047',
+            weight: 3,
+            opacity: 0.3,
+            interactive: false
+          }).addTo(ceposRouteLayer);
+        }
+        if (cur) remainingCoords.push([cur.lat, cur.lng]);
+        for (let j = ceposRouteState.segmentIndex + 1; j < pts.length; j += 1) {
+          remainingCoords.push([pts[j].lat, pts[j].lng]);
+        }
+      } else {
+        pts.forEach((p) => remainingCoords.push([p.lat, p.lng]));
+      }
+
+      if (remainingCoords.length >= 2) {
+        L.polyline(remainingCoords, {
+          color: '#facc15',
+          weight: 4,
+          opacity: 0.82,
+          dashArray: '7, 7',
+          interactive: false
+        }).addTo(ceposRouteLayer);
+      }
+
+      const endPt = pts[pts.length - 1];
+      L.circleMarker([endPt.lat, endPt.lng], {
+        radius: 5.5,
+        color: '#0f172a',
+        weight: 2,
+        fillColor: '#facc15',
+        fillOpacity: 1,
+        interactive: false
+      }).addTo(ceposRouteLayer);
+    }
+
+    function updateCeposRouteUI() {
+      const hasValidRoute = ceposRouteState.waypoints.length >= 2 && ceposRouteState.totalMeters >= 5;
+      const totalRounded = Math.round(ceposRouteState.totalMeters);
+      const traveledRounded = Math.min(totalRounded, Math.round(ceposRouteState.traveledMeters));
+
+      if (btnCeposDrawRoute) {
+        btnCeposDrawRoute.classList.toggle('active', ceposRouteState.isDrawing);
+        btnCeposDrawRoute.textContent = ceposRouteState.isDrawing
+          ? '✓ Listo trazo'
+          : (hasValidRoute ? '✏️ Editar trazo' : '✏️ Trazar ruta');
+      }
+
+      if (btnCeposPlayPauseRoute) {
+        btnCeposPlayPauseRoute.disabled = !hasValidRoute;
+        btnCeposPlayPauseRoute.classList.toggle('playing', ceposRouteState.isPlaying);
+        if (ceposRouteState.isPlaying) {
+          btnCeposPlayPauseRoute.textContent = '⏸ Pausar';
+        } else if (hasValidRoute && ceposRouteState.traveledMeters > 0 && !ceposRouteState.isCompleted) {
+          btnCeposPlayPauseRoute.textContent = '▶ Reanudar';
+        } else if (ceposRouteState.isCompleted) {
+          btnCeposPlayPauseRoute.textContent = '▶ Repetir';
+        } else {
+          btnCeposPlayPauseRoute.textContent = '▶ Iniciar';
+        }
+      }
+
+      if (btnCeposChangeRoute) {
+        btnCeposChangeRoute.disabled = !ceposJoystickState.activeReportId;
+      }
+      if (btnCeposClearRoute) {
+        btnCeposClearRoute.disabled = ceposRouteState.waypoints.length === 0;
+      }
+
+      document.querySelectorAll('[data-cepos-speed-kmh]').forEach((btn) => {
+        btn.classList.toggle('active', Number(btn.dataset.ceposSpeedKmh) === Number(ceposRouteState.speedKmh));
+      });
+
+      if (ceposRouteStatusText) {
+        if (ceposRouteState.isDrawing) {
+          ceposRouteStatusText.textContent = hasValidRoute
+            ? `✏️ Trazando con el dedo: ${ceposRouteState.waypoints.length} pts (${totalRounded} m) · Pulsa ▶ Iniciar`
+            : '✏️ Desliza el dedo sobre las calles del mapa para trazar la ruta...';
+        } else if (ceposRouteState.isPlaying) {
+          ceposRouteStatusText.textContent = `🚐 Avanzando lento (${ceposRouteState.speedKmh} km/h): ${traveledRounded} m / ${totalRounded} m`;
+        } else if (ceposRouteState.isCompleted && hasValidRoute) {
+          ceposRouteStatusText.textContent = `🏁 Recorrido completado (${totalRounded} m) · Puedes cambiar ruta o usar joystick`;
+        } else if (hasValidRoute && ceposRouteState.traveledMeters > 0) {
+          ceposRouteStatusText.textContent = `⏸ Ruta en pausa: ${traveledRounded} m / ${totalRounded} m`;
+        } else if (hasValidRoute) {
+          ceposRouteStatusText.textContent = `🛣️ Ruta lista (${totalRounded} m) · Pulsa ▶ Iniciar para avance lento`;
+        } else {
+          ceposRouteStatusText.textContent = '🛣️ Sin ruta trazada · Toca "Trazar ruta" para dibujar con el dedo';
+        }
+      }
+
+      syncCeposManualDeckVisibility();
+    }
+
+    function stopCeposRouteTimer() {
+      if (ceposRouteState.timerId) {
+        clearInterval(ceposRouteState.timerId);
+        ceposRouteState.timerId = null;
+      }
+    }
+
+    function exitCeposDrawMode() {
+      if (!ceposRouteState.isDrawing) return;
+      ceposRouteState.isDrawing = false;
+      ceposRouteState.drawPointerId = null;
+      if (map) {
+        try {
+          if (map.dragging && typeof map.dragging.enable === 'function') map.dragging.enable();
+          if (map.doubleClickZoom && typeof map.doubleClickZoom.enable === 'function') map.doubleClickZoom.enable();
+          if (typeof map.getContainer === 'function') {
+            const c = map.getContainer();
+            if (c && c.style) {
+              c.style.touchAction = '';
+              c.style.cursor = '';
+            }
+          }
+        } catch (e) {}
+      }
+      updateCeposRouteUI();
+    }
+
+    function enterCeposDrawMode() {
+      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      if (ceposRouteState.isPlaying) {
+        pauseCeposRoute(false);
+      }
+      ceposRouteState.isDrawing = true;
+      ceposRouteState.isCompleted = false;
+      if (map) {
+        try {
+          if (map.dragging && typeof map.dragging.disable === 'function') map.dragging.disable();
+          if (map.doubleClickZoom && typeof map.doubleClickZoom.disable === 'function') map.doubleClickZoom.disable();
+          if (typeof map.getContainer === 'function') {
+            const c = map.getContainer();
+            if (c && c.style) {
+              c.style.touchAction = 'none';
+              c.style.cursor = 'crosshair';
+            }
+          }
+        } catch (e) {}
+      }
+      updateCeposRouteUI();
+      showToast('✏️ Desliza tu dedo sobre el mapa (o toca esquinas) para trazar la ruta.');
+      return true;
+    }
+
+    function appendCeposRoutePoint(lat, lng, isStrokeMove = false) {
+      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      const nLat = Number(Number(lat).toFixed(6));
+      const nLng = Number(Number(lng).toFixed(6));
+      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) return false;
+
+      if (ceposRouteState.waypoints.length === 0 && ceposJoystickState.pendingCoords) {
+        const startLat = Number(ceposJoystickState.pendingCoords.lat);
+        const startLng = Number(ceposJoystickState.pendingCoords.lng);
+        if (Number.isFinite(startLat) && Number.isFinite(startLng)) {
+          ceposRouteState.waypoints.push({ lat: startLat, lng: startLng });
+        }
+      }
+
+      const lastPt = ceposRouteState.waypoints[ceposRouteState.waypoints.length - 1];
+      const minGap = isStrokeMove ? CEPOS_DRAW_SAMPLE_METERS : 8;
+      if (lastPt && calcularDistanciaMetros(lastPt.lat, lastPt.lng, nLat, nLng) < minGap) {
+        return false;
+      }
+
+      ceposRouteState.waypoints.push({ lat: nLat, lng: nLng });
+      ceposRouteState.isCompleted = false;
+      computeCeposRouteMetrics();
+      renderCeposRoutePolyline();
+      updateCeposRouteUI();
+      return true;
+    }
+
+    function applyCeposAutoRouteCoords(newLat, newLng, forceFlush = false) {
+      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
+      ceposJoystickState.pendingCoords = { lat: newLat, lng: newLng };
+      ceposJoystickState.dirty = true;
+      updateCeposJoystickBadge('pending');
+      updateCeposMarkerCoordsLocally(ceposJoystickState.activeReportId, newLat, newLng);
+
+      if (forceFlush) {
+        flushCeposPositionToFirestore(false);
+      } else {
+        scheduleCeposFirestoreSync(CEPOS_AUTO_SYNC_THROTTLE_MS);
+      }
+    }
+
+    function advanceCeposAlongRouteTick(overrideDtSec = null) {
+      if (!ceposRouteState.isPlaying || !hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) {
+        stopCeposRouteTimer();
+        return false;
+      }
+      const segs = ceposRouteState.segments;
+      const pts = ceposRouteState.waypoints;
+      if (!segs.length || pts.length < 2) {
+        ceposRouteState.isPlaying = false;
+        stopCeposRouteTimer();
+        updateCeposRouteUI();
+        return false;
+      }
+
+      const now = Date.now();
+      const dtSec = overrideDtSec !== null
+        ? Math.max(0.02, Number(overrideDtSec))
+        : Math.min(0.6, Math.max(0.03, (now - (ceposRouteState.lastTickMs || now)) / 1000));
+      ceposRouteState.lastTickMs = now;
+
+      const mps = (Number(ceposRouteState.speedKmh || 10) * 1000) / 3600;
+      const stepDist = mps * dtSec;
+
+      let idx = ceposRouteState.segmentIndex;
+      let off = ceposRouteState.segmentOffsetMeters + stepDist;
+      while (idx < segs.length && off >= segs[idx].lengthMeters) {
+        off -= segs[idx].lengthMeters;
+        idx += 1;
+      }
+
+      if (idx >= segs.length) {
+        const endPt = pts[pts.length - 1];
+        ceposRouteState.segmentIndex = Math.max(0, segs.length - 1);
+        ceposRouteState.segmentOffsetMeters = segs[segs.length - 1].lengthMeters;
+        ceposRouteState.traveledMeters = ceposRouteState.totalMeters;
+        ceposRouteState.isPlaying = false;
+        ceposRouteState.isCompleted = true;
+        stopCeposRouteTimer();
+        applyCeposAutoRouteCoords(endPt.lat, endPt.lng, true);
+        renderCeposRoutePolyline();
+        updateCeposRouteUI();
+        showToast('🏁 La unidad de Cepos completó la ruta trazada.');
+        return true;
+      }
+
+      const seg = segs[idx];
+      const ratio = seg.lengthMeters > 0 ? Math.max(0, Math.min(1, off / seg.lengthMeters)) : 0;
+      const newLat = Number((seg.from.lat + (seg.to.lat - seg.from.lat) * ratio).toFixed(6));
+      const newLng = Number((seg.from.lng + (seg.to.lng - seg.from.lng) * ratio).toFixed(6));
+
+      let traveled = off;
+      for (let k = 0; k < idx; k += 1) traveled += segs[k].lengthMeters;
+      ceposRouteState.segmentIndex = idx;
+      ceposRouteState.segmentOffsetMeters = off;
+      ceposRouteState.traveledMeters = traveled;
+
+      applyCeposAutoRouteCoords(newLat, newLng, false);
+      renderCeposRoutePolyline();
+      updateCeposRouteUI();
+      return true;
+    }
+
+    function startCeposRoutePlayback() {
+      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      if (ceposRouteState.waypoints.length < 2 || ceposRouteState.totalMeters < 5) {
+        showToast('Traza primero al menos 2 puntos sobre el mapa.');
+        return false;
+      }
+      exitCeposDrawMode();
+      if (ceposRouteState.isCompleted || ceposRouteState.segmentIndex >= ceposRouteState.segments.length) {
+        ceposRouteState.segmentIndex = 0;
+        ceposRouteState.segmentOffsetMeters = 0;
+        ceposRouteState.traveledMeters = 0;
+        ceposRouteState.isCompleted = false;
+        const firstPt = ceposRouteState.waypoints[0];
+        applyCeposAutoRouteCoords(firstPt.lat, firstPt.lng, false);
+      }
+      ceposRouteState.isPlaying = true;
+      ceposRouteState.lastTickMs = Date.now();
+      stopCeposRouteTimer();
+      ceposRouteState.timerId = setInterval(() => {
+        advanceCeposAlongRouteTick(null);
+      }, CEPOS_AUTO_TICK_MS);
+      renderCeposRoutePolyline();
+      updateCeposRouteUI();
+      showToast(`🚐 Avance automático lento iniciado (${ceposRouteState.speedKmh} km/h).`);
+      return true;
+    }
+
+    function pauseCeposRoute(flushNow = true) {
+      if (!ceposRouteState.isPlaying) return false;
+      ceposRouteState.isPlaying = false;
+      stopCeposRouteTimer();
+      updateCeposRouteUI();
+      if (flushNow && ceposJoystickState.dirty) {
+        flushCeposPositionToFirestore(false);
+      }
+      return true;
+    }
+
+    function clearCeposRouteData(enterDrawAfter = false) {
+      ceposRouteState.isPlaying = false;
+      ceposRouteState.isCompleted = false;
+      stopCeposRouteTimer();
+      ceposRouteState.waypoints = [];
+      ceposRouteState.segments = [];
+      ceposRouteState.totalMeters = 0;
+      ceposRouteState.segmentIndex = 0;
+      ceposRouteState.segmentOffsetMeters = 0;
+      ceposRouteState.traveledMeters = 0;
+      if (ceposRouteLayer) ceposRouteLayer.clearLayers();
+      if (enterDrawAfter) {
+        enterCeposDrawMode();
+      } else {
+        exitCeposDrawMode();
+        updateCeposRouteUI();
+      }
     }
 
     function moveCeposByMeters(eastMeters, northMeters) {
       if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return null;
+      if (ceposRouteState.isPlaying) {
+        pauseCeposRoute(false);
+      }
       const base = ceposJoystickState.pendingCoords || findReportByIdForJoystick(ceposJoystickState.activeReportId);
       if (!base) return null;
       const curLat = Number(base.lat);
@@ -10908,7 +11964,7 @@
         } catch (e) {}
       }
 
-      scheduleCeposFirestoreSync();
+      scheduleCeposFirestoreSync(CEPOS_SYNC_THROTTLE_MS);
       return { lat: newLat, lng: newLng };
     }
 
@@ -10939,6 +11995,7 @@
 
     window.closeCeposJoystick = async function(flushPending = true) {
       stopCeposHoldAndStickTimers();
+      clearCeposRouteData(false);
       if (flushPending && ceposJoystickState.activeReportId && (ceposJoystickState.dirty || ceposJoystickState.syncing)) {
         await flushCeposPositionToFirestore(true);
       }
@@ -10973,8 +12030,11 @@
         showToast('Selecciona un reporte activo de tipo Cepos para usar el joystick.');
         return false;
       }
-      if (ceposJoystickState.activeReportId && ceposJoystickState.activeReportId !== String(rep.id) && (ceposJoystickState.dirty || ceposJoystickState.syncing)) {
-        await flushCeposPositionToFirestore(true);
+      if (ceposJoystickState.activeReportId && ceposJoystickState.activeReportId !== String(rep.id)) {
+        clearCeposRouteData(false);
+        if (ceposJoystickState.dirty || ceposJoystickState.syncing) {
+          await flushCeposPositionToFirestore(true);
+        }
       }
       if (isReactionMapModeActive && typeof stopReactionMapMode === 'function') {
         stopReactionMapMode(false);
@@ -10998,6 +12058,7 @@
       }
       updateCeposJoystickBadge('saved');
       syncCeposStepButtons(ceposJoystickState.stepMeters);
+      updateCeposRouteUI();
 
       isFollowingUser = false;
       if (bottomPanelEl) bottomPanelEl.style.display = 'none';
@@ -11014,7 +12075,7 @@
       if (typeof refreshReportsForRole === 'function') {
         refreshReportsForRole();
       }
-      showToast('🕹️ Joystick Cepos activo: desliza la palanca o usa la cruceta.');
+      showToast('🕹️ Control Cepos activo: traza una ruta con el dedo o usa el joystick.');
       return true;
     };
 
@@ -11022,12 +12083,112 @@
     window.__anthiCloseCeposJoystick = window.closeCeposJoystick;
     window.__anthiMoveCeposByMeters = moveCeposByMeters;
     window.__anthiGetCeposJoystickState = () => ({ ...ceposJoystickState });
+    window.__anthiGetCeposRouteState = () => ({ ...ceposRouteState, waypoints: [...ceposRouteState.waypoints] });
+    window.__anthiStartCeposDrawRoute = enterCeposDrawMode;
+    window.__anthiExitCeposDrawRoute = exitCeposDrawMode;
+    window.__anthiAppendCeposRoutePoint = appendCeposRoutePoint;
+    window.__anthiStartCeposAutoRoute = startCeposRoutePlayback;
+    window.__anthiPauseCeposAutoRoute = pauseCeposRoute;
+    window.__anthiChangeCeposRoute = () => clearCeposRouteData(true);
+    window.__anthiClearCeposRoute = () => clearCeposRouteData(false);
+    window.__anthiTickCeposAutoRoute = advanceCeposAlongRouteTick;
 
     if (btnCloseCeposJoystick) {
       btnCloseCeposJoystick.addEventListener('click', () => {
         window.closeCeposJoystick(true);
       });
     }
+    if (btnToggleCeposManualDeck) {
+      btnToggleCeposManualDeck.addEventListener('click', () => {
+        ceposRouteState.manualDeckCollapsed = !ceposRouteState.manualDeckCollapsed;
+        syncCeposManualDeckVisibility();
+      });
+    }
+    if (btnCeposDrawRoute) {
+      btnCeposDrawRoute.addEventListener('click', () => {
+        if (ceposRouteState.isDrawing) {
+          exitCeposDrawMode();
+        } else {
+          enterCeposDrawMode();
+        }
+      });
+    }
+    if (btnCeposPlayPauseRoute) {
+      btnCeposPlayPauseRoute.addEventListener('click', () => {
+        if (ceposRouteState.isPlaying) {
+          pauseCeposRoute(true);
+          showToast('⏸ Avance automático de Cepos en pausa.');
+        } else {
+          startCeposRoutePlayback();
+        }
+      });
+    }
+    if (btnCeposChangeRoute) {
+      btnCeposChangeRoute.addEventListener('click', () => {
+        if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
+        clearCeposRouteData(true);
+      });
+    }
+    if (btnCeposClearRoute) {
+      btnCeposClearRoute.addEventListener('click', () => {
+        if (!hasValidatedAdminPermission()) return;
+        clearCeposRouteData(false);
+        showToast('🗑️ Ruta limpiada.');
+      });
+    }
+    document.querySelectorAll('[data-cepos-speed-kmh]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const kmh = Number(btn.dataset.ceposSpeedKmh);
+        if ([6, 10, 15, 22].includes(kmh)) {
+          ceposRouteState.speedKmh = kmh;
+          updateCeposRouteUI();
+        }
+      });
+    });
+
+    if (map && typeof map.getContainer === 'function') {
+      const mapElForDraw = map.getContainer();
+      if (mapElForDraw && typeof mapElForDraw.addEventListener === 'function') {
+        const isDrawBlockedTarget = (target) => {
+          if (!target || typeof target.closest !== 'function') return false;
+          return Boolean(target.closest('.cepos-joystick-panel, .leaflet-popup, .map-controls, .top-bar, .gps-hud'));
+        };
+        const pointerToMapLatLng = (ev) => {
+          const rect = mapElForDraw.getBoundingClientRect();
+          if (!rect || typeof map.containerPointToLatLng !== 'function') return null;
+          return map.containerPointToLatLng(L.point(ev.clientX - rect.left, ev.clientY - rect.top));
+        };
+        mapElForDraw.addEventListener('pointerdown', (ev) => {
+          if (!ceposRouteState.isDrawing || !hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
+          if (ev.isPrimary === false || isDrawBlockedTarget(ev.target)) return;
+          const ll = pointerToMapLatLng(ev);
+          if (!ll) return;
+          ev.preventDefault();
+          ceposRouteState.drawPointerId = ev.pointerId;
+          if (typeof mapElForDraw.setPointerCapture === 'function') {
+            try { mapElForDraw.setPointerCapture(ev.pointerId); } catch (e) {}
+          }
+          appendCeposRoutePoint(ll.lat, ll.lng, false);
+        });
+        mapElForDraw.addEventListener('pointermove', (ev) => {
+          if (!ceposRouteState.isDrawing || ceposRouteState.drawPointerId !== ev.pointerId) return;
+          if (!hasValidatedAdminPermission()) return;
+          const ll = pointerToMapLatLng(ev);
+          if (!ll) return;
+          ev.preventDefault();
+          appendCeposRoutePoint(ll.lat, ll.lng, true);
+        });
+        const finishDrawStroke = (ev) => {
+          if (ceposRouteState.drawPointerId !== ev.pointerId) return;
+          ceposRouteState.drawPointerId = null;
+          renderCeposRoutePolyline();
+          updateCeposRouteUI();
+        };
+        mapElForDraw.addEventListener('pointerup', finishDrawStroke);
+        mapElForDraw.addEventListener('pointercancel', finishDrawStroke);
+      }
+    }
+
     if (btnCenterCeposJoystick) {
       btnCenterCeposJoystick.addEventListener('click', () => {
         const coords = ceposJoystickState.pendingCoords;
@@ -11040,7 +12201,7 @@
       btnFlushCeposJoystick.addEventListener('click', async () => {
         if (!ceposJoystickState.activeReportId) return;
         ceposJoystickState.dirty = true;
-        const ok = await flushCeposPositionToFirestore();
+        const ok = await flushCeposPositionToFirestore(true);
         if (ok) showToast('💾 Posición de Cepos sincronizada en Firestore.');
       });
     }
@@ -12086,6 +13247,9 @@
         vipRedeemFeedback.style.color = '#6ee7b7';
       }
       if (vipCodeRedeemInput) vipCodeRedeemInput.value = '';
+      if (typeof window.requestAnthiNotificationPermission === 'function') {
+        window.requestAnthiNotificationPermission({ interactive: true });
+      }
       showToast(`🎉 ¡${meta.badge} activado! Ya publicas en primera instancia.`);
       return true;
     }
@@ -12943,8 +14107,8 @@
       const title = `⚠️ Alerta Hoja de Vida (${alerts.length})`;
       const options = {
         body: summaryText,
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-192.png',
+        icon: '/icon.svg',
+        badge: '/icon.svg',
         tag: 'anthi-hoja-vida-alerta',
         renotify: true
       };
