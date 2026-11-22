@@ -1541,6 +1541,120 @@
       display: none;
     }
 
+    .cepos-joystick-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .cepos-mini-btn {
+      width: auto;
+      height: 29px;
+      padding: 0 9px;
+      border-radius: 9px;
+      border: 1px solid rgba(148, 163, 184, 0.42);
+      background: rgba(30, 41, 59, 0.92);
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .cepos-mini-btn:hover {
+      border-color: rgba(250, 204, 21, 0.72);
+      color: #fef08a;
+    }
+
+    .cepos-mini-dock {
+      position: fixed;
+      bottom: calc(var(--bottom-nav-height) + 12px);
+      left: 10px;
+      right: 10px;
+      max-width: 440px;
+      margin: 0 auto;
+      z-index: 1064;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(250, 204, 21, 0.85);
+      border-radius: 14px;
+      padding: 8px 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .cepos-mini-dock.visible {
+      display: flex;
+    }
+
+    .cepos-mini-dock-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .cepos-mini-dock-info {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .cepos-mini-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #fef08a, #eab308);
+      border: 1.5px solid #0f172a;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    .cepos-mini-status {
+      font-size: 11px;
+      font-weight: 800;
+      color: #fef08a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cepos-mini-sub {
+      font-size: 10px;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cepos-mini-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .cepos-mini-actions .cepos-route-btn {
+      flex: 1 1 auto;
+      padding: 5px 8px;
+      font-size: 10.5px;
+    }
+
     .quick-actions-bar {
       pointer-events: auto;
       width: 100%;
@@ -3119,7 +3233,7 @@
     <div class="manual-pin-bar" id="manualPinBar">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <span id="manualPinTitleLabel" style="font-size:12px;font-weight:800;color:#f8fafc;">🗺️ Mueve el mapa hasta la ubicación exacta</span>
-        <span id="manualPinCoordsLabel" style="font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#67e8f9;">7.1193, -73.1227</span>
+        <span id="manualPinCoordsLabel" style="font-size:11px;font-weight:700;color:#67e8f9;">Bucaramanga • Centro</span>
       </div>
       <div class="manual-pin-actions">
         <button type="button" class="btn-submit" id="btnConfirmManualPin" style="min-height:42px;font-size:13px;">✅ Confirmar este punto</button>
@@ -3193,14 +3307,19 @@
             <div class="cepos-joystick-sub" id="ceposJoystickTargetLabel">Unidad móvil seleccionada</div>
           </div>
         </div>
-        <span class="cepos-joystick-sync-pill saved" id="ceposJoystickSyncBadge">Listo</span>
-        <button type="button" class="btn-close" id="btnCloseCeposJoystick" style="width:auto;padding:0 10px;height:30px;font-size:11px;font-weight:800;" title="Cerrar control joystick">
-          ✕ Cerrar
-        </button>
+        <div class="cepos-joystick-head-actions">
+          <span class="cepos-joystick-sync-pill saved" id="ceposJoystickSyncBadge">Listo</span>
+          <button type="button" class="cepos-mini-btn" id="btnMinimizeCeposJoystick" title="Minimizar panel para ver el mapa y trazar rutas">
+            🗕 Minimizar
+          </button>
+          <button type="button" class="btn-close" id="btnCloseCeposJoystick" style="width:auto;padding:0 9px;height:29px;font-size:11px;font-weight:800;" title="Cerrar control joystick">
+            ✕ Cerrar
+          </button>
+        </div>
       </div>
 
       <div class="cepos-joystick-meta-row">
-        <span class="cepos-joystick-coords" id="ceposJoystickCoords">📍 0.00000, 0.00000</span>
+        <span class="cepos-joystick-coords" id="ceposJoystickCoords">📍 Sector en mapa</span>
         <div style="display:flex;gap:5px;align-items:center;">
           <button type="button" class="alert-admin-btn edit" id="btnToggleCeposManualDeck" style="padding:3px 8px;font-size:10.5px;" title="Mostrar u ocultar joystick manual">🕹️ Joystick</button>
           <button type="button" class="alert-admin-btn edit" id="btnCenterCeposJoystick" style="padding:3px 8px;font-size:10.5px;">🎯 Centrar</button>
@@ -3258,6 +3377,29 @@
           <button type="button" class="cepos-step-btn" data-cepos-step="50">50 m</button>
           <button type="button" class="cepos-step-btn" data-cepos-step="100">100 m</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Cápsula flotante compacta al minimizar el Joystick de Cepos (no bloquea mapa ni rutas) -->
+    <div class="cepos-mini-dock" id="ceposMiniDock" aria-hidden="true">
+      <div class="cepos-mini-dock-top">
+        <div class="cepos-mini-dock-info">
+          <span class="cepos-mini-badge" aria-hidden="true">🚐</span>
+          <div style="min-width:0;flex:1;">
+            <div class="cepos-mini-status" id="ceposMiniStatusText">Cepos activo · Mapa despejado</div>
+            <div class="cepos-mini-sub" id="ceposMiniPlaceText">📍 Sector en mapa</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
+          <button type="button" class="cepos-mini-btn" id="btnExpandCeposJoystick" title="Abrir panel completo Joystick">🕹️ Joystick</button>
+          <button type="button" class="cepos-mini-btn" id="btnCloseCeposMiniDock" title="Finalizar control Cepos" aria-label="Cerrar control Cepos">✕</button>
+        </div>
+      </div>
+      <div class="cepos-mini-actions">
+        <button type="button" class="cepos-route-btn" id="btnCeposMiniDraw">✏️ Ruta</button>
+        <button type="button" class="cepos-route-btn play" id="btnCeposMiniPlayPause" disabled>▶ Iniciar</button>
+        <button type="button" class="cepos-route-btn" id="btnCeposMiniChangeRoute" title="Trazar nueva ruta">🔄 Cambiar</button>
+        <button type="button" class="cepos-route-btn clear-icon" id="btnCeposMiniClearRoute" title="Limpiar ruta" aria-label="Limpiar ruta">🗑️</button>
       </div>
     </div>
 
@@ -4834,7 +4976,8 @@
       REACTION_POINTS: 'anthi_reaction_points_v1',
       VIP_PROFILE: 'anthi_vip_profile_v1',
       BG_NOTIFS: 'anthi_bg_notifs_v1',
-      NOTIFIED_ALERTS: 'anthi_notified_alerts_v1'
+      NOTIFIED_ALERTS: 'anthi_notified_alerts_v1',
+      GEO_PLACE_CACHE: 'anthi_geo_place_cache_v1'
     };
 
     const BUCARAMANGA_COORDS = [7.1193, -73.1227];
@@ -6011,7 +6154,7 @@
               <span style="font-size:10.5px;color:#94a3b8;font-weight:700;">⏱ ${escapeHtml(remainingLabel)}</span>
             </div>
             <div class="alert-list-meta">
-              📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}${rawDesc ? ` · ${escapeHtml(rawDesc)}` : ''}${escapeHtml(resolvedTag)}
+              📍 ${formatAlertPlaceHtml(rep)}${escapeHtml(resolvedTag)}
             </div>
           </div>
         `;
@@ -6122,7 +6265,7 @@
         );
         const agenteRadiusM = isAgente ? clampAgentRadiusMeters(rep.radioMetros) : null;
         const rawDescText = String(rep.descripcion || rep.description || '').trim();
-        const descripcionTexto = rawDescText || (isAgente ? 'Regulación puntual de tránsito en la vía (no retén).' : 'Sin referencia adicional (ver ubicación en el mapa).');
+        const placeMetaPopup = getResolvedPlaceInfo(lat, lng);
         const fotoUrl = rep.urlFoto || rep.mediaUrl || rep.mediaDataUrl || null;
         const timeMs = extractTimestampMs(rep);
         const isPending = Boolean(rep.isPending);
@@ -6218,9 +6361,10 @@
               ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación / paso (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
               ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
             </div>
-            <div>${escapeHtml(descripcionTexto)}</div>
+            <div>📍 ${formatAlertPlaceHtml(rep)}</div>
+            ${isAgente && !rawDescText ? '<div style="font-size:11px;color:#7dd3fc;margin-top:2px;">🚦 Regulación puntual de tránsito en la vía (no retén).</div>' : ''}
             ${mediaHtml}
-            <div class="popup-meta">🕒 ${formatTimeLabel(timeMs)} · ⏱ ${escapeHtml(remainingLabel)} · 📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+            <div class="popup-meta">🕒 ${formatTimeLabel(timeMs)} · ⏱ ${escapeHtml(remainingLabel)} · 📍 ${formatGeoPlaceHtml(lat, lng, 'barrio', placeMetaPopup.barrio)}</div>
             ${actionsHtml}
           </div>
         `);
@@ -7547,7 +7691,7 @@
           <div class="popup-card">
             <span class="popup-badge" style="background:#0891b2;">⚡ Punto de Reacción Inmediata</span>
             <div style="font-weight:800;margin-bottom:4px;">${escapeHtml(rp.nombre || 'Punto Crítico')}</div>
-            <div class="popup-meta">Radio: ${radiusM} m · 📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+            <div class="popup-meta">Radio: ${radiusM} m · 📍 ${formatGeoPlaceHtml(lat, lng, 'full')}</div>
             <div class="popup-meta" style="color:#67e8f9;margin-top:4px;">Reportes dentro de esta zona quedan FIRMES en primera opción al instante.</div>
             ${canShowZones ? `<div class="popup-admin-bar">
               <button type="button" class="popup-vote-btn edit" onclick="startEditReactionPoint('${escapeHtml(rp.id)}')">✏️ Ajustar radio / punto</button>
@@ -7712,14 +7856,393 @@
       return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
+    // =========================================================================
+    // 7B. RESOLUCIÓN LOCAL + CACHÉ ECONÓMICA DE BARRIO Y REFERENCIA CONOCIDA
+    // =========================================================================
+    const BGA_BARRIOS_INDEX = [
+      { name: 'Cabecera del Llano', lat: 7.1168, lng: -73.1112, r: 950 },
+      { name: 'Sotomayor', lat: 7.1188, lng: -73.1168, r: 650 },
+      { name: 'Centro', lat: 7.1195, lng: -73.1258, r: 800 },
+      { name: 'Mejoras Públicas', lat: 7.1145, lng: -73.1192, r: 580 },
+      { name: 'Antonia Santos', lat: 7.1128, lng: -73.1228, r: 620 },
+      { name: 'La Aurora', lat: 7.1258, lng: -73.1172, r: 720 },
+      { name: 'San Alonso', lat: 7.1312, lng: -73.1175, r: 760 },
+      { name: 'Alarcón', lat: 7.1252, lng: -73.1228, r: 650 },
+      { name: 'Chapinero', lat: 7.1282, lng: -73.1246, r: 620 },
+      { name: 'Comuneros', lat: 7.1322, lng: -73.1268, r: 680 },
+      { name: 'San Francisco', lat: 7.1310, lng: -73.1230, r: 680 },
+      { name: 'Universidad', lat: 7.1388, lng: -73.1210, r: 780 },
+      { name: 'Estadio / San Alonso', lat: 7.1362, lng: -73.1155, r: 650 },
+      { name: 'La Concordia', lat: 7.1072, lng: -73.1202, r: 720 },
+      { name: 'Ciudadela Real de Minas', lat: 7.1058, lng: -73.1252, r: 850 },
+      { name: 'La Victoria', lat: 7.1012, lng: -73.1208, r: 650 },
+      { name: 'Provenza', lat: 7.0872, lng: -73.1148, r: 1050 },
+      { name: 'Diamante II', lat: 7.0928, lng: -73.1112, r: 820 },
+      { name: 'San Luis', lat: 7.0958, lng: -73.1115, r: 700 },
+      { name: 'Conucos', lat: 7.1038, lng: -73.1122, r: 700 },
+      { name: 'Puerta del Sol', lat: 7.1078, lng: -73.1132, r: 650 },
+      { name: 'Pan de Azúcar', lat: 7.1105, lng: -73.1015, r: 900 },
+      { name: 'Terrazas', lat: 7.1088, lng: -73.1068, r: 750 },
+      { name: 'El Prado', lat: 7.1122, lng: -73.1095, r: 650 },
+      { name: 'Alvarez', lat: 7.1212, lng: -73.1078, r: 700 },
+      { name: 'Las Américas', lat: 7.1245, lng: -73.1115, r: 650 },
+      { name: 'Morrorico', lat: 7.1292, lng: -73.0992, r: 1100 },
+      { name: 'Girardot', lat: 7.1238, lng: -73.1332, r: 750 },
+      { name: 'La Joya', lat: 7.1142, lng: -73.1342, r: 750 },
+      { name: 'Mutis', lat: 7.1015, lng: -73.1362, r: 850 },
+      { name: 'Fontana', lat: 7.0835, lng: -73.1135, r: 750 },
+      { name: 'Cañaveral (Floridablanca)', lat: 7.0715, lng: -73.1075, r: 1400 },
+      { name: 'Lagos (Floridablanca)', lat: 7.0672, lng: -73.1012, r: 1200 },
+      { name: 'Floridablanca Centro', lat: 7.0622, lng: -73.0865, r: 1400 },
+      { name: 'Girón Centro', lat: 7.0682, lng: -73.1695, r: 1600 },
+      { name: 'Piedecuesta Centro', lat: 6.9892, lng: -73.0495, r: 1800 }
+    ];
+
+    const BGA_POIS_INDEX = [
+      { name: 'Parque San Pío', lat: 7.1165, lng: -73.1098 },
+      { name: 'C.C. Cabecera Etapa IV', lat: 7.1173, lng: -73.1110 },
+      { name: 'C.C. Cuarta Etapa', lat: 7.1175, lng: -73.1108 },
+      { name: 'C.C. Quinta Etapa', lat: 7.1162, lng: -73.1118 },
+      { name: 'Éxito Cabecera', lat: 7.1178, lng: -73.1115 },
+      { name: 'Clínica Chicamocha', lat: 7.1180, lng: -73.1142 },
+      { name: 'Clínica San Luis', lat: 7.1172, lng: -73.1136 },
+      { name: 'Parque Las Palmas', lat: 7.1188, lng: -73.1155 },
+      { name: 'Parque Turbay', lat: 7.1205, lng: -73.1168 },
+      { name: 'C.C. Megamall', lat: 7.1246, lng: -73.1162 },
+      { name: 'Parque de los Niños', lat: 7.1238, lng: -73.1190 },
+      { name: 'Hospital Universitario HUS', lat: 7.1216, lng: -73.1188 },
+      { name: 'Parque Santander', lat: 7.1192, lng: -73.1246 },
+      { name: 'Catedral Sagrada Familia', lat: 7.1190, lng: -73.1238 },
+      { name: 'Alcaldía de Bucaramanga', lat: 7.1186, lng: -73.1268 },
+      { name: 'Parque García Rovira', lat: 7.1188, lng: -73.1272 },
+      { name: 'Parque Centenario', lat: 7.1196, lng: -73.1220 },
+      { name: 'Plaza de Mercado Centro', lat: 7.1202, lng: -73.1292 },
+      { name: 'Glorieta Quebradaseca', lat: 7.1258, lng: -73.1245 },
+      { name: 'Estación Quebradaseca', lat: 7.1254, lng: -73.1248 },
+      { name: 'Parque San Francisco', lat: 7.1308, lng: -73.1228 },
+      { name: 'Universidad UIS', lat: 7.1404, lng: -73.1211 },
+      { name: 'Glorieta Caballo de Bolívar', lat: 7.1380, lng: -73.1228 },
+      { name: 'Estadio Américo Montanini', lat: 7.1365, lng: -73.1166 },
+      { name: 'SENA Girón / Quebradaseca', lat: 7.1262, lng: -73.1185 },
+      { name: 'Glorieta La Meseta', lat: 7.1228, lng: -73.1310 },
+      { name: 'Viaducto La Flora', lat: 7.1055, lng: -73.1100 },
+      { name: 'Puente La Novena', lat: 7.1135, lng: -73.1268 },
+      { name: 'Plaza Mayor / Real de Minas', lat: 7.1052, lng: -73.1252 },
+      { name: 'Éxito La Rosita', lat: 7.1118, lng: -73.1228 },
+      { name: 'Estación La Rosita', lat: 7.1112, lng: -73.1236 },
+      { name: 'Glorieta Puerta del Sol', lat: 7.1074, lng: -73.1145 },
+      { name: 'C.C. Acrópolis', lat: 7.1058, lng: -73.1242 },
+      { name: 'C.C. Cacique', lat: 7.0982, lng: -73.1066 },
+      { name: 'Neomundo', lat: 7.0992, lng: -73.1088 },
+      { name: 'Intercambiador El Bueno', lat: 7.1045, lng: -73.1155 },
+      { name: 'Estación Provenza', lat: 7.0878, lng: -73.1168 },
+      { name: 'Terminal de Transportes', lat: 7.0885, lng: -73.1338 },
+      { name: 'C.C. La Florida', lat: 7.0725, lng: -73.1052 },
+      { name: 'C.C. Cañaveral', lat: 7.0715, lng: -73.1074 },
+      { name: 'C.C. Caracolí', lat: 7.0706, lng: -73.1054 },
+      { name: 'Clínica FOSCAL', lat: 7.0685, lng: -73.1085 },
+      { name: 'Makro / La Pera', lat: 7.0752, lng: -73.1112 },
+      { name: 'Estación Lagos', lat: 7.0674, lng: -73.1045 },
+      { name: 'Estación Payador', lat: 7.0762, lng: -73.1095 },
+      { name: 'Parque Principal Floridablanca', lat: 7.0622, lng: -73.0865 },
+      { name: 'Parque Principal Girón', lat: 7.0682, lng: -73.1695 },
+      { name: 'C.C. De La Cuesta', lat: 6.9985, lng: -73.0542 },
+      { name: 'Parque Principal Piedecuesta', lat: 6.9892, lng: -73.0495 }
+    ];
+
+    const BGA_ROADS_INDEX = [
+      { name: 'Carrera 27', lat: 7.1180, lng: -73.1180 },
+      { name: 'Carrera 33', lat: 7.1170, lng: -73.1116 },
+      { name: 'Carrera 36 (Cabecera)', lat: 7.1165, lng: -73.1090 },
+      { name: 'Carrera 15', lat: 7.1195, lng: -73.1245 },
+      { name: 'Carrera 9', lat: 7.1155, lng: -73.1275 },
+      { name: 'Calle 36', lat: 7.1182, lng: -73.1225 },
+      { name: 'Calle 45', lat: 7.1135, lng: -73.1210 },
+      { name: 'Calle 56', lat: 7.1092, lng: -73.1145 },
+      { name: 'Av. Quebradaseca', lat: 7.1256, lng: -73.1215 },
+      { name: 'Bulevar Santander', lat: 7.1278, lng: -73.1235 },
+      { name: 'Bulevar Bolívar', lat: 7.1255, lng: -73.1285 },
+      { name: 'Av. González Valencia', lat: 7.1140, lng: -73.1145 },
+      { name: 'Diagonal 15', lat: 7.1118, lng: -73.1218 },
+      { name: 'Transversal Oriental', lat: 7.0985, lng: -73.1045 },
+      { name: 'Autopista a Floridablanca', lat: 7.0825, lng: -73.1125 },
+      { name: 'Anillo Vial', lat: 7.0785, lng: -73.1395 },
+      { name: 'Vía a Girón', lat: 7.0865, lng: -73.1495 },
+      { name: 'Autopista a Piedecuesta', lat: 7.0320, lng: -73.0760 }
+    ];
+
+    const GEO_CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+    const GEO_CACHE_MAX_ENTRIES = 250;
+    const GEO_LOOKUP_MIN_INTERVAL_MS = 1250;
+    const geoMemoryPlaceCache = new Map();
+    const geoPendingQueue = [];
+    const geoQueuedKeys = new Set();
+    let geoLookupTimerId = null;
+    let lastGeoLookupAt = 0;
+
+    (function hydrateGeoPlaceCache() {
+      const stored = safeReadJson(STORAGE_KEYS.GEO_PLACE_CACHE, null);
+      if (!stored || typeof stored !== 'object') return;
+      const now = Date.now();
+      Object.entries(stored).forEach(([k, val]) => {
+        if (val && typeof val === 'object' && val.barrio && (now - Number(val.ts || 0)) < GEO_CACHE_TTL_MS) {
+          geoMemoryPlaceCache.set(k, val);
+        }
+      });
+    })();
+
+    function persistGeoPlaceCache() {
+      try {
+        const entries = Array.from(geoMemoryPlaceCache.entries())
+          .sort((a, b) => Number((b[1] && b[1].ts) || 0) - Number((a[1] && a[1].ts) || 0))
+          .slice(0, GEO_CACHE_MAX_ENTRIES);
+        const obj = {};
+        entries.forEach(([k, v]) => {
+          obj[k] = v;
+        });
+        localStorage.setItem(STORAGE_KEYS.GEO_PLACE_CACHE, JSON.stringify(obj));
+      } catch (e) {}
+    }
+
+    function getAnthiGeoBucketKey(lat, lng) {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) return '';
+      return `${Math.round(nLat * 900)}_${Math.round(nLng * 900)}`;
+    }
+
+    function resolveLocalBgaPlace(lat, lng) {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) {
+        return { barrio: 'Bucaramanga', ref: 'Área metropolitana', poiDist: Infinity, barrioDist: Infinity, isExact: false };
+      }
+
+      let bestBarrio = null;
+      let bestBarrioDist = Infinity;
+      let bestRatio = Infinity;
+      for (let i = 0; i < BGA_BARRIOS_INDEX.length; i += 1) {
+        const b = BGA_BARRIOS_INDEX[i];
+        const d = calcularDistanciaMetros(nLat, nLng, b.lat, b.lng);
+        const ratio = d / Math.max(400, b.r || 700);
+        if (ratio < bestRatio) {
+          bestRatio = ratio;
+          bestBarrio = b;
+          bestBarrioDist = d;
+        }
+      }
+
+      let nearestPoi = null;
+      let nearestPoiDist = Infinity;
+      for (let i = 0; i < BGA_POIS_INDEX.length; i += 1) {
+        const p = BGA_POIS_INDEX[i];
+        const d = calcularDistanciaMetros(nLat, nLng, p.lat, p.lng);
+        if (d < nearestPoiDist) {
+          nearestPoiDist = d;
+          nearestPoi = p;
+        }
+      }
+
+      let nearestRoad = null;
+      let nearestRoadDist = Infinity;
+      for (let i = 0; i < BGA_ROADS_INDEX.length; i += 1) {
+        const r = BGA_ROADS_INDEX[i];
+        const d = calcularDistanciaMetros(nLat, nLng, r.lat, r.lng);
+        if (d < nearestRoadDist) {
+          nearestRoadDist = d;
+          nearestRoad = r;
+        }
+      }
+
+      const barrioName = bestBarrio && bestBarrioDist <= 2800
+        ? bestBarrio.name
+        : 'Bucaramanga';
+
+      let refLabel = '';
+      if (nearestPoi && nearestPoiDist <= 450) {
+        refLabel = `Cerca de ${nearestPoi.name}`;
+      } else if (nearestRoad && nearestRoadDist <= 380) {
+        refLabel = `Sector ${nearestRoad.name}`;
+      } else if (nearestPoi && nearestPoiDist <= 1400) {
+        refLabel = `Cerca de ${nearestPoi.name}`;
+      } else if (nearestRoad && nearestRoadDist <= 1800) {
+        refLabel = `Zona ${nearestRoad.name}`;
+      } else {
+        refLabel = 'Vía principal del sector';
+      }
+
+      return {
+        barrio: barrioName,
+        ref: refLabel,
+        poiDist: nearestPoiDist,
+        barrioDist: bestBarrioDist,
+        isExact: Boolean(nearestPoi && nearestPoiDist <= 320 && bestBarrioDist <= 1200)
+      };
+    }
+
+    function composePlaceDisplay(info, mode = 'full', userNote = '') {
+      const barrio = String((info && info.barrio) || 'Bucaramanga').trim();
+      const ref = String((info && info.ref) || '').trim();
+      const note = String(userNote || '').trim();
+      if (mode === 'barrio') return barrio;
+      if (note) {
+        const noteLower = note.toLowerCase();
+        const barrioLower = barrio.toLowerCase().split('(')[0].trim();
+        if (barrioLower && noteLower.includes(barrioLower)) {
+          return note;
+        }
+        return `${barrio} · ${note}`;
+      }
+      if (mode === 'ref') return ref || barrio;
+      const strippedRef = ref.replace(/^(cerca de|sector|zona|sobre)\s+/i, '').trim().toLowerCase();
+      if (ref && strippedRef && strippedRef !== barrio.toLowerCase()) {
+        return `${barrio} • ${ref}`;
+      }
+      return barrio;
+    }
+
+    function updateLiveDomGeoElements(bucketKey, info) {
+      if (typeof document === 'undefined' || !bucketKey || !info) return;
+      try {
+        document.querySelectorAll(`[data-geo-key="${bucketKey}"]`).forEach((el) => {
+          const mode = el.getAttribute('data-geo-mode') || 'full';
+          const note = el.getAttribute('data-geo-note') || '';
+          el.textContent = composePlaceDisplay(info, mode, note);
+        });
+      } catch (e) {}
+    }
+
+    async function processNextReverseGeocode() {
+      geoLookupTimerId = null;
+      if (geoPendingQueue.length === 0) return;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+      if (typeof fetch !== 'function') return;
+
+      const waitMs = GEO_LOOKUP_MIN_INTERVAL_MS - (Date.now() - lastGeoLookupAt);
+      if (waitMs > 0) {
+        geoLookupTimerId = setTimeout(processNextReverseGeocode, waitMs);
+        return;
+      }
+
+      const item = geoPendingQueue.shift();
+      if (!item) return;
+      geoQueuedKeys.delete(item.key);
+      lastGeoLookupAt = Date.now();
+
+      try {
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const abortId = controller ? setTimeout(() => controller.abort(), 4500) : null;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(item.lat)}&lon=${encodeURIComponent(item.lng)}&zoom=18&addressdetails=1&accept-language=es`;
+        const resp = await fetch(url, {
+          headers: { Accept: 'application/json' },
+          signal: controller ? controller.signal : undefined
+        });
+        if (abortId) clearTimeout(abortId);
+        if (resp && resp.ok) {
+          const data = await resp.json();
+          const addr = (data && data.address) || {};
+          const fallbackLocal = resolveLocalBgaPlace(item.lat, item.lng);
+          const barrioRaw = addr.neighbourhood || addr.suburb || addr.quarter || addr.city_district || addr.town || addr.village || '';
+          const cleanBarrio = String(barrioRaw || fallbackLocal.barrio || 'Bucaramanga').trim();
+          const poiRaw = addr.amenity || addr.shop || addr.leisure || addr.tourism || addr.building || (data && data.name) || '';
+          const roadRaw = addr.road || addr.pedestrian || '';
+          let cleanRef = fallbackLocal.ref;
+          if (poiRaw && String(poiRaw).trim().toLowerCase() !== cleanBarrio.toLowerCase()) {
+            cleanRef = `Cerca de ${String(poiRaw).trim()}`;
+          } else if (roadRaw && fallbackLocal.poiDist > 260) {
+            cleanRef = `Sobre ${String(roadRaw).trim()}`;
+          }
+          const enriched = {
+            barrio: cleanBarrio,
+            ref: cleanRef,
+            ts: Date.now()
+          };
+          geoMemoryPlaceCache.set(item.key, enriched);
+          persistGeoPlaceCache();
+          updateLiveDomGeoElements(item.key, enriched);
+        }
+      } catch (e) {
+      } finally {
+        if (geoPendingQueue.length > 0 && !geoLookupTimerId) {
+          geoLookupTimerId = setTimeout(processNextReverseGeocode, GEO_LOOKUP_MIN_INTERVAL_MS);
+        }
+      }
+    }
+
+    function enqueueReverseGeocodeLookup(lat, lng, bucketKey) {
+      if (!bucketKey || geoMemoryPlaceCache.has(bucketKey) || geoQueuedKeys.has(bucketKey)) return;
+      if (typeof fetch !== 'function' || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
+      if (geoPendingQueue.length >= 10) return;
+      geoQueuedKeys.add(bucketKey);
+      geoPendingQueue.push({ key: bucketKey, lat: Number(lat), lng: Number(lng) });
+      if (!geoLookupTimerId) {
+        const delay = Math.max(120, GEO_LOOKUP_MIN_INTERVAL_MS - (Date.now() - lastGeoLookupAt));
+        geoLookupTimerId = setTimeout(processNextReverseGeocode, delay);
+      }
+    }
+
+    function getResolvedPlaceInfo(lat, lng, opts = {}) {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      const local = resolveLocalBgaPlace(nLat, nLng);
+      const bucketKey = getAnthiGeoBucketKey(nLat, nLng);
+      if (bucketKey && geoMemoryPlaceCache.has(bucketKey)) {
+        const cached = geoMemoryPlaceCache.get(bucketKey);
+        return {
+          key: bucketKey,
+          barrio: cached.barrio || local.barrio,
+          ref: local.poiDist <= 200 ? local.ref : (cached.ref || local.ref),
+          fromCache: true
+        };
+      }
+      if (bucketKey && opts.allowRemote !== false && !local.isExact) {
+        enqueueReverseGeocodeLookup(nLat, nLng, bucketKey);
+      }
+      return {
+        key: bucketKey,
+        barrio: local.barrio,
+        ref: local.ref,
+        fromCache: false
+      };
+    }
+
+    function formatGeoPlaceText(lat, lng, mode = 'full', userNote = '', opts = {}) {
+      const info = getResolvedPlaceInfo(lat, lng, opts);
+      return composePlaceDisplay(info, mode, userNote);
+    }
+
+    function formatGeoPlaceHtml(lat, lng, mode = 'full', overrideInitial = '', userNote = '', opts = {}) {
+      const info = getResolvedPlaceInfo(lat, lng, opts);
+      const text = overrideInitial || composePlaceDisplay(info, mode, userNote);
+      const noteAttr = userNote ? ` data-geo-note="${escapeHtml(userNote)}"` : '';
+      return `<span data-geo-key="${escapeHtml(info.key)}" data-geo-mode="${escapeHtml(mode)}"${noteAttr}>${escapeHtml(text)}</span>`;
+    }
+
+    function formatAlertLocationText(rep, opts = {}) {
+      if (!rep) return 'Bucaramanga';
+      const includeDesc = opts.includeDescription !== false;
+      const note = includeDesc ? String(rep.descripcion || rep.description || '').trim() : '';
+      return formatGeoPlaceText(rep.lat, rep.lng, opts.mode || 'full', note, opts);
+    }
+
+    function formatAlertPlaceHtml(rep, mode = 'full') {
+      if (!rep) return '<span>Bucaramanga</span>';
+      const note = String(rep.descripcion || rep.description || '').trim();
+      return formatGeoPlaceHtml(rep.lat, rep.lng, mode, '', note);
+    }
+
+    window.__anthiResolvePlace = getResolvedPlaceInfo;
+    window.__anthiFormatAlertLocationText = formatAlertLocationText;
+
     function updateUserPositionOnMap(lat, lng, mode = 'live', speedKmh = null, accuracyMeters = null) {
       const isDefault = mode === 'default';
       const isCached = mode === 'cached';
       latestGps = { lat, lng, isDefault, isCached };
+      const resolvedGpsPlace = formatGeoPlaceText(lat, lng, 'full');
 
       const hudCoordsEl = document.getElementById('hudCoords');
       if (hudCoordsEl) {
-        hudCoordsEl.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        hudCoordsEl.textContent = resolvedGpsPlace;
       }
       if (typeof speedKmh === 'number' && !Number.isNaN(speedKmh) && speedKmh >= 0) {
         const hudSpeedEl = document.getElementById('hudSpeed');
@@ -7755,14 +8278,14 @@
       const gpsNote = document.getElementById('gpsStatusText');
       if (gpsNote) {
         if (isDefault) {
-          gpsNote.textContent = `📍 Ubicación por defecto en Bucaramanga (${lat.toFixed(4)}, ${lng.toFixed(4)}).`;
+          gpsNote.textContent = `📍 Zona actual: ${resolvedGpsPlace}.`;
         } else if (isCached) {
-          gpsNote.textContent = `📌 Última posición GPS guardada (${lat.toFixed(5)}, ${lng.toFixed(5)}).`;
+          gpsNote.textContent = `📌 Última ubicación conocida: ${resolvedGpsPlace}.`;
         } else {
           const accLabel = typeof accuracyMeters === 'number' && !Number.isNaN(accuracyMeters)
-            ? ` · ±${Math.round(accuracyMeters)}m`
+            ? ` · precisión ±${Math.round(accuracyMeters)} m`
             : '';
-          gpsNote.textContent = `🔵 GPS preciso activo (${lat.toFixed(5)}, ${lng.toFixed(5)}${accLabel}).`;
+          gpsNote.textContent = `🔵 GPS activo: ${resolvedGpsPlace}${accLabel}.`;
         }
       }
     }
@@ -8080,7 +8603,7 @@
             iconSize: [28, 28],
             iconAnchor: [14, 14]
           })
-        }).bindPopup(`<strong>⭐ ${escapeHtml(pt.name)}</strong><br/><small>${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</small>`);
+        }).bindPopup(`<strong>⭐ ${escapeHtml(pt.name)}</strong><br/><small>📍 ${formatGeoPlaceHtml(pt.lat, pt.lng, 'full')}</small>`);
         frequentPointsLayer.addLayer(marker);
 
         const row = document.createElement('div');
@@ -8088,7 +8611,7 @@
         row.innerHTML = `
           <div class="point-info">
             <div class="point-title">⭐ ${escapeHtml(pt.name)}</div>
-            <div class="point-coords">${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</div>
+            <div class="point-coords">📍 ${formatGeoPlaceHtml(pt.lat, pt.lng, 'full')}</div>
           </div>
           <button type="button" class="point-delete" title="Borrar">🗑️</button>
         `;
@@ -8437,7 +8960,8 @@
       if (manualReportCoords) {
         btnModeGpsReport.classList.remove('active');
         btnModeManualPin.classList.add('active');
-        gpsStatusText.textContent = `📌 Pin manual fijado en mapa (${manualReportCoords.lat.toFixed(5)}, ${manualReportCoords.lng.toFixed(5)}).`;
+        const manualPlace = formatGeoPlaceText(manualReportCoords.lat, manualReportCoords.lng, 'full');
+        gpsStatusText.textContent = `📌 Pin fijado en mapa: ${manualPlace}.`;
         gpsStatusText.style.color = '#67e8f9';
       } else {
         btnModeGpsReport.classList.add('active');
@@ -8451,7 +8975,7 @@
     function updateManualPinCenterDisplay() {
       if (!isPickingReportPin || !manualPinCoordsLabel) return;
       const center = map.getCenter();
-      manualPinCoordsLabel.textContent = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
+      manualPinCoordsLabel.textContent = formatGeoPlaceText(center.lat, center.lng, 'full', '', { allowRemote: false });
     }
 
     function openManualPinPicker(targetMode = 'report') {
@@ -8963,7 +9487,7 @@
         : tier === 'active'
         ? 'Activa 2/3'
         : 'Reciente';
-      const desc = String(rep.descripcion || rep.description || '').trim();
+      const placeText = formatAlertLocationText(rep, { includeDescription: true });
 
       const vipPrefix = isVipUser
         ? (activeVip.tipoVip === 'fundador'
@@ -8974,7 +9498,7 @@
         : '⚠️ ¡Alerta ANTHI! · ';
 
       const title = `${vipPrefix}${meta.emoji} ${meta.label}`;
-      const body = `${tierTag} ${distLabel}${desc ? ` · ${desc}` : ''}${extraCount}`;
+      const body = `${tierTag} ${distLabel}${placeText ? ` · ${placeText}` : ''}${extraCount}`;
       const rLat = Number(rep.lat);
       const rLng = Number(rep.lng);
       const safeLat = Number.isFinite(rLat) ? rLat : null;
@@ -9272,9 +9796,11 @@
             } catch (e) {}
           }
           if (!document.hidden) {
+            const closestPlace = formatAlertLocationText(closest.rep, { includeDescription: false });
+            const placeTag = closestPlace ? ` · ${closestPlace}` : '';
             const toastMsg = isAgenteTransitoTipo(closest.rep.tipo || closest.rep.type)
-              ? `📡 ANTHI Sónar: 🚦 Agente de Tránsito regulando a ${Math.round(closest.dist)} m (radio ${closest.effectiveRadius} m)`
-              : `📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m de ti`;
+              ? `📡 ANTHI Sónar: 🚦 Agente de Tránsito regulando a ${Math.round(closest.dist)} m (radio ${closest.effectiveRadius} m${placeTag})`
+              : `📡 ANTHI Sónar: ${meta.emoji} ${meta.label} a ${Math.round(closest.dist)} m${placeTag}`;
             showToast(toastMsg);
           }
         }
@@ -9492,7 +10018,7 @@
             <div style="font-size:12px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
               ${escapeHtml(d.emoji || '📍')} ${escapeHtml(d.name)}
             </div>
-            <div style="font-size:10px;color:#94a3b8;">${Number(d.lat).toFixed(4)}, ${Number(d.lng).toFixed(4)}</div>
+            <div style="font-size:10px;color:#94a3b8;">📍 ${formatGeoPlaceHtml(d.lat, d.lng, 'full')}</div>
           </div>
           <div class="dest-crud-actions">
             <button type="button" class="dest-mini-btn go" title="Activar radar hacia este destino">📡 Ir</button>
@@ -9922,10 +10448,9 @@
         const alertListHtml = alertsInProximity.slice(0, 5).map(({ rep, distFromUser, reason }) => {
           const meta = getTipoMeta(rep.tipo || rep.type);
           const kmAway = (distFromUser / 1000).toFixed(1);
-          const desc = String(rep.descripcion || '').trim();
           return `<div class="route-proximity-hit" data-rep-id="${escapeHtml(rep.id)}" style="margin-top:6px;padding-top:6px;border-top:1px solid #334155;cursor:pointer;">
             <strong>${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</strong> · a ${kmAway} km (${escapeHtml(reason)})
-            ${desc ? `<div style="color:#94a3b8;font-size:11px;">${escapeHtml(desc)}</div>` : ''}
+            <div style="color:#94a3b8;font-size:11px;">📍 ${formatAlertPlaceHtml(rep)}</div>
           </div>`;
         }).join('');
 
@@ -11372,12 +11897,23 @@
     const ceposJoystickTargetLabel = document.getElementById('ceposJoystickTargetLabel');
     const ceposJoystickSyncBadge = document.getElementById('ceposJoystickSyncBadge');
     const ceposJoystickCoords = document.getElementById('ceposJoystickCoords');
+    const btnMinimizeCeposJoystick = document.getElementById('btnMinimizeCeposJoystick');
     const btnCloseCeposJoystick = document.getElementById('btnCloseCeposJoystick');
     const btnCenterCeposJoystick = document.getElementById('btnCenterCeposJoystick');
     const btnFlushCeposJoystick = document.getElementById('btnFlushCeposJoystick');
     const ceposStickPad = document.getElementById('ceposStickPad');
     const ceposStickKnob = document.getElementById('ceposStickKnob');
     const ceposDpadGrid = document.getElementById('ceposDpadGrid');
+
+    const ceposMiniDock = document.getElementById('ceposMiniDock');
+    const ceposMiniStatusText = document.getElementById('ceposMiniStatusText');
+    const ceposMiniPlaceText = document.getElementById('ceposMiniPlaceText');
+    const btnExpandCeposJoystick = document.getElementById('btnExpandCeposJoystick');
+    const btnCloseCeposMiniDock = document.getElementById('btnCloseCeposMiniDock');
+    const btnCeposMiniDraw = document.getElementById('btnCeposMiniDraw');
+    const btnCeposMiniPlayPause = document.getElementById('btnCeposMiniPlayPause');
+    const btnCeposMiniChangeRoute = document.getElementById('btnCeposMiniChangeRoute');
+    const btnCeposMiniClearRoute = document.getElementById('btnCeposMiniClearRoute');
 
     const CEPOS_SYNC_THROTTLE_MS = 800;
     const CEPOS_AUTO_SYNC_THROTTLE_MS = 2500;
@@ -11395,6 +11931,7 @@
 
     const ceposJoystickState = {
       activeReportId: null,
+      isMinimized: false,
       stepMeters: 25,
       pendingCoords: null,
       dirty: false,
@@ -11443,6 +11980,16 @@
       }
     }
 
+    function updateCeposLocationLabels(lat, lng) {
+      const placeLabel = formatGeoPlaceText(lat, lng, 'full', '', { allowRemote: false });
+      if (ceposJoystickCoords) {
+        ceposJoystickCoords.textContent = `📍 ${placeLabel}`;
+      }
+      if (ceposMiniPlaceText) {
+        ceposMiniPlaceText.textContent = `📍 ${placeLabel}`;
+      }
+    }
+
     function findReportByIdForJoystick(reportId) {
       if (!reportId) return null;
       const targetId = String(reportId);
@@ -11479,9 +12026,7 @@
           }
         });
       }
-      if (ceposJoystickCoords) {
-        ceposJoystickCoords.textContent = `📍 ${newLat.toFixed(5)}, ${newLng.toFixed(5)}`;
-      }
+      updateCeposLocationLabels(newLat, newLng);
     }
 
     async function flushCeposPositionToFirestore(forceDrain = false) {
@@ -11716,6 +12261,49 @@
         }
       }
 
+      if (btnCeposMiniDraw) {
+        btnCeposMiniDraw.classList.toggle('active', ceposRouteState.isDrawing);
+        btnCeposMiniDraw.textContent = ceposRouteState.isDrawing
+          ? '✓ Listo'
+          : (hasValidRoute ? '✏️ Editar' : '✏️ Ruta');
+      }
+      if (btnCeposMiniPlayPause) {
+        btnCeposMiniPlayPause.disabled = !hasValidRoute;
+        btnCeposMiniPlayPause.classList.toggle('playing', ceposRouteState.isPlaying);
+        if (ceposRouteState.isPlaying) {
+          btnCeposMiniPlayPause.textContent = '⏸ Pausar';
+        } else if (hasValidRoute && ceposRouteState.traveledMeters > 0 && !ceposRouteState.isCompleted) {
+          btnCeposMiniPlayPause.textContent = '▶ Seguir';
+        } else if (ceposRouteState.isCompleted) {
+          btnCeposMiniPlayPause.textContent = '▶ Repetir';
+        } else {
+          btnCeposMiniPlayPause.textContent = '▶ Iniciar';
+        }
+      }
+      if (btnCeposMiniChangeRoute) {
+        btnCeposMiniChangeRoute.disabled = !ceposJoystickState.activeReportId;
+      }
+      if (btnCeposMiniClearRoute) {
+        btnCeposMiniClearRoute.disabled = ceposRouteState.waypoints.length === 0;
+      }
+      if (ceposMiniStatusText) {
+        if (ceposRouteState.isDrawing) {
+          ceposMiniStatusText.textContent = hasValidRoute
+            ? `✏️ Trazando: ${ceposRouteState.waypoints.length} pts (${totalRounded} m)`
+            : '✏️ Desliza el dedo sobre las calles...';
+        } else if (ceposRouteState.isPlaying) {
+          ceposMiniStatusText.textContent = `🚐 Avanzando (${ceposRouteState.speedKmh} km/h): ${traveledRounded}/${totalRounded} m`;
+        } else if (ceposRouteState.isCompleted && hasValidRoute) {
+          ceposMiniStatusText.textContent = `🏁 Ruta completada (${totalRounded} m)`;
+        } else if (hasValidRoute && ceposRouteState.traveledMeters > 0) {
+          ceposMiniStatusText.textContent = `⏸ Ruta en pausa: ${traveledRounded}/${totalRounded} m`;
+        } else if (hasValidRoute) {
+          ceposMiniStatusText.textContent = `🛣️ Ruta lista (${totalRounded} m) · Mapa despejado`;
+        } else {
+          ceposMiniStatusText.textContent = '🚐 Cepos activo · Mapa despejado para trazar ruta';
+        }
+      }
+
       syncCeposManualDeckVisibility();
     }
 
@@ -11746,6 +12334,41 @@
       updateCeposRouteUI();
     }
 
+    function minimizeCeposJoystick() {
+      if (!ceposJoystickState.activeReportId) return false;
+      stopCeposHoldAndStickTimers();
+      ceposJoystickState.isMinimized = true;
+      if (ceposJoystickPanel) {
+        ceposJoystickPanel.classList.remove('visible');
+        ceposJoystickPanel.setAttribute('aria-hidden', 'true');
+      }
+      if (bottomPanelEl && !isPickingReportPin && !isReactionMapModeActive) {
+        bottomPanelEl.style.display = '';
+      }
+      if (ceposMiniDock) {
+        ceposMiniDock.classList.add('visible');
+        ceposMiniDock.setAttribute('aria-hidden', 'false');
+      }
+      updateCeposRouteUI();
+      return true;
+    }
+
+    function restoreCeposJoystick() {
+      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      ceposJoystickState.isMinimized = false;
+      if (ceposMiniDock) {
+        ceposMiniDock.classList.remove('visible');
+        ceposMiniDock.setAttribute('aria-hidden', 'true');
+      }
+      if (bottomPanelEl) bottomPanelEl.style.display = 'none';
+      if (ceposJoystickPanel) {
+        ceposJoystickPanel.classList.add('visible');
+        ceposJoystickPanel.setAttribute('aria-hidden', 'false');
+      }
+      updateCeposRouteUI();
+      return true;
+    }
+
     function enterCeposDrawMode() {
       if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
       if (ceposRouteState.isPlaying) {
@@ -11753,6 +12376,9 @@
       }
       ceposRouteState.isDrawing = true;
       ceposRouteState.isCompleted = false;
+      if (!ceposJoystickState.isMinimized) {
+        minimizeCeposJoystick();
+      }
       if (map) {
         try {
           if (map.dragging && typeof map.dragging.disable === 'function') map.dragging.disable();
@@ -11767,7 +12393,7 @@
         } catch (e) {}
       }
       updateCeposRouteUI();
-      showToast('✏️ Desliza tu dedo sobre el mapa (o toca esquinas) para trazar la ruta.');
+      showToast('✏️ Mapa despejado: desliza tu dedo por las calles para trazar la ruta.');
       return true;
     }
 
@@ -12005,12 +12631,17 @@
       }
       const hadActive = Boolean(ceposJoystickState.activeReportId);
       ceposJoystickState.activeReportId = null;
+      ceposJoystickState.isMinimized = false;
       ceposJoystickState.pendingCoords = null;
       ceposJoystickState.dirty = false;
       ceposJoystickState.needsTrailingFlush = false;
       if (ceposJoystickPanel) {
         ceposJoystickPanel.classList.remove('visible');
         ceposJoystickPanel.setAttribute('aria-hidden', 'true');
+      }
+      if (ceposMiniDock) {
+        ceposMiniDock.classList.remove('visible');
+        ceposMiniDock.setAttribute('aria-hidden', 'true');
       }
       if (bottomPanelEl && !isPickingReportPin && !isReactionMapModeActive) {
         bottomPanelEl.style.display = '';
@@ -12045,6 +12676,7 @@
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
 
       ceposJoystickState.activeReportId = String(rep.id);
+      ceposJoystickState.isMinimized = false;
       ceposJoystickState.pendingCoords = { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
       ceposJoystickState.dirty = false;
       ceposJoystickState.needsTrailingFlush = false;
@@ -12053,14 +12685,16 @@
       if (ceposJoystickTargetLabel) {
         ceposJoystickTargetLabel.textContent = rawDesc || 'Camionetica / Unidad Cepos';
       }
-      if (ceposJoystickCoords) {
-        ceposJoystickCoords.textContent = `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-      }
+      updateCeposLocationLabels(lat, lng);
       updateCeposJoystickBadge('saved');
       syncCeposStepButtons(ceposJoystickState.stepMeters);
       updateCeposRouteUI();
 
       isFollowingUser = false;
+      if (ceposMiniDock) {
+        ceposMiniDock.classList.remove('visible');
+        ceposMiniDock.setAttribute('aria-hidden', 'true');
+      }
       if (bottomPanelEl) bottomPanelEl.style.display = 'none';
       if (ceposJoystickPanel) {
         ceposJoystickPanel.classList.add('visible');
@@ -12081,6 +12715,8 @@
 
     window.__anthiOpenCeposJoystick = window.openCeposJoystick;
     window.__anthiCloseCeposJoystick = window.closeCeposJoystick;
+    window.__anthiMinimizeCeposJoystick = minimizeCeposJoystick;
+    window.__anthiRestoreCeposJoystick = restoreCeposJoystick;
     window.__anthiMoveCeposByMeters = moveCeposByMeters;
     window.__anthiGetCeposJoystickState = () => ({ ...ceposJoystickState });
     window.__anthiGetCeposRouteState = () => ({ ...ceposRouteState, waypoints: [...ceposRouteState.waypoints] });
@@ -12093,8 +12729,23 @@
     window.__anthiClearCeposRoute = () => clearCeposRouteData(false);
     window.__anthiTickCeposAutoRoute = advanceCeposAlongRouteTick;
 
+    if (btnMinimizeCeposJoystick) {
+      btnMinimizeCeposJoystick.addEventListener('click', () => {
+        minimizeCeposJoystick();
+      });
+    }
+    if (btnExpandCeposJoystick) {
+      btnExpandCeposJoystick.addEventListener('click', () => {
+        restoreCeposJoystick();
+      });
+    }
     if (btnCloseCeposJoystick) {
       btnCloseCeposJoystick.addEventListener('click', () => {
+        window.closeCeposJoystick(true);
+      });
+    }
+    if (btnCloseCeposMiniDock) {
+      btnCloseCeposMiniDock.addEventListener('click', () => {
         window.closeCeposJoystick(true);
       });
     }
@@ -12104,38 +12755,40 @@
         syncCeposManualDeckVisibility();
       });
     }
-    if (btnCeposDrawRoute) {
-      btnCeposDrawRoute.addEventListener('click', () => {
-        if (ceposRouteState.isDrawing) {
-          exitCeposDrawMode();
-        } else {
-          enterCeposDrawMode();
-        }
-      });
-    }
-    if (btnCeposPlayPauseRoute) {
-      btnCeposPlayPauseRoute.addEventListener('click', () => {
-        if (ceposRouteState.isPlaying) {
-          pauseCeposRoute(true);
-          showToast('⏸ Avance automático de Cepos en pausa.');
-        } else {
-          startCeposRoutePlayback();
-        }
-      });
-    }
-    if (btnCeposChangeRoute) {
-      btnCeposChangeRoute.addEventListener('click', () => {
-        if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
-        clearCeposRouteData(true);
-      });
-    }
-    if (btnCeposClearRoute) {
-      btnCeposClearRoute.addEventListener('click', () => {
-        if (!hasValidatedAdminPermission()) return;
-        clearCeposRouteData(false);
-        showToast('🗑️ Ruta limpiada.');
-      });
-    }
+    const handleToggleDrawClick = () => {
+      if (ceposRouteState.isDrawing) {
+        exitCeposDrawMode();
+      } else {
+        enterCeposDrawMode();
+      }
+    };
+    const handlePlayPauseClick = () => {
+      if (ceposRouteState.isPlaying) {
+        pauseCeposRoute(true);
+        showToast('⏸ Avance automático de Cepos en pausa.');
+      } else {
+        startCeposRoutePlayback();
+      }
+    };
+    const handleChangeRouteClick = () => {
+      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
+      clearCeposRouteData(true);
+    };
+    const handleClearRouteClick = () => {
+      if (!hasValidatedAdminPermission()) return;
+      clearCeposRouteData(false);
+      showToast('🗑️ Ruta limpiada.');
+    };
+
+    if (btnCeposDrawRoute) btnCeposDrawRoute.addEventListener('click', handleToggleDrawClick);
+    if (btnCeposMiniDraw) btnCeposMiniDraw.addEventListener('click', handleToggleDrawClick);
+    if (btnCeposPlayPauseRoute) btnCeposPlayPauseRoute.addEventListener('click', handlePlayPauseClick);
+    if (btnCeposMiniPlayPause) btnCeposMiniPlayPause.addEventListener('click', handlePlayPauseClick);
+    if (btnCeposChangeRoute) btnCeposChangeRoute.addEventListener('click', handleChangeRouteClick);
+    if (btnCeposMiniChangeRoute) btnCeposMiniChangeRoute.addEventListener('click', handleChangeRouteClick);
+    if (btnCeposClearRoute) btnCeposClearRoute.addEventListener('click', handleClearRouteClick);
+    if (btnCeposMiniClearRoute) btnCeposMiniClearRoute.addEventListener('click', handleClearRouteClick);
+
     document.querySelectorAll('[data-cepos-speed-kmh]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const kmh = Number(btn.dataset.ceposSpeedKmh);
@@ -12151,7 +12804,7 @@
       if (mapElForDraw && typeof mapElForDraw.addEventListener === 'function') {
         const isDrawBlockedTarget = (target) => {
           if (!target || typeof target.closest !== 'function') return false;
-          return Boolean(target.closest('.cepos-joystick-panel, .leaflet-popup, .map-controls, .top-bar, .gps-hud'));
+          return Boolean(target.closest('.cepos-joystick-panel, .cepos-mini-dock, .leaflet-popup, .map-controls, .top-bar, .gps-hud, .bottom-panel'));
         };
         const pointerToMapLatLng = (ev) => {
           const rect = mapElForDraw.getBoundingClientRect();
@@ -12318,7 +12971,7 @@
         lng: Number(Number(latlng.lng).toFixed(6))
       };
       if (rpMapCoordsLabel) {
-        rpMapCoordsLabel.textContent = `📌 ${reactionMapDraftCoords.lat.toFixed(5)}, ${reactionMapDraftCoords.lng.toFixed(5)}`;
+        rpMapCoordsLabel.textContent = `📌 ${formatGeoPlaceText(reactionMapDraftCoords.lat, reactionMapDraftCoords.lng, 'full')}`;
       }
       renderReactionMapPreview();
       if (rpMapNameInput && !rpMapNameInput.value.trim()) {
@@ -12445,14 +13098,14 @@
       let labelText = '';
       let labelColor = '#cbd5e1';
       if (pendingReactionCoords) {
-        labelText = `📌 ${pendingReactionCoords.lat.toFixed(5)}, ${pendingReactionCoords.lng.toFixed(5)}`;
+        labelText = `📌 ${formatGeoPlaceText(pendingReactionCoords.lat, pendingReactionCoords.lng, 'full')}`;
         labelColor = '#67e8f9';
       } else if (latestGps && !latestGps.isDefault) {
-        labelText = `📍 GPS: ${latestGps.lat.toFixed(5)}, ${latestGps.lng.toFixed(5)}`;
+        labelText = `📍 GPS: ${formatGeoPlaceText(latestGps.lat, latestGps.lng, 'full')}`;
         labelColor = '#6ee7b7';
       } else {
         const c = map.getCenter();
-        labelText = `🗺️ Centro mapa: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+        labelText = `🗺️ Centro: ${formatGeoPlaceText(c.lat, c.lng, 'full', '', { allowRemote: false })}`;
         labelColor = '#cbd5e1';
       }
       if (rpCoordsBadge) {
@@ -12485,7 +13138,7 @@
             ⚡ ${escapeHtml(rp.nombre)}
           </div>
           <div style="font-size:10px;color:#67e8f9;font-weight:700;">
-            Radio ${Number(rp.radioMetros || 150)} m · ${Number(rp.lat).toFixed(4)}, ${Number(rp.lng).toFixed(4)}
+            Radio ${Number(rp.radioMetros || 150)} m · 📍 ${formatGeoPlaceHtml(rp.lat, rp.lng, 'full')}
           </div>
         `;
 
@@ -12687,7 +13340,7 @@
           lng: Number(gpsCoords.lng.toFixed(6))
         };
         if (rpMapCoordsLabel) {
-          rpMapCoordsLabel.textContent = `📍 ${reactionMapDraftCoords.lat.toFixed(5)}, ${reactionMapDraftCoords.lng.toFixed(5)}`;
+          rpMapCoordsLabel.textContent = `📍 ${formatGeoPlaceText(reactionMapDraftCoords.lat, reactionMapDraftCoords.lng, 'full')}`;
         }
         map.setView([reactionMapDraftCoords.lat, reactionMapDraftCoords.lng], Math.max(map.getZoom(), 16), { animate: true });
         renderReactionMapPreview();
@@ -12839,14 +13492,14 @@
     window.__anthiUpdateAgentCoordsBadge = function updateAgentCoordsBadge() {
       if (!agentCoordsBadge) return;
       if (pendingAgentCoords) {
-        agentCoordsBadge.textContent = `📌 ${pendingAgentCoords.lat.toFixed(5)}, ${pendingAgentCoords.lng.toFixed(5)}`;
+        agentCoordsBadge.textContent = `📌 ${formatGeoPlaceText(pendingAgentCoords.lat, pendingAgentCoords.lng, 'full')}`;
         agentCoordsBadge.style.color = '#7dd3fc';
       } else if (latestGps && !latestGps.isDefault) {
-        agentCoordsBadge.textContent = `📍 GPS: ${latestGps.lat.toFixed(5)}, ${latestGps.lng.toFixed(5)}`;
+        agentCoordsBadge.textContent = `📍 GPS: ${formatGeoPlaceText(latestGps.lat, latestGps.lng, 'full')}`;
         agentCoordsBadge.style.color = '#6ee7b7';
       } else {
         const c = map.getCenter();
-        agentCoordsBadge.textContent = `🗺️ Centro mapa: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+        agentCoordsBadge.textContent = `🗺️ Centro: ${formatGeoPlaceText(c.lat, c.lng, 'full', '', { allowRemote: false })}`;
         agentCoordsBadge.style.color = '#cbd5e1';
       }
     };
@@ -12877,7 +13530,7 @@
             🚦 ${escapeHtml(descText)}
           </div>
           <div style="font-size:10px;color:#7dd3fc;font-weight:700;">
-            Radio ${radM} m · ${rep.isFixed ? '👑 Habitual' : escapeHtml(remText)} · ${Number(rep.lat).toFixed(4)}, ${Number(rep.lng).toFixed(4)}
+            Radio ${radM} m · ${rep.isFixed ? '👑 Habitual' : escapeHtml(remText)} · 📍 ${formatGeoPlaceHtml(rep.lat, rep.lng, 'full')}
           </div>
         `;
 
