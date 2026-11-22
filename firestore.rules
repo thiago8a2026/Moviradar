@@ -302,15 +302,15 @@ service cloud.firestore {
         && isValidReporte(incoming())
         && incoming().authorId == existing().authorId
         && incoming().timestamp == existing().timestamp
-        && incoming().lat == existing().lat
-        && incoming().lng == existing().lng
         && (
           (
             isAdmin()
             && !incoming().diff(existing()).affectedKeys().hasAny(['confirmations', 'denials', 'confirmaciones', 'confirmadoPor'])
           ) ||
           (
-            incoming().diff(existing()).affectedKeys().hasOnly(['confirmations', 'confirmaciones', 'confirmadoPor', 'expiresAt'])
+            incoming().lat == existing().lat
+            && incoming().lng == existing().lng
+            && incoming().diff(existing()).affectedKeys().hasOnly(['confirmations', 'confirmaciones', 'confirmadoPor', 'expiresAt'])
             && (
               incoming().confirmations == existing().confirmations + 1 ||
               (isActiveVip() && (incoming().confirmations == existing().confirmations + 2 || incoming().confirmations == existing().confirmations + 3))
@@ -325,13 +325,17 @@ service cloud.firestore {
             && existsAfter(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
           ) ||
           (
-            incoming().diff(existing()).affectedKeys().hasOnly(['denials'])
+            incoming().lat == existing().lat
+            && incoming().lng == existing().lng
+            && incoming().diff(existing()).affectedKeys().hasOnly(['denials'])
             && incoming().denials == existing().denials + 1
             && !exists(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
             && existsAfter(/databases/$(database)/documents/reportes/$(reportId)/votos/$(request.auth.uid))
           ) ||
           (
             existing().authorId == request.auth.uid
+            && incoming().lat == existing().lat
+            && incoming().lng == existing().lng
             && incoming().isFixed == existing().isFixed
             && incoming().diff(existing()).affectedKeys().hasOnly(['tipo', 'descripcion', 'urlFoto', 'mediaType', 'radioMetros'])
           )
