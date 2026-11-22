@@ -2661,7 +2661,7 @@
         </div>
 
         <p style="font-size:12px;color:#cbd5e1;line-height:1.42;margin-bottom:10px;">
-          Coloca zonas en Bucaramanga donde <strong>cualquier usuario</strong> que reporte dentro del radio active la alerta <strong>FIRME de inmediato</strong> (3 h, sin esperar confirmaciones).
+          Coloca zonas en Bucaramanga donde cualquier usuario que reporte <strong>Retén</strong> o <strong>Agente de Tránsito</strong> dentro del radio active la alerta <strong>FIRME de inmediato</strong> (3 h, sin esperar confirmaciones; accidentes, cierres viales y demás siguen su flujo normal).
         </p>
 
         <button type="button" class="btn-submit" id="btnStartReactionMapMode" style="min-height:42px;font-size:12.5px;margin-bottom:10px;">
@@ -3490,7 +3490,7 @@
               </label>
             </div>
             <p style="font-size:11px;color:#94a3b8;line-height:1.35;margin-bottom:8px;">
-              Los reportes enviados dentro de estas zonas quedan activos y FIRMES en primera opción de inmediato (sin espera de confirmaciones ni bloqueo de 300 m).
+              Los reportes de <strong>Retén</strong> o <strong>Agente de Tránsito</strong> enviados dentro de estas zonas quedan activos y FIRMES en primera opción de inmediato (accidentes, cierres viales y demás novedades siguen su flujo normal).
             </p>
             <button type="button" class="alert-admin-btn edit" id="btnLaunchMapReactionModeFromAdmin" style="width:100%;padding:7px 10px;font-size:11.5px;margin-bottom:8px;">
               🎯 Colocar varios puntos tocando el mapa
@@ -5071,6 +5071,20 @@
       );
     }
 
+    function isReactionPointEligibleTipo(tipo) {
+      const key = String(tipo || '').trim().toLowerCase();
+      if (!key) return false;
+      return (
+        key === 'retén' ||
+        key === 'reten' ||
+        key === 'retén de tránsito' ||
+        key === 'reten de transito' ||
+        key.includes('reten') ||
+        key.includes('retén') ||
+        isAgenteTransitoTipo(key)
+      );
+    }
+
     function clampAgentRadiusMeters(val) {
       const n = Math.round(Number(val));
       if (!Number.isFinite(n)) return DEFAULT_AGENT_RADIUS_METERS;
@@ -5226,7 +5240,7 @@
 
     function getFastActivationTag(rep) {
       if (!rep) return '';
-      if (rep.activacionRapida === 'punto_reaccion' || rep.puntoReaccionId) {
+      if ((rep.activacionRapida === 'punto_reaccion' || rep.puntoReaccionId) && isReactionPointEligibleTipo(rep.tipo || rep.type)) {
         return rep.puntoReaccionNombre
           ? `⚡ Punto Crítico: ${rep.puntoReaccionNombre}`
           : '⚡ Punto Crítico';
@@ -6793,7 +6807,10 @@
       } catch (e) {}
     }
 
-    function findMatchingReactionPoint(lat, lng) {
+    function findMatchingReactionPoint(lat, lng, tipo = null) {
+      if (tipo !== null && tipo !== undefined && !isReactionPointEligibleTipo(tipo)) {
+        return null;
+      }
       const targetLat = Number(lat);
       const targetLng = Number(lng);
       if (!Number.isFinite(targetLat) || !Number.isFinite(targetLng)) return null;
@@ -6814,6 +6831,9 @@
       }
       return closest;
     }
+
+    window.__anthiIsReactionPointEligibleTipo = isReactionPointEligibleTipo;
+    window.__anthiFindMatchingReactionPoint = findMatchingReactionPoint;
 
     const CRITICAL_ZONES_VISIBILITY_KEY = 'anthi_show_critical_zones_v1';
 
@@ -7668,7 +7688,9 @@
       const bannerEl = fastActivationBanner || document.getElementById('fastActivationBanner');
       if (!bannerEl) return;
       const previewCoords = getCurrentReportPreviewCoords();
-      const matchedRP = previewCoords ? findMatchingReactionPoint(previewCoords.lat, previewCoords.lng) : null;
+      const selectedTipo = selectedCategory && selectedCategory.type ? selectedCategory.type : 'Retén de Tránsito';
+      const spatialMatchedRP = previewCoords ? findMatchingReactionPoint(previewCoords.lat, previewCoords.lng) : null;
+      const matchedRP = spatialMatchedRP && isReactionPointEligibleTipo(selectedTipo) ? spatialMatchedRP : null;
       const hasPhoto = Boolean(pendingImageDataUrl && String(pendingImageDataUrl).length > 100);
       const isAdminMode = hasValidatedAdminPermission();
       const activeVip = getActiveVipProfile(auth.currentUser);
@@ -7678,7 +7700,7 @@
         bannerEl.style.background = 'rgba(6, 182, 212, 0.14)';
         bannerEl.style.border = '1px solid rgba(34, 211, 238, 0.5)';
         bannerEl.style.color = '#a5f3fc';
-        bannerEl.innerHTML = `⚡ <strong>Punto de Reacción Inmediata «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> tu alerta quedará <strong>FIRME y activa de inmediato</strong> para toda la comunidad.`;
+        bannerEl.innerHTML = `⚡ <strong>Punto de Reacción Inmediata «${escapeHtml(matchedRP.point.nombre)}» (${matchedRP.radiusMeters} m):</strong> tu alerta de <strong>${escapeHtml(getTipoMeta(selectedTipo).label)}</strong> quedará <strong>FIRME y activa de inmediato</strong> para toda la comunidad.`;
         if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = '⚡ Publicar FIRME en primera opción';
         return;
       }
@@ -7722,7 +7744,9 @@
       bannerEl.style.background = 'rgba(15, 23, 42, 0.72)';
       bannerEl.style.border = '1px solid rgba(100, 116, 139, 0.45)';
       bannerEl.style.color = '#cbd5e1';
-      bannerEl.innerHTML = '⏳ <strong>Activación escalonada:</strong> inicia 1/3 (30 min) → 2/3 (1h con radar) → 3+ (Firme 3h). <em>Tip: adjunta una foto, usa código VIP o reporta en un Punto Crítico para activación inmediata.</em>';
+      bannerEl.innerHTML = spatialMatchedRP
+        ? `⏳ <strong>Activación escalonada:</strong> inicia 1/3 (30 min) → 2/3 (1h con radar) → 3+ (Firme 3h). <em>Nota: el Punto Crítico «${escapeHtml(spatialMatchedRP.point.nombre)}» aplica activación inmediata solo para Retén y Agente de Tránsito.</em>`
+        : '⏳ <strong>Activación escalonada:</strong> inicia 1/3 (30 min) → 2/3 (1h con radar) → 3+ (Firme 3h). <em>Tip: adjunta una foto, usa código VIP o reporta Retén/Agente en un Punto Crítico para activación inmediata.</em>';
       if (btnSubmit && !btnSubmit.disabled) btnSubmit.textContent = 'Publicar reporte en vivo';
     }
 
@@ -7738,7 +7762,7 @@
         renderDuplicateGuardBanner(null, false);
         return;
       }
-      const inReactionPoint = Boolean(findMatchingReactionPoint(previewCoords.lat, previewCoords.lng));
+      const inReactionPoint = Boolean(findMatchingReactionPoint(previewCoords.lat, previewCoords.lng, selectedCategory.type));
       const vipPrivilege = hasValidatedVipPermission(auth.currentUser);
       if ((inReactionPoint || vipPrivilege) && !hasValidatedAdminPermission()) {
         renderDuplicateGuardBanner(null, false);
@@ -9089,7 +9113,7 @@
 
       const localId = `pending_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
       const nowMs = Date.now();
-      const matchedRP = findMatchingReactionPoint(coords.lat, coords.lng);
+      const matchedRP = findMatchingReactionPoint(coords.lat, coords.lng, selectedCategory.type);
       const hasPhoto = Boolean(mediaDataUrl && mediaDataUrl.length > 100);
       const activeVip = getActiveVipProfile(auth.currentUser);
       const isImmediateFirm = hasValidatedAdminPermission() || Boolean(matchedRP) || Boolean(activeVip) || hasPhoto;
@@ -9258,7 +9282,7 @@
         for (const item of initialQueue) {
           if (!navigator.onLine) break;
 
-          const matchedRP = findMatchingReactionPoint(item.lat, item.lng);
+          const matchedRP = findMatchingReactionPoint(item.lat, item.lng, item.tipo || 'Retén');
           if (!adminSyncBypass && !matchedRP && !activeVip) {
             const dupMatch = findNearbyDuplicateActiveReport(
               item.lat,
@@ -9387,7 +9411,7 @@
           ? { lat: manualReportCoords.lat, lng: manualReportCoords.lng, simulated: false, isManual: true }
           : await getReportCoordinates();
 
-        const matchedReactionPoint = findMatchingReactionPoint(coords.lat, coords.lng);
+        const matchedReactionPoint = findMatchingReactionPoint(coords.lat, coords.lng, selectedCategory.type);
 
         if (!navigator.onLine) {
           if (!hasValidatedAdminPermission() && !matchedReactionPoint && !hasValidatedVipPermission(auth.currentUser)) {
