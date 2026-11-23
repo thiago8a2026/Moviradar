@@ -1,5 +1,5 @@
 /* Service Worker Oficial de ANTHI (Radar Vial Antitodo) */
-const CACHE_NAME = 'anthi-pwa-v2';
+const CACHE_NAME = 'anthi-pwa-v3';
 const PRECACHE_URLS = [
   '/',
   '/icon.svg',

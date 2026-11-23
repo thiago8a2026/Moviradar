@@ -466,9 +466,10 @@
     }
 
     .role-btn.admin {
-      border-color: rgba(245, 158, 11, 0.7);
-      background: rgba(245, 158, 11, 0.14);
-      color: #fcd34d;
+      border-color: rgba(245, 158, 11, 0.9);
+      background: linear-gradient(135deg, rgba(69, 26, 3, 0.96), rgba(23, 23, 38, 0.96));
+      color: #fef08a;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.22);
     }
 
     /* Mapa principal ocupando toda la pantalla */
@@ -1677,6 +1678,13 @@
 
     .quick-btn.role-btn {
       flex: 0.86 1 0;
+    }
+
+    .quick-btn.role-btn.admin {
+      border-color: rgba(245, 158, 11, 0.9);
+      background: linear-gradient(135deg, rgba(69, 26, 3, 0.96), rgba(23, 23, 38, 0.96));
+      color: #fef08a;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.24);
     }
 
     .map-pick-banner {
@@ -5131,7 +5139,10 @@
       navigator.serviceWorker.register('/service-worker.js', { scope: '/', updateViaCache: 'none' })
         .then(function(reg) {
           window.__anthiSwRegistration = reg;
-          if (reg.waiting) {
+          if (reg && typeof reg.update === 'function') {
+            try { reg.update().catch(function() {}); } catch (e) {}
+          }
+          if (reg && reg.waiting) {
             try { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
           }
           reg.addEventListener('updatefound', function() {
@@ -5321,7 +5332,11 @@
         }
       }
     }
-    testConnection();
+    try {
+      testConnection();
+    } catch (e) {
+      console.warn('Error verificando conexión inicial a Firestore:', e);
+    }
 
     // =========================================================================
     // 2. CACHÉ LOCAL EN LOCALSTORAGE (GPS, REPORTES, COLA OFFLINE, PUNTOS, ROL)
@@ -6057,6 +6072,402 @@
         );
       });
     }
+
+    function calcularDistanciaMetros(lat1, lng1, lat2, lng2) {
+      const R = 6371000;
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // =========================================================================
+    // 7B. RESOLUCIÓN LOCAL + CACHÉ ECONÓMICA DE BARRIO Y REFERENCIA CONOCIDA
+    // =========================================================================
+    const BGA_BARRIOS_INDEX = [
+      { name: 'Cabecera del Llano', lat: 7.1168, lng: -73.1112, r: 950 },
+      { name: 'Sotomayor', lat: 7.1188, lng: -73.1168, r: 650 },
+      { name: 'Centro', lat: 7.1195, lng: -73.1258, r: 800 },
+      { name: 'Mejoras Públicas', lat: 7.1145, lng: -73.1192, r: 580 },
+      { name: 'Antonia Santos', lat: 7.1128, lng: -73.1228, r: 620 },
+      { name: 'La Aurora', lat: 7.1258, lng: -73.1172, r: 720 },
+      { name: 'San Alonso', lat: 7.1312, lng: -73.1175, r: 760 },
+      { name: 'Alarcón', lat: 7.1252, lng: -73.1228, r: 650 },
+      { name: 'Chapinero', lat: 7.1282, lng: -73.1246, r: 620 },
+      { name: 'Comuneros', lat: 7.1322, lng: -73.1268, r: 680 },
+      { name: 'San Francisco', lat: 7.1310, lng: -73.1230, r: 680 },
+      { name: 'Universidad', lat: 7.1388, lng: -73.1210, r: 780 },
+      { name: 'Estadio / San Alonso', lat: 7.1362, lng: -73.1155, r: 650 },
+      { name: 'La Concordia', lat: 7.1072, lng: -73.1202, r: 720 },
+      { name: 'Ciudadela Real de Minas', lat: 7.1058, lng: -73.1252, r: 850 },
+      { name: 'La Victoria', lat: 7.1012, lng: -73.1208, r: 650 },
+      { name: 'Provenza', lat: 7.0872, lng: -73.1148, r: 1050 },
+      { name: 'Diamante II', lat: 7.0928, lng: -73.1112, r: 820 },
+      { name: 'San Luis', lat: 7.0958, lng: -73.1115, r: 700 },
+      { name: 'Conucos', lat: 7.1038, lng: -73.1122, r: 700 },
+      { name: 'Puerta del Sol', lat: 7.1078, lng: -73.1132, r: 650 },
+      { name: 'Pan de Azúcar', lat: 7.1105, lng: -73.1015, r: 900 },
+      { name: 'Terrazas', lat: 7.1088, lng: -73.1068, r: 750 },
+      { name: 'El Prado', lat: 7.1122, lng: -73.1095, r: 650 },
+      { name: 'Alvarez', lat: 7.1212, lng: -73.1078, r: 700 },
+      { name: 'Las Américas', lat: 7.1245, lng: -73.1115, r: 650 },
+      { name: 'Morrorico', lat: 7.1292, lng: -73.0992, r: 1100 },
+      { name: 'Girardot', lat: 7.1238, lng: -73.1332, r: 750 },
+      { name: 'La Joya', lat: 7.1142, lng: -73.1342, r: 750 },
+      { name: 'Mutis', lat: 7.1015, lng: -73.1362, r: 850 },
+      { name: 'Fontana', lat: 7.0835, lng: -73.1135, r: 750 },
+      { name: 'Cañaveral (Floridablanca)', lat: 7.0715, lng: -73.1075, r: 1400 },
+      { name: 'Lagos (Floridablanca)', lat: 7.0672, lng: -73.1012, r: 1200 },
+      { name: 'Floridablanca Centro', lat: 7.0622, lng: -73.0865, r: 1400 },
+      { name: 'Girón Centro', lat: 7.0682, lng: -73.1695, r: 1600 },
+      { name: 'Piedecuesta Centro', lat: 6.9892, lng: -73.0495, r: 1800 }
+    ];
+
+    const BGA_POIS_INDEX = [
+      { name: 'Parque San Pío', lat: 7.1165, lng: -73.1098 },
+      { name: 'C.C. Cabecera Etapa IV', lat: 7.1173, lng: -73.1110 },
+      { name: 'C.C. Cuarta Etapa', lat: 7.1175, lng: -73.1108 },
+      { name: 'C.C. Quinta Etapa', lat: 7.1162, lng: -73.1118 },
+      { name: 'Éxito Cabecera', lat: 7.1178, lng: -73.1115 },
+      { name: 'Clínica Chicamocha', lat: 7.1180, lng: -73.1142 },
+      { name: 'Clínica San Luis', lat: 7.1172, lng: -73.1136 },
+      { name: 'Parque Las Palmas', lat: 7.1188, lng: -73.1155 },
+      { name: 'Parque Turbay', lat: 7.1205, lng: -73.1168 },
+      { name: 'C.C. Megamall', lat: 7.1246, lng: -73.1162 },
+      { name: 'Parque de los Niños', lat: 7.1238, lng: -73.1190 },
+      { name: 'Hospital Universitario HUS', lat: 7.1216, lng: -73.1188 },
+      { name: 'Parque Santander', lat: 7.1192, lng: -73.1246 },
+      { name: 'Catedral Sagrada Familia', lat: 7.1190, lng: -73.1238 },
+      { name: 'Alcaldía de Bucaramanga', lat: 7.1186, lng: -73.1268 },
+      { name: 'Parque García Rovira', lat: 7.1188, lng: -73.1272 },
+      { name: 'Parque Centenario', lat: 7.1196, lng: -73.1220 },
+      { name: 'Plaza de Mercado Centro', lat: 7.1202, lng: -73.1292 },
+      { name: 'Glorieta Quebradaseca', lat: 7.1258, lng: -73.1245 },
+      { name: 'Estación Quebradaseca', lat: 7.1254, lng: -73.1248 },
+      { name: 'Parque San Francisco', lat: 7.1308, lng: -73.1228 },
+      { name: 'Universidad UIS', lat: 7.1404, lng: -73.1211 },
+      { name: 'Glorieta Caballo de Bolívar', lat: 7.1380, lng: -73.1228 },
+      { name: 'Estadio Américo Montanini', lat: 7.1365, lng: -73.1166 },
+      { name: 'SENA Girón / Quebradaseca', lat: 7.1262, lng: -73.1185 },
+      { name: 'Glorieta La Meseta', lat: 7.1228, lng: -73.1310 },
+      { name: 'Viaducto La Flora', lat: 7.1055, lng: -73.1100 },
+      { name: 'Puente La Novena', lat: 7.1135, lng: -73.1268 },
+      { name: 'Plaza Mayor / Real de Minas', lat: 7.1052, lng: -73.1252 },
+      { name: 'Éxito La Rosita', lat: 7.1118, lng: -73.1228 },
+      { name: 'Estación La Rosita', lat: 7.1112, lng: -73.1236 },
+      { name: 'Glorieta Puerta del Sol', lat: 7.1074, lng: -73.1145 },
+      { name: 'C.C. Acrópolis', lat: 7.1058, lng: -73.1242 },
+      { name: 'C.C. Cacique', lat: 7.0982, lng: -73.1066 },
+      { name: 'Neomundo', lat: 7.0992, lng: -73.1088 },
+      { name: 'Intercambiador El Bueno', lat: 7.1045, lng: -73.1155 },
+      { name: 'Estación Provenza', lat: 7.0878, lng: -73.1168 },
+      { name: 'Terminal de Transportes', lat: 7.0885, lng: -73.1338 },
+      { name: 'C.C. La Florida', lat: 7.0725, lng: -73.1052 },
+      { name: 'C.C. Cañaveral', lat: 7.0715, lng: -73.1074 },
+      { name: 'C.C. Caracolí', lat: 7.0706, lng: -73.1054 },
+      { name: 'Clínica FOSCAL', lat: 7.0685, lng: -73.1085 },
+      { name: 'Makro / La Pera', lat: 7.0752, lng: -73.1112 },
+      { name: 'Estación Lagos', lat: 7.0674, lng: -73.1045 },
+      { name: 'Estación Payador', lat: 7.0762, lng: -73.1095 },
+      { name: 'Parque Principal Floridablanca', lat: 7.0622, lng: -73.0865 },
+      { name: 'Parque Principal Girón', lat: 7.0682, lng: -73.1695 },
+      { name: 'C.C. De La Cuesta', lat: 6.9985, lng: -73.0542 },
+      { name: 'Parque Principal Piedecuesta', lat: 6.9892, lng: -73.0495 }
+    ];
+
+    const BGA_ROADS_INDEX = [
+      { name: 'Carrera 27', lat: 7.1180, lng: -73.1180 },
+      { name: 'Carrera 33', lat: 7.1170, lng: -73.1116 },
+      { name: 'Carrera 36 (Cabecera)', lat: 7.1165, lng: -73.1090 },
+      { name: 'Carrera 15', lat: 7.1195, lng: -73.1245 },
+      { name: 'Carrera 9', lat: 7.1155, lng: -73.1275 },
+      { name: 'Calle 36', lat: 7.1182, lng: -73.1225 },
+      { name: 'Calle 45', lat: 7.1135, lng: -73.1210 },
+      { name: 'Calle 56', lat: 7.1092, lng: -73.1145 },
+      { name: 'Av. Quebradaseca', lat: 7.1256, lng: -73.1215 },
+      { name: 'Bulevar Santander', lat: 7.1278, lng: -73.1235 },
+      { name: 'Bulevar Bolívar', lat: 7.1255, lng: -73.1285 },
+      { name: 'Av. González Valencia', lat: 7.1140, lng: -73.1145 },
+      { name: 'Diagonal 15', lat: 7.1118, lng: -73.1218 },
+      { name: 'Transversal Oriental', lat: 7.0985, lng: -73.1045 },
+      { name: 'Autopista a Floridablanca', lat: 7.0825, lng: -73.1125 },
+      { name: 'Anillo Vial', lat: 7.0785, lng: -73.1395 },
+      { name: 'Vía a Girón', lat: 7.0865, lng: -73.1495 },
+      { name: 'Autopista a Piedecuesta', lat: 7.0320, lng: -73.0760 }
+    ];
+
+    const GEO_CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+    const GEO_CACHE_MAX_ENTRIES = 250;
+    const GEO_LOOKUP_MIN_INTERVAL_MS = 1250;
+    const geoMemoryPlaceCache = new Map();
+    const geoPendingQueue = [];
+    const geoQueuedKeys = new Set();
+    let geoLookupTimerId = null;
+    let lastGeoLookupAt = 0;
+
+    (function hydrateGeoPlaceCache() {
+      const stored = safeReadJson(STORAGE_KEYS.GEO_PLACE_CACHE, null);
+      if (!stored || typeof stored !== 'object') return;
+      const now = Date.now();
+      Object.entries(stored).forEach(([k, val]) => {
+        if (val && typeof val === 'object' && val.barrio && (now - Number(val.ts || 0)) < GEO_CACHE_TTL_MS) {
+          geoMemoryPlaceCache.set(k, val);
+        }
+      });
+    })();
+
+    function persistGeoPlaceCache() {
+      try {
+        const entries = Array.from(geoMemoryPlaceCache.entries())
+          .sort((a, b) => Number((b[1] && b[1].ts) || 0) - Number((a[1] && a[1].ts) || 0))
+          .slice(0, GEO_CACHE_MAX_ENTRIES);
+        const obj = {};
+        entries.forEach(([k, v]) => {
+          obj[k] = v;
+        });
+        localStorage.setItem(STORAGE_KEYS.GEO_PLACE_CACHE, JSON.stringify(obj));
+      } catch (e) {}
+    }
+
+    function getAnthiGeoBucketKey(lat, lng) {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) return '';
+      return `${Math.round(nLat * 900)}_${Math.round(nLng * 900)}`;
+    }
+
+    function resolveLocalBgaPlace(lat, lng) {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) {
+        return { barrio: 'Bucaramanga', ref: 'Área metropolitana', poiDist: Infinity, barrioDist: Infinity, isExact: false };
+      }
+
+      let bestBarrio = null;
+      let bestBarrioDist = Infinity;
+      let bestRatio = Infinity;
+      for (let i = 0; i < BGA_BARRIOS_INDEX.length; i += 1) {
+        const b = BGA_BARRIOS_INDEX[i];
+        const d = calcularDistanciaMetros(nLat, nLng, b.lat, b.lng);
+        const ratio = d / Math.max(400, b.r || 700);
+        if (ratio < bestRatio) {
+          bestRatio = ratio;
+          bestBarrio = b;
+          bestBarrioDist = d;
+        }
+      }
+
+      let nearestPoi = null;
+      let nearestPoiDist = Infinity;
+      for (let i = 0; i < BGA_POIS_INDEX.length; i += 1) {
+        const p = BGA_POIS_INDEX[i];
+        const d = calcularDistanciaMetros(nLat, nLng, p.lat, p.lng);
+        if (d < nearestPoiDist) {
+          nearestPoiDist = d;
+          nearestPoi = p;
+        }
+      }
+
+      let nearestRoad = null;
+      let nearestRoadDist = Infinity;
+      for (let i = 0; i < BGA_ROADS_INDEX.length; i += 1) {
+        const r = BGA_ROADS_INDEX[i];
+        const d = calcularDistanciaMetros(nLat, nLng, r.lat, r.lng);
+        if (d < nearestRoadDist) {
+          nearestRoadDist = d;
+          nearestRoad = r;
+        }
+      }
+
+      const barrioName = bestBarrio && bestBarrioDist <= 2800
+        ? bestBarrio.name
+        : 'Bucaramanga';
+
+      let refLabel = '';
+      if (nearestPoi && nearestPoiDist <= 450) {
+        refLabel = `Cerca de ${nearestPoi.name}`;
+      } else if (nearestRoad && nearestRoadDist <= 380) {
+        refLabel = `Sector ${nearestRoad.name}`;
+      } else if (nearestPoi && nearestPoiDist <= 1400) {
+        refLabel = `Cerca de ${nearestPoi.name}`;
+      } else if (nearestRoad && nearestRoadDist <= 1800) {
+        refLabel = `Zona ${nearestRoad.name}`;
+      } else {
+        refLabel = 'Vía principal del sector';
+      }
+
+      return {
+        barrio: barrioName,
+        ref: refLabel,
+        poiDist: nearestPoiDist,
+        barrioDist: bestBarrioDist,
+        isExact: Boolean(nearestPoi && nearestPoiDist <= 320 && bestBarrioDist <= 1200)
+      };
+    }
+
+    function composePlaceDisplay(info, mode = 'full', userNote = '') {
+      const barrio = String((info && info.barrio) || 'Bucaramanga').trim();
+      const ref = String((info && info.ref) || '').trim();
+      const note = String(userNote || '').trim();
+      if (mode === 'barrio') return barrio;
+      if (note) {
+        const noteLower = note.toLowerCase();
+        const barrioLower = barrio.toLowerCase().split('(')[0].trim();
+        if (barrioLower && noteLower.includes(barrioLower)) {
+          return note;
+        }
+        return `${barrio} · ${note}`;
+      }
+      if (mode === 'ref') return ref || barrio;
+      const strippedRef = ref.replace(/^(cerca de|sector|zona|sobre)\s+/i, '').trim().toLowerCase();
+      if (ref && strippedRef && strippedRef !== barrio.toLowerCase()) {
+        return `${barrio} • ${ref}`;
+      }
+      return barrio;
+    }
+
+    function updateLiveDomGeoElements(bucketKey, info) {
+      if (typeof document === 'undefined' || !bucketKey || !info) return;
+      try {
+        document.querySelectorAll(`[data-geo-key="${bucketKey}"]`).forEach((el) => {
+          const mode = el.getAttribute('data-geo-mode') || 'full';
+          const note = el.getAttribute('data-geo-note') || '';
+          el.textContent = composePlaceDisplay(info, mode, note);
+        });
+      } catch (e) {}
+    }
+
+    async function processNextReverseGeocode() {
+      geoLookupTimerId = null;
+      if (geoPendingQueue.length === 0) return;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+      if (typeof fetch !== 'function') return;
+
+      const waitMs = GEO_LOOKUP_MIN_INTERVAL_MS - (Date.now() - lastGeoLookupAt);
+      if (waitMs > 0) {
+        geoLookupTimerId = setTimeout(processNextReverseGeocode, waitMs);
+        return;
+      }
+
+      const item = geoPendingQueue.shift();
+      if (!item) return;
+      geoQueuedKeys.delete(item.key);
+      lastGeoLookupAt = Date.now();
+
+      try {
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const abortId = controller ? setTimeout(() => controller.abort(), 4500) : null;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(item.lat)}&lon=${encodeURIComponent(item.lng)}&zoom=18&addressdetails=1&accept-language=es`;
+        const resp = await fetch(url, {
+          headers: { Accept: 'application/json' },
+          signal: controller ? controller.signal : undefined
+        });
+        if (abortId) clearTimeout(abortId);
+        if (resp && resp.ok) {
+          const data = await resp.json();
+          const addr = (data && data.address) || {};
+          const fallbackLocal = resolveLocalBgaPlace(item.lat, item.lng);
+          const barrioRaw = addr.neighbourhood || addr.suburb || addr.quarter || addr.city_district || addr.town || addr.village || '';
+          const cleanBarrio = String(barrioRaw || fallbackLocal.barrio || 'Bucaramanga').trim();
+          const poiRaw = addr.amenity || addr.shop || addr.leisure || addr.tourism || addr.building || (data && data.name) || '';
+          const roadRaw = addr.road || addr.pedestrian || '';
+          let cleanRef = fallbackLocal.ref;
+          if (poiRaw && String(poiRaw).trim().toLowerCase() !== cleanBarrio.toLowerCase()) {
+            cleanRef = `Cerca de ${String(poiRaw).trim()}`;
+          } else if (roadRaw && fallbackLocal.poiDist > 260) {
+            cleanRef = `Sobre ${String(roadRaw).trim()}`;
+          }
+          const enriched = {
+            barrio: cleanBarrio,
+            ref: cleanRef,
+            ts: Date.now()
+          };
+          geoMemoryPlaceCache.set(item.key, enriched);
+          persistGeoPlaceCache();
+          updateLiveDomGeoElements(item.key, enriched);
+        }
+      } catch (e) {
+      } finally {
+        if (geoPendingQueue.length > 0 && !geoLookupTimerId) {
+          geoLookupTimerId = setTimeout(processNextReverseGeocode, GEO_LOOKUP_MIN_INTERVAL_MS);
+        }
+      }
+    }
+
+    function enqueueReverseGeocodeLookup(lat, lng, bucketKey) {
+      try {
+        if (!bucketKey || geoMemoryPlaceCache.has(bucketKey) || geoQueuedKeys.has(bucketKey)) return;
+        if (typeof fetch !== 'function' || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
+        if (geoPendingQueue.length >= 10) return;
+        geoQueuedKeys.add(bucketKey);
+        geoPendingQueue.push({ key: bucketKey, lat: Number(lat), lng: Number(lng) });
+        if (!geoLookupTimerId) {
+          const delay = Math.max(120, GEO_LOOKUP_MIN_INTERVAL_MS - (Date.now() - lastGeoLookupAt));
+          geoLookupTimerId = setTimeout(processNextReverseGeocode, delay);
+        }
+      } catch (e) {}
+    }
+
+    function getResolvedPlaceInfo(lat, lng, opts = {}) {
+      try {
+        const nLat = Number(lat);
+        const nLng = Number(lng);
+        const local = resolveLocalBgaPlace(nLat, nLng);
+        const bucketKey = getAnthiGeoBucketKey(nLat, nLng);
+        if (bucketKey && geoMemoryPlaceCache.has(bucketKey)) {
+          const cached = geoMemoryPlaceCache.get(bucketKey);
+          return {
+            key: bucketKey,
+            barrio: cached.barrio || local.barrio,
+            ref: local.poiDist <= 200 ? local.ref : (cached.ref || local.ref),
+            fromCache: true
+          };
+        }
+        if (bucketKey && opts.allowRemote !== false && !local.isExact) {
+          enqueueReverseGeocodeLookup(nLat, nLng, bucketKey);
+        }
+        return {
+          key: bucketKey,
+          barrio: local.barrio,
+          ref: local.ref,
+          fromCache: false
+        };
+      } catch (e) {
+        return { key: '', barrio: 'Bucaramanga', ref: '', fromCache: false };
+      }
+    }
+
+    function formatGeoPlaceText(lat, lng, mode = 'full', userNote = '', opts = {}) {
+      const info = getResolvedPlaceInfo(lat, lng, opts);
+      return composePlaceDisplay(info, mode, userNote);
+    }
+
+    function formatGeoPlaceHtml(lat, lng, mode = 'full', overrideInitial = '', userNote = '', opts = {}) {
+      const info = getResolvedPlaceInfo(lat, lng, opts);
+      const text = overrideInitial || composePlaceDisplay(info, mode, userNote);
+      const noteAttr = userNote ? ` data-geo-note="${escapeHtml(userNote)}"` : '';
+      return `<span data-geo-key="${escapeHtml(info.key)}" data-geo-mode="${escapeHtml(mode)}"${noteAttr}>${escapeHtml(text)}</span>`;
+    }
+
+    function formatAlertLocationText(rep, opts = {}) {
+      if (!rep) return 'Bucaramanga';
+      const includeDesc = opts.includeDescription !== false;
+      const note = includeDesc ? String(rep.descripcion || rep.description || '').trim() : '';
+      return formatGeoPlaceText(rep.lat, rep.lng, opts.mode || 'full', note, opts);
+    }
+
+    function formatAlertPlaceHtml(rep, mode = 'full') {
+      if (!rep) return '<span>Bucaramanga</span>';
+      const note = String(rep.descripcion || rep.description || '').trim();
+      return formatGeoPlaceHtml(rep.lat, rep.lng, mode, '', note);
+    }
+
+    window.__anthiResolvePlace = getResolvedPlaceInfo;
+    window.__anthiFormatAlertLocationText = formatAlertLocationText;
 
     // =========================================================================
     // 6. MARCADORES PERSONALIZADOS, POPUPS Y FIRESTORE EN TIEMPO REAL
@@ -6836,8 +7247,14 @@
       renderReports([...pending, ...(Array.isArray(serverReports) ? serverReports : [])]);
     }
 
-    renderCombinedReports(lastServerReports);
-    updateNetworkAndSyncStatus();
+    try {
+      renderCombinedReports(lastServerReports);
+    } catch (err) {
+      console.error('Error renderizando reportes iniciales:', err);
+    }
+    try {
+      updateNetworkAndSyncStatus();
+    } catch (err) {}
 
     const btnAuth = document.getElementById('btnAuth');
     const authModal = document.getElementById('authModal');
@@ -7314,11 +7731,12 @@
     });
 
     onAuthStateChanged(auth, async (user) => {
+      try {
       if (!user) {
         detachUserSessionListener(true);
         if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
         if (window.__anthiAdminBuzonReady && typeof detachAdminDeletedReportsAuditListener === 'function') detachAdminDeletedReportsAuditListener();
-        if (typeof detachAdminVipCodesListener === 'function') detachAdminVipCodesListener();
+        if (window.__anthiAdminVipCodesReady && typeof detachAdminVipCodesListener === 'function') detachAdminVipCodesListener();
         currentSessionId = null;
         currentMonitoredUid = null;
         pendingOfflineRetryUid = null;
@@ -7390,6 +7808,9 @@
 
       if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
         window.__anthiSyncHojaVidaOnAuth(user);
+      }
+      } catch (authErr) {
+        console.warn('Error actualizando sesión de usuario:', authErr);
       }
     });
 
@@ -8254,396 +8675,6 @@
     map.on('dragstart', () => {
       isFollowingUser = false;
     });
-
-    function calcularDistanciaMetros(lat1, lng1, lat2, lng2) {
-      const R = 6371000;
-      const toRad = (deg) => (deg * Math.PI) / 180;
-      const dLat = toRad(lat2 - lat1);
-      const dLng = toRad(lng2 - lng1);
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-        Math.sin(dLng / 2) * Math.sin(dLng / 2);
-      return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    // =========================================================================
-    // 7B. RESOLUCIÓN LOCAL + CACHÉ ECONÓMICA DE BARRIO Y REFERENCIA CONOCIDA
-    // =========================================================================
-    const BGA_BARRIOS_INDEX = [
-      { name: 'Cabecera del Llano', lat: 7.1168, lng: -73.1112, r: 950 },
-      { name: 'Sotomayor', lat: 7.1188, lng: -73.1168, r: 650 },
-      { name: 'Centro', lat: 7.1195, lng: -73.1258, r: 800 },
-      { name: 'Mejoras Públicas', lat: 7.1145, lng: -73.1192, r: 580 },
-      { name: 'Antonia Santos', lat: 7.1128, lng: -73.1228, r: 620 },
-      { name: 'La Aurora', lat: 7.1258, lng: -73.1172, r: 720 },
-      { name: 'San Alonso', lat: 7.1312, lng: -73.1175, r: 760 },
-      { name: 'Alarcón', lat: 7.1252, lng: -73.1228, r: 650 },
-      { name: 'Chapinero', lat: 7.1282, lng: -73.1246, r: 620 },
-      { name: 'Comuneros', lat: 7.1322, lng: -73.1268, r: 680 },
-      { name: 'San Francisco', lat: 7.1310, lng: -73.1230, r: 680 },
-      { name: 'Universidad', lat: 7.1388, lng: -73.1210, r: 780 },
-      { name: 'Estadio / San Alonso', lat: 7.1362, lng: -73.1155, r: 650 },
-      { name: 'La Concordia', lat: 7.1072, lng: -73.1202, r: 720 },
-      { name: 'Ciudadela Real de Minas', lat: 7.1058, lng: -73.1252, r: 850 },
-      { name: 'La Victoria', lat: 7.1012, lng: -73.1208, r: 650 },
-      { name: 'Provenza', lat: 7.0872, lng: -73.1148, r: 1050 },
-      { name: 'Diamante II', lat: 7.0928, lng: -73.1112, r: 820 },
-      { name: 'San Luis', lat: 7.0958, lng: -73.1115, r: 700 },
-      { name: 'Conucos', lat: 7.1038, lng: -73.1122, r: 700 },
-      { name: 'Puerta del Sol', lat: 7.1078, lng: -73.1132, r: 650 },
-      { name: 'Pan de Azúcar', lat: 7.1105, lng: -73.1015, r: 900 },
-      { name: 'Terrazas', lat: 7.1088, lng: -73.1068, r: 750 },
-      { name: 'El Prado', lat: 7.1122, lng: -73.1095, r: 650 },
-      { name: 'Alvarez', lat: 7.1212, lng: -73.1078, r: 700 },
-      { name: 'Las Américas', lat: 7.1245, lng: -73.1115, r: 650 },
-      { name: 'Morrorico', lat: 7.1292, lng: -73.0992, r: 1100 },
-      { name: 'Girardot', lat: 7.1238, lng: -73.1332, r: 750 },
-      { name: 'La Joya', lat: 7.1142, lng: -73.1342, r: 750 },
-      { name: 'Mutis', lat: 7.1015, lng: -73.1362, r: 850 },
-      { name: 'Fontana', lat: 7.0835, lng: -73.1135, r: 750 },
-      { name: 'Cañaveral (Floridablanca)', lat: 7.0715, lng: -73.1075, r: 1400 },
-      { name: 'Lagos (Floridablanca)', lat: 7.0672, lng: -73.1012, r: 1200 },
-      { name: 'Floridablanca Centro', lat: 7.0622, lng: -73.0865, r: 1400 },
-      { name: 'Girón Centro', lat: 7.0682, lng: -73.1695, r: 1600 },
-      { name: 'Piedecuesta Centro', lat: 6.9892, lng: -73.0495, r: 1800 }
-    ];
-
-    const BGA_POIS_INDEX = [
-      { name: 'Parque San Pío', lat: 7.1165, lng: -73.1098 },
-      { name: 'C.C. Cabecera Etapa IV', lat: 7.1173, lng: -73.1110 },
-      { name: 'C.C. Cuarta Etapa', lat: 7.1175, lng: -73.1108 },
-      { name: 'C.C. Quinta Etapa', lat: 7.1162, lng: -73.1118 },
-      { name: 'Éxito Cabecera', lat: 7.1178, lng: -73.1115 },
-      { name: 'Clínica Chicamocha', lat: 7.1180, lng: -73.1142 },
-      { name: 'Clínica San Luis', lat: 7.1172, lng: -73.1136 },
-      { name: 'Parque Las Palmas', lat: 7.1188, lng: -73.1155 },
-      { name: 'Parque Turbay', lat: 7.1205, lng: -73.1168 },
-      { name: 'C.C. Megamall', lat: 7.1246, lng: -73.1162 },
-      { name: 'Parque de los Niños', lat: 7.1238, lng: -73.1190 },
-      { name: 'Hospital Universitario HUS', lat: 7.1216, lng: -73.1188 },
-      { name: 'Parque Santander', lat: 7.1192, lng: -73.1246 },
-      { name: 'Catedral Sagrada Familia', lat: 7.1190, lng: -73.1238 },
-      { name: 'Alcaldía de Bucaramanga', lat: 7.1186, lng: -73.1268 },
-      { name: 'Parque García Rovira', lat: 7.1188, lng: -73.1272 },
-      { name: 'Parque Centenario', lat: 7.1196, lng: -73.1220 },
-      { name: 'Plaza de Mercado Centro', lat: 7.1202, lng: -73.1292 },
-      { name: 'Glorieta Quebradaseca', lat: 7.1258, lng: -73.1245 },
-      { name: 'Estación Quebradaseca', lat: 7.1254, lng: -73.1248 },
-      { name: 'Parque San Francisco', lat: 7.1308, lng: -73.1228 },
-      { name: 'Universidad UIS', lat: 7.1404, lng: -73.1211 },
-      { name: 'Glorieta Caballo de Bolívar', lat: 7.1380, lng: -73.1228 },
-      { name: 'Estadio Américo Montanini', lat: 7.1365, lng: -73.1166 },
-      { name: 'SENA Girón / Quebradaseca', lat: 7.1262, lng: -73.1185 },
-      { name: 'Glorieta La Meseta', lat: 7.1228, lng: -73.1310 },
-      { name: 'Viaducto La Flora', lat: 7.1055, lng: -73.1100 },
-      { name: 'Puente La Novena', lat: 7.1135, lng: -73.1268 },
-      { name: 'Plaza Mayor / Real de Minas', lat: 7.1052, lng: -73.1252 },
-      { name: 'Éxito La Rosita', lat: 7.1118, lng: -73.1228 },
-      { name: 'Estación La Rosita', lat: 7.1112, lng: -73.1236 },
-      { name: 'Glorieta Puerta del Sol', lat: 7.1074, lng: -73.1145 },
-      { name: 'C.C. Acrópolis', lat: 7.1058, lng: -73.1242 },
-      { name: 'C.C. Cacique', lat: 7.0982, lng: -73.1066 },
-      { name: 'Neomundo', lat: 7.0992, lng: -73.1088 },
-      { name: 'Intercambiador El Bueno', lat: 7.1045, lng: -73.1155 },
-      { name: 'Estación Provenza', lat: 7.0878, lng: -73.1168 },
-      { name: 'Terminal de Transportes', lat: 7.0885, lng: -73.1338 },
-      { name: 'C.C. La Florida', lat: 7.0725, lng: -73.1052 },
-      { name: 'C.C. Cañaveral', lat: 7.0715, lng: -73.1074 },
-      { name: 'C.C. Caracolí', lat: 7.0706, lng: -73.1054 },
-      { name: 'Clínica FOSCAL', lat: 7.0685, lng: -73.1085 },
-      { name: 'Makro / La Pera', lat: 7.0752, lng: -73.1112 },
-      { name: 'Estación Lagos', lat: 7.0674, lng: -73.1045 },
-      { name: 'Estación Payador', lat: 7.0762, lng: -73.1095 },
-      { name: 'Parque Principal Floridablanca', lat: 7.0622, lng: -73.0865 },
-      { name: 'Parque Principal Girón', lat: 7.0682, lng: -73.1695 },
-      { name: 'C.C. De La Cuesta', lat: 6.9985, lng: -73.0542 },
-      { name: 'Parque Principal Piedecuesta', lat: 6.9892, lng: -73.0495 }
-    ];
-
-    const BGA_ROADS_INDEX = [
-      { name: 'Carrera 27', lat: 7.1180, lng: -73.1180 },
-      { name: 'Carrera 33', lat: 7.1170, lng: -73.1116 },
-      { name: 'Carrera 36 (Cabecera)', lat: 7.1165, lng: -73.1090 },
-      { name: 'Carrera 15', lat: 7.1195, lng: -73.1245 },
-      { name: 'Carrera 9', lat: 7.1155, lng: -73.1275 },
-      { name: 'Calle 36', lat: 7.1182, lng: -73.1225 },
-      { name: 'Calle 45', lat: 7.1135, lng: -73.1210 },
-      { name: 'Calle 56', lat: 7.1092, lng: -73.1145 },
-      { name: 'Av. Quebradaseca', lat: 7.1256, lng: -73.1215 },
-      { name: 'Bulevar Santander', lat: 7.1278, lng: -73.1235 },
-      { name: 'Bulevar Bolívar', lat: 7.1255, lng: -73.1285 },
-      { name: 'Av. González Valencia', lat: 7.1140, lng: -73.1145 },
-      { name: 'Diagonal 15', lat: 7.1118, lng: -73.1218 },
-      { name: 'Transversal Oriental', lat: 7.0985, lng: -73.1045 },
-      { name: 'Autopista a Floridablanca', lat: 7.0825, lng: -73.1125 },
-      { name: 'Anillo Vial', lat: 7.0785, lng: -73.1395 },
-      { name: 'Vía a Girón', lat: 7.0865, lng: -73.1495 },
-      { name: 'Autopista a Piedecuesta', lat: 7.0320, lng: -73.0760 }
-    ];
-
-    const GEO_CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
-    const GEO_CACHE_MAX_ENTRIES = 250;
-    const GEO_LOOKUP_MIN_INTERVAL_MS = 1250;
-    const geoMemoryPlaceCache = new Map();
-    const geoPendingQueue = [];
-    const geoQueuedKeys = new Set();
-    let geoLookupTimerId = null;
-    let lastGeoLookupAt = 0;
-
-    (function hydrateGeoPlaceCache() {
-      const stored = safeReadJson(STORAGE_KEYS.GEO_PLACE_CACHE, null);
-      if (!stored || typeof stored !== 'object') return;
-      const now = Date.now();
-      Object.entries(stored).forEach(([k, val]) => {
-        if (val && typeof val === 'object' && val.barrio && (now - Number(val.ts || 0)) < GEO_CACHE_TTL_MS) {
-          geoMemoryPlaceCache.set(k, val);
-        }
-      });
-    })();
-
-    function persistGeoPlaceCache() {
-      try {
-        const entries = Array.from(geoMemoryPlaceCache.entries())
-          .sort((a, b) => Number((b[1] && b[1].ts) || 0) - Number((a[1] && a[1].ts) || 0))
-          .slice(0, GEO_CACHE_MAX_ENTRIES);
-        const obj = {};
-        entries.forEach(([k, v]) => {
-          obj[k] = v;
-        });
-        localStorage.setItem(STORAGE_KEYS.GEO_PLACE_CACHE, JSON.stringify(obj));
-      } catch (e) {}
-    }
-
-    function getAnthiGeoBucketKey(lat, lng) {
-      const nLat = Number(lat);
-      const nLng = Number(lng);
-      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) return '';
-      return `${Math.round(nLat * 900)}_${Math.round(nLng * 900)}`;
-    }
-
-    function resolveLocalBgaPlace(lat, lng) {
-      const nLat = Number(lat);
-      const nLng = Number(lng);
-      if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) {
-        return { barrio: 'Bucaramanga', ref: 'Área metropolitana', poiDist: Infinity, barrioDist: Infinity, isExact: false };
-      }
-
-      let bestBarrio = null;
-      let bestBarrioDist = Infinity;
-      let bestRatio = Infinity;
-      for (let i = 0; i < BGA_BARRIOS_INDEX.length; i += 1) {
-        const b = BGA_BARRIOS_INDEX[i];
-        const d = calcularDistanciaMetros(nLat, nLng, b.lat, b.lng);
-        const ratio = d / Math.max(400, b.r || 700);
-        if (ratio < bestRatio) {
-          bestRatio = ratio;
-          bestBarrio = b;
-          bestBarrioDist = d;
-        }
-      }
-
-      let nearestPoi = null;
-      let nearestPoiDist = Infinity;
-      for (let i = 0; i < BGA_POIS_INDEX.length; i += 1) {
-        const p = BGA_POIS_INDEX[i];
-        const d = calcularDistanciaMetros(nLat, nLng, p.lat, p.lng);
-        if (d < nearestPoiDist) {
-          nearestPoiDist = d;
-          nearestPoi = p;
-        }
-      }
-
-      let nearestRoad = null;
-      let nearestRoadDist = Infinity;
-      for (let i = 0; i < BGA_ROADS_INDEX.length; i += 1) {
-        const r = BGA_ROADS_INDEX[i];
-        const d = calcularDistanciaMetros(nLat, nLng, r.lat, r.lng);
-        if (d < nearestRoadDist) {
-          nearestRoadDist = d;
-          nearestRoad = r;
-        }
-      }
-
-      const barrioName = bestBarrio && bestBarrioDist <= 2800
-        ? bestBarrio.name
-        : 'Bucaramanga';
-
-      let refLabel = '';
-      if (nearestPoi && nearestPoiDist <= 450) {
-        refLabel = `Cerca de ${nearestPoi.name}`;
-      } else if (nearestRoad && nearestRoadDist <= 380) {
-        refLabel = `Sector ${nearestRoad.name}`;
-      } else if (nearestPoi && nearestPoiDist <= 1400) {
-        refLabel = `Cerca de ${nearestPoi.name}`;
-      } else if (nearestRoad && nearestRoadDist <= 1800) {
-        refLabel = `Zona ${nearestRoad.name}`;
-      } else {
-        refLabel = 'Vía principal del sector';
-      }
-
-      return {
-        barrio: barrioName,
-        ref: refLabel,
-        poiDist: nearestPoiDist,
-        barrioDist: bestBarrioDist,
-        isExact: Boolean(nearestPoi && nearestPoiDist <= 320 && bestBarrioDist <= 1200)
-      };
-    }
-
-    function composePlaceDisplay(info, mode = 'full', userNote = '') {
-      const barrio = String((info && info.barrio) || 'Bucaramanga').trim();
-      const ref = String((info && info.ref) || '').trim();
-      const note = String(userNote || '').trim();
-      if (mode === 'barrio') return barrio;
-      if (note) {
-        const noteLower = note.toLowerCase();
-        const barrioLower = barrio.toLowerCase().split('(')[0].trim();
-        if (barrioLower && noteLower.includes(barrioLower)) {
-          return note;
-        }
-        return `${barrio} · ${note}`;
-      }
-      if (mode === 'ref') return ref || barrio;
-      const strippedRef = ref.replace(/^(cerca de|sector|zona|sobre)\s+/i, '').trim().toLowerCase();
-      if (ref && strippedRef && strippedRef !== barrio.toLowerCase()) {
-        return `${barrio} • ${ref}`;
-      }
-      return barrio;
-    }
-
-    function updateLiveDomGeoElements(bucketKey, info) {
-      if (typeof document === 'undefined' || !bucketKey || !info) return;
-      try {
-        document.querySelectorAll(`[data-geo-key="${bucketKey}"]`).forEach((el) => {
-          const mode = el.getAttribute('data-geo-mode') || 'full';
-          const note = el.getAttribute('data-geo-note') || '';
-          el.textContent = composePlaceDisplay(info, mode, note);
-        });
-      } catch (e) {}
-    }
-
-    async function processNextReverseGeocode() {
-      geoLookupTimerId = null;
-      if (geoPendingQueue.length === 0) return;
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
-      if (typeof fetch !== 'function') return;
-
-      const waitMs = GEO_LOOKUP_MIN_INTERVAL_MS - (Date.now() - lastGeoLookupAt);
-      if (waitMs > 0) {
-        geoLookupTimerId = setTimeout(processNextReverseGeocode, waitMs);
-        return;
-      }
-
-      const item = geoPendingQueue.shift();
-      if (!item) return;
-      geoQueuedKeys.delete(item.key);
-      lastGeoLookupAt = Date.now();
-
-      try {
-        const controller = typeof AbortController === 'function' ? new AbortController() : null;
-        const abortId = controller ? setTimeout(() => controller.abort(), 4500) : null;
-        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(item.lat)}&lon=${encodeURIComponent(item.lng)}&zoom=18&addressdetails=1&accept-language=es`;
-        const resp = await fetch(url, {
-          headers: { Accept: 'application/json' },
-          signal: controller ? controller.signal : undefined
-        });
-        if (abortId) clearTimeout(abortId);
-        if (resp && resp.ok) {
-          const data = await resp.json();
-          const addr = (data && data.address) || {};
-          const fallbackLocal = resolveLocalBgaPlace(item.lat, item.lng);
-          const barrioRaw = addr.neighbourhood || addr.suburb || addr.quarter || addr.city_district || addr.town || addr.village || '';
-          const cleanBarrio = String(barrioRaw || fallbackLocal.barrio || 'Bucaramanga').trim();
-          const poiRaw = addr.amenity || addr.shop || addr.leisure || addr.tourism || addr.building || (data && data.name) || '';
-          const roadRaw = addr.road || addr.pedestrian || '';
-          let cleanRef = fallbackLocal.ref;
-          if (poiRaw && String(poiRaw).trim().toLowerCase() !== cleanBarrio.toLowerCase()) {
-            cleanRef = `Cerca de ${String(poiRaw).trim()}`;
-          } else if (roadRaw && fallbackLocal.poiDist > 260) {
-            cleanRef = `Sobre ${String(roadRaw).trim()}`;
-          }
-          const enriched = {
-            barrio: cleanBarrio,
-            ref: cleanRef,
-            ts: Date.now()
-          };
-          geoMemoryPlaceCache.set(item.key, enriched);
-          persistGeoPlaceCache();
-          updateLiveDomGeoElements(item.key, enriched);
-        }
-      } catch (e) {
-      } finally {
-        if (geoPendingQueue.length > 0 && !geoLookupTimerId) {
-          geoLookupTimerId = setTimeout(processNextReverseGeocode, GEO_LOOKUP_MIN_INTERVAL_MS);
-        }
-      }
-    }
-
-    function enqueueReverseGeocodeLookup(lat, lng, bucketKey) {
-      if (!bucketKey || geoMemoryPlaceCache.has(bucketKey) || geoQueuedKeys.has(bucketKey)) return;
-      if (typeof fetch !== 'function' || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
-      if (geoPendingQueue.length >= 10) return;
-      geoQueuedKeys.add(bucketKey);
-      geoPendingQueue.push({ key: bucketKey, lat: Number(lat), lng: Number(lng) });
-      if (!geoLookupTimerId) {
-        const delay = Math.max(120, GEO_LOOKUP_MIN_INTERVAL_MS - (Date.now() - lastGeoLookupAt));
-        geoLookupTimerId = setTimeout(processNextReverseGeocode, delay);
-      }
-    }
-
-    function getResolvedPlaceInfo(lat, lng, opts = {}) {
-      const nLat = Number(lat);
-      const nLng = Number(lng);
-      const local = resolveLocalBgaPlace(nLat, nLng);
-      const bucketKey = getAnthiGeoBucketKey(nLat, nLng);
-      if (bucketKey && geoMemoryPlaceCache.has(bucketKey)) {
-        const cached = geoMemoryPlaceCache.get(bucketKey);
-        return {
-          key: bucketKey,
-          barrio: cached.barrio || local.barrio,
-          ref: local.poiDist <= 200 ? local.ref : (cached.ref || local.ref),
-          fromCache: true
-        };
-      }
-      if (bucketKey && opts.allowRemote !== false && !local.isExact) {
-        enqueueReverseGeocodeLookup(nLat, nLng, bucketKey);
-      }
-      return {
-        key: bucketKey,
-        barrio: local.barrio,
-        ref: local.ref,
-        fromCache: false
-      };
-    }
-
-    function formatGeoPlaceText(lat, lng, mode = 'full', userNote = '', opts = {}) {
-      const info = getResolvedPlaceInfo(lat, lng, opts);
-      return composePlaceDisplay(info, mode, userNote);
-    }
-
-    function formatGeoPlaceHtml(lat, lng, mode = 'full', overrideInitial = '', userNote = '', opts = {}) {
-      const info = getResolvedPlaceInfo(lat, lng, opts);
-      const text = overrideInitial || composePlaceDisplay(info, mode, userNote);
-      const noteAttr = userNote ? ` data-geo-note="${escapeHtml(userNote)}"` : '';
-      return `<span data-geo-key="${escapeHtml(info.key)}" data-geo-mode="${escapeHtml(mode)}"${noteAttr}>${escapeHtml(text)}</span>`;
-    }
-
-    function formatAlertLocationText(rep, opts = {}) {
-      if (!rep) return 'Bucaramanga';
-      const includeDesc = opts.includeDescription !== false;
-      const note = includeDesc ? String(rep.descripcion || rep.description || '').trim() : '';
-      return formatGeoPlaceText(rep.lat, rep.lng, opts.mode || 'full', note, opts);
-    }
-
-    function formatAlertPlaceHtml(rep, mode = 'full') {
-      if (!rep) return '<span>Bucaramanga</span>';
-      const note = String(rep.descripcion || rep.description || '').trim();
-      return formatGeoPlaceHtml(rep.lat, rep.lng, mode, '', note);
-    }
-
-    window.__anthiResolvePlace = getResolvedPlaceInfo;
-    window.__anthiFormatAlertLocationText = formatAlertLocationText;
 
     function updateUserPositionOnMap(lat, lng, mode = 'live', speedKmh = null, accuracyMeters = null) {
       const isDefault = mode === 'default';
@@ -9898,23 +9929,29 @@
     }
 
     function playSubmarineSonarPing(forcePreview = false) {
-      if (!forcePreview && !isSonarAudioEnabled) return false;
-      if (!forcePreview && !hasUserAudioInteraction) return false;
-      const nowMs = Date.now();
-      if (!forcePreview && nowMs - lastSonarPingAt < 2400) return false;
+      try {
+        if (!forcePreview && !isSonarAudioEnabled) return false;
+        if (!forcePreview && !hasUserAudioInteraction) return false;
+        const nowMs = Date.now();
+        if (!forcePreview && nowMs - lastSonarPingAt < 2400) return false;
 
-      const ctx = ensureSonarAudioContext();
-      if (!ctx) return false;
-      lastSonarPingAt = nowMs;
+        const ctx = ensureSonarAudioContext();
+        if (!ctx) return false;
+        lastSonarPingAt = nowMs;
 
-      if (ctx.state === 'suspended') {
-        ctx.resume()
-          .then(() => scheduleSonarOscillators(ctx))
-          .catch(() => {});
-      } else {
-        scheduleSonarOscillators(ctx);
+        if (ctx.state === 'suspended') {
+          ctx.resume()
+            .then(() => {
+              try { scheduleSonarOscillators(ctx); } catch (e) {}
+            })
+            .catch(() => {});
+        } else {
+          scheduleSonarOscillators(ctx);
+        }
+        return true;
+      } catch (e) {
+        return false;
       }
-      return true;
     }
 
     function scheduleCeposUmbrellaOscillators(ctx) {
@@ -9968,27 +10005,33 @@
     }
 
     function playCeposEmergencyAlarm(forcePreview = false) {
-      if (!forcePreview && !isSonarAudioEnabled) return false;
-      if (!forcePreview && !hasUserAudioInteraction) return false;
-      const nowMs = Date.now();
-      if (!forcePreview && nowMs - lastCeposAlarmAt < 2200) return false;
+      try {
+        if (!forcePreview && !isSonarAudioEnabled) return false;
+        if (!forcePreview && !hasUserAudioInteraction) return false;
+        const nowMs = Date.now();
+        if (!forcePreview && nowMs - lastCeposAlarmAt < 2200) return false;
 
-      if (forcePreview) {
-        hasUserAudioInteraction = true;
+        if (forcePreview) {
+          hasUserAudioInteraction = true;
+        }
+
+        const ctx = ensureSonarAudioContext();
+        if (!ctx) return false;
+        lastCeposAlarmAt = nowMs;
+
+        if (ctx.state === 'suspended') {
+          ctx.resume()
+            .then(() => {
+              try { scheduleCeposUmbrellaOscillators(ctx); } catch (e) {}
+            })
+            .catch(() => {});
+        } else {
+          scheduleCeposUmbrellaOscillators(ctx);
+        }
+        return true;
+      } catch (e) {
+        return false;
       }
-
-      const ctx = ensureSonarAudioContext();
-      if (!ctx) return false;
-      lastCeposAlarmAt = nowMs;
-
-      if (ctx.state === 'suspended') {
-        ctx.resume()
-          .then(() => scheduleCeposUmbrellaOscillators(ctx))
-          .catch(() => {});
-      } else {
-        scheduleCeposUmbrellaOscillators(ctx);
-      }
-      return true;
     }
 
     window.__anthiPlayCeposEmergencyAlarm = playCeposEmergencyAlarm;
@@ -10379,10 +10422,11 @@
     }
 
     function evaluarRadarProximidadCercana(allowRepeatInterval = true) {
-      if (!hasUsableUserGps()) {
-        renderCeposActiveBanner(lastRenderedReports);
-        return;
-      }
+      try {
+        if (!hasUsableUserGps()) {
+          renderCeposActiveBanner(lastRenderedReports);
+          return;
+        }
       const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const nowMs = Date.now();
@@ -10543,6 +10587,9 @@
         }
       }
       renderCeposActiveBanner(lastRenderedReports);
+      } catch (err) {
+        console.warn('Error evaluando radar de proximidad:', err);
+      }
     }
 
     window.__anthiFocusAlertById = function(reportId, lat, lng, fromDeepLink = false) {
@@ -11964,15 +12011,19 @@
       }
     }, 15000);
 
-    startFirestoreListener();
-    startReactionPointsListener();
-    renderReactionZonesOnMap();
-    if (typeof window.__anthiStartCierresEventoListener === 'function') {
-      window.__anthiStartCierresEventoListener();
-    }
-    if (navigator.onLine) {
-      sincronizarReportesPendientes();
-    }
+    try { startFirestoreListener(); } catch (err) { console.error('Error iniciando listener de reportes:', err); }
+    try { startReactionPointsListener(); } catch (err) { console.error('Error iniciando listener de zonas de reacción:', err); }
+    try { renderReactionZonesOnMap(); } catch (err) { console.error('Error dibujando zonas de reacción:', err); }
+    try {
+      if (typeof window.__anthiStartCierresEventoListener === 'function') {
+        window.__anthiStartCierresEventoListener();
+      }
+    } catch (err) {}
+    try {
+      if (navigator.onLine) {
+        sincronizarReportesPendientes();
+      }
+    } catch (err) {}
 
     // =========================================================================
     // 11. BUZÓN DE SUGERENCIAS Y CONSEJOS (COLECCIÓN FIRESTORE 'buzon_sugerencias')
@@ -15345,6 +15396,11 @@
       }
     }
     window.__anthiStartCierresEventoListener = startCierresEventoListener;
+    try {
+      startCierresEventoListener();
+    } catch (err) {
+      console.warn('Error iniciando cierres_evento al arrancar:', err);
+    }
 
     if (btnFocusCierreBanner) {
       btnFocusCierreBanner.addEventListener('click', () => {
@@ -15727,9 +15783,15 @@
     }
 
     setInterval(() => {
-      renderCierresEventoOnMap();
+      try {
+        renderCierresEventoOnMap();
+      } catch (e) {}
     }, 30000);
-    refreshCierresEventoUI();
+    try {
+      refreshCierresEventoUI();
+    } catch (err) {
+      console.error('Error inicializando UI de Cierre Evento:', err);
+    }
 
     // =========================================================================
     // 11B. SISTEMA VIP POR CÓDIGO Y NIVELES DIFERENCIADOS (ADMIN GENERAL INTOCABLE)
@@ -16212,6 +16274,7 @@
         }
       );
     }
+    window.__anthiAdminVipCodesReady = true;
 
     if (adminVipCodeForm) {
       adminVipCodeForm.addEventListener('submit', async (e) => {
@@ -17513,10 +17576,15 @@
       });
     }
 
-    renderHojaVidaUI(true, false);
+    try {
+      renderHojaVidaUI(true, false);
+    } catch (err) {
+      console.error('Error inicializando Pico y Placa / Hoja de Vida:', err);
+      try { renderPicoYPlacaUI(); } catch (e) {}
+    }
     window.__anthiPicoYPlacaReady = true;
     setInterval(() => {
-      renderPicoYPlacaUI();
+      try { renderPicoYPlacaUI(); } catch (e) {}
     }, 60000);
 
     // =========================================================================
