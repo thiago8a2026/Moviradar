@@ -544,8 +544,8 @@
         },
         "mensaje": {
           "type": "string",
-          "description": "Aviso informativo corto para los conductores.",
-          "minLength": 4,
+          "description": "Aviso informativo corto opcional para los conductores.",
+          "minLength": 0,
           "maxLength": 320
         },
         "cierreModo": {

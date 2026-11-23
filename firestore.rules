@@ -273,7 +273,7 @@ service cloud.firestore {
         ])
         && data.titulo is string && data.titulo.size() >= 2 && data.titulo.size() <= 80
         && data.sector is string && data.sector.size() <= 120
-        && data.mensaje is string && data.mensaje.size() >= 4 && data.mensaje.size() <= 320
+        && data.mensaje is string && data.mensaje.size() <= 320
         && (data.cierreModo == 'tramo' || data.cierreModo == 'cuadrante')
         && data.cierrePuntos is list
         && data.cierrePuntos.size() >= 2

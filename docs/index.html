@@ -1214,25 +1214,25 @@
       animation: anthiCeposMotion 2.4s ease-in-out infinite;
     }
 
-    .cepos-marker-motion.joystick-manual {
+    .cepos-marker-motion.route-active {
       animation: none;
       box-shadow: 0 0 0 3px #facc15, 0 0 18px rgba(250, 204, 21, 0.95) !important;
     }
 
-    .cepos-joystick-panel {
+    .cepos-route-panel {
       position: fixed;
-      bottom: 14px;
+      bottom: 10px;
       left: 10px;
       right: 10px;
-      max-width: 390px;
+      max-width: 440px;
       margin: 0 auto;
       z-index: 1065;
       background: rgba(15, 23, 42, 0.97);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1.5px solid rgba(250, 204, 21, 0.86);
+      border: 1.5px solid rgba(250, 204, 21, 0.88);
       border-radius: 18px;
-      padding: 11px 13px;
+      padding: 11px 12px;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.78);
       display: none;
       flex-direction: column;
@@ -1241,27 +1241,33 @@
       -webkit-user-select: none;
     }
 
-    .cepos-joystick-panel.visible {
+    .cepos-route-panel.visible {
       display: flex;
     }
 
-    .cepos-joystick-head {
+    .cepos-route-panel.drawing-compact .cepos-route-head,
+    .cepos-route-panel.drawing-compact .cepos-route-meta-row,
+    .cepos-route-panel.drawing-compact .cepos-route-speed-row {
+      display: none;
+    }
+
+    .cepos-route-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
     }
 
-    .cepos-joystick-title-wrap {
+    .cepos-route-title-wrap {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       min-width: 0;
       flex: 1;
     }
 
-    .cepos-joystick-title {
-      font-size: 12.5px;
+    .cepos-route-title {
+      font-size: 13px;
       font-weight: 900;
       color: #fde047;
       white-space: nowrap;
@@ -1269,18 +1275,18 @@
       text-overflow: ellipsis;
     }
 
-    .cepos-joystick-sub {
-      font-size: 10.5px;
+    .cepos-route-sub {
+      font-size: 11px;
       color: #cbd5e1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .cepos-joystick-sync-pill {
+    .cepos-route-sync-pill {
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 999px;
       border: 1px solid rgba(250, 204, 21, 0.55);
       background: rgba(250, 204, 21, 0.14);
@@ -1289,13 +1295,20 @@
       flex-shrink: 0;
     }
 
-    .cepos-joystick-sync-pill.saved {
+    .cepos-route-sync-pill.saved {
       border-color: rgba(16, 185, 129, 0.55);
       background: rgba(16, 185, 129, 0.16);
       color: #6ee7b7;
     }
 
-    .cepos-joystick-meta-row {
+    .cepos-route-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .cepos-route-meta-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1303,226 +1316,122 @@
       background: rgba(2, 6, 23, 0.65);
       border: 1px solid rgba(51, 65, 85, 0.8);
       border-radius: 10px;
-      padding: 5px 9px;
+      padding: 6px 10px;
     }
 
-    .cepos-joystick-coords {
-      font-size: 10.5px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    .cepos-route-coords {
+      font-size: 11px;
       color: #fef08a;
       font-weight: 700;
-    }
-
-    .cepos-joystick-deck {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .cepos-stick-pad {
-      position: relative;
-      width: 108px;
-      height: 108px;
-      border-radius: 50%;
-      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.96) 0%, rgba(2, 6, 23, 0.98) 76%);
-      border: 2px solid rgba(250, 204, 21, 0.72);
-      box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.75);
-      touch-action: none;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: grab;
-    }
-
-    .cepos-stick-pad:active {
-      cursor: grabbing;
-    }
-
-    .cepos-stick-crosshair {
-      position: absolute;
-      inset: 14px;
-      border-radius: 50%;
-      border: 1px dashed rgba(250, 204, 21, 0.25);
-      pointer-events: none;
-    }
-
-    .cepos-stick-knob {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fef08a, #eab308);
-      border: 2.5px solid #0f172a;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65), 0 0 10px rgba(250, 204, 21, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      transform: translate(0px, 0px);
-      transition: transform 0.08s ease-out;
-    }
-
-    .cepos-stick-knob.dragging {
-      transition: none;
-    }
-
-    .cepos-dpad-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 36px);
-      grid-template-rows: repeat(3, 34px);
-      gap: 4px;
-      touch-action: manipulation;
-    }
-
-    .cepos-dpad-btn {
-      border: 1px solid rgba(250, 204, 21, 0.48);
-      border-radius: 9px;
-      background: rgba(30, 41, 59, 0.94);
-      color: #fef08a;
-      font-size: 14px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .cepos-dpad-btn:active,
-    .cepos-dpad-btn.pressed {
-      background: #facc15;
-      color: #0f172a;
-      border-color: #0f172a;
-    }
-
-    .cepos-dpad-center {
-      border-color: rgba(100, 116, 139, 0.5);
-      background: rgba(15, 23, 42, 0.85);
-      color: #94a3b8;
-      font-size: 11px;
-    }
-
-    .cepos-steps-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .cepos-steps-label {
-      font-size: 10.5px;
-      font-weight: 800;
-      color: #94a3b8;
-      margin-right: 2px;
-    }
-
-    .cepos-step-btn {
-      border: 1px solid rgba(100, 116, 139, 0.55);
-      background: rgba(15, 23, 42, 0.85);
-      color: #cbd5e1;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .cepos-step-btn.active {
-      background: #facc15;
-      color: #0f172a;
-      border-color: #0f172a;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .cepos-route-box {
       background: rgba(2, 6, 23, 0.72);
       border: 1px solid rgba(250, 204, 21, 0.36);
-      border-radius: 12px;
-      padding: 7px 9px;
+      border-radius: 14px;
+      padding: 9px 10px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 9px;
     }
 
     .cepos-route-status {
-      font-size: 10.5px;
-      font-weight: 700;
+      font-size: 11.5px;
+      font-weight: 800;
       color: #fde68a;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
     .cepos-route-actions {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .cepos-route-btn {
-      border: 1px solid rgba(250, 204, 21, 0.45);
-      background: rgba(30, 41, 59, 0.94);
+      min-height: 46px;
+      border: 1.5px solid rgba(250, 204, 21, 0.52);
+      background: rgba(30, 41, 59, 0.96);
       color: #fef08a;
-      border-radius: 9px;
-      padding: 5px 8px;
-      font-size: 11px;
-      font-weight: 800;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 12.5px;
+      font-weight: 900;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      flex: 1 1 auto;
       justify-content: center;
-      white-space: nowrap;
+      gap: 6px;
+      text-align: center;
+      line-height: 1.15;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .cepos-route-btn:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .cepos-route-btn:disabled {
-      opacity: 0.42;
+      opacity: 0.4;
       cursor: not-allowed;
     }
 
     .cepos-route-btn.active {
       background: #facc15;
       color: #0f172a;
-      border-color: #0f172a;
+      border-color: #fef08a;
+      box-shadow: 0 4px 14px rgba(250, 204, 21, 0.35);
     }
 
     .cepos-route-btn.play {
-      border-color: rgba(16, 185, 129, 0.58);
-      background: rgba(6, 78, 59, 0.78);
+      border-color: rgba(16, 185, 129, 0.72);
+      background: rgba(6, 78, 59, 0.88);
       color: #a7f3d0;
     }
 
-    .cepos-route-btn.play.playing {
+    .cepos-route-btn.stop {
       border-color: rgba(245, 158, 11, 0.72);
       background: rgba(120, 53, 15, 0.85);
       color: #fde68a;
     }
 
-    .cepos-route-btn.clear-icon {
-      flex: 0 0 auto;
-      padding: 5px 8px;
-      border-color: rgba(239, 68, 68, 0.45);
+    .cepos-route-btn.reset {
+      border-color: rgba(239, 68, 68, 0.62);
+      background: rgba(127, 29, 29, 0.56);
       color: #fecaca;
-      background: rgba(127, 29, 29, 0.42);
     }
 
     .cepos-route-speed-row {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
+    .cepos-steps-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-right: 2px;
+    }
+
     .cepos-speed-btn {
-      border: 1px solid rgba(100, 116, 139, 0.5);
-      background: rgba(15, 23, 42, 0.85);
+      min-height: 36px;
+      border: 1px solid rgba(100, 116, 139, 0.55);
+      background: rgba(15, 23, 42, 0.9);
       color: #cbd5e1;
-      border-radius: 7px;
-      padding: 3px 7px;
-      font-size: 10px;
+      border-radius: 9px;
+      padding: 5px 10px;
+      font-size: 11.5px;
       font-weight: 800;
       cursor: pointer;
+      flex: 1 1 auto;
     }
 
     .cepos-speed-btn.active {
@@ -1531,38 +1440,21 @@
       border-color: #34d399;
     }
 
-    .cepos-manual-deck-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cepos-manual-deck-wrapper.hidden {
-      display: none;
-    }
-
-    .cepos-joystick-head-actions {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-shrink: 0;
-    }
-
     .cepos-mini-btn {
       width: auto;
-      height: 29px;
-      padding: 0 9px;
-      border-radius: 9px;
-      border: 1px solid rgba(148, 163, 184, 0.42);
-      background: rgba(30, 41, 59, 0.92);
+      min-height: 34px;
+      padding: 0 11px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(30, 41, 59, 0.94);
       color: #e2e8f0;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
     }
 
     .cepos-mini-btn:hover {
@@ -1572,22 +1464,22 @@
 
     .cepos-mini-dock {
       position: fixed;
-      bottom: calc(var(--bottom-nav-height) + 12px);
+      bottom: calc(var(--bottom-nav-height) + 10px);
       left: 10px;
       right: 10px;
-      max-width: 440px;
+      max-width: 450px;
       margin: 0 auto;
       z-index: 1064;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1.5px solid rgba(250, 204, 21, 0.85);
-      border-radius: 14px;
-      padding: 8px 10px;
+      border-radius: 16px;
+      padding: 9px 11px;
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
       display: none;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       user-select: none;
       -webkit-user-select: none;
     }
@@ -1616,17 +1508,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 7px;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
       background: linear-gradient(135deg, #fef08a, #eab308);
       border: 1.5px solid #0f172a;
       flex-shrink: 0;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     .cepos-mini-status {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 800;
       color: #fef08a;
       white-space: nowrap;
@@ -1635,7 +1527,7 @@
     }
 
     .cepos-mini-sub {
-      font-size: 10px;
+      font-size: 10.5px;
       color: #cbd5e1;
       white-space: nowrap;
       overflow: hidden;
@@ -1643,16 +1535,15 @@
     }
 
     .cepos-mini-actions {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
     }
 
     .cepos-mini-actions .cepos-route-btn {
-      flex: 1 1 auto;
-      padding: 5px 8px;
-      font-size: 10.5px;
+      min-height: 44px;
+      padding: 7px 9px;
+      font-size: 12px;
     }
 
     .quick-actions-bar {
@@ -1879,6 +1770,106 @@
       box-shadow: 0 10px 26px rgba(0, 0, 0, 0.56);
     }
 
+    @keyframes anthiCeposBeaconPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
+      }
+      60% {
+        transform: scale(1.18);
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+      }
+    }
+
+    .cepos-active-banner {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(250, 204, 21, 0.88);
+      border-radius: 14px;
+      padding: 8px 11px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(239, 68, 68, 0.3);
+    }
+
+    .cepos-active-banner.visible {
+      display: flex;
+    }
+
+    .cepos-active-banner-main {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cepos-active-banner-top {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .cepos-active-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(127, 29, 29, 0.85);
+      border: 1px solid rgba(248, 113, 113, 0.85);
+      color: #fef08a;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .cepos-active-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: anthiCeposBeaconPulse 1.35s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .cepos-active-meta-pill {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #fde047;
+    }
+
+    .cepos-active-banner-place {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cepos-banner-focus-btn {
+      border: 1px solid rgba(250, 204, 21, 0.8);
+      background: rgba(234, 179, 8, 0.22);
+      color: #fef08a;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
     .cierre-evento-banner.visible {
       display: flex;
     }
@@ -2022,6 +2013,112 @@
       background: rgba(168, 85, 247, 0.18);
       border: 1px solid rgba(168, 85, 247, 0.65);
       color: #e9d5ff;
+    }
+
+    .cierre-draw-tools-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .cierre-draw-tool-btn {
+      min-height: 36px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(2, 6, 23, 0.9);
+      color: #e2e8f0;
+      border-radius: 9px;
+      padding: 5px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      touch-action: manipulation;
+    }
+
+    .cierre-draw-tool-btn.active {
+      border-color: #c084fc;
+      background: rgba(126, 34, 206, 0.72);
+      color: #faf5ff;
+      box-shadow: 0 3px 12px rgba(168, 85, 247, 0.35);
+    }
+
+    .cierre-evac-chips-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .cierre-evac-chip {
+      border: 1px solid rgba(16, 185, 129, 0.48);
+      background: rgba(6, 78, 59, 0.45);
+      color: #a7f3d0;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .cierre-evac-chip.active {
+      border-color: #34d399;
+      background: #059669;
+      color: #ecfdf5;
+    }
+
+    .cierre-vector-node {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.65);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .cierre-vector-node.cierre {
+      background: #dc2626;
+    }
+
+    .cierre-vector-node.cierre.tip {
+      background: #f97316;
+      border-color: #fef08a;
+    }
+
+    .cierre-vector-node.evac {
+      background: #059669;
+    }
+
+    .cierre-vector-node.evac.tip {
+      background: #06b6d4;
+      border-color: #ecfdf5;
+    }
+
+    .cierre-vector-move-handle {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 2px solid #ffffff;
+      background: linear-gradient(135deg, #7e22ce, #db2777);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.7);
+      cursor: move;
+      touch-action: none;
     }
 
     .select-input {
@@ -3451,11 +3548,11 @@
       </div>
     </div>
 
-    <!-- Panel táctil tipo Joystick / Cruceta (Solo Admin) para mover reportes de Cepos en tiempo real -->
-    <div class="cepos-joystick-panel" id="ceposJoystickPanel" aria-hidden="true">
-      <div class="cepos-joystick-head">
-        <div class="cepos-joystick-title-wrap">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#fef08a,#eab308);border:1.5px solid #0f172a;flex-shrink:0;" aria-hidden="true">
+    <!-- Panel táctil de Ruta Cepos (Solo Admin · sin joystick, con botones grandes) -->
+    <div class="cepos-route-panel" id="ceposRoutePanel" aria-hidden="true">
+      <div class="cepos-route-head">
+        <div class="cepos-route-title-wrap">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#fef08a,#eab308);border:1.5px solid #0f172a;flex-shrink:0;" aria-hidden="true">
             <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
               <rect x="11.2" y="5.4" width="5.2" height="2.4" rx="1" fill="#f97316" stroke="#0f172a" stroke-width="1.2"/>
               <path d="M3.2 18.8V10.6C3.2 8.9 4.4 7.8 6.1 7.8H16.6C17.8 7.8 18.8 8.3 19.6 9.3L22.3 12.2H24C25 12.2 25.6 12.9 25.6 14V18.8C25.6 19.7 24.9 20.3 24 20.3H4.6C3.8 20.3 3.2 19.7 3.2 18.8Z" fill="#facc15" stroke="#0f172a" stroke-width="1.65" stroke-linejoin="round"/>
@@ -3465,84 +3562,45 @@
             </svg>
           </span>
           <div style="min-width:0;">
-            <div class="cepos-joystick-title">🕹️ Control Manual Cepos</div>
-            <div class="cepos-joystick-sub" id="ceposJoystickTargetLabel">Unidad móvil seleccionada</div>
+            <div class="cepos-route-title">🛣️ Ruta en Vivo Cepos</div>
+            <div class="cepos-route-sub" id="ceposRouteTargetLabel">Camionetica seleccionada</div>
           </div>
         </div>
-        <div class="cepos-joystick-head-actions">
-          <span class="cepos-joystick-sync-pill saved" id="ceposJoystickSyncBadge">Listo</span>
-          <button type="button" class="cepos-mini-btn" id="btnMinimizeCeposJoystick" title="Minimizar panel para ver el mapa y trazar rutas">
+        <div class="cepos-route-head-actions">
+          <span class="cepos-route-sync-pill saved" id="ceposRouteSyncBadge">Listo</span>
+          <button type="button" class="cepos-mini-btn" id="btnMinimizeCeposRoute" title="Minimizar panel para ver más mapa">
             🗕 Minimizar
           </button>
-          <button type="button" class="btn-close" id="btnCloseCeposJoystick" style="width:auto;padding:0 9px;height:29px;font-size:11px;font-weight:800;" title="Cerrar control joystick">
+          <button type="button" class="btn-close" id="btnCloseCeposRoute" style="width:auto;padding:0 10px;height:34px;font-size:11.5px;font-weight:800;" title="Cerrar control Cepos">
             ✕ Cerrar
           </button>
         </div>
       </div>
 
-      <div class="cepos-joystick-meta-row">
-        <span class="cepos-joystick-coords" id="ceposJoystickCoords">📍 Sector en mapa</span>
-        <div style="display:flex;gap:5px;align-items:center;">
-          <button type="button" class="alert-admin-btn edit" id="btnToggleCeposManualDeck" style="padding:3px 8px;font-size:10.5px;" title="Mostrar u ocultar joystick manual">🕹️ Joystick</button>
-          <button type="button" class="alert-admin-btn edit" id="btnCenterCeposJoystick" style="padding:3px 8px;font-size:10.5px;">🎯 Centrar</button>
-        </div>
+      <div class="cepos-route-meta-row">
+        <span class="cepos-route-coords" id="ceposRouteCoords">📍 Sector en mapa</span>
+        <button type="button" class="alert-admin-btn edit" id="btnCenterCeposRoute" style="padding:5px 10px;font-size:11px;min-height:30px;">🎯 Centrar</button>
       </div>
 
       <div class="cepos-route-box" id="ceposRouteBox">
-        <div class="cepos-route-status" id="ceposRouteStatusText">🛣️ Sin ruta trazada · Toca "Trazar ruta" para dibujar con el dedo</div>
+        <div class="cepos-route-status" id="ceposRouteStatusText">🛣️ Sin trayecto · Toca "Trazar Ruta" y desliza el dedo por la vía</div>
         <div class="cepos-route-actions">
-          <button type="button" class="cepos-route-btn" id="btnCeposDrawRoute">✏️ Trazar ruta</button>
-          <button type="button" class="cepos-route-btn play" id="btnCeposPlayPauseRoute" disabled>▶ Iniciar</button>
-          <button type="button" class="cepos-route-btn" id="btnCeposChangeRoute" title="Borrar ruta actual y trazar una nueva">🔄 Cambiar ruta</button>
-          <button type="button" class="cepos-route-btn clear-icon" id="btnCeposClearRoute" title="Limpiar trazo" aria-label="Limpiar ruta">🗑️</button>
+          <button type="button" class="cepos-route-btn" id="btnCeposDrawRoute">✏️ Trazar Ruta</button>
+          <button type="button" class="cepos-route-btn stop" id="btnCeposStopRoute" disabled>⏹ Parar</button>
+          <button type="button" class="cepos-route-btn play" id="btnCeposPlayRoute" disabled>▶ Seguir</button>
+          <button type="button" class="cepos-route-btn reset" id="btnCeposResetRoute" title="Limpiar trayecto actual o cambiar de ruta">🔄 Cambiar / Limpiar</button>
         </div>
         <div class="cepos-route-speed-row">
-          <span class="cepos-steps-label">Ritmo ruta:</span>
+          <span class="cepos-steps-label">Velocidad:</span>
           <button type="button" class="cepos-speed-btn" data-cepos-speed-kmh="6">6 km/h</button>
           <button type="button" class="cepos-speed-btn active" data-cepos-speed-kmh="10">10 km/h</button>
           <button type="button" class="cepos-speed-btn" data-cepos-speed-kmh="15">15 km/h</button>
           <button type="button" class="cepos-speed-btn" data-cepos-speed-kmh="22">22 km/h</button>
         </div>
       </div>
-
-      <div class="cepos-manual-deck-wrapper" id="ceposManualDeckWrapper">
-        <div class="cepos-joystick-deck">
-          <div class="cepos-stick-pad" id="ceposStickPad" title="Arrastra suavemente para mover la camionetica de Cepos">
-            <div class="cepos-stick-crosshair"></div>
-            <div class="cepos-stick-knob" id="ceposStickKnob">
-              <svg width="20" height="20" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-                <path d="M3.2 18.8V10.6C3.2 8.9 4.4 7.8 6.1 7.8H16.6C17.8 7.8 18.8 8.3 19.6 9.3L22.3 12.2H24C25 12.2 25.6 12.9 25.6 14V18.8C25.6 19.7 24.9 20.3 24 20.3H4.6C3.8 20.3 3.2 19.7 3.2 18.8Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round"/>
-                <path d="M16.8 9.4H18.4L21.3 12.5H16.8V9.4Z" fill="#38bdf8" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
-                <circle cx="8.2" cy="20.6" r="2.8" fill="#0f172a"/>
-                <circle cx="20.4" cy="20.6" r="2.8" fill="#0f172a"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="cepos-dpad-grid" id="ceposDpadGrid" aria-label="Cruceta direccional de Cepos">
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="-0.707" data-cepos-dy="0.707" aria-label="Noroeste">↖</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0" data-cepos-dy="1" aria-label="Norte">↑</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0.707" data-cepos-dy="0.707" aria-label="Noreste">↗</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="-1" data-cepos-dy="0" aria-label="Oeste">←</button>
-            <button type="button" class="cepos-dpad-btn cepos-dpad-center" id="btnFlushCeposJoystick" title="Guardar posición ahora" aria-label="Guardar posición">💾</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="1" data-cepos-dy="0" aria-label="Este">→</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="-0.707" data-cepos-dy="-0.707" aria-label="Suroeste">↙</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0" data-cepos-dy="-1" aria-label="Sur">↓</button>
-            <button type="button" class="cepos-dpad-btn" data-cepos-dx="0.707" data-cepos-dy="-0.707" aria-label="Sureste">↘</button>
-          </div>
-        </div>
-
-        <div class="cepos-steps-row">
-          <span class="cepos-steps-label">Paso joystick:</span>
-          <button type="button" class="cepos-step-btn" data-cepos-step="10">10 m</button>
-          <button type="button" class="cepos-step-btn active" data-cepos-step="25">25 m</button>
-          <button type="button" class="cepos-step-btn" data-cepos-step="50">50 m</button>
-          <button type="button" class="cepos-step-btn" data-cepos-step="100">100 m</button>
-        </div>
-      </div>
     </div>
 
-    <!-- Cápsula flotante compacta al minimizar el Joystick de Cepos (no bloquea mapa ni rutas) -->
+    <!-- Cápsula flotante compacta al minimizar la barra de Cepos (despeja el centro del mapa) -->
     <div class="cepos-mini-dock" id="ceposMiniDock" aria-hidden="true">
       <div class="cepos-mini-dock-top">
         <div class="cepos-mini-dock-info">
@@ -3552,42 +3610,48 @@
             <div class="cepos-mini-sub" id="ceposMiniPlaceText">📍 Sector en mapa</div>
           </div>
         </div>
-        <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
-          <button type="button" class="cepos-mini-btn" id="btnExpandCeposJoystick" title="Abrir panel completo Joystick">🕹️ Joystick</button>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">
+          <button type="button" class="cepos-mini-btn" id="btnExpandCeposRoute" title="Abrir panel completo de velocidad y ruta">⚙️ Velocidad</button>
           <button type="button" class="cepos-mini-btn" id="btnCloseCeposMiniDock" title="Finalizar control Cepos" aria-label="Cerrar control Cepos">✕</button>
         </div>
       </div>
       <div class="cepos-mini-actions">
-        <button type="button" class="cepos-route-btn" id="btnCeposMiniDraw">✏️ Ruta</button>
-        <button type="button" class="cepos-route-btn play" id="btnCeposMiniPlayPause" disabled>▶ Iniciar</button>
-        <button type="button" class="cepos-route-btn" id="btnCeposMiniChangeRoute" title="Trazar nueva ruta">🔄 Cambiar</button>
-        <button type="button" class="cepos-route-btn clear-icon" id="btnCeposMiniClearRoute" title="Limpiar ruta" aria-label="Limpiar ruta">🗑️</button>
+        <button type="button" class="cepos-route-btn" id="btnCeposMiniDraw">✏️ Trazar Ruta</button>
+        <button type="button" class="cepos-route-btn stop" id="btnCeposMiniStop" disabled>⏹ Parar</button>
+        <button type="button" class="cepos-route-btn play" id="btnCeposMiniPlay" disabled>▶ Seguir</button>
+        <button type="button" class="cepos-route-btn reset" id="btnCeposMiniReset">🔄 Cambiar / Limpiar</button>
       </div>
     </div>
 
-    <!-- Barra flotante interactiva (Solo Admin) para trazar Cierre Evento (tramo/cuadrante + rutas de evacuación/paso) -->
+    <!-- Barra flotante interactiva (Solo Admin) para editor por vectores encadenados y arrastrables de Cierre Evento -->
     <div class="cierre-draw-dock" id="cierreEventoDrawDock" aria-hidden="true">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <div style="min-width:0;">
-          <div style="font-size:12px;font-weight:900;color:#e9d5ff;">🏟️ Trazado Cierre Evento (Solo Admin)</div>
-          <div id="ceDrawPlaceLabel" style="font-size:10.5px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Toca o desliza el dedo en el mapa para trazar</div>
+          <div style="font-size:12px;font-weight:900;color:#e9d5ff;">🏟️ Editor Vectorial Cierre Evento (Admin)</div>
+          <div id="ceDrawPlaceLabel" style="font-size:10.5px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Toca o arrastra vértices para encadenar vectores rectos</div>
         </div>
-        <button type="button" class="btn-close" id="btnCeDrawExit" style="width:auto;padding:0 10px;height:29px;font-size:11px;font-weight:800;">✕ Salir</button>
+        <button type="button" class="btn-close" id="btnCeDrawExit" style="width:auto;padding:0 10px;height:30px;font-size:11px;font-weight:800;">✕ Salir</button>
       </div>
       <div class="cierre-draw-mode-row">
-        <button type="button" class="cierre-draw-mode-btn cierre active" id="btnCeDrawModeCierre">🔴 Cierre (Tramo/Cuadrante)</button>
-        <button type="button" class="cierre-draw-mode-btn evac" id="btnCeDrawModeEvac">🟢 + Ruta Evacuación/Paso</button>
+        <button type="button" class="cierre-draw-mode-btn cierre active" id="btnCeDrawModeCierre">🔴 Bloqueo / Cierre</button>
+        <button type="button" class="cierre-draw-mode-btn evac" id="btnCeDrawModeEvac">🟢 Evacuación / Paso</button>
       </div>
+      <div class="cierre-draw-tools-row">
+        <button type="button" class="cierre-draw-tool-btn active" id="btnCeToolDraw">📐 Trazar</button>
+        <button type="button" class="cierre-draw-tool-btn" id="btnCeToolMove">✋ Mover Vector</button>
+        <button type="button" class="cierre-draw-tool-btn" id="btnCeToolPan">🗺️ Ver Mapa</button>
+      </div>
+      <div id="ceEvacChipsRow" class="cierre-evac-chips-row" style="display:none;"></div>
       <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
-        <button type="button" class="pico-cal-btn active" id="btnCeShapeTramo" data-ce-draw-shape="tramo">〰️ Tramo</button>
+        <button type="button" class="pico-cal-btn active" id="btnCeShapeTramo" data-ce-draw-shape="tramo">📐 Vector Tramo</button>
         <button type="button" class="pico-cal-btn" id="btnCeShapeCuadrante" data-ce-draw-shape="cuadrante">⬟ Cuadrante</button>
-        <button type="button" class="pico-cal-btn" id="btnCeNewEvacRoute" style="border-color:rgba(16,185,129,0.65);color:#6ee7b7;">➕ Nueva ruta salida</button>
-        <span id="ceDrawStatsPill" style="margin-left:auto;font-size:10px;font-weight:800;color:#c4b5fd;">0 pts cierre · 0 salidas</span>
+        <button type="button" class="pico-cal-btn" id="btnCeNewEvacRoute" style="border-color:rgba(16,185,129,0.65);color:#6ee7b7;">➕ Nueva salida</button>
+        <span id="ceDrawStatsPill" style="margin-left:auto;font-size:10px;font-weight:800;color:#c4b5fd;">0 vértices · 0 salidas</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
-        <button type="button" class="cepos-route-btn" id="btnCeDrawUndo" style="flex:0 0 auto;border-color:rgba(148,163,184,0.5);color:#e2e8f0;">↩️ Deshacer</button>
-        <button type="button" class="cepos-route-btn clear-icon" id="btnCeDrawClear" title="Limpiar trazo actual">🗑️</button>
-        <button type="button" class="btn-submit" id="btnCeDrawBackForm" style="min-height:36px;font-size:11.5px;flex:1;background:linear-gradient(135deg,#7e22ce,#db2777);">✅ Listo · Configurar horario y guardar</button>
+        <button type="button" class="cepos-route-btn" id="btnCeDrawUndo" style="min-height:38px;flex:0 0 auto;border-color:rgba(148,163,184,0.5);color:#e2e8f0;font-size:11.5px;padding:4px 9px;">↩️ Deshacer</button>
+        <button type="button" class="cepos-route-btn reset" id="btnCeDrawClear" style="min-height:38px;flex:0 0 auto;font-size:11.5px;padding:4px 9px;" title="Limpiar vector actual">🗑️</button>
+        <button type="button" class="btn-submit" id="btnCeDrawBackForm" style="min-height:38px;font-size:11.5px;flex:1;background:linear-gradient(135deg,#7e22ce,#db2777);">✅ Listo · Horario y Guardar</button>
       </div>
     </div>
 
@@ -3618,6 +3682,20 @@
 
     <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos / Ciudadano y botón "+ Reportar Novedad" -->
     <div class="bottom-panel">
+      <div class="cepos-active-banner" id="ceposActiveBanner" aria-live="polite">
+        <div class="cepos-active-banner-main" id="ceposActiveBannerMain" role="button" tabindex="0" title="Ubicar unidad de Cepos activa en el mapa">
+          <div class="cepos-active-banner-top">
+            <span class="cepos-active-pill"><span class="cepos-active-dot" aria-hidden="true"></span><span id="ceposActiveBannerBadge">CEPO ACTIVO</span></span>
+            <span class="cepos-active-meta-pill" id="ceposActiveBannerMeta"></span>
+          </div>
+          <div class="cepos-active-banner-place" id="ceposActiveBannerPlace"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">
+          <button type="button" class="cepos-banner-focus-btn" id="btnFocusCeposBanner">🚐 Ver</button>
+          <button type="button" class="route-banner-close" id="btnDismissCeposBanner" title="Ocultar aviso temporalmente">✕</button>
+        </div>
+      </div>
+
       <div class="cierre-evento-banner" id="cierreEventoBanner" aria-live="polite">
         <div class="cierre-evento-banner-main" id="cierreEventoBannerMain" role="button" tabindex="0" title="Ver cierre y rutas de evacuación en el mapa">
           <div class="cierre-evento-banner-title" id="cierreEventoBannerTitle"></div>
@@ -4472,9 +4550,8 @@
                 class="text-input"
                 rows="2"
                 maxlength="320"
-                required
                 style="margin-bottom:0;"
-                placeholder="Mensaje informativo corto (ej: Evento deportivo: observa en el mapa los cierres en rojo y salidas en verde.)"
+                placeholder="Mensaje informativo corto (opcional, ej: Evento deportivo: observa los cierres en rojo y salidas en verde.)"
               ></textarea>
               <div style="display:flex;gap:5px;flex-wrap:wrap;">
                 <button type="button" class="pico-cal-btn" data-ce-msg-preset="deportivo">🏃 Evento deportivo</button>
@@ -4928,9 +5005,14 @@
 
         <div class="route-status-card" id="routeStatusCard"></div>
 
-        <button type="button" class="sonar-toggle-card sonar-on" id="btnToggleSonarAudio" data-sonar-toggle="true" title="Activar o silenciar el sónar cada 30s al acercarse a alertas">
-          <span>🔊 Sónar de submarino (cada 30 s)</span>
+        <button type="button" class="sonar-toggle-card sonar-on" id="btnToggleSonarAudio" data-sonar-toggle="true" title="Activar o silenciar el sónar cada 30s y alarma Cepos">
+          <span>🔊 Sónar (30s) y Alarma Cepos</span>
           <span class="sonar-toggle-pill">Activo</span>
+        </button>
+
+        <button type="button" class="sonar-toggle-card" id="btnPreviewCeposAlarmRoute" data-cepos-alarm-preview="true" style="border-color:rgba(250,204,21,0.58);background:rgba(127,29,29,0.34);color:#fef08a;" title="Escuchar protocolo de emergencia Cepos (estilo Umbrella)">
+          <span>🚨 Probar alarma Cepos (Emergencia)</span>
+          <span class="sonar-toggle-pill" style="background:rgba(250,204,21,0.2);color:#fef08a;">Probar</span>
         </button>
 
         <div style="display:flex;gap:8px;">
@@ -5186,7 +5268,7 @@
     try {
       db = initializeFirestore(
         app,
-        { experimentalAutoDetectLongPolling: true },
+        { experimentalForceLongPolling: true, useFetchStreams: false },
         firebaseConfig.firestoreDatabaseId
       );
     } catch (e) {
@@ -5226,11 +5308,15 @@
       throw new Error(JSON.stringify(errInfo));
     }
 
-    async function testConnection() {
+    async function testConnection(retryCount = 0) {
       try {
         await getDocFromServer(doc(db, 'test', 'connection'));
       } catch (error) {
         if (error instanceof Error && error.message.includes('the client is offline')) {
+          if (retryCount < 1 && typeof navigator !== 'undefined' && navigator.onLine !== false) {
+            setTimeout(() => testConnection(retryCount + 1), 2000);
+            return;
+          }
           console.error('Please check your Firebase configuration.');
         }
       }
@@ -5784,8 +5870,8 @@
       if (window.__anthiPicoYPlacaReady && typeof renderPicoYPlacaUI === 'function') {
         renderPicoYPlacaUI();
       }
-      if (userRole !== 'admin' && typeof window.closeCeposJoystick === 'function') {
-        window.closeCeposJoystick(false);
+      if (userRole !== 'admin' && typeof window.closeCeposRoutePanel === 'function') {
+        window.closeCeposRoutePanel(false);
       }
       const catCierreBtn = document.getElementById('catOptionCierreEvento');
       if (catCierreBtn) {
@@ -6314,7 +6400,7 @@
       return getConfirmCount(rep) >= 2;
     }
 
-    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false, confirmCount = 1, tipoTexto = '', isJoystickControlled = false) {
+    function createCustomMarkerIcon(emoji, color, isPending = false, isFixed = false, confirmCount = 1, tipoTexto = '', isRouteActive = false) {
       const count = Math.max(1, Number(confirmCount || 1));
       const isUnvalidated = !isPending && !isFixed && count < 2;
       const tipoNorm = String(tipoTexto || '').trim().toLowerCase();
@@ -6358,7 +6444,7 @@
         ? `<span style="position:absolute;top:-6px;right:-6px;padding:1px 4px;border-radius:999px;background:#f97316;color:#020617;border:1.5px solid #020617;font-size:9px;line-height:1.1;font-weight:900;">2/3</span>`
         : `<span style="position:absolute;top:-6px;right:-6px;padding:1px 4px;border-radius:999px;background:#10b981;color:#020617;border:1.5px solid #020617;font-size:9px;line-height:1.1;font-weight:900;">✓${count}</span>`;
       const ceposMotionClass = isCeposMarker
-        ? (isJoystickControlled ? 'cepos-marker-motion joystick-manual' : 'cepos-marker-motion')
+        ? (isRouteActive ? 'cepos-marker-motion route-active' : 'cepos-marker-motion')
         : '';
 
       return L.divIcon({
@@ -6468,6 +6554,7 @@
             </div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:3px 0;">
               <span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              ${isCeposItem ? `<span style="font-size:10px;font-weight:900;padding:2px 6px;border-radius:999px;background:${confirmations >= 2 || isFixed ? 'rgba(127,29,29,0.82)' : 'rgba(234,179,8,0.2)'};color:${confirmations >= 2 || isFixed ? '#fef08a' : '#fde047'};border:1px solid ${confirmations >= 2 || isFixed ? 'rgba(248,113,113,0.75)' : 'rgba(250,204,21,0.55)'};">${confirmations >= 2 || isFixed ? '🚨 Cepo activo' : '🚐 Cepo reportado'}</span>` : ''}
               ${getVipReportBadgeHtml(rep)}
               ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
               ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
@@ -6486,21 +6573,21 @@
           adminActions.className = 'alert-list-admin-actions';
 
           if (isCeposTipo(tipoStr)) {
-            const joystickBtn = document.createElement('button');
-            joystickBtn.type = 'button';
-            joystickBtn.className = 'alert-admin-btn edit';
-            joystickBtn.style.background = 'rgba(250, 204, 21, 0.2)';
-            joystickBtn.style.color = '#fde047';
-            joystickBtn.style.borderColor = 'rgba(250, 204, 21, 0.6)';
-            joystickBtn.textContent = '🕹️ Mover Cepos';
-            joystickBtn.addEventListener('click', (ev) => {
+            const routeCeposBtn = document.createElement('button');
+            routeCeposBtn.type = 'button';
+            routeCeposBtn.className = 'alert-admin-btn edit';
+            routeCeposBtn.style.background = 'rgba(250, 204, 21, 0.2)';
+            routeCeposBtn.style.color = '#fde047';
+            routeCeposBtn.style.borderColor = 'rgba(250, 204, 21, 0.6)';
+            routeCeposBtn.textContent = '🛣️ Trazar Ruta Cepos';
+            routeCeposBtn.addEventListener('click', (ev) => {
               ev.stopPropagation();
               alertsCenterModal.classList.remove('open');
-              if (typeof window.openCeposJoystick === 'function') {
-                window.openCeposJoystick(rep.id);
+              if (typeof window.openCeposRoutePanel === 'function') {
+                window.openCeposRoutePanel(rep.id);
               }
             });
-            adminActions.appendChild(joystickBtn);
+            adminActions.appendChild(routeCeposBtn);
           }
 
           const editBtn = document.createElement('button');
@@ -6578,10 +6665,10 @@
         const meta = getTipoMeta(tipoTexto);
         const isAgente = isAgenteTransitoTipo(tipoTexto);
         const isCeposPopup = isCeposTipo(tipoTexto);
-        const isJoystickTarget = Boolean(
+        const isCeposRouteTarget = Boolean(
           isCeposPopup &&
-          typeof window.__anthiGetCeposJoystickState === 'function' &&
-          window.__anthiGetCeposJoystickState().activeReportId === String(rep.id)
+          typeof window.__anthiGetCeposPanelState === 'function' &&
+          window.__anthiGetCeposPanelState().activeReportId === String(rep.id)
         );
         const agenteRadiusM = isAgente ? clampAgentRadiusMeters(rep.radioMetros) : null;
         const rawDescText = String(rep.descripcion || rep.description || '').trim();
@@ -6608,8 +6695,8 @@
         }
 
         const marker = L.marker([lat, lng], {
-          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed, confirmations, tipoTexto, isJoystickTarget),
-          zIndexOffset: isJoystickTarget ? 900 : isFixed ? 700 : confirmations >= 3 ? 520 : confirmations === 2 ? 420 : 280
+          icon: createCustomMarkerIcon(meta.emoji, meta.color, isPending, isFixed, confirmations, tipoTexto, isCeposRouteTarget),
+          zIndexOffset: isCeposRouteTarget ? 900 : isFixed ? 700 : confirmations >= 3 ? 520 : confirmations === 2 ? 420 : 280
         });
 
         let mediaHtml = '';
@@ -6640,12 +6727,12 @@
           ? `<div class="popup-voted-note">✓ Ya aportaste tu confirmación a esta alerta</div>`
           : '';
         const canVipDelete = userRole !== 'admin' && !isPending && !isFixed && hasValidatedVipPermission(auth.currentUser);
-        const ceposJoystickPopupBtn = isCeposPopup
-          ? `<button type="button" class="popup-vote-btn edit" style="background:rgba(250,204,21,0.18);color:#fde047;border-color:rgba(250,204,21,0.58);" onclick="openCeposJoystick('${escapeHtml(rep.id)}')">🕹️ Mover Cepos (Joystick)</button>`
+        const ceposRoutePopupBtn = isCeposPopup
+          ? `<button type="button" class="popup-vote-btn edit" style="background:rgba(250,204,21,0.18);color:#fde047;border-color:rgba(250,204,21,0.58);" onclick="openCeposRoutePanel('${escapeHtml(rep.id)}')">🛣️ Trazar Ruta Cepos</button>`
           : '';
         const adminModerationBar = userRole === 'admin' && !isPending
           ? `<div class="popup-admin-bar">
-              ${ceposJoystickPopupBtn}
+              ${ceposRoutePopupBtn}
               <button type="button" class="popup-vote-btn edit" onclick="openAdminEditModal('${escapeHtml(rep.id)}')">✏️ Editar Novedad (Admin)</button>
               <button type="button" class="popup-vote-btn delete" onclick="deleteReportFromFirestore('${escapeHtml(rep.id)}')">🗑️ Eliminar Definitivamente (Admin)</button>
             </div>`
@@ -6677,6 +6764,7 @@
             </span>
             <div style="margin:5px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;">
               <span style="font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:${escapeHtml(consensusInfo.bg)};color:${escapeHtml(consensusInfo.color)};border:1px solid ${escapeHtml(consensusInfo.border)};">${escapeHtml(consensusInfo.label)}</span>
+              ${isCeposPopup ? `<span style="font-size:10px;font-weight:900;padding:2px 7px;border-radius:999px;background:${confirmations >= 2 || isFixed ? 'rgba(127,29,29,0.85)' : 'rgba(234,179,8,0.22)'};color:${confirmations >= 2 || isFixed ? '#fef08a' : '#fde047'};border:1px solid ${confirmations >= 2 || isFixed ? 'rgba(248,113,113,0.78)' : 'rgba(250,204,21,0.58)'};">${confirmations >= 2 || isFixed ? '🚨 Cepo activo' : '🚐 Cepo reportado'}</span>` : ''}
               ${getVipReportBadgeHtml(rep)}
               ${isAgente ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(14,165,233,0.18);color:#7dd3fc;border:1px solid rgba(56,189,248,0.45);">🚦 Regulación / paso (no retén) · Radio ${agenteRadiusM} m</span>` : ''}
               ${fastTag ? `<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(6,182,212,0.16);color:#67e8f9;border:1px solid rgba(6,182,212,0.4);">${escapeHtml(fastTag)}</span>` : ''}
@@ -6698,12 +6786,12 @@
           marker.on('click', () => {
             if (
               hasValidatedAdminPermission() &&
-              typeof window.__anthiGetCeposJoystickState === 'function' &&
-              window.__anthiGetCeposJoystickState().activeReportId &&
-              window.__anthiGetCeposJoystickState().activeReportId !== String(rep.id) &&
-              typeof window.openCeposJoystick === 'function'
+              typeof window.__anthiGetCeposPanelState === 'function' &&
+              window.__anthiGetCeposPanelState().activeReportId &&
+              window.__anthiGetCeposPanelState().activeReportId !== String(rep.id) &&
+              typeof window.openCeposRoutePanel === 'function'
             ) {
-              window.openCeposJoystick(rep.id);
+              window.openCeposRoutePanel(rep.id);
             }
           });
         }
@@ -6733,6 +6821,9 @@
             layer.openPopup();
           }
         });
+      }
+      if (typeof window.__anthiRenderCeposActiveBanner === 'function') {
+        window.__anthiRenderCeposActiveBanner(lastRenderedReports);
       }
     }
 
@@ -7784,11 +7875,11 @@
           (item) => String(item.id) !== String(reportId)
         );
         if (
-          typeof window.__anthiGetCeposJoystickState === 'function' &&
-          window.__anthiGetCeposJoystickState().activeReportId === String(reportId) &&
-          typeof window.closeCeposJoystick === 'function'
+          typeof window.__anthiGetCeposPanelState === 'function' &&
+          window.__anthiGetCeposPanelState().activeReportId === String(reportId) &&
+          typeof window.closeCeposRoutePanel === 'function'
         ) {
-          window.closeCeposJoystick(false);
+          window.closeCeposRoutePanel(false);
         }
         refreshReportsForRole();
         if (alertsCenterModal && alertsCenterModal.classList.contains('open')) {
@@ -7827,21 +7918,21 @@
 
           const nowMs = Date.now();
           const nonExpiredReports = [];
-          const activeStickState = typeof window.__anthiGetCeposJoystickState === 'function'
-            ? window.__anthiGetCeposJoystickState()
+          const activeCeposState = typeof window.__anthiGetCeposPanelState === 'function'
+            ? window.__anthiGetCeposPanelState()
             : null;
           snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             const timeMs = extractTimestampMs(data);
             const candidate = { id: docSnap.id, ...data, _sortMs: timeMs };
             if (
-              activeStickState &&
-              activeStickState.activeReportId === String(docSnap.id) &&
-              (activeStickState.dirty || activeStickState.syncing || activeStickState.needsTrailingFlush) &&
-              activeStickState.pendingCoords
+              activeCeposState &&
+              activeCeposState.activeReportId === String(docSnap.id) &&
+              (activeCeposState.dirty || activeCeposState.syncing || activeCeposState.needsTrailingFlush) &&
+              activeCeposState.pendingCoords
             ) {
-              candidate.lat = activeStickState.pendingCoords.lat;
-              candidate.lng = activeStickState.pendingCoords.lng;
+              candidate.lat = activeCeposState.pendingCoords.lat;
+              candidate.lng = activeCeposState.pendingCoords.lng;
             }
             if (!isReportExpired(candidate, nowMs)) {
               nonExpiredReports.push(candidate);
@@ -9299,8 +9390,8 @@
     }
 
     function openManualPinPicker(targetMode = 'report') {
-      if (typeof window.closeCeposJoystick === 'function') {
-        window.closeCeposJoystick(true);
+      if (typeof window.closeCeposRoutePanel === 'function') {
+        window.closeCeposRoutePanel(true);
       }
       manualPinPickerTarget =
         targetMode === 'reactionPoint'
@@ -9546,15 +9637,30 @@
     const VIP_CEPOS_PROXIMITY_RADIUS_METERS = 2500;
     const STANDARD_BG_SNAPSHOT_RADIUS_METERS = 1200;
 
-    // Sintetizador Web Audio API para el sonido de Sónar de Submarino + Motor de Notificaciones en 2.º Plano
+    // Sintetizador Web Audio API: Sónar de Submarino + Alarma de Emergencia Cepos (Protocolo Umbrella) + Motor 2.º Plano
     const sonarToggleButtons = Array.from(document.querySelectorAll('[data-sonar-toggle="true"]'));
     const bgNotifToggleButtons = Array.from(document.querySelectorAll('[data-bg-notif-toggle="true"]'));
+    const ceposAlarmPreviewButtons = Array.from(document.querySelectorAll('[data-cepos-alarm-preview="true"]'));
+    const ceposActiveBanner = document.getElementById('ceposActiveBanner');
+    const ceposActiveBannerMain = document.getElementById('ceposActiveBannerMain');
+    const ceposActiveBannerBadge = document.getElementById('ceposActiveBannerBadge');
+    const ceposActiveBannerMeta = document.getElementById('ceposActiveBannerMeta');
+    const ceposActiveBannerPlace = document.getElementById('ceposActiveBannerPlace');
+    const btnFocusCeposBanner = document.getElementById('btnFocusCeposBanner');
+    const btnDismissCeposBanner = document.getElementById('btnDismissCeposBanner');
     let sonarAudioCtx = null;
+    let hasUserAudioInteraction = false;
     let isSonarAudioEnabled = safeReadJson(STORAGE_KEYS.SONAR_AUDIO, true) !== false;
     let isBgNotificationsEnabled = safeReadJson(STORAGE_KEYS.BG_NOTIFS, true) !== false;
     let lastSonarPingAt = 0;
     let lastNearbySonarAt = 0;
     let lastNearbySonarSignature = '';
+    let lastCeposAlarmAt = 0;
+    let lastNearbyCeposAt = 0;
+    let lastNearbyCeposSignature = '';
+    let activeCeposBannerReportId = null;
+    let activeCeposBannerDismissKey = '';
+    let dismissedCeposBannerKey = '';
 
     const knownSnapshotReportStates = new Map();
     let hasSeededInitialSnapshotStates = false;
@@ -9617,27 +9723,38 @@
       return sonarAudioCtx;
     }
 
-    document.addEventListener('pointerdown', () => {
+    function unlockAnthiAudioOnUserGesture() {
+      const wasLocked = !hasUserAudioInteraction;
+      hasUserAudioInteraction = true;
       if (isSonarAudioEnabled) {
         const ctx = ensureSonarAudioContext();
         if (ctx && ctx.state === 'suspended') {
           ctx.resume().catch(() => {});
         }
+        if (wasLocked && typeof evaluarRadarProximidadCercana === 'function') {
+          lastNearbyCeposSignature = '';
+          lastNearbySonarSignature = '';
+          setTimeout(() => evaluarRadarProximidadCercana(false), 120);
+        }
       }
-    }, { passive: true });
+    }
+
+    document.addEventListener('pointerdown', unlockAnthiAudioOnUserGesture, { passive: true });
+    document.addEventListener('touchstart', unlockAnthiAudioOnUserGesture, { passive: true });
+    document.addEventListener('keydown', unlockAnthiAudioOnUserGesture, { passive: true });
 
     function updateSonarAudioButtonUI() {
       sonarToggleButtons.forEach((btn) => {
         if (isSonarAudioEnabled) {
-          btn.innerHTML = '<span>🔊 Sónar de submarino (cada 30 s)</span><span class="sonar-toggle-pill">Sonido</span>';
+          btn.innerHTML = '<span>🔊 Sónar (30s) y Alarma Cepos</span><span class="sonar-toggle-pill">Sonido</span>';
           btn.classList.add('sonar-on');
           btn.classList.remove('sonar-muted');
-          btn.title = 'Audio Sónar activo cada 30 s (toca para silenciar)';
+          btn.title = 'Audio Sónar y Alarma Cepos activos (toca para silenciar)';
         } else {
-          btn.innerHTML = '<span>🔇 Sónar de submarino (cada 30 s)</span><span class="sonar-toggle-pill">Mute</span>';
+          btn.innerHTML = '<span>🔇 Sónar y Alarma Cepos</span><span class="sonar-toggle-pill">Mute</span>';
           btn.classList.remove('sonar-on');
           btn.classList.add('sonar-muted');
-          btn.title = 'Audio Sónar silenciado (toca para activar)';
+          btn.title = 'Audio Sónar y Alarma Cepos silenciados (toca para activar)';
         }
       });
     }
@@ -9781,12 +9898,13 @@
     }
 
     function playSubmarineSonarPing(forcePreview = false) {
-      if (!forcePreview && !isSonarAudioEnabled) return;
+      if (!forcePreview && !isSonarAudioEnabled) return false;
+      if (!forcePreview && !hasUserAudioInteraction) return false;
       const nowMs = Date.now();
-      if (!forcePreview && nowMs - lastSonarPingAt < 2400) return;
+      if (!forcePreview && nowMs - lastSonarPingAt < 2400) return false;
 
       const ctx = ensureSonarAudioContext();
-      if (!ctx) return;
+      if (!ctx) return false;
       lastSonarPingAt = nowMs;
 
       if (ctx.state === 'suspended') {
@@ -9796,6 +9914,184 @@
       } else {
         scheduleSonarOscillators(ctx);
       }
+      return true;
+    }
+
+    function scheduleCeposUmbrellaOscillators(ctx) {
+      const start = ctx.currentTime + 0.015;
+      // Alarma de emergencia / contención tipo laboratorio "Umbrella": 3 pulsos cortos, firmes y clínicos
+      const pulseOffsets = [0, 0.21, 0.42];
+      pulseOffsets.forEach((offsetSec) => {
+        const t0 = start + offsetSec;
+        const pulseDur = 0.145;
+
+        const oscLead = ctx.createOscillator();
+        const oscSub = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const leadGain = ctx.createGain();
+        const subGain = ctx.createGain();
+        const masterGain = ctx.createGain();
+
+        oscLead.type = 'sawtooth';
+        oscLead.frequency.setValueAtTime(880, t0);
+        oscLead.frequency.exponentialRampToValueAtTime(587.33, t0 + pulseDur);
+
+        oscSub.type = 'square';
+        oscSub.frequency.setValueAtTime(440, t0);
+        oscSub.frequency.exponentialRampToValueAtTime(293.66, t0 + pulseDur);
+
+        filter.type = 'bandpass';
+        filter.Q.setValueAtTime(2.2, t0);
+        filter.frequency.setValueAtTime(1650, t0);
+        filter.frequency.exponentialRampToValueAtTime(920, t0 + pulseDur);
+
+        leadGain.gain.setValueAtTime(0.72, t0);
+        subGain.gain.setValueAtTime(0.32, t0);
+
+        masterGain.gain.setValueAtTime(0.0001, t0);
+        masterGain.gain.linearRampToValueAtTime(0.26, t0 + 0.007);
+        masterGain.gain.setValueAtTime(0.24, t0 + 0.095);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, t0 + pulseDur);
+
+        oscLead.connect(leadGain);
+        oscSub.connect(subGain);
+        leadGain.connect(filter);
+        subGain.connect(filter);
+        filter.connect(masterGain);
+        masterGain.connect(ctx.destination);
+
+        oscLead.start(t0);
+        oscSub.start(t0);
+        oscLead.stop(t0 + pulseDur + 0.03);
+        oscSub.stop(t0 + pulseDur + 0.03);
+      });
+    }
+
+    function playCeposEmergencyAlarm(forcePreview = false) {
+      if (!forcePreview && !isSonarAudioEnabled) return false;
+      if (!forcePreview && !hasUserAudioInteraction) return false;
+      const nowMs = Date.now();
+      if (!forcePreview && nowMs - lastCeposAlarmAt < 2200) return false;
+
+      if (forcePreview) {
+        hasUserAudioInteraction = true;
+      }
+
+      const ctx = ensureSonarAudioContext();
+      if (!ctx) return false;
+      lastCeposAlarmAt = nowMs;
+
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+          .then(() => scheduleCeposUmbrellaOscillators(ctx))
+          .catch(() => {});
+      } else {
+        scheduleCeposUmbrellaOscillators(ctx);
+      }
+      return true;
+    }
+
+    window.__anthiPlayCeposEmergencyAlarm = playCeposEmergencyAlarm;
+    window.__anthiPlaySubmarineSonar = playSubmarineSonarPing;
+
+    function renderCeposActiveBanner(reportsList) {
+      if (!ceposActiveBanner) return;
+      const nowMs = Date.now();
+      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
+      const source = Array.isArray(reportsList) ? reportsList : lastRenderedReports;
+
+      const ceposActivos = (Array.isArray(source) ? source : []).filter((rep) => {
+        if (!rep || isReportExpired(rep, nowMs)) return false;
+        if (!isCeposTipo(rep.tipo || rep.type)) return false;
+        return isReportAudibleForCurrentUser(rep) || Boolean(activeVip);
+      });
+
+      if (ceposActivos.length === 0) {
+        activeCeposBannerReportId = null;
+        activeCeposBannerDismissKey = '';
+        ceposActiveBanner.classList.remove('visible');
+        return;
+      }
+
+      const hasGps = hasUsableUserGps();
+      const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
+      const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
+
+      const ranked = ceposActivos
+        .map((rep) => {
+          const rLat = Number(rep.lat);
+          const rLng = Number(rep.lng);
+          const dist = (hasGps && Number.isFinite(rLat) && Number.isFinite(rLng))
+            ? calcularDistanciaMetros(origLat, origLng, rLat, rLng)
+            : null;
+          return { rep, dist };
+        })
+        .sort((a, b) => {
+          if (a.dist !== null && b.dist !== null && Math.abs(a.dist - b.dist) > 25) {
+            return a.dist - b.dist;
+          }
+          if (Boolean(a.rep.isFixed) !== Boolean(b.rep.isFixed)) return a.rep.isFixed ? -1 : 1;
+          return getConfirmCount(b.rep) - getConfirmCount(a.rep);
+        });
+
+      const topEntry = ranked[0];
+      const top = topEntry.rep;
+      const topLat = Number(top.lat);
+      const topLng = Number(top.lng);
+      const dismissKey = `${top.id}:${Number.isFinite(topLat) ? Math.round(topLat * 1000) : 0}:${Number.isFinite(topLng) ? Math.round(topLng * 1000) : 0}`;
+      activeCeposBannerReportId = String(top.id);
+      activeCeposBannerDismissKey = dismissKey;
+
+      if (dismissedCeposBannerKey && dismissedCeposBannerKey === dismissKey) {
+        ceposActiveBanner.classList.remove('visible');
+        return;
+      }
+
+      const distLabel = topEntry.dist !== null
+        ? (topEntry.dist >= 1000 ? `a ${(topEntry.dist / 1000).toFixed(1)} km` : `a ${Math.round(topEntry.dist)} m`)
+        : 'en vía';
+      const tier = getReportAlertTier(top);
+      const statusTag = Boolean(top.isFixed)
+        ? 'Fijo'
+        : tier === 'firm'
+        ? 'Firme'
+        : tier === 'active'
+        ? 'Activo 2/3'
+        : 'Reportado';
+
+      if (ceposActiveBannerBadge) {
+        ceposActiveBannerBadge.textContent = ceposActivos.length > 1
+          ? `CEPO ACTIVO (${ceposActivos.length})`
+          : 'CEPO ACTIVO';
+      }
+      if (ceposActiveBannerMeta) {
+        ceposActiveBannerMeta.textContent = `${distLabel} · ${statusTag}`;
+      }
+      if (ceposActiveBannerPlace) {
+        ceposActiveBannerPlace.innerHTML = `📍 ${formatAlertPlaceHtml(top)}`;
+      }
+      ceposActiveBanner.classList.add('visible');
+    }
+
+    window.__anthiRenderCeposActiveBanner = renderCeposActiveBanner;
+
+    if (btnFocusCeposBanner) {
+      btnFocusCeposBanner.addEventListener('click', () => {
+        const rep = (lastRenderedReports || []).find((r) => String(r.id) === String(activeCeposBannerReportId));
+        if (rep && typeof focusAlertOnMap === 'function') focusAlertOnMap(rep);
+      });
+    }
+    if (ceposActiveBannerMain) {
+      ceposActiveBannerMain.addEventListener('click', () => {
+        const rep = (lastRenderedReports || []).find((r) => String(r.id) === String(activeCeposBannerReportId));
+        if (rep && typeof focusAlertOnMap === 'function') focusAlertOnMap(rep);
+      });
+    }
+    if (btnDismissCeposBanner) {
+      btnDismissCeposBanner.addEventListener('click', () => {
+        dismissedCeposBannerKey = activeCeposBannerDismissKey || String(activeCeposBannerReportId || 'dismissed');
+        if (ceposActiveBanner) ceposActiveBanner.classList.remove('visible');
+      });
     }
 
     async function dispatchAnthiBackgroundNotification(rep, context = {}) {
@@ -9850,7 +10146,11 @@
         tipo: tipoStr,
         isVip: isVipUser,
         requireInteraction: true,
-        vibrate: isVipUser ? [320, 110, 320, 110, 480] : [280, 120, 280, 120, 420]
+        vibrate: isCeposTipo(tipoStr)
+          ? [240, 80, 240, 80, 340]
+          : isVipUser
+          ? [320, 110, 320, 110, 480]
+          : [280, 120, 280, 120, 420]
       };
 
       const notifOptions = {
@@ -9947,7 +10247,9 @@
           currentIds.add(id);
           knownSnapshotReportStates.set(id, {
             confirmCount: getConfirmCount(rep),
-            isFixed: Boolean(rep.isFixed)
+            isFixed: Boolean(rep.isFixed),
+            lat: Number.isFinite(Number(rep.lat)) ? Number(rep.lat) : null,
+            lng: Number.isFinite(Number(rep.lng)) ? Number(rep.lng) : null
           });
         });
         hasSeededInitialSnapshotStates = true;
@@ -9961,11 +10263,17 @@
       const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const nowMs = Date.now();
+      const localActiveCeposId = typeof window.__anthiGetCeposPanelState === 'function'
+        ? window.__anthiGetCeposPanelState().activeReportId
+        : null;
 
       const candidateAlerts = [];
+      let foregroundCeposTriggered = false;
 
       list.forEach((rep) => {
         if (!rep || !rep.id || isReportExpired(rep, nowMs)) return;
+        const tipoStr = rep.tipo || rep.type || '';
+        if (isCierreEventoTipo(tipoStr)) return;
         const id = String(rep.id);
         currentIds.add(id);
 
@@ -9973,36 +10281,70 @@
         const confirmCount = getConfirmCount(rep);
         const isFixed = Boolean(rep.isFixed);
         const tier = getReportAlertTier(rep);
+        const rLat = Number(rep.lat);
+        const rLng = Number(rep.lng);
+        const isCepos = isCeposTipo(tipoStr);
 
         const isBrandNew = !prev;
         const becameFirm = Boolean(prev && !prev.isFixed && prev.confirmCount < 3 && tier === 'firm');
         const becameAudible = Boolean(prev && !prev.isFixed && prev.confirmCount < 2 && confirmCount >= 2);
+        const ceposMoved = Boolean(
+          isCepos &&
+          prev &&
+          Number.isFinite(prev.lat) &&
+          Number.isFinite(prev.lng) &&
+          Number.isFinite(rLat) &&
+          Number.isFinite(rLng) &&
+          calcularDistanciaMetros(prev.lat, prev.lng, rLat, rLng) >= 120
+        );
 
-        knownSnapshotReportStates.set(id, { confirmCount, isFixed });
+        knownSnapshotReportStates.set(id, {
+          confirmCount,
+          isFixed,
+          lat: Number.isFinite(rLat) ? rLat : null,
+          lng: Number.isFinite(rLng) ? rLng : null
+        });
 
-        if (!canNotify || (!isBrandNew && !becameFirm && !becameAudible)) return;
+        const distMeters = (hasGps && Number.isFinite(rLat) && Number.isFinite(rLng))
+          ? calcularDistanciaMetros(origLat, origLng, rLat, rLng)
+          : null;
+
+        // Disparo de alarma de emergencia Umbrella cuando un Cepos relevante se activa o cambia de zona en tiempo real
+        if (
+          !bgMode &&
+          !foregroundCeposTriggered &&
+          isCepos &&
+          (isBrandNew || becameFirm || becameAudible || ceposMoved) &&
+          String(localActiveCeposId || '') !== id &&
+          (isReportAudibleForCurrentUser(rep) || Boolean(activeVip))
+        ) {
+          const maxAudioDist = activeVip ? VIP_CEPOS_PROXIMITY_RADIUS_METERS : VIP_BG_PROXIMITY_RADIUS_METERS;
+          const isOwnFresh = Boolean(auth.currentUser && rep.authorId && String(rep.authorId) === String(auth.currentUser.uid) && isBrandNew);
+          if (!isOwnFresh && (distMeters === null || distMeters <= maxAudioDist || Boolean(activeRouteDestination))) {
+            foregroundCeposTriggered = true;
+            playCeposEmergencyAlarm(false);
+            const placeText = formatAlertLocationText(rep, { includeDescription: false });
+            showToast(`🚨 Cepo Activo${placeText ? ` · ${placeText}` : ''}`);
+          }
+        }
+
+        if (!canNotify || (!isBrandNew && !becameFirm && !becameAudible && !ceposMoved)) return;
 
         // No auto-notificar por reportes propios recién creados
         if (auth.currentUser && rep.authorId && String(rep.authorId) === String(auth.currentUser.uid) && isBrandNew) {
           return;
         }
 
-        const rLat = Number(rep.lat);
-        const rLng = Number(rep.lng);
-        const distMeters = (hasGps && Number.isFinite(rLat) && Number.isFinite(rLng))
-          ? calcularDistanciaMetros(origLat, origLng, rLat, rLng)
-          : null;
-
         let eligible = false;
         let priorityScore = 0;
 
         if (activeVip && isVipBackgroundPriorityAlert(rep, activeVip)) {
-          const maxVipDist = isCeposTipo(rep.tipo || rep.type) && activeVip.tipoVip === 'rastreo_cepos'
+          const maxVipDist = isCepos && activeVip.tipoVip === 'rastreo_cepos'
             ? VIP_CEPOS_PROXIMITY_RADIUS_METERS
             : VIP_BG_PROXIMITY_RADIUS_METERS;
           if (distMeters === null || distMeters <= maxVipDist || tier === 'firm' || activeRouteDestination) {
             eligible = true;
-            priorityScore = isCeposTipo(rep.tipo || rep.type) ? 300 : tier === 'firm' ? 250 : 200;
+            priorityScore = isCepos ? 300 : tier === 'firm' ? 250 : 200;
           }
         } else if (isReportAudibleForCurrentUser(rep)) {
           const maxStdDist = tier === 'firm' ? STANDARD_BG_SNAPSHOT_RADIUS_METERS : getEffectiveAlertRadiusMeters(rep);
@@ -10037,17 +10379,25 @@
     }
 
     function evaluarRadarProximidadCercana(allowRepeatInterval = true) {
-      if (!hasUsableUserGps()) return;
+      if (!hasUsableUserGps()) {
+        renderCeposActiveBanner(lastRenderedReports);
+        return;
+      }
       const origLat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
       const origLng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
       const nowMs = Date.now();
+      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
       const pendingList = loadPendingReports().map((item) => ({ ...item, id: item.localId, isPending: true }));
       const allActiveAlerts = [
         ...pendingList,
         ...(Array.isArray(lastServerReports) ? lastServerReports : [])
-      ].filter((rep) => rep && !isReportExpired(rep, nowMs) && isReportAudibleForCurrentUser(rep));
+      ].filter((rep) => {
+        if (!rep || isReportExpired(rep, nowMs)) return false;
+        if (isCierreEventoTipo(rep.tipo || rep.type)) return false;
+        if (isReportAudibleForCurrentUser(rep)) return true;
+        return Boolean(activeVip && isCeposTipo(rep.tipo || rep.type));
+      });
 
-      const activeVip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(auth.currentUser) : null;
       const nearbyHits = [];
       const vipExtendedHits = [];
 
@@ -10112,15 +10462,50 @@
         }
       }
 
-      if (nearbyHits.length > 0) {
-        nearbyHits.sort((a, b) => a.dist - b.dist);
-        const closest = nearbyHits[0];
+      const ceposNearbyHits = nearbyHits.filter((h) => isCeposTipo(h.rep.tipo || h.rep.type));
+      const vipCeposHits = activeVip
+        ? vipExtendedHits.filter((h) => isCeposTipo(h.rep.tipo || h.rep.type))
+        : [];
+      const relevantCeposHits = [...ceposNearbyHits, ...vipCeposHits];
+      const nonCeposNearbyHits = nearbyHits.filter((h) => !isCeposTipo(h.rep.tipo || h.rep.type));
+
+      let ceposAlarmFiredThisCycle = false;
+      if (relevantCeposHits.length > 0) {
+        relevantCeposHits.sort((a, b) => a.dist - b.dist);
+        const topCepos = relevantCeposHits[0];
+        const ceposSig = relevantCeposHits.map((h) => h.rep.id).join(',');
+        const isNewCeposSig = ceposSig !== lastNearbyCeposSignature;
+        const shouldRepeatCepos = allowRepeatInterval && (nowMs - lastNearbyCeposAt >= SONAR_REPEAT_INTERVAL_MS);
+
+        if (isNewCeposSig || shouldRepeatCepos) {
+          lastNearbyCeposSignature = ceposSig;
+          lastNearbyCeposAt = nowMs;
+          ceposAlarmFiredThisCycle = true;
+          playCeposEmergencyAlarm(false);
+          if (navigator.vibrate) {
+            try {
+              navigator.vibrate([240, 80, 240, 80, 340]);
+            } catch (e) {}
+          }
+          if (!document.hidden) {
+            const ceposPlace = formatAlertLocationText(topCepos.rep, { includeDescription: false });
+            const ceposPlaceTag = ceposPlace ? ` · ${ceposPlace}` : '';
+            showToast(`🚨 Cepo Activo a ${Math.round(topCepos.dist)} m${ceposPlaceTag}`);
+          }
+        }
+      } else {
+        lastNearbyCeposSignature = '';
+      }
+
+      if (nonCeposNearbyHits.length > 0) {
+        nonCeposNearbyHits.sort((a, b) => a.dist - b.dist);
+        const closest = nonCeposNearbyHits[0];
         const meta = getTipoMeta(closest.rep.tipo || closest.rep.type || 'Novedad');
-        const sig = nearbyHits.map((h) => h.rep.id).join(',');
+        const sig = nonCeposNearbyHits.map((h) => h.rep.id).join(',');
         const isNewSignature = sig !== lastNearbySonarSignature;
         const shouldRepeatSonar = allowRepeatInterval && (nowMs - lastNearbySonarAt >= SONAR_REPEAT_INTERVAL_MS);
 
-        if (isNewSignature || shouldRepeatSonar) {
+        if (!ceposAlarmFiredThisCycle && (isNewSignature || shouldRepeatSonar)) {
           lastNearbySonarSignature = sig;
           lastNearbySonarAt = nowMs;
           playSubmarineSonarPing(false);
@@ -10157,6 +10542,7 @@
           }
         }
       }
+      renderCeposActiveBanner(lastRenderedReports);
     }
 
     window.__anthiFocusAlertById = function(reportId, lat, lng, fromDeepLink = false) {
@@ -10205,10 +10591,19 @@
               window.requestAnthiNotificationPermission({ interactive: true });
             }
             playSubmarineSonarPing(true);
-            showToast('🔊 Sonido de alerta Sónar activado (cada 30 s).');
+            showToast('🔊 Sónar (30 s) y Alarma Cepos activados.');
           } else {
-            showToast('🔇 Sonido Sónar silenciado (las alertas emergentes siguen configurables en tu cuenta).');
+            showToast('🔇 Sonido Sónar y Alarma Cepos silenciados (las alertas visuales y emergentes siguen activas).');
           }
+        });
+      });
+    }
+
+    if (ceposAlarmPreviewButtons.length > 0) {
+      ceposAlarmPreviewButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          playCeposEmergencyAlarm(true);
+          showToast('🚨 Alarma Cepos (Protocolo de Emergencia / Umbrella)');
         });
       });
     }
@@ -10478,7 +10873,10 @@
         window.__anthiIsCierreDrawing() &&
         e && e.latlng
       ) {
-        if (typeof window.__anthiAppendCierreDrawPoint === 'function') {
+        if (
+          (typeof window.__anthiShouldCierreClickAdd !== 'function' || window.__anthiShouldCierreClickAdd()) &&
+          typeof window.__anthiAppendCierreDrawPoint === 'function'
+        ) {
           window.__anthiAppendCierreDrawPoint(e.latlng.lat, e.latlng.lng, false);
         }
         return;
@@ -10821,7 +11219,12 @@
         const signature = `${dest.id}:${alertsInProximity.map((a) => a.rep.id).join(',')}`;
         if (shouldCenter || signature !== lastRouteAlertSignature) {
           lastRouteAlertSignature = signature;
-          playSubmarineSonarPing(false);
+          const hasCeposOnRoute = alertsInProximity.some((a) => isCeposTipo(a.rep.tipo || a.rep.type));
+          if (isCeposTipo(first.tipo || first.type) || hasCeposOnRoute) {
+            playCeposEmergencyAlarm(false);
+          } else {
+            playSubmarineSonarPing(false);
+          }
           if (!document.hidden) {
             showToast(`⚠️ ${warningText}`);
           }
@@ -12224,8 +12627,8 @@
         showToast('⛔ Solo los administradores autorizados pueden crear Puntos de Reacción Inmediata.');
         return;
       }
-      if (typeof window.closeCeposJoystick === 'function') {
-        window.closeCeposJoystick(true);
+      if (typeof window.closeCeposRoutePanel === 'function') {
+        window.closeCeposRoutePanel(true);
       }
       isReactionMapModeActive = true;
       isFollowingUser = false;
@@ -12244,58 +12647,46 @@
       showToast('🎯 Modo mapa activo: toca cualquier lugar en Bucaramanga para colocar puntos.');
     }
 
-    // --- Control Manual Tipo Joystick / Cruceta para Cepos (Solo Administradores) ---
-    const ceposJoystickPanel = document.getElementById('ceposJoystickPanel');
-    const ceposJoystickTargetLabel = document.getElementById('ceposJoystickTargetLabel');
-    const ceposJoystickSyncBadge = document.getElementById('ceposJoystickSyncBadge');
-    const ceposJoystickCoords = document.getElementById('ceposJoystickCoords');
-    const btnMinimizeCeposJoystick = document.getElementById('btnMinimizeCeposJoystick');
-    const btnCloseCeposJoystick = document.getElementById('btnCloseCeposJoystick');
-    const btnCenterCeposJoystick = document.getElementById('btnCenterCeposJoystick');
-    const btnFlushCeposJoystick = document.getElementById('btnFlushCeposJoystick');
-    const ceposStickPad = document.getElementById('ceposStickPad');
-    const ceposStickKnob = document.getElementById('ceposStickKnob');
-    const ceposDpadGrid = document.getElementById('ceposDpadGrid');
+    // --- Control de Ruta con Dedo y Velocidad km/h para Cepos (Solo Administradores · Sin Joystick) ---
+    const ceposRoutePanel = document.getElementById('ceposRoutePanel');
+    const ceposRouteTargetLabel = document.getElementById('ceposRouteTargetLabel');
+    const ceposRouteSyncBadge = document.getElementById('ceposRouteSyncBadge');
+    const ceposRouteCoords = document.getElementById('ceposRouteCoords');
+    const btnMinimizeCeposRoute = document.getElementById('btnMinimizeCeposRoute');
+    const btnCloseCeposRoute = document.getElementById('btnCloseCeposRoute');
+    const btnCenterCeposRoute = document.getElementById('btnCenterCeposRoute');
 
     const ceposMiniDock = document.getElementById('ceposMiniDock');
     const ceposMiniStatusText = document.getElementById('ceposMiniStatusText');
     const ceposMiniPlaceText = document.getElementById('ceposMiniPlaceText');
-    const btnExpandCeposJoystick = document.getElementById('btnExpandCeposJoystick');
+    const btnExpandCeposRoute = document.getElementById('btnExpandCeposRoute');
     const btnCloseCeposMiniDock = document.getElementById('btnCloseCeposMiniDock');
     const btnCeposMiniDraw = document.getElementById('btnCeposMiniDraw');
-    const btnCeposMiniPlayPause = document.getElementById('btnCeposMiniPlayPause');
-    const btnCeposMiniChangeRoute = document.getElementById('btnCeposMiniChangeRoute');
-    const btnCeposMiniClearRoute = document.getElementById('btnCeposMiniClearRoute');
+    const btnCeposMiniStop = document.getElementById('btnCeposMiniStop');
+    const btnCeposMiniPlay = document.getElementById('btnCeposMiniPlay');
+    const btnCeposMiniReset = document.getElementById('btnCeposMiniReset');
 
-    const CEPOS_SYNC_THROTTLE_MS = 800;
     const CEPOS_AUTO_SYNC_THROTTLE_MS = 2500;
     const CEPOS_SYNC_DEBOUNCE_MS = 500;
     const CEPOS_AUTO_TICK_MS = 120;
     const CEPOS_DRAW_SAMPLE_METERS = 14;
 
-    const btnToggleCeposManualDeck = document.getElementById('btnToggleCeposManualDeck');
-    const ceposManualDeckWrapper = document.getElementById('ceposManualDeckWrapper');
     const ceposRouteStatusText = document.getElementById('ceposRouteStatusText');
     const btnCeposDrawRoute = document.getElementById('btnCeposDrawRoute');
-    const btnCeposPlayPauseRoute = document.getElementById('btnCeposPlayPauseRoute');
-    const btnCeposChangeRoute = document.getElementById('btnCeposChangeRoute');
-    const btnCeposClearRoute = document.getElementById('btnCeposClearRoute');
+    const btnCeposStopRoute = document.getElementById('btnCeposStopRoute');
+    const btnCeposPlayRoute = document.getElementById('btnCeposPlayRoute');
+    const btnCeposResetRoute = document.getElementById('btnCeposResetRoute');
 
-    const ceposJoystickState = {
+    const ceposPanelState = {
       activeReportId: null,
       isMinimized: false,
-      stepMeters: 25,
       pendingCoords: null,
       dirty: false,
       syncing: false,
       needsTrailingFlush: false,
       inFlightFlushPromise: null,
       lastWriteAt: 0,
-      flushTimer: null,
-      holdTimer: null,
-      stickTimer: null,
-      stickVector: { x: 0, y: 0 },
-      activePointerId: null
+      flushTimer: null
     };
 
     const ceposRouteState = {
@@ -12311,38 +12702,37 @@
       traveledMeters: 0,
       timerId: null,
       lastTickMs: 0,
-      manualDeckCollapsed: false,
       drawPointerId: null
     };
 
-    function updateCeposJoystickBadge(mode = 'saved') {
-      if (!ceposJoystickSyncBadge) return;
+    function updateCeposSyncBadge(mode = 'saved') {
+      if (!ceposRouteSyncBadge) return;
       if (mode === 'syncing') {
-        ceposJoystickSyncBadge.textContent = 'Sincronizando...';
-        ceposJoystickSyncBadge.classList.remove('saved');
+        ceposRouteSyncBadge.textContent = 'Sincronizando...';
+        ceposRouteSyncBadge.classList.remove('saved');
       } else if (mode === 'pending') {
-        ceposJoystickSyncBadge.textContent = 'Moviendo...';
-        ceposJoystickSyncBadge.classList.remove('saved');
+        ceposRouteSyncBadge.textContent = 'En ruta...';
+        ceposRouteSyncBadge.classList.remove('saved');
       } else if (mode === 'error') {
-        ceposJoystickSyncBadge.textContent = 'Reintentando';
-        ceposJoystickSyncBadge.classList.remove('saved');
+        ceposRouteSyncBadge.textContent = 'Reintentando';
+        ceposRouteSyncBadge.classList.remove('saved');
       } else {
-        ceposJoystickSyncBadge.textContent = '✓ Guardado';
-        ceposJoystickSyncBadge.classList.add('saved');
+        ceposRouteSyncBadge.textContent = '✓ Guardado';
+        ceposRouteSyncBadge.classList.add('saved');
       }
     }
 
     function updateCeposLocationLabels(lat, lng) {
       const placeLabel = formatGeoPlaceText(lat, lng, 'full', '', { allowRemote: false });
-      if (ceposJoystickCoords) {
-        ceposJoystickCoords.textContent = `📍 ${placeLabel}`;
+      if (ceposRouteCoords) {
+        ceposRouteCoords.textContent = `📍 ${placeLabel}`;
       }
       if (ceposMiniPlaceText) {
         ceposMiniPlaceText.textContent = `📍 ${placeLabel}`;
       }
     }
 
-    function findReportByIdForJoystick(reportId) {
+    function findReportByIdForCepos(reportId) {
       if (!reportId) return null;
       const targetId = String(reportId);
       return (
@@ -12382,22 +12772,22 @@
     }
 
     async function flushCeposPositionToFirestore(forceDrain = false) {
-      if (ceposJoystickState.flushTimer) {
-        clearTimeout(ceposJoystickState.flushTimer);
-        ceposJoystickState.flushTimer = null;
+      if (ceposPanelState.flushTimer) {
+        clearTimeout(ceposPanelState.flushTimer);
+        ceposPanelState.flushTimer = null;
       }
-      const reportId = ceposJoystickState.activeReportId;
-      const coords = ceposJoystickState.pendingCoords ? { ...ceposJoystickState.pendingCoords } : null;
+      const reportId = ceposPanelState.activeReportId;
+      const coords = ceposPanelState.pendingCoords ? { ...ceposPanelState.pendingCoords } : null;
       if (!reportId || !coords || !hasValidatedAdminPermission()) return false;
-      if (!ceposJoystickState.dirty && !ceposJoystickState.needsTrailingFlush) return true;
+      if (!ceposPanelState.dirty && !ceposPanelState.needsTrailingFlush) return true;
 
-      if (ceposJoystickState.syncing) {
-        ceposJoystickState.needsTrailingFlush = true;
-        if (forceDrain && ceposJoystickState.inFlightFlushPromise) {
+      if (ceposPanelState.syncing) {
+        ceposPanelState.needsTrailingFlush = true;
+        if (forceDrain && ceposPanelState.inFlightFlushPromise) {
           try {
-            await ceposJoystickState.inFlightFlushPromise;
+            await ceposPanelState.inFlightFlushPromise;
           } catch (e) {}
-          if (ceposJoystickState.activeReportId === reportId && ceposJoystickState.dirty) {
+          if (ceposPanelState.activeReportId === reportId && ceposPanelState.dirty) {
             return flushCeposPositionToFirestore(true);
           }
           return true;
@@ -12405,9 +12795,9 @@
         return false;
       }
 
-      ceposJoystickState.syncing = true;
-      ceposJoystickState.needsTrailingFlush = false;
-      updateCeposJoystickBadge('syncing');
+      ceposPanelState.syncing = true;
+      ceposPanelState.needsTrailingFlush = false;
+      updateCeposSyncBadge('syncing');
 
       const path = `${COLLECTION_NAME}/${reportId}`;
       const runPromise = (async () => {
@@ -12420,66 +12810,56 @@
             }),
             12000
           );
-          ceposJoystickState.lastWriteAt = Date.now();
+          ceposPanelState.lastWriteAt = Date.now();
           if (
-            ceposJoystickState.pendingCoords &&
-            ceposJoystickState.pendingCoords.lat === coords.lat &&
-            ceposJoystickState.pendingCoords.lng === coords.lng
+            ceposPanelState.pendingCoords &&
+            ceposPanelState.pendingCoords.lat === coords.lat &&
+            ceposPanelState.pendingCoords.lng === coords.lng
           ) {
-            ceposJoystickState.dirty = false;
-            updateCeposJoystickBadge('saved');
+            ceposPanelState.dirty = false;
+            updateCeposSyncBadge('saved');
           } else {
-            ceposJoystickState.needsTrailingFlush = true;
+            ceposPanelState.needsTrailingFlush = true;
           }
           return true;
         } catch (err) {
-          updateCeposJoystickBadge('error');
+          updateCeposSyncBadge('error');
           if (err && err.code === 'permission-denied') {
             showToast('⛔ Firestore requiere sesión de Administrador autorizado para mover Cepos.');
           }
           handleFirestoreError(err, OperationType.UPDATE, path);
           return false;
         } finally {
-          ceposJoystickState.syncing = false;
-          ceposJoystickState.inFlightFlushPromise = null;
-          if (!forceDrain && ceposJoystickState.needsTrailingFlush && ceposJoystickState.activeReportId) {
-            ceposJoystickState.needsTrailingFlush = false;
-            ceposJoystickState.flushTimer = setTimeout(() => {
+          ceposPanelState.syncing = false;
+          ceposPanelState.inFlightFlushPromise = null;
+          if (!forceDrain && ceposPanelState.needsTrailingFlush && ceposPanelState.activeReportId) {
+            ceposPanelState.needsTrailingFlush = false;
+            ceposPanelState.flushTimer = setTimeout(() => {
               flushCeposPositionToFirestore(false);
             }, 180);
           }
         }
       })();
-      ceposJoystickState.inFlightFlushPromise = runPromise;
+      ceposPanelState.inFlightFlushPromise = runPromise;
       return runPromise;
     }
 
-    function scheduleCeposFirestoreSync(throttleMs = CEPOS_SYNC_THROTTLE_MS) {
-      if (!ceposJoystickState.activeReportId || !ceposJoystickState.dirty) return;
-      if (ceposJoystickState.flushTimer) {
-        clearTimeout(ceposJoystickState.flushTimer);
-        ceposJoystickState.flushTimer = null;
+    function scheduleCeposFirestoreSync(throttleMs = CEPOS_AUTO_SYNC_THROTTLE_MS) {
+      if (!ceposPanelState.activeReportId || !ceposPanelState.dirty) return;
+      if (ceposPanelState.flushTimer) {
+        clearTimeout(ceposPanelState.flushTimer);
+        ceposPanelState.flushTimer = null;
       }
-      const effectiveThrottle = Math.max(400, Number(throttleMs) || CEPOS_SYNC_THROTTLE_MS);
-      const elapsed = Date.now() - ceposJoystickState.lastWriteAt;
-      if (!ceposJoystickState.syncing && elapsed >= effectiveThrottle) {
+      const effectiveThrottle = Math.max(400, Number(throttleMs) || CEPOS_AUTO_SYNC_THROTTLE_MS);
+      const elapsed = Date.now() - ceposPanelState.lastWriteAt;
+      if (!ceposPanelState.syncing && elapsed >= effectiveThrottle) {
         flushCeposPositionToFirestore(false);
         return;
       }
       const waitMs = Math.max(220, Math.min(Math.max(CEPOS_SYNC_DEBOUNCE_MS, effectiveThrottle), effectiveThrottle - elapsed));
-      ceposJoystickState.flushTimer = setTimeout(() => {
+      ceposPanelState.flushTimer = setTimeout(() => {
         flushCeposPositionToFirestore(false);
       }, waitMs);
-    }
-
-    function syncCeposManualDeckVisibility() {
-      if (ceposManualDeckWrapper) {
-        const shouldHide = ceposRouteState.isDrawing || ceposRouteState.manualDeckCollapsed;
-        ceposManualDeckWrapper.classList.toggle('hidden', shouldHide);
-      }
-      if (btnToggleCeposManualDeck) {
-        btnToggleCeposManualDeck.textContent = ceposRouteState.manualDeckCollapsed ? '🕹️ Mostrar Joystick' : '🕹️ Ocultar Joystick';
-      }
     }
 
     function computeCeposRouteMetrics() {
@@ -12503,7 +12883,7 @@
 
       if (pts.length === 1) {
         L.circleMarker([pts[0].lat, pts[0].lng], {
-          radius: 5,
+          radius: 5.5,
           color: '#0f172a',
           weight: 2,
           fillColor: '#facc15',
@@ -12514,7 +12894,7 @@
       }
 
       const remainingCoords = [];
-      const cur = ceposJoystickState.pendingCoords;
+      const cur = ceposPanelState.pendingCoords;
       if (ceposRouteState.isPlaying || ceposRouteState.traveledMeters > 0) {
         const traveledCoords = [];
         for (let i = 0; i <= Math.min(ceposRouteState.segmentIndex, pts.length - 1); i += 1) {
@@ -12524,8 +12904,8 @@
         if (traveledCoords.length >= 2) {
           L.polyline(traveledCoords, {
             color: '#fde047',
-            weight: 3,
-            opacity: 0.3,
+            weight: 3.5,
+            opacity: 0.34,
             interactive: false
           }).addTo(ceposRouteLayer);
         }
@@ -12540,16 +12920,16 @@
       if (remainingCoords.length >= 2) {
         L.polyline(remainingCoords, {
           color: '#facc15',
-          weight: 4,
-          opacity: 0.82,
-          dashArray: '7, 7',
+          weight: 4.5,
+          opacity: 0.88,
+          dashArray: '8, 7',
           interactive: false
         }).addTo(ceposRouteLayer);
       }
 
       const endPt = pts[pts.length - 1];
       L.circleMarker([endPt.lat, endPt.lng], {
-        radius: 5.5,
+        radius: 6,
         color: '#0f172a',
         weight: 2,
         fillColor: '#facc15',
@@ -12563,32 +12943,28 @@
       const totalRounded = Math.round(ceposRouteState.totalMeters);
       const traveledRounded = Math.min(totalRounded, Math.round(ceposRouteState.traveledMeters));
 
+      if (ceposRoutePanel) {
+        ceposRoutePanel.classList.toggle('drawing-compact', Boolean(ceposRouteState.isDrawing));
+      }
+
       if (btnCeposDrawRoute) {
         btnCeposDrawRoute.classList.toggle('active', ceposRouteState.isDrawing);
         btnCeposDrawRoute.textContent = ceposRouteState.isDrawing
-          ? '✓ Listo trazo'
-          : (hasValidRoute ? '✏️ Editar trazo' : '✏️ Trazar ruta');
+          ? '✓ Listo Trazo'
+          : '✏️ Trazar Ruta';
       }
 
-      if (btnCeposPlayPauseRoute) {
-        btnCeposPlayPauseRoute.disabled = !hasValidRoute;
-        btnCeposPlayPauseRoute.classList.toggle('playing', ceposRouteState.isPlaying);
-        if (ceposRouteState.isPlaying) {
-          btnCeposPlayPauseRoute.textContent = '⏸ Pausar';
-        } else if (hasValidRoute && ceposRouteState.traveledMeters > 0 && !ceposRouteState.isCompleted) {
-          btnCeposPlayPauseRoute.textContent = '▶ Reanudar';
-        } else if (ceposRouteState.isCompleted) {
-          btnCeposPlayPauseRoute.textContent = '▶ Repetir';
-        } else {
-          btnCeposPlayPauseRoute.textContent = '▶ Iniciar';
-        }
+      if (btnCeposStopRoute) {
+        btnCeposStopRoute.disabled = !ceposRouteState.isPlaying;
       }
 
-      if (btnCeposChangeRoute) {
-        btnCeposChangeRoute.disabled = !ceposJoystickState.activeReportId;
+      if (btnCeposPlayRoute) {
+        btnCeposPlayRoute.disabled = !hasValidRoute || ceposRouteState.isPlaying;
+        btnCeposPlayRoute.textContent = ceposRouteState.isCompleted ? '▶ Repetir' : '▶ Seguir';
       }
-      if (btnCeposClearRoute) {
-        btnCeposClearRoute.disabled = ceposRouteState.waypoints.length === 0;
+
+      if (btnCeposResetRoute) {
+        btnCeposResetRoute.disabled = !ceposPanelState.activeReportId || (ceposRouteState.waypoints.length === 0 && !ceposRouteState.isDrawing);
       }
 
       document.querySelectorAll('[data-cepos-speed-kmh]').forEach((btn) => {
@@ -12598,65 +12974,52 @@
       if (ceposRouteStatusText) {
         if (ceposRouteState.isDrawing) {
           ceposRouteStatusText.textContent = hasValidRoute
-            ? `✏️ Trazando con el dedo: ${ceposRouteState.waypoints.length} pts (${totalRounded} m) · Pulsa ▶ Iniciar`
-            : '✏️ Desliza el dedo sobre las calles del mapa para trazar la ruta...';
+            ? `✏️ Trayecto marcado: ${totalRounded} m · Pulsa "Listo Trazo" o "▶ Seguir"`
+            : '✏️ Desliza el dedo sobre las calles del centro del mapa para trazar la ruta...';
         } else if (ceposRouteState.isPlaying) {
-          ceposRouteStatusText.textContent = `🚐 Avanzando lento (${ceposRouteState.speedKmh} km/h): ${traveledRounded} m / ${totalRounded} m`;
+          ceposRouteStatusText.textContent = `🚐 En marcha (${ceposRouteState.speedKmh} km/h): ${traveledRounded} m / ${totalRounded} m`;
         } else if (ceposRouteState.isCompleted && hasValidRoute) {
-          ceposRouteStatusText.textContent = `🏁 Recorrido completado (${totalRounded} m) · Puedes cambiar ruta o usar joystick`;
+          ceposRouteStatusText.textContent = `🏁 Trayecto finalizado (${totalRounded} m) · Pulsa "▶ Seguir" o "Cambiar / Limpiar"`;
         } else if (hasValidRoute && ceposRouteState.traveledMeters > 0) {
-          ceposRouteStatusText.textContent = `⏸ Ruta en pausa: ${traveledRounded} m / ${totalRounded} m`;
+          ceposRouteStatusText.textContent = `⏹ Detenido en ${traveledRounded} m / ${totalRounded} m · Pulsa "▶ Seguir" para continuar`;
         } else if (hasValidRoute) {
-          ceposRouteStatusText.textContent = `🛣️ Ruta lista (${totalRounded} m) · Pulsa ▶ Iniciar para avance lento`;
+          ceposRouteStatusText.textContent = `🛣️ Trayecto listo (${totalRounded} m) · Pulsa "▶ Seguir" a ${ceposRouteState.speedKmh} km/h`;
         } else {
-          ceposRouteStatusText.textContent = '🛣️ Sin ruta trazada · Toca "Trazar ruta" para dibujar con el dedo';
+          ceposRouteStatusText.textContent = '🛣️ Sin trayecto · Toca "Trazar Ruta" y desliza el dedo por la vía';
         }
       }
 
       if (btnCeposMiniDraw) {
         btnCeposMiniDraw.classList.toggle('active', ceposRouteState.isDrawing);
-        btnCeposMiniDraw.textContent = ceposRouteState.isDrawing
-          ? '✓ Listo'
-          : (hasValidRoute ? '✏️ Editar' : '✏️ Ruta');
+        btnCeposMiniDraw.textContent = ceposRouteState.isDrawing ? '✓ Listo Trazo' : '✏️ Trazar Ruta';
       }
-      if (btnCeposMiniPlayPause) {
-        btnCeposMiniPlayPause.disabled = !hasValidRoute;
-        btnCeposMiniPlayPause.classList.toggle('playing', ceposRouteState.isPlaying);
-        if (ceposRouteState.isPlaying) {
-          btnCeposMiniPlayPause.textContent = '⏸ Pausar';
-        } else if (hasValidRoute && ceposRouteState.traveledMeters > 0 && !ceposRouteState.isCompleted) {
-          btnCeposMiniPlayPause.textContent = '▶ Seguir';
-        } else if (ceposRouteState.isCompleted) {
-          btnCeposMiniPlayPause.textContent = '▶ Repetir';
-        } else {
-          btnCeposMiniPlayPause.textContent = '▶ Iniciar';
-        }
+      if (btnCeposMiniStop) {
+        btnCeposMiniStop.disabled = !ceposRouteState.isPlaying;
       }
-      if (btnCeposMiniChangeRoute) {
-        btnCeposMiniChangeRoute.disabled = !ceposJoystickState.activeReportId;
+      if (btnCeposMiniPlay) {
+        btnCeposMiniPlay.disabled = !hasValidRoute || ceposRouteState.isPlaying;
+        btnCeposMiniPlay.textContent = ceposRouteState.isCompleted ? '▶ Repetir' : '▶ Seguir';
       }
-      if (btnCeposMiniClearRoute) {
-        btnCeposMiniClearRoute.disabled = ceposRouteState.waypoints.length === 0;
+      if (btnCeposMiniReset) {
+        btnCeposMiniReset.disabled = !ceposPanelState.activeReportId || (ceposRouteState.waypoints.length === 0 && !ceposRouteState.isDrawing);
       }
       if (ceposMiniStatusText) {
         if (ceposRouteState.isDrawing) {
           ceposMiniStatusText.textContent = hasValidRoute
-            ? `✏️ Trazando: ${ceposRouteState.waypoints.length} pts (${totalRounded} m)`
+            ? `✏️ Trazando: ${totalRounded} m · Mapa despejado`
             : '✏️ Desliza el dedo sobre las calles...';
         } else if (ceposRouteState.isPlaying) {
-          ceposMiniStatusText.textContent = `🚐 Avanzando (${ceposRouteState.speedKmh} km/h): ${traveledRounded}/${totalRounded} m`;
+          ceposMiniStatusText.textContent = `🚐 En marcha (${ceposRouteState.speedKmh} km/h): ${traveledRounded}/${totalRounded} m`;
         } else if (ceposRouteState.isCompleted && hasValidRoute) {
-          ceposMiniStatusText.textContent = `🏁 Ruta completada (${totalRounded} m)`;
+          ceposMiniStatusText.textContent = `🏁 Trayecto completado (${totalRounded} m)`;
         } else if (hasValidRoute && ceposRouteState.traveledMeters > 0) {
-          ceposMiniStatusText.textContent = `⏸ Ruta en pausa: ${traveledRounded}/${totalRounded} m`;
+          ceposMiniStatusText.textContent = `⏹ En pausa: ${traveledRounded}/${totalRounded} m`;
         } else if (hasValidRoute) {
-          ceposMiniStatusText.textContent = `🛣️ Ruta lista (${totalRounded} m) · Mapa despejado`;
+          ceposMiniStatusText.textContent = `🛣️ Trayecto listo (${totalRounded} m) · Mapa despejado`;
         } else {
-          ceposMiniStatusText.textContent = '🚐 Cepos activo · Mapa despejado para trazar ruta';
+          ceposMiniStatusText.textContent = '🚐 Cepos activo · Toca "Trazar Ruta"';
         }
       }
-
-      syncCeposManualDeckVisibility();
     }
 
     function stopCeposRouteTimer() {
@@ -12686,13 +13049,12 @@
       updateCeposRouteUI();
     }
 
-    function minimizeCeposJoystick() {
-      if (!ceposJoystickState.activeReportId) return false;
-      stopCeposHoldAndStickTimers();
-      ceposJoystickState.isMinimized = true;
-      if (ceposJoystickPanel) {
-        ceposJoystickPanel.classList.remove('visible');
-        ceposJoystickPanel.setAttribute('aria-hidden', 'true');
+    function minimizeCeposRoutePanel() {
+      if (!ceposPanelState.activeReportId) return false;
+      ceposPanelState.isMinimized = true;
+      if (ceposRoutePanel) {
+        ceposRoutePanel.classList.remove('visible');
+        ceposRoutePanel.setAttribute('aria-hidden', 'true');
       }
       if (bottomPanelEl && !isPickingReportPin && !isReactionMapModeActive) {
         bottomPanelEl.style.display = '';
@@ -12705,31 +13067,31 @@
       return true;
     }
 
-    function restoreCeposJoystick() {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
-      ceposJoystickState.isMinimized = false;
+    function restoreCeposRoutePanel() {
+      if (!hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return false;
+      ceposPanelState.isMinimized = false;
       if (ceposMiniDock) {
         ceposMiniDock.classList.remove('visible');
         ceposMiniDock.setAttribute('aria-hidden', 'true');
       }
       if (bottomPanelEl) bottomPanelEl.style.display = 'none';
-      if (ceposJoystickPanel) {
-        ceposJoystickPanel.classList.add('visible');
-        ceposJoystickPanel.setAttribute('aria-hidden', 'false');
+      if (ceposRoutePanel) {
+        ceposRoutePanel.classList.add('visible');
+        ceposRoutePanel.setAttribute('aria-hidden', 'false');
       }
       updateCeposRouteUI();
       return true;
     }
 
     function enterCeposDrawMode() {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      if (!hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return false;
       if (ceposRouteState.isPlaying) {
         pauseCeposRoute(false);
       }
       ceposRouteState.isDrawing = true;
       ceposRouteState.isCompleted = false;
-      if (!ceposJoystickState.isMinimized) {
-        minimizeCeposJoystick();
+      if (!ceposPanelState.isMinimized) {
+        minimizeCeposRoutePanel();
       }
       if (map) {
         try {
@@ -12745,19 +13107,19 @@
         } catch (e) {}
       }
       updateCeposRouteUI();
-      showToast('✏️ Mapa despejado: desliza tu dedo por las calles para trazar la ruta.');
+      showToast('✏️ Mapa despejado: desliza tu dedo por la calle para trazar la ruta de Cepos.');
       return true;
     }
 
     function appendCeposRoutePoint(lat, lng, isStrokeMove = false) {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      if (!hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return false;
       const nLat = Number(Number(lat).toFixed(6));
       const nLng = Number(Number(lng).toFixed(6));
       if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) return false;
 
-      if (ceposRouteState.waypoints.length === 0 && ceposJoystickState.pendingCoords) {
-        const startLat = Number(ceposJoystickState.pendingCoords.lat);
-        const startLng = Number(ceposJoystickState.pendingCoords.lng);
+      if (ceposRouteState.waypoints.length === 0 && ceposPanelState.pendingCoords) {
+        const startLat = Number(ceposPanelState.pendingCoords.lat);
+        const startLng = Number(ceposPanelState.pendingCoords.lng);
         if (Number.isFinite(startLat) && Number.isFinite(startLng)) {
           ceposRouteState.waypoints.push({ lat: startLat, lng: startLng });
         }
@@ -12778,11 +13140,11 @@
     }
 
     function applyCeposAutoRouteCoords(newLat, newLng, forceFlush = false) {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
-      ceposJoystickState.pendingCoords = { lat: newLat, lng: newLng };
-      ceposJoystickState.dirty = true;
-      updateCeposJoystickBadge('pending');
-      updateCeposMarkerCoordsLocally(ceposJoystickState.activeReportId, newLat, newLng);
+      if (!hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return;
+      ceposPanelState.pendingCoords = { lat: newLat, lng: newLng };
+      ceposPanelState.dirty = true;
+      updateCeposSyncBadge('pending');
+      updateCeposMarkerCoordsLocally(ceposPanelState.activeReportId, newLat, newLng);
 
       if (forceFlush) {
         flushCeposPositionToFirestore(false);
@@ -12792,7 +13154,7 @@
     }
 
     function advanceCeposAlongRouteTick(overrideDtSec = null) {
-      if (!ceposRouteState.isPlaying || !hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) {
+      if (!ceposRouteState.isPlaying || !hasValidatedAdminPermission() || !ceposPanelState.activeReportId) {
         stopCeposRouteTimer();
         return false;
       }
@@ -12832,7 +13194,7 @@
         applyCeposAutoRouteCoords(endPt.lat, endPt.lng, true);
         renderCeposRoutePolyline();
         updateCeposRouteUI();
-        showToast('🏁 La unidad de Cepos completó la ruta trazada.');
+        showToast('🏁 La unidad de Cepos completó el trayecto trazado.');
         return true;
       }
 
@@ -12854,9 +13216,9 @@
     }
 
     function startCeposRoutePlayback() {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return false;
+      if (!hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return false;
       if (ceposRouteState.waypoints.length < 2 || ceposRouteState.totalMeters < 5) {
-        showToast('Traza primero al menos 2 puntos sobre el mapa.');
+        showToast('Traza primero la ruta con el dedo sobre el mapa.');
         return false;
       }
       exitCeposDrawMode();
@@ -12876,7 +13238,7 @@
       }, CEPOS_AUTO_TICK_MS);
       renderCeposRoutePolyline();
       updateCeposRouteUI();
-      showToast(`🚐 Avance automático lento iniciado (${ceposRouteState.speedKmh} km/h).`);
+      showToast(`🚐 Camionetica Cepos siguiendo ruta (${ceposRouteState.speedKmh} km/h).`);
       return true;
     }
 
@@ -12885,7 +13247,7 @@
       ceposRouteState.isPlaying = false;
       stopCeposRouteTimer();
       updateCeposRouteUI();
-      if (flushNow && ceposJoystickState.dirty) {
+      if (flushNow && ceposPanelState.dirty) {
         flushCeposPositionToFirestore(false);
       }
       return true;
@@ -12910,86 +13272,24 @@
       }
     }
 
-    function moveCeposByMeters(eastMeters, northMeters) {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return null;
-      if (ceposRouteState.isPlaying) {
-        pauseCeposRoute(false);
-      }
-      const base = ceposJoystickState.pendingCoords || findReportByIdForJoystick(ceposJoystickState.activeReportId);
-      if (!base) return null;
-      const curLat = Number(base.lat);
-      const curLng = Number(base.lng);
-      if (!Number.isFinite(curLat) || !Number.isFinite(curLng)) return null;
-
-      const dLat = Number(northMeters || 0) / 111320;
-      const cosLat = Math.max(0.15, Math.cos((curLat * Math.PI) / 180));
-      const dLng = Number(eastMeters || 0) / (111320 * cosLat);
-
-      const newLat = Number(Math.max(-89.9, Math.min(89.9, curLat + dLat)).toFixed(6));
-      const newLng = Number(Math.max(-179.9, Math.min(179.9, curLng + dLng)).toFixed(6));
-
-      ceposJoystickState.pendingCoords = { lat: newLat, lng: newLng };
-      ceposJoystickState.dirty = true;
-      updateCeposJoystickBadge('pending');
-      updateCeposMarkerCoordsLocally(ceposJoystickState.activeReportId, newLat, newLng);
-
-      if (map && typeof map.getBounds === 'function') {
-        try {
-          const bounds = map.getBounds();
-          if (bounds && !bounds.contains([newLat, newLng])) {
-            map.panTo([newLat, newLng], { animate: true, duration: 0.25 });
-          }
-        } catch (e) {}
-      }
-
-      scheduleCeposFirestoreSync(CEPOS_SYNC_THROTTLE_MS);
-      return { lat: newLat, lng: newLng };
-    }
-
-    function stopCeposHoldAndStickTimers() {
-      if (ceposJoystickState.holdTimer) {
-        clearInterval(ceposJoystickState.holdTimer);
-        ceposJoystickState.holdTimer = null;
-      }
-      if (ceposJoystickState.stickTimer) {
-        clearInterval(ceposJoystickState.stickTimer);
-        ceposJoystickState.stickTimer = null;
-      }
-      ceposJoystickState.stickVector = { x: 0, y: 0 };
-      ceposJoystickState.activePointerId = null;
-      if (ceposStickKnob) {
-        ceposStickKnob.classList.remove('dragging');
-        ceposStickKnob.style.transform = 'translate(0px, 0px)';
-      }
-    }
-
-    function syncCeposStepButtons(stepVal) {
-      const clamped = [10, 25, 50, 100].includes(Number(stepVal)) ? Number(stepVal) : 25;
-      ceposJoystickState.stepMeters = clamped;
-      document.querySelectorAll('[data-cepos-step]').forEach((btn) => {
-        btn.classList.toggle('active', Number(btn.dataset.ceposStep) === clamped);
-      });
-    }
-
-    window.closeCeposJoystick = async function(flushPending = true) {
-      stopCeposHoldAndStickTimers();
+    window.closeCeposRoutePanel = async function(flushPending = true) {
       clearCeposRouteData(false);
-      if (flushPending && ceposJoystickState.activeReportId && (ceposJoystickState.dirty || ceposJoystickState.syncing)) {
+      if (flushPending && ceposPanelState.activeReportId && (ceposPanelState.dirty || ceposPanelState.syncing)) {
         await flushCeposPositionToFirestore(true);
       }
-      if (ceposJoystickState.flushTimer) {
-        clearTimeout(ceposJoystickState.flushTimer);
-        ceposJoystickState.flushTimer = null;
+      if (ceposPanelState.flushTimer) {
+        clearTimeout(ceposPanelState.flushTimer);
+        ceposPanelState.flushTimer = null;
       }
-      const hadActive = Boolean(ceposJoystickState.activeReportId);
-      ceposJoystickState.activeReportId = null;
-      ceposJoystickState.isMinimized = false;
-      ceposJoystickState.pendingCoords = null;
-      ceposJoystickState.dirty = false;
-      ceposJoystickState.needsTrailingFlush = false;
-      if (ceposJoystickPanel) {
-        ceposJoystickPanel.classList.remove('visible');
-        ceposJoystickPanel.setAttribute('aria-hidden', 'true');
+      const hadActive = Boolean(ceposPanelState.activeReportId);
+      ceposPanelState.activeReportId = null;
+      ceposPanelState.isMinimized = false;
+      ceposPanelState.pendingCoords = null;
+      ceposPanelState.dirty = false;
+      ceposPanelState.needsTrailingFlush = false;
+      if (ceposRoutePanel) {
+        ceposRoutePanel.classList.remove('visible', 'drawing-compact');
+        ceposRoutePanel.setAttribute('aria-hidden', 'true');
       }
       if (ceposMiniDock) {
         ceposMiniDock.classList.remove('visible');
@@ -13003,19 +13303,19 @@
       }
     };
 
-    window.openCeposJoystick = async function(reportId) {
+    window.openCeposRoutePanel = async function(reportId) {
       if (!hasValidatedAdminPermission()) {
-        showToast('⛔ Solo los administradores autorizados pueden mover unidades de Cepos con el joystick.');
+        showToast('⛔ Solo los administradores autorizados pueden trazar rutas para Cepos.');
         return false;
       }
-      const rep = findReportByIdForJoystick(reportId);
+      const rep = findReportByIdForCepos(reportId);
       if (!rep || !isCeposTipo(rep.tipo || rep.type)) {
-        showToast('Selecciona un reporte activo de tipo Cepos para usar el joystick.');
+        showToast('Selecciona un reporte activo de tipo Cepos para trazar su ruta.');
         return false;
       }
-      if (ceposJoystickState.activeReportId && ceposJoystickState.activeReportId !== String(rep.id)) {
+      if (ceposPanelState.activeReportId && ceposPanelState.activeReportId !== String(rep.id)) {
         clearCeposRouteData(false);
-        if (ceposJoystickState.dirty || ceposJoystickState.syncing) {
+        if (ceposPanelState.dirty || ceposPanelState.syncing) {
           await flushCeposPositionToFirestore(true);
         }
       }
@@ -13027,19 +13327,18 @@
       const lng = Number(rep.lng);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
 
-      ceposJoystickState.activeReportId = String(rep.id);
-      ceposJoystickState.isMinimized = false;
-      ceposJoystickState.pendingCoords = { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
-      ceposJoystickState.dirty = false;
-      ceposJoystickState.needsTrailingFlush = false;
+      ceposPanelState.activeReportId = String(rep.id);
+      ceposPanelState.isMinimized = false;
+      ceposPanelState.pendingCoords = { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
+      ceposPanelState.dirty = false;
+      ceposPanelState.needsTrailingFlush = false;
 
       const rawDesc = String(rep.descripcion || rep.description || '').trim();
-      if (ceposJoystickTargetLabel) {
-        ceposJoystickTargetLabel.textContent = rawDesc || 'Camionetica / Unidad Cepos';
+      if (ceposRouteTargetLabel) {
+        ceposRouteTargetLabel.textContent = rawDesc || 'Camionetica / Unidad Cepos';
       }
       updateCeposLocationLabels(lat, lng);
-      updateCeposJoystickBadge('saved');
-      syncCeposStepButtons(ceposJoystickState.stepMeters);
+      updateCeposSyncBadge('saved');
       updateCeposRouteUI();
 
       isFollowingUser = false;
@@ -13048,9 +13347,9 @@
         ceposMiniDock.setAttribute('aria-hidden', 'true');
       }
       if (bottomPanelEl) bottomPanelEl.style.display = 'none';
-      if (ceposJoystickPanel) {
-        ceposJoystickPanel.classList.add('visible');
-        ceposJoystickPanel.setAttribute('aria-hidden', 'false');
+      if (ceposRoutePanel) {
+        ceposRoutePanel.classList.add('visible');
+        ceposRoutePanel.setAttribute('aria-hidden', 'false');
       }
       if (map && typeof map.closePopup === 'function') {
         map.closePopup();
@@ -13061,16 +13360,15 @@
       if (typeof refreshReportsForRole === 'function') {
         refreshReportsForRole();
       }
-      showToast('🕹️ Control Cepos activo: traza una ruta con el dedo o usa el joystick.');
+      showToast('🛣️ Control de Ruta Cepos listo: pulsa "Trazar Ruta" y desliza el dedo.');
       return true;
     };
 
-    window.__anthiOpenCeposJoystick = window.openCeposJoystick;
-    window.__anthiCloseCeposJoystick = window.closeCeposJoystick;
-    window.__anthiMinimizeCeposJoystick = minimizeCeposJoystick;
-    window.__anthiRestoreCeposJoystick = restoreCeposJoystick;
-    window.__anthiMoveCeposByMeters = moveCeposByMeters;
-    window.__anthiGetCeposJoystickState = () => ({ ...ceposJoystickState });
+    window.__anthiOpenCeposRoutePanel = window.openCeposRoutePanel;
+    window.__anthiCloseCeposRoutePanel = window.closeCeposRoutePanel;
+    window.__anthiMinimizeCeposRoutePanel = minimizeCeposRoutePanel;
+    window.__anthiRestoreCeposRoutePanel = restoreCeposRoutePanel;
+    window.__anthiGetCeposPanelState = () => ({ ...ceposPanelState });
     window.__anthiGetCeposRouteState = () => ({ ...ceposRouteState, waypoints: [...ceposRouteState.waypoints] });
     window.__anthiStartCeposDrawRoute = enterCeposDrawMode;
     window.__anthiExitCeposDrawRoute = exitCeposDrawMode;
@@ -13081,32 +13379,19 @@
     window.__anthiClearCeposRoute = () => clearCeposRouteData(false);
     window.__anthiTickCeposAutoRoute = advanceCeposAlongRouteTick;
 
-    if (btnMinimizeCeposJoystick) {
-      btnMinimizeCeposJoystick.addEventListener('click', () => {
-        minimizeCeposJoystick();
-      });
+    if (btnMinimizeCeposRoute) {
+      btnMinimizeCeposRoute.addEventListener('click', minimizeCeposRoutePanel);
     }
-    if (btnExpandCeposJoystick) {
-      btnExpandCeposJoystick.addEventListener('click', () => {
-        restoreCeposJoystick();
-      });
+    if (btnExpandCeposRoute) {
+      btnExpandCeposRoute.addEventListener('click', restoreCeposRoutePanel);
     }
-    if (btnCloseCeposJoystick) {
-      btnCloseCeposJoystick.addEventListener('click', () => {
-        window.closeCeposJoystick(true);
-      });
+    if (btnCloseCeposRoute) {
+      btnCloseCeposRoute.addEventListener('click', () => window.closeCeposRoutePanel(true));
     }
     if (btnCloseCeposMiniDock) {
-      btnCloseCeposMiniDock.addEventListener('click', () => {
-        window.closeCeposJoystick(true);
-      });
+      btnCloseCeposMiniDock.addEventListener('click', () => window.closeCeposRoutePanel(true));
     }
-    if (btnToggleCeposManualDeck) {
-      btnToggleCeposManualDeck.addEventListener('click', () => {
-        ceposRouteState.manualDeckCollapsed = !ceposRouteState.manualDeckCollapsed;
-        syncCeposManualDeckVisibility();
-      });
-    }
+
     const handleToggleDrawClick = () => {
       if (ceposRouteState.isDrawing) {
         exitCeposDrawMode();
@@ -13114,32 +13399,29 @@
         enterCeposDrawMode();
       }
     };
-    const handlePlayPauseClick = () => {
+    const handleStopClick = () => {
       if (ceposRouteState.isPlaying) {
         pauseCeposRoute(true);
-        showToast('⏸ Avance automático de Cepos en pausa.');
-      } else {
-        startCeposRoutePlayback();
+        showToast('⏹ Unidad Cepos detenida. Pulsa "Seguir" para reanudar.');
       }
     };
-    const handleChangeRouteClick = () => {
-      if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
-      clearCeposRouteData(true);
+    const handlePlayClick = () => {
+      startCeposRoutePlayback();
     };
-    const handleClearRouteClick = () => {
-      if (!hasValidatedAdminPermission()) return;
+    const handleResetRouteClick = () => {
+      if (!hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return;
       clearCeposRouteData(false);
-      showToast('🗑️ Ruta limpiada.');
+      showToast('🔄 Trayecto limpiado. Pulsa "Trazar Ruta" para marcar uno nuevo.');
     };
 
     if (btnCeposDrawRoute) btnCeposDrawRoute.addEventListener('click', handleToggleDrawClick);
     if (btnCeposMiniDraw) btnCeposMiniDraw.addEventListener('click', handleToggleDrawClick);
-    if (btnCeposPlayPauseRoute) btnCeposPlayPauseRoute.addEventListener('click', handlePlayPauseClick);
-    if (btnCeposMiniPlayPause) btnCeposMiniPlayPause.addEventListener('click', handlePlayPauseClick);
-    if (btnCeposChangeRoute) btnCeposChangeRoute.addEventListener('click', handleChangeRouteClick);
-    if (btnCeposMiniChangeRoute) btnCeposMiniChangeRoute.addEventListener('click', handleChangeRouteClick);
-    if (btnCeposClearRoute) btnCeposClearRoute.addEventListener('click', handleClearRouteClick);
-    if (btnCeposMiniClearRoute) btnCeposMiniClearRoute.addEventListener('click', handleClearRouteClick);
+    if (btnCeposStopRoute) btnCeposStopRoute.addEventListener('click', handleStopClick);
+    if (btnCeposMiniStop) btnCeposMiniStop.addEventListener('click', handleStopClick);
+    if (btnCeposPlayRoute) btnCeposPlayRoute.addEventListener('click', handlePlayClick);
+    if (btnCeposMiniPlay) btnCeposMiniPlay.addEventListener('click', handlePlayClick);
+    if (btnCeposResetRoute) btnCeposResetRoute.addEventListener('click', handleResetRouteClick);
+    if (btnCeposMiniReset) btnCeposMiniReset.addEventListener('click', handleResetRouteClick);
 
     document.querySelectorAll('[data-cepos-speed-kmh]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -13156,7 +13438,7 @@
       if (mapElForDraw && typeof mapElForDraw.addEventListener === 'function') {
         const isDrawBlockedTarget = (target) => {
           if (!target || typeof target.closest !== 'function') return false;
-          return Boolean(target.closest('.cepos-joystick-panel, .cepos-mini-dock, .leaflet-popup, .map-controls, .top-bar, .gps-hud, .bottom-panel'));
+          return Boolean(target.closest('.cepos-route-panel, .cepos-mini-dock, .leaflet-popup, .map-controls, .top-bar, .gps-hud, .bottom-panel'));
         };
         const pointerToMapLatLng = (ev) => {
           const rect = mapElForDraw.getBoundingClientRect();
@@ -13164,7 +13446,7 @@
           return map.containerPointToLatLng(L.point(ev.clientX - rect.left, ev.clientY - rect.top));
         };
         mapElForDraw.addEventListener('pointerdown', (ev) => {
-          if (!ceposRouteState.isDrawing || !hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
+          if (!ceposRouteState.isDrawing || !hasValidatedAdminPermission() || !ceposPanelState.activeReportId) return;
           if (ev.isPrimary === false || isDrawBlockedTarget(ev.target)) return;
           const ll = pointerToMapLatLng(ev);
           if (!ll) return;
@@ -13194,126 +13476,13 @@
       }
     }
 
-    if (btnCenterCeposJoystick) {
-      btnCenterCeposJoystick.addEventListener('click', () => {
-        const coords = ceposJoystickState.pendingCoords;
+    if (btnCenterCeposRoute) {
+      btnCenterCeposRoute.addEventListener('click', () => {
+        const coords = ceposPanelState.pendingCoords;
         if (coords && map && typeof map.setView === 'function') {
           map.setView([coords.lat, coords.lng], Math.max(map.getZoom ? map.getZoom() : 16, 16), { animate: true });
         }
       });
-    }
-    if (btnFlushCeposJoystick) {
-      btnFlushCeposJoystick.addEventListener('click', async () => {
-        if (!ceposJoystickState.activeReportId) return;
-        ceposJoystickState.dirty = true;
-        const ok = await flushCeposPositionToFirestore(true);
-        if (ok) showToast('💾 Posición de Cepos sincronizada en Firestore.');
-      });
-    }
-
-    document.querySelectorAll('[data-cepos-step]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        syncCeposStepButtons(btn.dataset.ceposStep);
-      });
-    });
-
-    if (ceposDpadGrid) {
-      const stopDpadHold = () => {
-        if (ceposJoystickState.holdTimer) {
-          clearInterval(ceposJoystickState.holdTimer);
-          ceposJoystickState.holdTimer = null;
-        }
-        ceposDpadGrid.querySelectorAll('.cepos-dpad-btn.pressed').forEach((el) => el.classList.remove('pressed'));
-      };
-      ceposDpadGrid.querySelectorAll('[data-cepos-dx]').forEach((btn) => {
-        const dx = Number(btn.dataset.ceposDx || 0);
-        const dy = Number(btn.dataset.ceposDy || 0);
-        const stepAction = () => {
-          const stepM = ceposJoystickState.stepMeters || 25;
-          moveCeposByMeters(dx * stepM, dy * stepM);
-        };
-        btn.addEventListener('pointerdown', (ev) => {
-          ev.preventDefault();
-          stopDpadHold();
-          btn.classList.add('pressed');
-          stepAction();
-          ceposJoystickState.holdTimer = setInterval(stepAction, 130);
-        });
-        btn.addEventListener('pointerup', stopDpadHold);
-        btn.addEventListener('pointercancel', stopDpadHold);
-        btn.addEventListener('pointerleave', stopDpadHold);
-      });
-    }
-
-    if (ceposStickPad && ceposStickKnob) {
-      const maxRadiusPx = 32;
-      const updateStickFromPointer = (clientX, clientY) => {
-        const rect = ceposStickPad.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        let dx = clientX - cx;
-        let dy = clientY - cy;
-        const dist = Math.hypot(dx, dy);
-        if (dist > maxRadiusPx && dist > 0) {
-          dx = (dx / dist) * maxRadiusPx;
-          dy = (dy / dist) * maxRadiusPx;
-        }
-        ceposStickKnob.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
-        ceposJoystickState.stickVector = {
-          x: dx / maxRadiusPx,
-          y: -dy / maxRadiusPx
-        };
-      };
-
-      const startStickTick = () => {
-        if (ceposJoystickState.stickTimer) clearInterval(ceposJoystickState.stickTimer);
-        ceposJoystickState.stickTimer = setInterval(() => {
-          const vx = ceposJoystickState.stickVector.x;
-          const vy = ceposJoystickState.stickVector.y;
-          if (Math.hypot(vx, vy) < 0.08) return;
-          const stepM = ceposJoystickState.stepMeters || 25;
-          const tickScale = 0.45;
-          moveCeposByMeters(vx * stepM * tickScale, vy * stepM * tickScale);
-        }, 70);
-      };
-
-      const endStickDrag = () => {
-        if (ceposJoystickState.stickTimer) {
-          clearInterval(ceposJoystickState.stickTimer);
-          ceposJoystickState.stickTimer = null;
-        }
-        ceposJoystickState.activePointerId = null;
-        ceposJoystickState.stickVector = { x: 0, y: 0 };
-        ceposStickKnob.classList.remove('dragging');
-        ceposStickKnob.style.transform = 'translate(0px, 0px)';
-      };
-
-      ceposStickPad.addEventListener('pointerdown', (ev) => {
-        if (!hasValidatedAdminPermission() || !ceposJoystickState.activeReportId) return;
-        ev.preventDefault();
-        ceposJoystickState.activePointerId = ev.pointerId;
-        if (typeof ceposStickPad.setPointerCapture === 'function') {
-          try {
-            ceposStickPad.setPointerCapture(ev.pointerId);
-          } catch (e) {}
-        }
-        ceposStickKnob.classList.add('dragging');
-        updateStickFromPointer(ev.clientX, ev.clientY);
-        startStickTick();
-      });
-
-      ceposStickPad.addEventListener('pointermove', (ev) => {
-        if (ceposJoystickState.activePointerId !== ev.pointerId) return;
-        ev.preventDefault();
-        updateStickFromPointer(ev.clientX, ev.clientY);
-      });
-
-      ceposStickPad.addEventListener('pointerup', (ev) => {
-        if (ceposJoystickState.activePointerId !== ev.pointerId) return;
-        endStickDrag();
-      });
-
-      ceposStickPad.addEventListener('pointercancel', endStickDrag);
     }
 
     window.__anthiHandleReactionMapTap = function(latlng) {
@@ -14043,7 +14212,7 @@
     }
 
     // =========================================================================
-    // 11A. MÓDULO CIERRE EVENTO (SOLO ADMIN · SIN SÓNAR · EVACUACIÓN Y HORARIO)
+    // 11A. MÓDULO CIERRE EVENTO (SOLO ADMIN · SIN SÓNAR · VECTORES ENCADENADOS)
     // =========================================================================
     const cierreEventoBanner = document.getElementById('cierreEventoBanner');
     const cierreEventoBannerMain = document.getElementById('cierreEventoBannerMain');
@@ -14059,6 +14228,10 @@
     const btnCeDrawExit = document.getElementById('btnCeDrawExit');
     const btnCeDrawModeCierre = document.getElementById('btnCeDrawModeCierre');
     const btnCeDrawModeEvac = document.getElementById('btnCeDrawModeEvac');
+    const btnCeToolDraw = document.getElementById('btnCeToolDraw');
+    const btnCeToolMove = document.getElementById('btnCeToolMove');
+    const btnCeToolPan = document.getElementById('btnCeToolPan');
+    const ceEvacChipsRow = document.getElementById('ceEvacChipsRow');
     const btnCeShapeTramo = document.getElementById('btnCeShapeTramo');
     const btnCeShapeCuadrante = document.getElementById('btnCeShapeCuadrante');
     const btnCeNewEvacRoute = document.getElementById('btnCeNewEvacRoute');
@@ -14090,11 +14263,18 @@
     const cierreDrawState = {
       isDrawing: false,
       drawTarget: 'cierre', // 'cierre' | 'evac'
+      toolMode: 'draw', // 'draw' (vectores cabeza-punta) | 'move' (arrastrar vector completo) | 'pan' (mover mapa)
       cierreModo: 'tramo', // 'tramo' | 'cuadrante'
       cierrePuntos: [],
       evacuacionRutas: [], // [{ nombre, puntos: [{lat, lng}] }]
       activeEvacIndex: -1,
-      drawPointerId: null
+      drawPointerId: null,
+      pointerMode: null, // 'aim' | 'moveAll'
+      pointerStartLatLng: null,
+      pointerMoved: false,
+      previewTipLatLng: null,
+      moveBaselinePoints: null,
+      lastPointerHandledAt: 0
     };
 
     function saveCachedCierresEvento(list) {
@@ -14169,7 +14349,6 @@
       const endMs = Number(ev.endsAtMs || 0);
       if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return false;
       if (nowMs > endMs) return false;
-      // En curso o programado hasta 12 h antes (ideal antes o al inicio de eventos deportivos)
       return nowMs >= startMs || (startMs - nowMs) <= 12 * 60 * 60 * 1000;
     }
 
@@ -14194,6 +14373,26 @@
       }
     }
 
+    function getActiveCierreVectorPoints() {
+      if (cierreDrawState.drawTarget === 'evac') {
+        const r = cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex];
+        return r && Array.isArray(r.puntos) ? r.puntos : null;
+      }
+      return cierreDrawState.cierrePuntos;
+    }
+
+    function translateCierreVectorPoints(pointsArray, deltaLat, deltaLng) {
+      if (!Array.isArray(pointsArray) || pointsArray.length === 0) return false;
+      const dLat = Number(deltaLat);
+      const dLng = Number(deltaLng);
+      if (!Number.isFinite(dLat) || !Number.isFinite(dLng)) return false;
+      for (let i = 0; i < pointsArray.length; i += 1) {
+        pointsArray[i].lat = Number(Math.max(-89.9, Math.min(89.9, Number(pointsArray[i].lat) + dLat)).toFixed(6));
+        pointsArray[i].lng = Number(Math.max(-179.9, Math.min(179.9, Number(pointsArray[i].lng) + dLng)).toFixed(6));
+      }
+      return true;
+    }
+
     function syncCierreShapeButtons() {
       const modo = cierreDrawState.cierreModo === 'cuadrante' ? 'cuadrante' : 'tramo';
       if (btnCeShapeTramo) btnCeShapeTramo.classList.toggle('active', modo === 'tramo');
@@ -14202,61 +14401,226 @@
       if (btnCeFormModeCuadrante) btnCeFormModeCuadrante.classList.toggle('active', modo === 'cuadrante');
     }
 
+    function renderCierreEvacSelectorChips() {
+      if (!ceEvacChipsRow) return;
+      const showChips = cierreDrawState.drawTarget === 'evac' && cierreDrawState.evacuacionRutas.length > 0;
+      ceEvacChipsRow.style.display = showChips ? 'flex' : 'none';
+      ceEvacChipsRow.innerHTML = '';
+      if (!showChips) return;
+      cierreDrawState.evacuacionRutas.forEach((r, idx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `cierre-evac-chip${idx === cierreDrawState.activeEvacIndex ? ' active' : ''}`;
+        const ptsCount = Array.isArray(r.puntos) ? r.puntos.length : 0;
+        chip.textContent = `🟢 Salida ${idx + 1} (${ptsCount})`;
+        chip.addEventListener('click', () => {
+          cierreDrawState.activeEvacIndex = idx;
+          renderCierreDraftPreview();
+          syncCierreDrawDockUI();
+        });
+        ceEvacChipsRow.appendChild(chip);
+      });
+    }
+
+    function syncCierreMapDraggingForTool() {
+      if (!map) return;
+      const shouldEnableMapDrag = !cierreDrawState.isDrawing || cierreDrawState.toolMode === 'pan';
+      try {
+        if (map.dragging) {
+          if (shouldEnableMapDrag && typeof map.dragging.enable === 'function') map.dragging.enable();
+          if (!shouldEnableMapDrag && typeof map.dragging.disable === 'function') map.dragging.disable();
+        }
+        if (typeof map.getContainer === 'function') {
+          const c = map.getContainer();
+          if (c && c.style) {
+            c.style.cursor = !cierreDrawState.isDrawing
+              ? ''
+              : cierreDrawState.toolMode === 'move'
+              ? 'move'
+              : cierreDrawState.toolMode === 'pan'
+              ? 'grab'
+              : 'crosshair';
+            c.style.touchAction = cierreDrawState.isDrawing && cierreDrawState.toolMode !== 'pan' ? 'none' : '';
+          }
+        }
+      } catch (e) {}
+    }
+
     function syncCierreDrawDockUI() {
       syncCierreShapeButtons();
+      renderCierreEvacSelectorChips();
       if (btnCeDrawModeCierre) {
         btnCeDrawModeCierre.classList.toggle('active', cierreDrawState.drawTarget === 'cierre');
       }
       if (btnCeDrawModeEvac) {
         btnCeDrawModeEvac.classList.toggle('active', cierreDrawState.drawTarget === 'evac');
       }
+      if (btnCeToolDraw) btnCeToolDraw.classList.toggle('active', cierreDrawState.toolMode === 'draw');
+      if (btnCeToolMove) btnCeToolMove.classList.toggle('active', cierreDrawState.toolMode === 'move');
+      if (btnCeToolPan) btnCeToolPan.classList.toggle('active', cierreDrawState.toolMode === 'pan');
+
       const cierreCount = cierreDrawState.cierrePuntos.length;
       const validEvacs = cierreDrawState.evacuacionRutas.filter((r) => Array.isArray(r.puntos) && r.puntos.length >= 2).length;
       const draftEvacs = cierreDrawState.evacuacionRutas.filter((r) => Array.isArray(r.puntos) && r.puntos.length > 0).length;
       if (ceDrawStatsPill) {
-        ceDrawStatsPill.textContent = `${cierreCount} pts cierre · ${Math.max(validEvacs, draftEvacs)} salida(s)`;
+        ceDrawStatsPill.textContent = `${cierreCount} vértices · ${Math.max(validEvacs, draftEvacs)} salida(s)`;
       }
       if (ceDrawPlaceLabel) {
-        if (cierreCount > 0) {
-          const cent = computePointsCentroid(cierreDrawState.cierrePuntos);
-          const sectorLabel = formatGeoPlaceText(cent.lat, cent.lng, 'full');
+        const activePts = getActiveCierreVectorPoints() || [];
+        const targetPts = activePts.length > 0 ? activePts : cierreDrawState.cierrePuntos;
+        const sectorHint = targetPts.length > 0
+          ? formatGeoPlaceText(computePointsCentroid(targetPts).lat, computePointsCentroid(targetPts).lng, 'full', '', { allowRemote: false })
+          : '';
+        if (cierreDrawState.toolMode === 'move') {
+          ceDrawPlaceLabel.textContent = targetPts.length > 0
+            ? `✋ Arrastra el mapa o el ícono ✥ para mover todo el vector · ${sectorHint}`
+            : '✋ Primero coloca vértices con "📐 Trazar" para luego mover el vector';
+        } else if (cierreDrawState.toolMode === 'pan') {
+          ceDrawPlaceLabel.textContent = '🗺️ Desplaza el mapa libremente o arrastra cualquier vértice ●';
+        } else if (targetPts.length > 0) {
           ceDrawPlaceLabel.textContent = cierreDrawState.drawTarget === 'cierre'
-            ? `🔴 Trazando cierre (${cierreDrawState.cierreModo}) · ${sectorLabel}`
-            : `🟢 Trazando evacuación/paso #${Math.max(1, cierreDrawState.activeEvacIndex + 1)} · ${sectorLabel}`;
+            ? `🔴 Encadenando desde punta #${targetPts.length} (${cierreDrawState.cierreModo}) · ${sectorHint}`
+            : `🟢 Encadenando Salida #${Math.max(1, cierreDrawState.activeEvacIndex + 1)} desde punta #${targetPts.length} · ${sectorHint}`;
         } else {
           ceDrawPlaceLabel.textContent = cierreDrawState.drawTarget === 'cierre'
-            ? '🔴 Toca o desliza el dedo en el mapa para trazar el cierre'
-            : '🟢 Toca o desliza el dedo para trazar la ruta de evacuación/paso';
+            ? '🔴 Toca o extiende con el dedo para encadenar vectores rectos'
+            : '🟢 Toca o extiende para encadenar vectores de evacuación/paso';
         }
       }
       if (ceGeometrySummaryBadge) {
         if (cierreCount < 2) {
-          ceGeometrySummaryBadge.innerHTML = 'Sin trazado válido aún · Dibuja al menos 2 puntos del cierre (<strong>rojo</strong>) y las rutas de salida (<strong>verde</strong>).';
+          ceGeometrySummaryBadge.innerHTML = 'Sin trazado válido aún · Dibuja al menos 2 vértices del cierre (<strong>rojo</strong>) y las rutas de salida (<strong>verde</strong>).';
           ceGeometrySummaryBadge.style.borderColor = 'rgba(71,85,105,0.7)';
         } else {
           const cent = computePointsCentroid(cierreDrawState.cierrePuntos);
           const sectorHtml = formatGeoPlaceHtml(cent.lat, cent.lng, 'full');
-          ceGeometrySummaryBadge.innerHTML = `🔴 <strong>${cierreCount} pts</strong> (${cierreDrawState.cierreModo}) · 🟢 <strong>${validEvacs} ruta(s) evacuación/paso</strong> · 📍 ${sectorHtml}`;
+          ceGeometrySummaryBadge.innerHTML = `🔴 <strong>${cierreCount} vértices</strong> (${cierreDrawState.cierreModo}) · 🟢 <strong>${validEvacs} ruta(s) evacuación/paso</strong> · 📍 ${sectorHtml}`;
           ceGeometrySummaryBadge.style.borderColor = 'rgba(168,85,247,0.72)';
         }
       }
+      if (cierreDrawState.isDrawing) {
+        syncCierreMapDraggingForTool();
+      }
     }
 
-    function renderCierreDraftPreview() {
+    function addVectorDirectionChevrons(points, colorHex, targetLayer) {
+      if (!Array.isArray(points) || points.length < 2 || !targetLayer) return;
+      for (let i = 0; i < points.length - 1; i += 1) {
+        const a = points[i];
+        const b = points[i + 1];
+        const distM = calcularDistanciaMetros(a.lat, a.lng, b.lat, b.lng);
+        if (distM < 12) continue;
+        const midLat = (Number(a.lat) + Number(b.lat)) / 2;
+        const midLng = (Number(a.lng) + Number(b.lng)) / 2;
+        const angleDeg = (Math.atan2(Number(b.lng) - Number(a.lng), Number(b.lat) - Number(a.lat)) * 180) / Math.PI;
+        L.marker([midLat, midLng], {
+          interactive: false,
+          zIndexOffset: 760,
+          icon: L.divIcon({
+            className: 'custom-pin',
+            html: `<div style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;transform:rotate(${angleDeg.toFixed(1)}deg);pointer-events:none;"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1L14 13L8 10L2 13Z" fill="${colorHex}" stroke="#020617" stroke-width="1.3" stroke-linejoin="round"/></svg></div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          })
+        }).addTo(targetLayer);
+      }
+    }
+
+    function renderEditableVectorHandles(pointsArray, variant, isActiveTrace) {
+      if (!cierreEventoDraftLayer || !Array.isArray(pointsArray) || pointsArray.length === 0) return;
+      if (!isActiveTrace) return;
+
+      pointsArray.forEach((pt, idx) => {
+        const isTip = idx === pointsArray.length - 1;
+        const vertexMarker = L.marker([pt.lat, pt.lng], {
+          draggable: true,
+          zIndexOffset: 880 + idx,
+          icon: L.divIcon({
+            className: 'custom-pin',
+            html: `<div class="cierre-vector-node ${variant}${isTip ? ' tip' : ''}" title="Arrastra para ajustar este vértice">${idx + 1}</div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          })
+        });
+        vertexMarker.on('drag', (ev) => {
+          const ll = ev.target && ev.target.getLatLng ? ev.target.getLatLng() : null;
+          if (!ll) return;
+          pointsArray[idx].lat = Number(ll.lat.toFixed(6));
+          pointsArray[idx].lng = Number(ll.lng.toFixed(6));
+          renderCierreDraftPreview(true);
+        });
+        vertexMarker.on('dragend', (ev) => {
+          const ll = ev.target && ev.target.getLatLng ? ev.target.getLatLng() : null;
+          if (ll) {
+            pointsArray[idx].lat = Number(ll.lat.toFixed(6));
+            pointsArray[idx].lng = Number(ll.lng.toFixed(6));
+          }
+          renderCierreDraftPreview(false);
+          syncCierreDrawDockUI();
+        });
+        vertexMarker.addTo(cierreEventoDraftLayer);
+      });
+
+      if (pointsArray.length >= 2) {
+        const centroid = computePointsCentroid(pointsArray);
+        let dragAnchorLatLng = L.latLng(centroid.lat, centroid.lng);
+        const moveHandle = L.marker([centroid.lat, centroid.lng], {
+          draggable: true,
+          zIndexOffset: 940,
+          icon: L.divIcon({
+            className: 'custom-pin',
+            html: `<div class="cierre-vector-move-handle" title="Arrastra para mover todo este vector sobre las calles">✥</div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+          })
+        });
+        moveHandle.on('dragstart', (ev) => {
+          if (ev.target && ev.target.getLatLng) {
+            dragAnchorLatLng = ev.target.getLatLng();
+          }
+        });
+        moveHandle.on('drag', (ev) => {
+          const ll = ev.target && ev.target.getLatLng ? ev.target.getLatLng() : null;
+          if (!ll || !dragAnchorLatLng) return;
+          const dLat = ll.lat - dragAnchorLatLng.lat;
+          const dLng = ll.lng - dragAnchorLatLng.lng;
+          dragAnchorLatLng = ll;
+          translateCierreVectorPoints(pointsArray, dLat, dLng);
+          renderCierreDraftPreview(true);
+        });
+        moveHandle.on('dragend', () => {
+          renderCierreDraftPreview(false);
+          syncCierreDrawDockUI();
+        });
+        moveHandle.addTo(cierreEventoDraftLayer);
+      }
+    }
+
+    function renderCierreDraftPreview(skipHandles = false) {
       if (!cierreEventoDraftLayer) return;
       cierreEventoDraftLayer.clearLayers();
-      if (cierreDrawState.cierrePuntos.length >= 2) {
-        const latlngs = cierreDrawState.cierrePuntos.map((p) => [p.lat, p.lng]);
+
+      const closurePts = cierreDrawState.cierrePuntos;
+      if (closurePts.length >= 2) {
+        const latlngs = closurePts.map((p) => [p.lat, p.lng]);
         if (cierreDrawState.cierreModo === 'cuadrante' && latlngs.length >= 3) {
-          L.polygon(latlngs, {
+          const poly = L.polygon(latlngs, {
             color: '#ef4444',
             weight: 4,
             opacity: 0.96,
             dashArray: '8, 5',
             fillColor: '#f97316',
             fillOpacity: 0.28,
-            interactive: false
-          }).addTo(cierreEventoDraftLayer);
+            interactive: cierreDrawState.isDrawing && cierreDrawState.drawTarget !== 'cierre'
+          });
+          poly.on('click', () => {
+            if (cierreDrawState.isDrawing) {
+              cierreDrawState.drawTarget = 'cierre';
+              renderCierreDraftPreview();
+              syncCierreDrawDockUI();
+            }
+          });
+          poly.addTo(cierreEventoDraftLayer);
         } else {
           L.polyline(latlngs, {
             color: '#450a0a',
@@ -14264,27 +14628,25 @@
             opacity: 0.5,
             interactive: false
           }).addTo(cierreEventoDraftLayer);
-          L.polyline(latlngs, {
+          const line = L.polyline(latlngs, {
             color: '#ef4444',
             weight: 6,
             opacity: 0.95,
-            dashArray: '10, 6',
-            interactive: false
-          }).addTo(cierreEventoDraftLayer);
+            interactive: cierreDrawState.isDrawing && cierreDrawState.drawTarget !== 'cierre'
+          });
+          line.on('click', () => {
+            if (cierreDrawState.isDrawing) {
+              cierreDrawState.drawTarget = 'cierre';
+              renderCierreDraftPreview();
+              syncCierreDrawDockUI();
+            }
+          });
+          line.addTo(cierreEventoDraftLayer);
+          addVectorDirectionChevrons(closurePts, '#fca5a5', cierreEventoDraftLayer);
         }
-      } else if (cierreDrawState.cierrePuntos.length === 1) {
-        const p0 = cierreDrawState.cierrePuntos[0];
-        L.circleMarker([p0.lat, p0.lng], {
-          radius: 7,
-          color: '#ffffff',
-          weight: 2,
-          fillColor: '#ef4444',
-          fillOpacity: 0.95,
-          interactive: false
-        }).addTo(cierreEventoDraftLayer);
       }
 
-      cierreDrawState.evacuacionRutas.forEach((route) => {
+      cierreDrawState.evacuacionRutas.forEach((route, idx) => {
         const pts = Array.isArray(route && route.puntos) ? route.puntos : [];
         if (pts.length >= 2) {
           const latlngs = pts.map((p) => [p.lat, p.lng]);
@@ -14294,12 +14656,21 @@
             opacity: 0.45,
             interactive: false
           }).addTo(cierreEventoDraftLayer);
-          L.polyline(latlngs, {
+          const evacLine = L.polyline(latlngs, {
             color: '#10b981',
             weight: 5,
-            opacity: 0.95,
-            interactive: false
-          }).addTo(cierreEventoDraftLayer);
+            opacity: 0.96,
+            interactive: cierreDrawState.isDrawing
+          });
+          evacLine.on('click', () => {
+            if (cierreDrawState.isDrawing) {
+              cierreDrawState.drawTarget = 'evac';
+              cierreDrawState.activeEvacIndex = idx;
+              renderCierreDraftPreview();
+              syncCierreDrawDockUI();
+            }
+          });
+          evacLine.addTo(cierreEventoDraftLayer);
           L.polyline(latlngs, {
             color: '#22d3ee',
             weight: 2.2,
@@ -14307,21 +14678,72 @@
             dashArray: '6, 8',
             interactive: false
           }).addTo(cierreEventoDraftLayer);
-        } else if (pts.length === 1) {
-          L.circleMarker([pts[0].lat, pts[0].lng], {
+          addVectorDirectionChevrons(pts, '#6ee7b7', cierreEventoDraftLayer);
+        }
+      });
+
+      // Rubber-band vector preview from last chained tip (or drag head) to active finger aim
+      if (cierreDrawState.isDrawing && cierreDrawState.previewTipLatLng) {
+        const activePts = getActiveCierreVectorPoints();
+        const tail = (activePts && activePts.length >= 1)
+          ? activePts[activePts.length - 1]
+          : (cierreDrawState.pointerMode === 'aim' && cierreDrawState.pointerMoved && cierreDrawState.pointerStartLatLng
+              ? cierreDrawState.pointerStartLatLng
+              : null);
+        if (tail) {
+          const tip = cierreDrawState.previewTipLatLng;
+          const previewColor = cierreDrawState.drawTarget === 'evac' ? '#22d3ee' : '#fb923c';
+          L.polyline(
+            [
+              [tail.lat, tail.lng],
+              [tip.lat, tip.lng]
+            ],
+            {
+              color: previewColor,
+              weight: 4,
+              opacity: 0.95,
+              dashArray: '5, 6',
+              interactive: false
+            }
+          ).addTo(cierreEventoDraftLayer);
+          L.circleMarker([tail.lat, tail.lng], {
+            radius: 5,
+            color: '#ffffff',
+            weight: 2,
+            fillColor: previewColor,
+            fillOpacity: 1,
+            interactive: false
+          }).addTo(cierreEventoDraftLayer);
+          L.circleMarker([tip.lat, tip.lng], {
             radius: 6,
             color: '#ffffff',
             weight: 2,
-            fillColor: '#10b981',
-            fillOpacity: 0.95,
+            fillColor: previewColor,
+            fillOpacity: 1,
             interactive: false
           }).addTo(cierreEventoDraftLayer);
         }
-      });
+      }
+
+      if (!skipHandles && cierreDrawState.isDrawing) {
+        if (cierreDrawState.drawTarget === 'cierre') {
+          renderEditableVectorHandles(cierreDrawState.cierrePuntos, 'cierre', true);
+        } else if (
+          cierreDrawState.activeEvacIndex >= 0 &&
+          cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex]
+        ) {
+          renderEditableVectorHandles(
+            cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex].puntos,
+            'evac',
+            true
+          );
+        }
+      }
     }
 
     function appendCierreDrawPoint(lat, lng, isDrag = false) {
       if (!hasValidatedAdminPermission() || !cierreDrawState.isDrawing) return false;
+      if (isDrag) return false; // Vectores rectos por vértices encadenados (sin puntos libres al arrastrar)
       const latNum = Number(lat);
       const lngNum = Number(lng);
       if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) return false;
@@ -14331,7 +14753,7 @@
         if (pts.length > 0) {
           const last = pts[pts.length - 1];
           const dist = calcularDistanciaMetros(last.lat, last.lng, latNum, lngNum);
-          if (dist < (isDrag ? 18 : 6)) return false;
+          if (dist < 6) return false;
         }
         if (pts.length >= 80) return false;
         pts.push({ lat: Number(latNum.toFixed(6)), lng: Number(lngNum.toFixed(6)) });
@@ -14355,7 +14777,7 @@
         if (pts.length > 0) {
           const last = pts[pts.length - 1];
           const dist = calcularDistanciaMetros(last.lat, last.lng, latNum, lngNum);
-          if (dist < (isDrag ? 18 : 6)) return false;
+          if (dist < 6) return false;
         }
         if (pts.length >= 60) return false;
         pts.push({ lat: Number(latNum.toFixed(6)), lng: Number(lngNum.toFixed(6)) });
@@ -14371,8 +14793,8 @@
         showToast('⛔ Cierre Evento es exclusivo para administradores autorizados.');
         return false;
       }
-      if (typeof window.closeCeposJoystick === 'function' && window.__anthiGetCeposJoystickState && window.__anthiGetCeposJoystickState().activeReportId) {
-        window.closeCeposJoystick(false);
+      if (typeof window.closeCeposRoutePanel === 'function' && window.__anthiGetCeposPanelState && window.__anthiGetCeposPanelState().activeReportId) {
+        window.closeCeposRoutePanel(false);
       }
       if (isReactionMapModeActive && typeof stopReactionMapMode === 'function') {
         stopReactionMapMode(false);
@@ -14381,7 +14803,9 @@
       if (modal) modal.classList.remove('open');
 
       cierreDrawState.isDrawing = true;
+      cierreDrawState.toolMode = 'draw';
       cierreDrawState.drawTarget = target === 'evac' ? 'evac' : 'cierre';
+      cierreDrawState.previewTipLatLng = null;
       if (
         cierreDrawState.drawTarget === 'evac' &&
         (cierreDrawState.activeEvacIndex < 0 ||
@@ -14402,18 +14826,13 @@
         cierreEventoDrawDock.classList.add('visible');
         cierreEventoDrawDock.setAttribute('aria-hidden', 'false');
       }
-      if (map && map.dragging && typeof map.dragging.disable === 'function') {
-        map.dragging.disable();
-      }
-      if (map && typeof map.getContainer === 'function') {
-        map.getContainer().style.cursor = 'crosshair';
-      }
+      syncCierreMapDraggingForTool();
       renderCierreDraftPreview();
       syncCierreDrawDockUI();
       showToast(
         cierreDrawState.drawTarget === 'cierre'
-          ? '🔴 Traza con el dedo o tocando puntos el tramo o cuadrante cerrado.'
-          : '🟢 Traza con el dedo o tocando puntos la ruta de evacuación / paso.'
+          ? '📐 Toca o extiende con el dedo para encadenar vectores de cierre; arrastra vértices ● o ✥ para ajustar.'
+          : '📐 Toca o extiende con el dedo para encadenar vectores de evacuación/paso.'
       );
       return true;
     }
@@ -14421,20 +14840,18 @@
     function exitCierreDrawMode(reopenAdminForm = false) {
       cierreDrawState.isDrawing = false;
       cierreDrawState.drawPointerId = null;
-      if (map && map.dragging && typeof map.dragging.enable === 'function') {
-        map.dragging.enable();
-      }
-      if (map && typeof map.getContainer === 'function') {
-        map.getContainer().style.cursor = '';
-      }
+      cierreDrawState.pointerMode = null;
+      cierreDrawState.previewTipLatLng = null;
+      syncCierreMapDraggingForTool();
       if (cierreEventoDrawDock) {
         cierreEventoDrawDock.classList.remove('visible');
         cierreEventoDrawDock.setAttribute('aria-hidden', 'true');
       }
-      const ceposOpen = typeof window.__anthiGetCeposJoystickState === 'function' && window.__anthiGetCeposJoystickState().activeReportId;
+      const ceposOpen = typeof window.__anthiGetCeposPanelState === 'function' && window.__anthiGetCeposPanelState().activeReportId;
       if (bottomPanelEl && !ceposOpen) {
         bottomPanelEl.style.display = '';
       }
+      renderCierreDraftPreview();
       syncCierreDrawDockUI();
       if (reopenAdminForm && hasValidatedAdminPermission() && typeof openAdminPanelModal === 'function') {
         openAdminPanelModal('control');
@@ -14453,6 +14870,7 @@
       cierreDrawState.cierrePuntos = [];
       cierreDrawState.evacuacionRutas = [];
       cierreDrawState.activeEvacIndex = -1;
+      cierreDrawState.previewTipLatLng = null;
       if (ceTituloInput) ceTituloInput.value = '';
       if (ceMensajeInput) ceMensajeInput.value = '';
       if (ceStartInput) ceStartInput.value = '';
@@ -14508,17 +14926,16 @@
       }
 
       activeBannerCierreId = String(top.id);
-      const placeLabel = top.sector && String(top.sector).trim()
-        ? String(top.sector).trim()
-        : formatGeoPlaceText(top.centerLat, top.centerLng, 'full');
+      const placeLabel = formatGeoPlaceText(top.centerLat, top.centerLng, 'full');
       const evacCount = sanitizeEvacRoutesList(top.evacuacionRutas).length;
       const schedLabel = getCierreScheduleLabel(top, nowMs);
+      const customMsg = String(top.mensaje || '').trim();
 
       if (cierreEventoBannerTitle) {
         cierreEventoBannerTitle.textContent = `🏟️ ${top.titulo || 'Cierre Evento'} · ${placeLabel}`;
       }
       if (cierreEventoBannerMsg) {
-        cierreEventoBannerMsg.textContent = top.mensaje || 'Observa en el mapa las rutas de cierre (rojo) y evacuación/paso (verde).';
+        cierreEventoBannerMsg.textContent = customMsg || `Cierre programado en ${placeLabel}. Observa las vías cerradas (rojo) y rutas de evacuación/paso (verde).`;
       }
       if (cierreEventoBannerMeta) {
         cierreEventoBannerMeta.innerHTML = `
@@ -14548,6 +14965,7 @@
           : computePointsCentroid(cierrePts);
         const placeHtml = formatGeoPlaceHtml(center.lat, center.lng, 'full');
         const schedLabel = getCierreScheduleLabel(ev, nowMs);
+        const customMsg = String(ev.mensaje || '').trim();
 
         const popupHtml = `
           <div class="popup-card">
@@ -14558,17 +14976,15 @@
               <span class="cierre-legend-pill nosonar">${escapeHtml(schedLabel)}</span>
               <span class="cierre-legend-pill nosonar">🔕 Sin sónar</span>
             </div>
-            <div style="font-size:12px;color:#f8fafc;line-height:1.4;margin-bottom:6px;">
-              ${escapeHtml(ev.mensaje || '')}
-            </div>
+            ${customMsg ? `<div style="font-size:12px;color:#f8fafc;line-height:1.4;margin-bottom:6px;">${escapeHtml(customMsg)}</div>` : ''}
             <div class="cierre-legend-row" style="margin-bottom:6px;">
               <span class="cierre-legend-pill cierre">🔴 ${isCuadrante ? 'Cuadrante cerrado' : 'Tramo cerrado'}</span>
-              <span class="cierre-legend-pill evac">🟢 ${evacRoutes.length} ruta(s) evacuación/paso</span>
+              <span class="cierre-legend-pill evac">🟢 ${evacCountLabel(evacRoutes.length)}</span>
             </div>
             <div class="popup-meta">📍 ${placeHtml}</div>
             ${hasValidatedAdminPermission() ? `
               <div class="popup-admin-bar" style="margin-top:8px;">
-                <button type="button" class="popup-vote-btn edit" onclick="window.startEditCierreEvento('${escapeHtml(ev.id)}')">✏️ Editar Cierre Evento (Admin)</button>
+                <button type="button" class="popup-vote-btn edit" onclick="window.startEditCierreEvento('${escapeHtml(ev.id)}')">✏️ Editar Vectores (Admin)</button>
                 <button type="button" class="popup-vote-btn delete" onclick="window.deleteCierreEvento('${escapeHtml(ev.id)}')">🗑️ Eliminar Cierre Evento (Admin)</button>
               </div>
             ` : ''}
@@ -14602,6 +15018,7 @@
             });
             line.bindPopup(popupHtml);
             line.addTo(cierreEventosLayer);
+            addVectorDirectionChevrons(cierrePts, '#fca5a5', cierreEventosLayer);
           }
         }
 
@@ -14633,6 +15050,7 @@
             dashArray: '6, 9',
             interactive: false
           }).addTo(cierreEventosLayer);
+          addVectorDirectionChevrons(route.puntos, '#6ee7b7', cierreEventosLayer);
 
           const midPt = route.puntos[Math.floor(route.puntos.length / 2)];
           if (midPt) {
@@ -14678,6 +15096,10 @@
       });
 
       renderCierreEventoBanner(visibleEvents);
+    }
+
+    function evacCountLabel(count) {
+      return `${Number(count || 0)} ruta(s) evacuación/paso`;
     }
 
     function renderAdminCierresEventoList() {
@@ -14740,7 +15162,7 @@
         const editBtn = document.createElement('button');
         editBtn.type = 'button';
         editBtn.textContent = '✏️';
-        editBtn.title = 'Editar cierre y rutas';
+        editBtn.title = 'Editar vectores, mensaje y horario';
         editBtn.style.cssText = 'border:1px solid rgba(56,189,248,0.5);background:rgba(14,165,233,0.18);color:#bae6fd;border-radius:7px;padding:4px 7px;font-size:11px;cursor:pointer;';
         editBtn.addEventListener('click', () => {
           window.startEditCierreEvento(ev.id);
@@ -14775,8 +15197,26 @@
     window.__anthiRefreshCierresEventoUI = refreshCierresEventoUI;
     window.__anthiIsCierreEventoTipo = isCierreEventoTipo;
     window.__anthiIsCierreEventoVisible = isCierreEventoVisibleToDrivers;
-    window.__anthiIsCierreDrawing = () => Boolean(cierreDrawState.isDrawing);
+    window.__anthiIsCierreDrawing = () => Boolean(cierreDrawState.isDrawing && cierreDrawState.toolMode === 'draw');
+    window.__anthiShouldCierreClickAdd = () => (Date.now() - cierreDrawState.lastPointerHandledAt) > 350;
     window.__anthiAppendCierreDrawPoint = appendCierreDrawPoint;
+    window.__anthiTranslateCierreVector = (dLat, dLng) => {
+      const pts = getActiveCierreVectorPoints();
+      const ok = translateCierreVectorPoints(pts, dLat, dLng);
+      if (ok) {
+        renderCierreDraftPreview();
+        syncCierreDrawDockUI();
+      }
+      return ok;
+    };
+    window.__anthiGetCierreDrawState = () => ({
+      ...cierreDrawState,
+      cierrePuntos: cierreDrawState.cierrePuntos.map((p) => ({ ...p })),
+      evacuacionRutas: cierreDrawState.evacuacionRutas.map((r) => ({
+        ...r,
+        puntos: (r.puntos || []).map((p) => ({ ...p }))
+      }))
+    });
     window.__anthiExitCierreDrawMode = exitCierreDrawMode;
     window.__anthiFocusCierreEventoById = (eventoId) => {
       const target = (allCierresEvento || []).find((e) => String(e.id) === String(eventoId));
@@ -14934,6 +15374,26 @@
       });
     });
 
+    if (btnCeToolDraw) {
+      btnCeToolDraw.addEventListener('click', () => {
+        cierreDrawState.toolMode = 'draw';
+        syncCierreDrawDockUI();
+      });
+    }
+    if (btnCeToolMove) {
+      btnCeToolMove.addEventListener('click', () => {
+        cierreDrawState.toolMode = 'move';
+        syncCierreDrawDockUI();
+        showToast('✋ Arrastra sobre el mapa o usa el botón ✥ para mover el vector entero.');
+      });
+    }
+    if (btnCeToolPan) {
+      btnCeToolPan.addEventListener('click', () => {
+        cierreDrawState.toolMode = 'pan';
+        syncCierreDrawDockUI();
+      });
+    }
+
     if (btnCeTraceClosure) {
       btnCeTraceClosure.addEventListener('click', () => enterCierreDrawMode('cierre'));
     }
@@ -14943,25 +15403,23 @@
     if (btnCeDrawModeCierre) {
       btnCeDrawModeCierre.addEventListener('click', () => {
         cierreDrawState.drawTarget = 'cierre';
+        renderCierreDraftPreview();
         syncCierreDrawDockUI();
       });
     }
     if (btnCeDrawModeEvac) {
       btnCeDrawModeEvac.addEventListener('click', () => {
         cierreDrawState.drawTarget = 'evac';
-        if (
-          cierreDrawState.activeEvacIndex < 0 ||
-          (cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex] &&
-            cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex].puntos.length >= 2)
-        ) {
-          if (cierreDrawState.evacuacionRutas.length < 8) {
+        if (cierreDrawState.activeEvacIndex < 0 || !cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex]) {
+          if (cierreDrawState.evacuacionRutas.length === 0) {
             cierreDrawState.evacuacionRutas.push({
-              nombre: `Ruta salida ${cierreDrawState.evacuacionRutas.length + 1}`,
+              nombre: 'Ruta salida 1',
               puntos: []
             });
-            cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
           }
+          cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
         }
+        renderCierreDraftPreview();
         syncCierreDrawDockUI();
       });
     }
@@ -14972,13 +15430,15 @@
           return;
         }
         cierreDrawState.drawTarget = 'evac';
+        cierreDrawState.toolMode = 'draw';
         cierreDrawState.evacuacionRutas.push({
           nombre: `Ruta salida ${cierreDrawState.evacuacionRutas.length + 1}`,
           puntos: []
         });
         cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
+        renderCierreDraftPreview();
         syncCierreDrawDockUI();
-        showToast(`🟢 Traza ahora la Ruta de salida #${cierreDrawState.activeEvacIndex + 1}.`);
+        showToast(`🟢 Toca o extiende para encadenar vectores de Salida #${cierreDrawState.activeEvacIndex + 1}.`);
       });
     }
     if (btnCeDrawUndo) {
@@ -15001,9 +15461,9 @@
       btnCeDrawClear.addEventListener('click', () => {
         if (cierreDrawState.drawTarget === 'cierre') {
           cierreDrawState.cierrePuntos = [];
-        } else {
-          cierreDrawState.evacuacionRutas = [];
-          cierreDrawState.activeEvacIndex = -1;
+        } else if (cierreDrawState.activeEvacIndex >= 0 && cierreDrawState.evacuacionRutas[cierreDrawState.activeEvacIndex]) {
+          cierreDrawState.evacuacionRutas.splice(cierreDrawState.activeEvacIndex, 1);
+          cierreDrawState.activeEvacIndex = cierreDrawState.evacuacionRutas.length - 1;
         }
         renderCierreDraftPreview();
         syncCierreDrawDockUI();
@@ -15053,7 +15513,11 @@
       if (mapElForCierre && typeof mapElForCierre.addEventListener === 'function') {
         const isCierreDrawBlockedTarget = (target) => {
           if (!target || typeof target.closest !== 'function') return false;
-          return Boolean(target.closest('.cierre-draw-dock, .leaflet-popup, .map-controls, .top-bar, .gps-hud, .bottom-panel'));
+          return Boolean(
+            target.closest(
+              '.cierre-draw-dock, .cierre-vector-node, .cierre-vector-move-handle, .leaflet-marker-icon, .leaflet-popup, .map-controls, .top-bar, .gps-hud, .bottom-panel'
+            )
+          );
         };
         const pointerToCierreLatLng = (ev) => {
           const rect = mapElForCierre.getBoundingClientRect();
@@ -15062,15 +15526,33 @@
         };
         mapElForCierre.addEventListener('pointerdown', (ev) => {
           if (!cierreDrawState.isDrawing || !hasValidatedAdminPermission()) return;
+          if (cierreDrawState.toolMode === 'pan') return;
           if (ev.isPrimary === false || isCierreDrawBlockedTarget(ev.target)) return;
           const ll = pointerToCierreLatLng(ev);
           if (!ll) return;
           ev.preventDefault();
           cierreDrawState.drawPointerId = ev.pointerId;
+          cierreDrawState.pointerStartLatLng = ll;
+          cierreDrawState.pointerMoved = false;
           if (typeof mapElForCierre.setPointerCapture === 'function') {
             try { mapElForCierre.setPointerCapture(ev.pointerId); } catch (e) {}
           }
-          appendCierreDrawPoint(ll.lat, ll.lng, false);
+          if (cierreDrawState.toolMode === 'move') {
+            const activePts = getActiveCierreVectorPoints();
+            if (!activePts || activePts.length === 0) {
+              cierreDrawState.pointerMode = null;
+              return;
+            }
+            cierreDrawState.pointerMode = 'moveAll';
+            cierreDrawState.moveBaselinePoints = activePts.map((p) => ({ ...p }));
+          } else {
+            cierreDrawState.pointerMode = 'aim';
+            const activePts = getActiveCierreVectorPoints();
+            if (activePts && activePts.length > 0) {
+              cierreDrawState.previewTipLatLng = { lat: ll.lat, lng: ll.lng };
+              renderCierreDraftPreview(true);
+            }
+          }
         });
         mapElForCierre.addEventListener('pointermove', (ev) => {
           if (!cierreDrawState.isDrawing || cierreDrawState.drawPointerId !== ev.pointerId) return;
@@ -15078,16 +15560,61 @@
           const ll = pointerToCierreLatLng(ev);
           if (!ll) return;
           ev.preventDefault();
-          appendCierreDrawPoint(ll.lat, ll.lng, true);
+          if (
+            cierreDrawState.pointerStartLatLng &&
+            calcularDistanciaMetros(
+              cierreDrawState.pointerStartLatLng.lat,
+              cierreDrawState.pointerStartLatLng.lng,
+              ll.lat,
+              ll.lng
+            ) >= 8
+          ) {
+            cierreDrawState.pointerMoved = true;
+          }
+          if (cierreDrawState.pointerMode === 'moveAll' && cierreDrawState.pointerStartLatLng && cierreDrawState.moveBaselinePoints) {
+            const dLat = ll.lat - cierreDrawState.pointerStartLatLng.lat;
+            const dLng = ll.lng - cierreDrawState.pointerStartLatLng.lng;
+            const activePts = getActiveCierreVectorPoints();
+            if (activePts && activePts.length === cierreDrawState.moveBaselinePoints.length) {
+              for (let i = 0; i < activePts.length; i += 1) {
+                activePts[i].lat = Number(Math.max(-89.9, Math.min(89.9, cierreDrawState.moveBaselinePoints[i].lat + dLat)).toFixed(6));
+                activePts[i].lng = Number(Math.max(-179.9, Math.min(179.9, cierreDrawState.moveBaselinePoints[i].lng + dLng)).toFixed(6));
+              }
+              renderCierreDraftPreview(true);
+            }
+          } else if (cierreDrawState.pointerMode === 'aim') {
+            const activePts = getActiveCierreVectorPoints();
+            if ((activePts && activePts.length > 0) || cierreDrawState.pointerMoved) {
+              cierreDrawState.previewTipLatLng = { lat: ll.lat, lng: ll.lng };
+              renderCierreDraftPreview(true);
+            }
+          }
         });
-        const finishCierreStroke = (ev) => {
+        const finishCierreVectorPointer = (ev) => {
           if (cierreDrawState.drawPointerId !== ev.pointerId) return;
+          const mode = cierreDrawState.pointerMode;
+          const didMove = Boolean(cierreDrawState.pointerMoved);
+          const startLL = cierreDrawState.pointerStartLatLng;
+          const ll = pointerToCierreLatLng(ev) || startLL;
           cierreDrawState.drawPointerId = null;
-          renderCierreDraftPreview();
-          syncCierreDrawDockUI();
+          cierreDrawState.pointerMode = null;
+          cierreDrawState.pointerMoved = false;
+          cierreDrawState.previewTipLatLng = null;
+          cierreDrawState.moveBaselinePoints = null;
+          cierreDrawState.lastPointerHandledAt = Date.now();
+          if (mode === 'aim' && ll) {
+            const activePts = getActiveCierreVectorPoints();
+            if (didMove && startLL && (!activePts || activePts.length === 0)) {
+              appendCierreDrawPoint(startLL.lat, startLL.lng, false);
+            }
+            appendCierreDrawPoint(ll.lat, ll.lng, false);
+          } else {
+            renderCierreDraftPreview(false);
+            syncCierreDrawDockUI();
+          }
         };
-        mapElForCierre.addEventListener('pointerup', finishCierreStroke);
-        mapElForCierre.addEventListener('pointercancel', finishCierreStroke);
+        mapElForCierre.addEventListener('pointerup', finishCierreVectorPointer);
+        mapElForCierre.addEventListener('pointercancel', finishCierreVectorPointer);
       }
     }
 
@@ -15113,13 +15640,9 @@
         if (cierrePuntos.length < (cierreModo === 'cuadrante' ? 3 : 2)) {
           showToast(
             cierreModo === 'cuadrante'
-              ? '🔴 Traza al menos 3 puntos en el mapa para cerrar el cuadrante.'
-              : '🔴 Traza al menos 2 puntos en el mapa para marcar el tramo cerrado.'
+              ? '🔴 Traza al menos 3 vértices en el mapa para cerrar el cuadrante.'
+              : '🔴 Traza al menos 2 vértices en el mapa para marcar el vector de cierre.'
           );
-          return;
-        }
-        if (mensaje.length < 4) {
-          showToast('Escribe un mensaje informativo corto para los conductores.');
           return;
         }
         if (!Number.isFinite(startsAtMs) || !Number.isFinite(endsAtMs) || endsAtMs <= startsAtMs) {
