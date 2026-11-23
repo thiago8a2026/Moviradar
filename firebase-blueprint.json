@@ -88,12 +88,12 @@
         },
         "activacionRapida": {
           "type": "string",
-          "enum": ["normal", "foto", "punto_reaccion", "admin", "vip_fundador", "vip_estandar", "vip_cepos"],
+          "enum": ["normal", "foto", "punto_reaccion", "admin", "vip_fundador", "vip_estandar", "vip_cepos", "vip_m34"],
           "description": "Motivo de activación rápida cuando inicia firme de inmediato."
         },
         "vipNivel": {
           "type": "string",
-          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "enum": ["fundador", "estandar", "rastreo_cepos", "vip_m34"],
           "description": "Nivel VIP activo del autor al momento de publicar (opcional, verificado por reglas)."
         }
       },
@@ -145,7 +145,7 @@
         },
         "vipTipo": {
           "type": "string",
-          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "enum": ["fundador", "estandar", "rastreo_cepos", "vip_m34"],
           "description": "Nivel VIP activo asignado al canjear un código válido."
         },
         "vipActivo": {
@@ -378,7 +378,7 @@
         },
         "tipoVip": {
           "type": "string",
-          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "enum": ["fundador", "estandar", "rastreo_cepos", "vip_m34"],
           "description": "Nivel VIP asignado por este código."
         },
         "activo": {
@@ -443,7 +443,7 @@
         },
         "tipoVip": {
           "type": "string",
-          "enum": ["fundador", "estandar", "rastreo_cepos"],
+          "enum": ["fundador", "estandar", "rastreo_cepos", "vip_m34"],
           "description": "Nivel VIP otorgado por el código."
         },
         "canjeadoAt": {
@@ -504,7 +504,7 @@
         },
         "eliminadoPorRol": {
           "type": "string",
-          "enum": ["admin", "vip_fundador", "vip_estandar", "vip_cepos", "autor"],
+          "enum": ["admin", "vip_fundador", "vip_estandar", "vip_cepos", "vip_m34", "autor"],
           "description": "Rol o nivel VIP verificado de quien eliminó el reporte."
         },
         "eliminadoAt": {
@@ -620,6 +620,163 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "EmergenciaM34": {
+      "title": "Emergencia Gremial M34",
+      "description": "Alerta gremial de auxilio en tiempo real (taxis y particulares) con seguimiento GPS en vivo, múltiples eventos y confirmación fotográfica de cierre.",
+      "type": "object",
+      "properties": {
+        "estado": {
+          "type": "string",
+          "enum": ["ACTIVA", "FINALIZADA"],
+          "description": "Estado de la emergencia M34."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID de Firebase Auth del compañero que activó la alerta M34.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "apodo": {
+          "type": "string",
+          "description": "Indicativo o apodo visible del compañero (sin correo ni teléfono).",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "tipoVehiculo": {
+          "type": "string",
+          "enum": ["taxi", "particular", "moto", "camioneta"],
+          "description": "Tipo de vehículo del compañero en emergencia."
+        },
+        "lat": {
+          "type": "number",
+          "description": "Latitud GPS en tiempo real del evento M34."
+        },
+        "lng": {
+          "type": "number",
+          "description": "Longitud GPS en tiempo real del evento M34."
+        },
+        "sector": {
+          "type": "string",
+          "description": "Barrio y punto de referencia cercano legible (sin coordenadas crudas).",
+          "maxLength": 160
+        },
+        "nota": {
+          "type": "string",
+          "description": "Detalle corto opcional del auxilio.",
+          "maxLength": 240
+        },
+        "fotoCierre": {
+          "type": "string",
+          "description": "Foto de verificación comprimida en JPEG Base64 al finalizar la emergencia (opcional o null).",
+          "maxLength": 450000
+        },
+        "finalizadoPorUid": {
+          "type": "string",
+          "description": "UID del compañero o administrador que confirmó 'Todo está bien'.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "finalizadoPorApodo": {
+          "type": "string",
+          "description": "Apodo de quien finalizó el evento M34.",
+          "maxLength": 32
+        },
+        "finalizadoAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora del servidor al finalizar el evento."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora del servidor al activar la emergencia."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora de última actualización GPS o cierre."
+        }
+      },
+      "required": [
+        "estado",
+        "authorId",
+        "apodo",
+        "tipoVehiculo",
+        "lat",
+        "lng",
+        "sector",
+        "nota",
+        "fotoCierre",
+        "finalizadoPorUid",
+        "finalizadoPorApodo",
+        "finalizadoAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ApoyoM34": {
+      "title": "Compañero en Apoyo M34 (Yo Voy)",
+      "description": "Registro en vivo de un compañero que acude en apoyo ('Yo Voy') a un evento M34 activo con detección automática de llegada.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "UID de Firebase Auth del compañero que responde.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "apodo": {
+          "type": "string",
+          "description": "Indicativo o apodo del compañero en apoyo.",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "tipoVehiculo": {
+          "type": "string",
+          "enum": ["taxi", "particular", "moto", "camioneta"],
+          "description": "Tipo de vehículo del compañero que acude."
+        },
+        "lat": {
+          "type": "number",
+          "description": "Latitud GPS en vivo del compañero en apoyo."
+        },
+        "lng": {
+          "type": "number",
+          "description": "Longitud GPS en vivo del compañero en apoyo."
+        },
+        "sector": {
+          "type": "string",
+          "description": "Barrio y punto de referencia cercano legible.",
+          "maxLength": 160
+        },
+        "estadoApoyo": {
+          "type": "string",
+          "enum": ["EN_CAMINO", "EN_SITIO"],
+          "description": "Estado del desplazamiento o llegada automática al sitio."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Hora de inicio de apoyo asignada por servidor."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Última actualización GPS asignada por servidor."
+        }
+      },
+      "required": [
+        "uid",
+        "apodo",
+        "tipoVehiculo",
+        "lat",
+        "lng",
+        "sector",
+        "estadoApoyo",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -674,6 +831,14 @@
     "/cierres_evento/{eventoId}": {
       "schema": { "$ref": "#/entities/CierreEvento" },
       "description": "Cierres por eventos deportivos o cívicos con rutas de evacuación y horario configurable (solo Admin)."
+    },
+    "/emergencias_m34/{eventoId}": {
+      "schema": { "$ref": "#/entities/EmergenciaM34" },
+      "description": "Eventos activos y finalizados del módulo de emergencia gremial M34 con GPS en tiempo real (restringido a VIP M34 y Administradores)."
+    },
+    "/emergencias_m34/{eventoId}/apoyos/{userId}": {
+      "schema": { "$ref": "#/entities/ApoyoM34" },
+      "description": "Compañeros VIP M34 / Administradores vinculados mediante 'Yo Voy' con seguimiento en tiempo real y llegada automática."
     }
   }
 }

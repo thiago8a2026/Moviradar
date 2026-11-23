@@ -37,7 +37,7 @@ service cloud.firestore {
     }
 
     function isValidVipTipo(t) {
-      return t == 'fundador' || t == 'estandar' || t == 'rastreo_cepos';
+      return t == 'fundador' || t == 'estandar' || t == 'rastreo_cepos' || t == 'vip_m34';
     }
 
     function hasUserDoc() {
@@ -56,12 +56,16 @@ service cloud.firestore {
         && (
           userData().vipTipo == 'fundador' ||
           (
-            (userData().vipTipo == 'estandar' || userData().vipTipo == 'rastreo_cepos') &&
+            (userData().vipTipo == 'estandar' || userData().vipTipo == 'rastreo_cepos' || userData().vipTipo == 'vip_m34') &&
             'vipExpiraAt' in userData() &&
             userData().vipExpiraAt is timestamp &&
             userData().vipExpiraAt > request.time
           )
         );
+    }
+
+    function isVipM34OrAdmin() {
+      return isAdmin() || (isActiveVip() && userData().vipTipo == 'vip_m34');
     }
 
     function isValidReporte(data) {
@@ -104,7 +108,8 @@ service cloud.firestore {
           data.activacionRapida == 'admin' ||
           data.activacionRapida == 'vip_fundador' ||
           data.activacionRapida == 'vip_estandar' ||
-          data.activacionRapida == 'vip_cepos'
+          data.activacionRapida == 'vip_cepos' ||
+          data.activacionRapida == 'vip_m34'
         ))
         && (!('radioMetros' in data) || data.radioMetros == null || (data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 100))
         && (!('vipNivel' in data) || data.vipNivel == null || isValidVipTipo(data.vipNivel));
@@ -145,7 +150,7 @@ service cloud.firestore {
         && data.usosActuales is int && data.usosActuales >= 0 && data.usosActuales <= data.maxUsos
         && (
           (data.tipoVip == 'fundador' && data.expiraAt == null) ||
-          ((data.tipoVip == 'estandar' || data.tipoVip == 'rastreo_cepos') && data.expiraAt is timestamp)
+          ((data.tipoVip == 'estandar' || data.tipoVip == 'rastreo_cepos' || data.tipoVip == 'vip_m34') && data.expiraAt is timestamp)
         )
         && (!('nota' in data) || (data.nota is string && data.nota.size() <= 120))
         && data.createdBy is string && isValidId(data.createdBy)
@@ -184,6 +189,7 @@ service cloud.firestore {
           data.eliminadoPorRol == 'vip_fundador' ||
           data.eliminadoPorRol == 'vip_estandar' ||
           data.eliminadoPorRol == 'vip_cepos' ||
+          data.eliminadoPorRol == 'vip_m34' ||
           data.eliminadoPorRol == 'autor'
         )
         && data.eliminadoAt is timestamp;
@@ -260,6 +266,90 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    function isValidCierreEvento(data) {
+      return data.keys().hasAll([
+          'titulo', 'sector', 'mensaje', 'cierreModo', 'cierrePuntos',
+          'evacuacionRutas', 'centerLat', 'centerLng', 'startsAtMs', 'endsAtMs',
+          'activo', 'sinSonar', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'titulo', 'sector', 'mensaje', 'cierreModo', 'cierrePuntos',
+          'evacuacionRutas', 'centerLat', 'centerLng', 'startsAtMs', 'endsAtMs',
+          'activo', 'sinSonar', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.titulo is string && data.titulo.size() >= 2 && data.titulo.size() <= 80
+        && data.sector is string && data.sector.size() <= 120
+        && data.mensaje is string && data.mensaje.size() <= 320
+        && (data.cierreModo == 'tramo' || data.cierreModo == 'cuadrante')
+        && data.cierrePuntos is list
+        && data.cierrePuntos.size() >= 2
+        && data.cierrePuntos.size() <= 80
+        && data.cierrePuntos[0] is map
+        && data.evacuacionRutas is list
+        && data.evacuacionRutas.size() <= 8
+        && (data.evacuacionRutas.size() == 0 || data.evacuacionRutas[0] is map)
+        && data.centerLat is number && data.centerLat >= -90 && data.centerLat <= 90
+        && data.centerLng is number && data.centerLng >= -180 && data.centerLng <= 180
+        && data.startsAtMs is int && data.startsAtMs > 0
+        && data.endsAtMs is int && data.endsAtMs > data.startsAtMs
+        && data.activo is bool
+        && data.sinSonar == true
+        && data.createdBy is string && isValidId(data.createdBy)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTipoVehiculo(v) {
+      return v == 'taxi' || v == 'particular' || v == 'moto' || v == 'camioneta';
+    }
+
+    function isValidEmergenciaM34(data) {
+      return data.keys().hasAll([
+          'estado', 'authorId', 'apodo', 'tipoVehiculo', 'lat', 'lng',
+          'sector', 'nota', 'fotoCierre', 'finalizadoPorUid',
+          'finalizadoPorApodo', 'finalizadoAt', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'estado', 'authorId', 'apodo', 'tipoVehiculo', 'lat', 'lng',
+          'sector', 'nota', 'fotoCierre', 'finalizadoPorUid',
+          'finalizadoPorApodo', 'finalizadoAt', 'createdAt', 'updatedAt'
+        ])
+        && (data.estado == 'ACTIVA' || data.estado == 'FINALIZADA')
+        && data.authorId is string && isValidId(data.authorId)
+        && data.apodo is string && data.apodo.size() >= 1 && data.apodo.size() <= 32
+        && data.tipoVehiculo is string && isValidTipoVehiculo(data.tipoVehiculo)
+        && data.lat is number && data.lat >= -90 && data.lat <= 90
+        && data.lng is number && data.lng >= -180 && data.lng <= 180
+        && data.sector is string && data.sector.size() <= 160
+        && data.nota is string && data.nota.size() <= 240
+        && (data.fotoCierre == null || (data.fotoCierre is string && data.fotoCierre.size() <= 450000))
+        && (data.finalizadoPorUid == null || (data.finalizadoPorUid is string && isValidId(data.finalizadoPorUid)))
+        && (data.finalizadoPorApodo == null || (data.finalizadoPorApodo is string && data.finalizadoPorApodo.size() <= 32))
+        && (data.finalizadoAt == null || data.finalizadoAt is timestamp)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidApoyoM34(data) {
+      return data.keys().hasAll([
+          'uid', 'apodo', 'tipoVehiculo', 'lat', 'lng', 'sector',
+          'estadoApoyo', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'apodo', 'tipoVehiculo', 'lat', 'lng', 'sector',
+          'estadoApoyo', 'createdAt', 'updatedAt'
+        ])
+        && data.uid is string && isValidId(data.uid)
+        && data.apodo is string && data.apodo.size() >= 1 && data.apodo.size() <= 32
+        && data.tipoVehiculo is string && isValidTipoVehiculo(data.tipoVehiculo)
+        && data.lat is number && data.lat >= -90 && data.lat <= 90
+        && data.lng is number && data.lng >= -180 && data.lng <= 180
+        && data.sector is string && data.sector.size() <= 160
+        && (data.estadoApoyo == 'EN_CAMINO' || data.estadoApoyo == 'EN_SITIO')
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
     match /reportes/{reportId} {
       // Road alerts contain zero PII and are public for drivers viewing the map (bounded to <= 200 docs per query)
       allow get: if isValidId(reportId);
@@ -288,13 +378,15 @@ service cloud.firestore {
           (incoming().activacionRapida == 'admin' && isAdmin()) ||
           (incoming().activacionRapida == 'vip_fundador' && isActiveVip() && userData().vipTipo == 'fundador') ||
           (incoming().activacionRapida == 'vip_estandar' && isActiveVip() && userData().vipTipo == 'estandar') ||
-          (incoming().activacionRapida == 'vip_cepos' && isActiveVip() && userData().vipTipo == 'rastreo_cepos')
+          (incoming().activacionRapida == 'vip_cepos' && isActiveVip() && userData().vipTipo == 'rastreo_cepos') ||
+          (incoming().activacionRapida == 'vip_m34' && isActiveVip() && userData().vipTipo == 'vip_m34')
         ))
         && (!('confirmadoPor' in incoming()) || (
           incoming().confirmadoPor.size() == 1
           && incoming().confirmadoPor[0] == request.auth.uid
         ))
         && (!('expiresAt' in incoming()) || incoming().expiresAt <= request.time + duration.value(12, 'h'))
+        && (incoming().tipo != 'Cierre Evento' || isAdmin())
         && (incoming().isFixed == false || isAdmin());
 
       allow update: if isSignedIn()
@@ -393,7 +485,8 @@ service cloud.firestore {
             && (
               (incoming().eliminadoPorRol == 'vip_fundador' && userData().vipTipo == 'fundador') ||
               (incoming().eliminadoPorRol == 'vip_estandar' && userData().vipTipo == 'estandar') ||
-              (incoming().eliminadoPorRol == 'vip_cepos' && userData().vipTipo == 'rastreo_cepos')
+              (incoming().eliminadoPorRol == 'vip_cepos' && userData().vipTipo == 'rastreo_cepos') ||
+              (incoming().eliminadoPorRol == 'vip_m34' && userData().vipTipo == 'vip_m34')
             )
           )
         );
@@ -480,7 +573,7 @@ service cloud.firestore {
             && (
               (incoming().vipTipo == 'fundador' && incoming().vipExpiraAt == null) ||
               (
-                (incoming().vipTipo == 'estandar' || incoming().vipTipo == 'rastreo_cepos')
+                (incoming().vipTipo == 'estandar' || incoming().vipTipo == 'rastreo_cepos' || incoming().vipTipo == 'vip_m34')
                 && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt is timestamp
                 && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt > request.time
                 && incoming().vipExpiraAt == get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt
@@ -644,6 +737,116 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/codigos_vip/$(codeId)).data.usosActuales == get(/databases/$(database)/documents/codigos_vip/$(codeId)).data.usosActuales + 1;
         allow update: if false;
         allow delete: if isAdmin() && isValidId(codeId) && isValidId(userId);
+      }
+    }
+
+    match /cierres_evento/{eventoId} {
+      // Zero-PII public road closure & evacuation geometry for drivers; creation, tracing, schedule & deletion strictly restricted to Admins
+      allow get: if isValidId(eventoId);
+      allow list: if request.query.limit != null && request.query.limit <= 50;
+      allow create: if isAdmin()
+        && isValidId(eventoId)
+        && isValidCierreEvento(incoming())
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(eventoId)
+        && isValidCierreEvento(incoming())
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'titulo', 'sector', 'mensaje', 'cierreModo', 'cierrePuntos',
+          'evacuacionRutas', 'centerLat', 'centerLng', 'startsAtMs', 'endsAtMs',
+          'activo', 'sinSonar', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(eventoId);
+    }
+
+    match /emergencias_m34/{eventoId} {
+      // Guild emergency beacons restricted strictly to active VIP M34 users and verified Admins (zero PII: apodo only)
+      allow get: if isVipM34OrAdmin() && isValidId(eventoId);
+      allow list: if isVipM34OrAdmin() && request.query.limit != null && request.query.limit <= 50;
+
+      allow create: if isVipM34OrAdmin()
+        && isValidId(eventoId)
+        && isValidEmergenciaM34(incoming())
+        && incoming().estado == 'ACTIVA'
+        && incoming().authorId == request.auth.uid
+        && incoming().fotoCierre == null
+        && incoming().finalizadoPorUid == null
+        && incoming().finalizadoPorApodo == null
+        && incoming().finalizadoAt == null
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isVipM34OrAdmin()
+        && isValidId(eventoId)
+        && isValidEmergenciaM34(incoming())
+        && incoming().authorId == existing().authorId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && existing().estado == 'ACTIVA'
+        && (
+          (
+            existing().authorId == request.auth.uid
+            && incoming().estado == 'ACTIVA'
+            && incoming().diff(existing()).affectedKeys().hasOnly(['lat', 'lng', 'sector', 'updatedAt'])
+          ) ||
+          (
+            incoming().estado == 'FINALIZADA'
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'estado', 'fotoCierre', 'finalizadoPorUid', 'finalizadoPorApodo', 'finalizadoAt', 'updatedAt'
+            ])
+            && incoming().finalizadoPorUid == request.auth.uid
+            && incoming().finalizadoPorApodo is string
+            && incoming().finalizadoPorApodo.size() >= 1
+            && incoming().finalizadoAt == request.time
+            && (
+              existing().authorId == request.auth.uid ||
+              exists(/databases/$(database)/documents/emergencias_m34/$(eventoId)/apoyos/$(request.auth.uid)) ||
+              existsAfter(/databases/$(database)/documents/emergencias_m34/$(eventoId)/apoyos/$(request.auth.uid)) ||
+              isAdmin()
+            )
+          )
+        );
+
+      allow delete: if isAdmin() && isValidId(eventoId);
+
+      match /apoyos/{userId} {
+        allow get: if isVipM34OrAdmin() && isValidId(eventoId) && isValidId(userId);
+        allow list: if isVipM34OrAdmin() && request.query.limit != null && request.query.limit <= 100;
+
+        allow create: if isVipM34OrAdmin()
+          && isValidId(eventoId)
+          && isValidId(userId)
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/emergencias_m34/$(eventoId))
+          && get(/databases/$(database)/documents/emergencias_m34/$(eventoId)).data.estado == 'ACTIVA'
+          && isValidApoyoM34(incoming())
+          && incoming().uid == request.auth.uid
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+
+        allow update: if isVipM34OrAdmin()
+          && isValidId(eventoId)
+          && isValidId(userId)
+          && request.auth.uid == userId
+          && exists(/databases/$(database)/documents/emergencias_m34/$(eventoId))
+          && get(/databases/$(database)/documents/emergencias_m34/$(eventoId)).data.estado == 'ACTIVA'
+          && isValidApoyoM34(incoming())
+          && incoming().uid == existing().uid
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'apodo', 'tipoVehiculo', 'lat', 'lng', 'sector', 'estadoApoyo', 'updatedAt'
+          ]);
+
+        allow delete: if isVipM34OrAdmin()
+          && isValidId(eventoId)
+          && isValidId(userId)
+          && (request.auth.uid == userId || isAdmin());
       }
     }
   }

@@ -23,3 +23,12 @@
 10. Modifying `authorId` or `lat`/`lng` during an update.
 11. Vote manipulation (`confirmations` jumped by `+100` instead of `+1`).
 12. Unauthorized deletion of another user's report by a non-admin.
+
+## 3. Módulo de Emergencia Gremial M34 Invariants (`/emergencias_m34` y `/apoyos`)
+1. Access to `/emergencias_m34` and `/apoyos` (`get`, `list`, `create`, `update`, `delete`) is strictly restricted to verified Admins (`isAdmin()`) and active `vip_m34` users (`isVipM34OrAdmin()`).
+2. Every document in `/emergencias_m34/{eventoId}` must have a valid `eventoId` (`isValidId`) and zero PII (only `apodo` indicativo, never email/phone).
+3. On create: `estado == 'ACTIVA'`, `authorId == request.auth.uid`, `fotoCierre == null`, `finalizadoPorUid == null`, `finalizadoAt == null`, `createdAt == request.time`, `updatedAt == request.time`.
+4. Live GPS updates (`lat`, `lng`, `sector`, `updatedAt`) while `estado == 'ACTIVA'` are strictly restricted to `existing().authorId == request.auth.uid`.
+5. Terminal state locking: once `estado == 'FINALIZADA'`, further non-admin mutations are denied. Finalization (`estado: 'FINALIZADA'`) is allowed only for the event creator, a responder who linked via `/apoyos/{uid}`, or an authorized admin, with compressed `fotoCierre` bounded `<= 450000` chars.
+6. Responder tracking `/emergencias_m34/{eventoId}/apoyos/{userId}` enforces Master Gate (`parent.estado == 'ACTIVA'`), self-only `request.auth.uid == userId`, bounded `list <= 100`, and valid `estadoApoyo` (`EN_CAMINO` | `EN_SITIO`).
+

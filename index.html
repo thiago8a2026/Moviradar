@@ -3337,6 +3337,395 @@
       color: #cbd5e1;
       line-height: 1.38;
     }
+
+    /* =====================================================================
+       MÓDULO DE EMERGENCIA GREMIAL M34 (BOTÓN SEGURO, BANNER DANGER Y MODAL)
+       ===================================================================== */
+    @keyframes anthiM34Pulse {
+      0% {
+        transform: scale(0.92);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.88), 0 0 18px rgba(220, 38, 38, 0.72);
+      }
+      65% {
+        transform: scale(1.08);
+        box-shadow: 0 0 0 18px rgba(239, 68, 68, 0), 0 0 26px rgba(239, 68, 68, 0.92);
+      }
+      100% {
+        transform: scale(0.92);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 0 16px rgba(220, 38, 38, 0.68);
+      }
+    }
+
+    @keyframes anthiM34BannerGlow {
+      0%, 100% {
+        border-color: #ef4444;
+        box-shadow: 0 10px 28px rgba(185, 28, 28, 0.55), 0 0 0 1px rgba(254, 202, 202, 0.35);
+      }
+      50% {
+        border-color: #fca5a5;
+        box-shadow: 0 12px 34px rgba(239, 68, 68, 0.8), 0 0 0 2px rgba(248, 113, 113, 0.55);
+      }
+    }
+
+    .m34-trigger-row {
+      pointer-events: none;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .m34-sos-btn {
+      pointer-events: auto;
+      position: relative;
+      overflow: hidden;
+      min-height: 46px;
+      min-width: 104px;
+      padding: 6px 13px;
+      border-radius: 15px;
+      border: 1.5px solid rgba(254, 202, 202, 0.85);
+      background: linear-gradient(135deg, #991b1b, #dc2626);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(185, 28, 28, 0.55);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: transform 0.12s ease, box-shadow 0.15s ease;
+    }
+
+    .m34-sos-btn:active {
+      transform: scale(0.96);
+    }
+
+    .m34-sos-btn.has-active {
+      animation: anthiM34BannerGlow 1.5s ease-in-out infinite;
+    }
+
+    .m34-sos-btn.is-creator-active {
+      background: linear-gradient(135deg, #b91c1c, #ef4444);
+      border-color: #fef08a;
+    }
+
+    .m34-hold-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(254, 240, 138, 0.35), rgba(255, 255, 255, 0.45));
+      pointer-events: none;
+      transition: width 0.05s linear;
+    }
+
+    .m34-sos-btn-content {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .m34-sos-sub {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 6px;
+      background: rgba(2, 6, 23, 0.58);
+      color: #fef08a;
+      letter-spacing: 0.02em;
+    }
+
+    .m34-danger-banner {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      background: linear-gradient(135deg, rgba(69, 10, 10, 0.97), rgba(127, 29, 29, 0.96));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid #ef4444;
+      border-radius: 15px;
+      padding: 9px 11px;
+      display: none;
+      flex-direction: column;
+      gap: 7px;
+      animation: anthiM34BannerGlow 1.7s ease-in-out infinite;
+    }
+
+    .m34-danger-banner.visible {
+      display: flex;
+    }
+
+    .m34-danger-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .m34-danger-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #dc2626;
+      border: 1px solid #fecaca;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .m34-danger-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fef08a;
+      animation: anthiCeposBeaconPulse 1s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .m34-event-tabs {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .m34-event-tab {
+      border: 1px solid rgba(254, 202, 202, 0.45);
+      background: rgba(2, 6, 23, 0.55);
+      color: #fee2e2;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .m34-event-tab.active {
+      background: #fef08a;
+      border-color: #ffffff;
+      color: #450a0a;
+    }
+
+    .m34-danger-info {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fef2f2;
+      line-height: 1.35;
+      cursor: pointer;
+    }
+
+    .m34-danger-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .m34-action-btn {
+      min-height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      background: rgba(2, 6, 23, 0.72);
+      color: #ffffff;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex: 1 1 auto;
+      touch-action: manipulation;
+    }
+
+    .m34-action-btn.yovoy {
+      background: linear-gradient(135deg, #059669, #10b981);
+      border-color: #a7f3d0;
+      color: #022c22;
+    }
+
+    .m34-action-btn.yovoy.active {
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      border-color: #bae6fd;
+      color: #082f49;
+    }
+
+    .m34-action-btn.ok {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      border-color: #dcfce7;
+      color: #052e16;
+    }
+
+    .m34-marker-beacon {
+      position: relative;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .m34-marker-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.32);
+      border: 2.5px solid #ef4444;
+      animation: anthiM34Pulse 1.3s ease-out infinite;
+    }
+
+    .m34-marker-core {
+      position: relative;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #b91c1c, #ef4444);
+      border: 2.5px solid #ffffff;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.72);
+    }
+
+    .m34-marker-tag {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: #991b1b;
+      color: #fef08a;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      padding: 1px 5px;
+      font-size: 9px;
+      font-weight: 900;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+    }
+
+    .m34-responder-beacon {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      border: 2.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+      font-size: 15px;
+    }
+
+    .m34-responder-beacon.on-site {
+      background: linear-gradient(135deg, #16a34a, #eab308);
+      border-color: #fef08a;
+    }
+
+    .m34-responder-tag {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: rgba(2, 6, 23, 0.92);
+      color: #a7f3d0;
+      border: 1px solid rgba(16, 185, 129, 0.7);
+      border-radius: 6px;
+      padding: 1px 5px;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .m34-modal-card-box {
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.75);
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      margin-bottom: 12px;
+    }
+
+    .m34-hold-trigger-btn {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      min-height: 52px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(254, 202, 202, 0.85);
+      background: linear-gradient(135deg, #991b1b, #dc2626);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .m34-responder-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      font-size: 11.5px;
+    }
+
+    .m34-status-chip {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .m34-status-chip.en-camino {
+      background: rgba(14, 165, 233, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.65);
+      color: #7dd3fc;
+    }
+
+    .m34-status-chip.en-sitio {
+      background: rgba(16, 185, 129, 0.22);
+      border: 1px solid rgba(52, 211, 153, 0.78);
+      color: #6ee7b7;
+    }
+
+    .m34-photo-preview {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(16, 185, 129, 0.55);
+      margin-top: 8px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -3690,6 +4079,33 @@
 
     <!-- Panel inferior táctil: aviso de ruta, Compartir / Ruta / Mis Destinos / Ciudadano y botón "+ Reportar Novedad" -->
     <div class="bottom-panel">
+      <div class="m34-danger-banner" id="m34DangerBanner" aria-live="assertive">
+        <div class="m34-danger-top">
+          <span class="m34-danger-pill"><span class="m34-danger-dot" aria-hidden="true"></span><span id="m34DangerBannerBadge">DANGER · EMERGENCIA M34</span></span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <button type="button" class="route-banner-close" id="btnToggleM34Mute" title="Silenciar o activar voz M34" style="width:auto;padding:0 8px;font-size:11px;font-weight:800;">🔊 M34</button>
+            <button type="button" class="route-banner-close" id="btnOpenM34FromBanner" title="Abrir Centro M34" style="width:auto;padding:0 8px;font-size:11px;font-weight:800;">📋 Panel</button>
+          </div>
+        </div>
+        <div class="m34-event-tabs" id="m34BannerEventTabs"></div>
+        <div class="m34-danger-info" id="m34DangerBannerInfo" role="button" tabindex="0"></div>
+        <div class="m34-danger-actions">
+          <button type="button" class="m34-action-btn yovoy" id="btnM34YoVoyBanner">🚨 Yo Voy</button>
+          <button type="button" class="m34-action-btn" id="btnM34FocusBanner">🗺️ Ubicar</button>
+          <button type="button" class="m34-action-btn ok" id="btnM34OpenCloseBanner">✅ Todo bien</button>
+        </div>
+      </div>
+
+      <div class="m34-trigger-row">
+        <button type="button" class="m34-sos-btn" id="btnEmergencyM34" title="Emergencia Gremial M34: doble toque o mantén 1.5s para activar SOS; 1 toque abre panel M34">
+          <span class="m34-hold-fill" id="m34TriggerHoldFill"></span>
+          <span class="m34-sos-btn-content">
+            <span>🆘 M34</span>
+            <span class="m34-sos-sub" id="m34TriggerSubLabel">1.5s / 2x</span>
+          </span>
+        </button>
+      </div>
+
       <div class="cepos-active-banner" id="ceposActiveBanner" aria-live="polite">
         <div class="cepos-active-banner-main" id="ceposActiveBannerMain" role="button" tabindex="0" title="Ubicar unidad de Cepos activa en el mapa">
           <div class="cepos-active-banner-top">
@@ -5030,6 +5446,85 @@
           <button type="button" class="btn-logout" id="btnCancelRoute" style="width:auto;padding:0 14px;display:none;">
             Desactivar
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Emergencia Gremial M34 (Activación segura, Multi-evento, Yo Voy y Cierre con Foto) -->
+    <div class="modal-backdrop" id="m34Modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 style="color:#fecaca;">🆘 Emergencia Gremial M34</h2>
+          <button type="button" class="btn-close" id="btnCloseM34Modal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.42;margin-bottom:10px;">
+          Red solidaria de apoyo inmediato entre compañeros (taxis, motos y particulares). Sin coordenadas crudas visibles y con ubicación en vivo mientras dure el evento.
+        </p>
+
+        <div class="m34-modal-card-box" style="border-color:rgba(239,68,68,0.65);background:rgba(69,10,10,0.34);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:900;color:#fecaca;">🚨 Activar Mi Emergencia M34</span>
+            <span id="m34MyProfileBadge" style="font-size:10.5px;font-weight:800;color:#fde047;"></span>
+          </div>
+          <input
+            type="text"
+            id="m34TriggerNotaInput"
+            class="text-input"
+            maxlength="180"
+            style="margin-bottom:8px;"
+            placeholder="Detalle rápido opcional (ej: pinchazo, cierre, intento de hurto...)"
+          />
+          <button type="button" class="m34-hold-trigger-btn" id="btnM34ModalHoldTrigger">
+            <span class="m34-hold-fill" id="m34ModalHoldFill"></span>
+            <span style="position:relative;z-index:1;" id="m34ModalHoldLabel">🆘 Mantén 1.5s o Doble Toque para Activar M34</span>
+          </button>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:7px;">
+            <span style="font-size:10.5px;color:#fca5a5;">Confirmación doble o 1.5s para evitar falsas alarmas.</span>
+            <button type="button" class="cepos-mini-btn" id="btnPreviewM34Alarm" style="min-height:28px;font-size:10.5px;border-color:rgba(239,68,68,0.6);color:#fecaca;">🔊 Probar "M34"</button>
+          </div>
+        </div>
+
+        <div class="m34-modal-card-box" id="m34ActiveEventsSection">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:900;color:#fef08a;">📡 Eventos M34 Activos</span>
+            <span id="m34ActiveCountLabel" style="font-size:10.5px;font-weight:800;color:#fca5a5;">0 activos</span>
+          </div>
+
+          <div class="m34-event-tabs" id="m34ModalEventSelector" style="margin-bottom:8px;"></div>
+
+          <div id="m34SelectedEventDetails" style="font-size:12px;color:#e2e8f0;line-height:1.4;">
+            No hay emergencias M34 activas en este momento.
+          </div>
+
+          <div id="m34RespondersWrap" style="display:none;margin-top:9px;">
+            <div style="font-size:11px;font-weight:800;color:#6ee7b7;margin-bottom:5px;">🤝 Compañeros en apoyo ("Yo Voy"):</div>
+            <div id="m34RespondersList" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+        </div>
+
+        <div class="m34-modal-card-box" id="m34FinalizeSection" style="display:none;border-color:rgba(16,185,129,0.65);background:rgba(6,78,59,0.22);">
+          <div style="font-size:12px;font-weight:900;color:#6ee7b7;margin-bottom:6px;">📸 Verificación en Sitio ("Todo Está Bien")</div>
+          <p style="font-size:11px;color:#cbd5e1;line-height:1.38;margin-bottom:8px;">
+            El compañero que activó el M34 o un compañero en apoyo puede tomar o adjuntar una foto de verificación y finalizar la emergencia.
+          </p>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:6px;">
+            <label for="m34ClosePhotoInput" class="cepos-mini-btn" style="cursor:pointer;min-height:38px;border-color:rgba(52,211,153,0.7);color:#a7f3d0;">
+              📷 Tomar / Adjuntar Foto
+            </label>
+            <input type="file" id="m34ClosePhotoInput" accept="image/*" capture="environment" style="display:none;" />
+            <button type="button" class="cepos-mini-btn" id="btnM34ClearClosePhoto" style="display:none;min-height:38px;border-color:rgba(239,68,68,0.6);color:#fecaca;">🗑️ Quitar foto</button>
+          </div>
+          <div id="m34ClosePhotoStatus" style="font-size:11px;color:#94a3b8;margin-bottom:4px;">Sin foto adjunta (recomendado tomar foto al verificar).</div>
+          <img id="m34ClosePhotoPreview" class="m34-photo-preview" alt="Foto de verificación M34" />
+          <button type="button" class="btn-submit" id="btnM34FinalizeEvent" style="margin-top:9px;min-height:46px;background:linear-gradient(135deg,#16a34a,#10b981);color:#022c22;font-weight:900;">
+            ✅ Todo está bien / Finalizar M34
+          </button>
+        </div>
+
+        <div class="m34-modal-card-box" id="m34RecentClosedSection" style="display:none;">
+          <div style="font-size:11.5px;font-weight:900;color:#93c5fd;margin-bottom:6px;">🛡️ Últimos Cierres M34 Verificados</div>
+          <div id="m34RecentClosedList" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
       </div>
     </div>
@@ -7752,6 +8247,9 @@
         } else {
           renderCombinedReports(lastServerReports);
         }
+        if (typeof window.__anthiSyncM34Auth === 'function') {
+          window.__anthiSyncM34Auth(null);
+        }
         return;
       }
 
@@ -7808,6 +8306,9 @@
 
       if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
         window.__anthiSyncHojaVidaOnAuth(user);
+      }
+      if (typeof window.__anthiSyncM34Auth === 'function') {
+        window.__anthiSyncM34Auth(user);
       }
       } catch (authErr) {
         console.warn('Error actualizando sesión de usuario:', authErr);
@@ -18150,6 +18651,1509 @@
           showToast('No se pudo copiar automáticamente; selecciona el enlace de arriba.');
         }
       });
+    }
+
+    // =========================================================================
+    // 14. MÓDULO DE EMERGENCIA GREMIAL "M34" (ACTIVACIÓN SEGURA, MULTI-EVENTO,
+    //     ALARMA "M34, M34, M34", "YO VOY" EN VIVO Y CIERRE CON FOTO)
+    // =========================================================================
+    try {
+      const M34_COLLECTION = 'emergencias_m34';
+      const M34_APOYOS_SUB = 'apoyos';
+      const M34_ARRIVAL_RADIUS_METERS = 100;
+      const M34_HOLD_DURATION_MS = 1500;
+      const M34_DOUBLE_TAP_MS = 430;
+      const M34_GPS_MIN_INTERVAL_MS = 4500;
+      const M34_GPS_MIN_STEP_METERS = 8;
+      const M34_VOICE_COOLDOWN_MS = 12000;
+      const M34_CLOSED_RETENTION_MS = 2 * 60 * 60 * 1000;
+
+      const m34Layer = L.layerGroup().addTo(map);
+      const m34DangerBanner = document.getElementById('m34DangerBanner');
+      const m34DangerBannerBadge = document.getElementById('m34DangerBannerBadge');
+      const m34BannerEventTabs = document.getElementById('m34BannerEventTabs');
+      const m34DangerBannerInfo = document.getElementById('m34DangerBannerInfo');
+      const btnToggleM34Mute = document.getElementById('btnToggleM34Mute');
+      const btnOpenM34FromBanner = document.getElementById('btnOpenM34FromBanner');
+      const btnM34YoVoyBanner = document.getElementById('btnM34YoVoyBanner');
+      const btnM34FocusBanner = document.getElementById('btnM34FocusBanner');
+      const btnM34OpenCloseBanner = document.getElementById('btnM34OpenCloseBanner');
+
+      const btnEmergencyM34 = document.getElementById('btnEmergencyM34');
+      const m34TriggerHoldFill = document.getElementById('m34TriggerHoldFill');
+      const m34TriggerSubLabel = document.getElementById('m34TriggerSubLabel');
+
+      const m34Modal = document.getElementById('m34Modal');
+      const btnCloseM34Modal = document.getElementById('btnCloseM34Modal');
+      const m34MyProfileBadge = document.getElementById('m34MyProfileBadge');
+      const m34TriggerNotaInput = document.getElementById('m34TriggerNotaInput');
+      const btnM34ModalHoldTrigger = document.getElementById('btnM34ModalHoldTrigger');
+      const m34ModalHoldFill = document.getElementById('m34ModalHoldFill');
+      const m34ModalHoldLabel = document.getElementById('m34ModalHoldLabel');
+      const btnPreviewM34Alarm = document.getElementById('btnPreviewM34Alarm');
+
+      const m34ActiveCountLabel = document.getElementById('m34ActiveCountLabel');
+      const m34ModalEventSelector = document.getElementById('m34ModalEventSelector');
+      const m34SelectedEventDetails = document.getElementById('m34SelectedEventDetails');
+      const m34RespondersWrap = document.getElementById('m34RespondersWrap');
+      const m34RespondersList = document.getElementById('m34RespondersList');
+
+      const m34FinalizeSection = document.getElementById('m34FinalizeSection');
+      const m34ClosePhotoInput = document.getElementById('m34ClosePhotoInput');
+      const btnM34ClearClosePhoto = document.getElementById('btnM34ClearClosePhoto');
+      const m34ClosePhotoStatus = document.getElementById('m34ClosePhotoStatus');
+      const m34ClosePhotoPreview = document.getElementById('m34ClosePhotoPreview');
+      const btnM34FinalizeEvent = document.getElementById('btnM34FinalizeEvent');
+
+      const m34RecentClosedSection = document.getElementById('m34RecentClosedSection');
+      const m34RecentClosedList = document.getElementById('m34RecentClosedList');
+
+      let activeM34Events = [];
+      let recentClosedM34Events = [];
+      let selectedM34EventId = null;
+      const m34ApoyosByEvent = new Map();
+      const m34ApoyosUnsubByEvent = new Map();
+      let unsubscribeM34Main = null;
+
+      let hasSeededM34Snapshot = false;
+      const knownActiveM34Ids = new Set();
+      let isM34AudioMuted = false;
+      let lastM34AlarmAt = 0;
+      let pendingM34VoiceOnUnlock = false;
+
+      let m34CreatorWatchId = null;
+      let m34CreatorEventId = null;
+      let m34CreatorLastPushAt = 0;
+      let m34CreatorLastLat = null;
+      let m34CreatorLastLng = null;
+
+      let m34ResponderWatchId = null;
+      let m34ResponderEventId = null;
+      let m34ResponderLastPushAt = 0;
+      let m34ResponderLastLat = null;
+      let m34ResponderLastLng = null;
+      let m34ResponderWasOnSite = false;
+
+      let pendingM34ClosePhotoBase64 = null;
+      let isActivatingM34 = false;
+      let isFinalizingM34 = false;
+      let isTogglingYoVoy = false;
+
+      function stripRawCoordinatesText(raw) {
+        return String(raw || '')
+          .replace(/-?\d{1,2}\.\d{3,}\s*[,;\s]\s*-?\d{1,3}\.\d{3,}/g, '')
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      }
+
+      function normalizeM34VehicleType(raw) {
+        const v = String(raw || '').trim().toLowerCase();
+        if (v === 'taxi' || v === 'particular' || v === 'moto' || v === 'camioneta') return v;
+        return 'particular';
+      }
+
+      function getM34VehicleType() {
+        try {
+          if (typeof hojaVidaState === 'object' && hojaVidaState) {
+            return normalizeM34VehicleType(hojaVidaState.tipoVehiculo);
+          }
+        } catch (e) {}
+        return 'particular';
+      }
+
+      function getM34VehicleEmoji(tipoVehiculo) {
+        const v = normalizeM34VehicleType(tipoVehiculo);
+        if (v === 'taxi') return '🚕';
+        if (v === 'moto') return '🏍️';
+        if (v === 'camioneta') return '🚙';
+        return '🚗';
+      }
+
+      function getM34Apodo(user = auth.currentUser) {
+        if (user && typeof getUserApodo === 'function') {
+          const custom = getUserApodo(user);
+          if (custom) return custom.slice(0, 32);
+        }
+        if (user && user.displayName) {
+          const cleanName = String(user.displayName).trim().slice(0, 32);
+          if (cleanName) return cleanName;
+        }
+        if (user && user.email) {
+          const prefix = String(user.email).split('@')[0].replace(/[^a-zA-Z0-9._\-\s]/g, '').trim().slice(0, 24);
+          if (prefix) return prefix;
+        }
+        return 'Compañero';
+      }
+
+      function getM34SafeSector(lat, lng, fallbackSector = '') {
+        let place = '';
+        try {
+          if (typeof formatGeoPlaceText === 'function' && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng))) {
+            place = formatGeoPlaceText(Number(lat), Number(lng), 'full', '', { allowRemote: false });
+          }
+        } catch (e) {}
+        const clean = stripRawCoordinatesText(place || fallbackSector || 'Bucaramanga · Sector activo');
+        return (clean || 'Bucaramanga · Sector activo').slice(0, 160);
+      }
+
+      function formatM34DistanceLabel(distMeters) {
+        if (!Number.isFinite(distMeters)) return '';
+        return distMeters >= 1000
+          ? `a ${(distMeters / 1000).toFixed(1)} km`
+          : `a ${Math.max(1, Math.round(distMeters))} m`;
+      }
+
+      function m34ToMillis(tsVal) {
+        if (typeof extractOptionalTimestampMs === 'function') {
+          return extractOptionalTimestampMs(tsVal) || 0;
+        }
+        if (!tsVal) return 0;
+        if (typeof tsVal.toMillis === 'function') return tsVal.toMillis();
+        if (typeof tsVal.seconds === 'number') return tsVal.seconds * 1000;
+        if (typeof tsVal === 'number' && Number.isFinite(tsVal)) return tsVal;
+        return 0;
+      }
+
+      function formatM34ElapsedLabel(tsVal) {
+        const ms = m34ToMillis(tsVal);
+        if (!ms) return 'ahora';
+        const diffSec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+        if (diffSec < 60) return `hace ${diffSec}s`;
+        const diffMin = Math.floor(diffSec / 60);
+        if (diffMin < 60) return `hace ${diffMin} min`;
+        const diffH = Math.floor(diffMin / 60);
+        return `hace ${diffH} h`;
+      }
+
+      function updateM34ProfileBadge() {
+        if (!m34MyProfileBadge) return;
+        const veh = getM34VehicleType();
+        const vehLabel = (typeof VEHICLE_LABELS === 'object' && VEHICLE_LABELS[veh]) || 'Particular';
+        const apodo = auth.currentUser ? getM34Apodo(auth.currentUser) : 'Invitado';
+        m34MyProfileBadge.textContent = `${getM34VehicleEmoji(veh)} ${apodo} · ${vehLabel}`;
+      }
+
+      function scheduleM34AlarmOscillators(ctx) {
+        const start = ctx.currentTime + 0.015;
+        // Patrón urgente distintivo M34 (dos ráfagas descendentes graves-medias; distinto del sónar 30s y de Cepos Umbrella)
+        const bursts = [
+          { offset: 0, f1: 980, f2: 660, dur: 0.22 },
+          { offset: 0.27, f1: 980, f2: 660, dur: 0.22 },
+          { offset: 0.56, f1: 1120, f2: 740, dur: 0.26 }
+        ];
+        bursts.forEach((b) => {
+          const t0 = start + b.offset;
+          const oscA = ctx.createOscillator();
+          const oscB = ctx.createOscillator();
+          const filter = ctx.createBiquadFilter();
+          const gain = ctx.createGain();
+
+          oscA.type = 'sawtooth';
+          oscA.frequency.setValueAtTime(b.f1, t0);
+          oscA.frequency.linearRampToValueAtTime(b.f2, t0 + b.dur);
+
+          oscB.type = 'triangle';
+          oscB.frequency.setValueAtTime(b.f1 * 0.5, t0);
+          oscB.frequency.linearRampToValueAtTime(b.f2 * 0.5, t0 + b.dur);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1950, t0);
+
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.linearRampToValueAtTime(0.24, t0 + 0.015);
+          gain.gain.setValueAtTime(0.22, t0 + b.dur * 0.72);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + b.dur);
+
+          oscA.connect(filter);
+          oscB.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+
+          oscA.start(t0);
+          oscB.start(t0);
+          oscA.stop(t0 + b.dur + 0.03);
+          oscB.stop(t0 + b.dur + 0.03);
+        });
+      }
+
+      function speakM34Phrase() {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+        if (typeof window.SpeechSynthesisUtterance !== 'function') return false;
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new window.SpeechSynthesisUtterance('M34, M34, M34');
+          utter.lang = 'es-CO';
+          utter.rate = 1.02;
+          utter.pitch = 1.05;
+          utter.volume = 1.0;
+          if (typeof window.speechSynthesis.getVoices === 'function') {
+            const voices = window.speechSynthesis.getVoices() || [];
+            const esVoice =
+              voices.find((v) => v && v.lang && v.lang.toLowerCase() === 'es-co') ||
+              voices.find((v) => v && v.lang && v.lang.toLowerCase().startsWith('es'));
+            if (esVoice) utter.voice = esVoice;
+          }
+          window.speechSynthesis.speak(utter);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      function hasExternalActiveM34Events() {
+        const curUser = auth.currentUser;
+        if (!curUser) return activeM34Events.length > 0;
+        return activeM34Events.some((e) => e.authorId !== curUser.uid);
+      }
+
+      function playM34EmergencyAlarmAndVoice(forcePreview = false) {
+        try {
+          if (!forcePreview && isM34AudioMuted) return false;
+          if (!forcePreview && !hasExternalActiveM34Events()) {
+            pendingM34VoiceOnUnlock = false;
+            return false;
+          }
+          if (!forcePreview && !hasUserAudioInteraction) {
+            pendingM34VoiceOnUnlock = true;
+            return false;
+          }
+          const nowMs = Date.now();
+          if (!forcePreview && nowMs - lastM34AlarmAt < M34_VOICE_COOLDOWN_MS) return false;
+
+          if (forcePreview) {
+            hasUserAudioInteraction = true;
+          }
+          lastM34AlarmAt = nowMs;
+          pendingM34VoiceOnUnlock = false;
+
+          const ctx = typeof ensureSonarAudioContext === 'function' ? ensureSonarAudioContext() : null;
+          if (ctx) {
+            if (ctx.state === 'suspended') {
+              ctx.resume()
+                .then(() => {
+                  try { scheduleM34AlarmOscillators(ctx); } catch (e) {}
+                })
+                .catch(() => {});
+            } else {
+              scheduleM34AlarmOscillators(ctx);
+            }
+          }
+
+          setTimeout(() => {
+            if (!forcePreview && (isM34AudioMuted || !hasExternalActiveM34Events())) return;
+            speakM34Phrase();
+          }, 180);
+
+          if (navigator.vibrate) {
+            try { navigator.vibrate([260, 80, 260, 80, 360]); } catch (e) {}
+          }
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      window.__anthiPlayM34Alarm = playM34EmergencyAlarmAndVoice;
+
+      function unlockPendingM34Voice() {
+        if (!pendingM34VoiceOnUnlock) return;
+        if (!hasExternalActiveM34Events() || isM34AudioMuted) {
+          pendingM34VoiceOnUnlock = false;
+          return;
+        }
+        pendingM34VoiceOnUnlock = false;
+        setTimeout(() => playM34EmergencyAlarmAndVoice(false), 80);
+      }
+      document.addEventListener('pointerdown', unlockPendingM34Voice, { passive: true });
+      document.addEventListener('touchstart', unlockPendingM34Voice, { passive: true });
+
+      async function dispatchM34BackgroundNotification(evt, eventIndex = 1) {
+        if (!evt || typeof canDispatchBackgroundNotification !== 'function' || !canDispatchBackgroundNotification()) return false;
+        const vehLabel = VEHICLE_LABELS[normalizeM34VehicleType(evt.tipoVehiculo)] || 'Vehículo';
+        const sector = stripRawCoordinatesText(evt.sector || getM34SafeSector(evt.lat, evt.lng));
+        const title = `🚨 DANGER · EMERGENCIA M34 (Evento ${eventIndex})`;
+        const body = `${evt.apodo || 'Compañero'} (${vehLabel}) solicita apoyo en ${sector}.`;
+        const safeLat = Number.isFinite(Number(evt.lat)) ? Number(evt.lat) : null;
+        const safeLng = Number.isFinite(Number(evt.lng)) ? Number(evt.lng) : null;
+        const payload = {
+          type: 'AN_THI_SHOW_NOTIFICATION',
+          title,
+          body,
+          tag: `anthi-m34-${evt.id}`,
+          reportId: evt.id,
+          lat: safeLat,
+          lng: safeLng,
+          tipo: 'M34',
+          isVip: true,
+          requireInteraction: true,
+          vibrate: [360, 90, 360, 90, 480]
+        };
+        try {
+          const swReg = typeof window.__anthiGetReadySwRegistration === 'function'
+            ? await window.__anthiGetReadySwRegistration()
+            : window.__anthiSwRegistration;
+          if (swReg && typeof swReg.showNotification === 'function') {
+            await swReg.showNotification(title, {
+              body,
+              icon: '/icon.svg',
+              badge: '/icon.svg',
+              tag: payload.tag,
+              renotify: true,
+              requireInteraction: true,
+              vibrate: payload.vibrate,
+              data: { url: '/', reportId: evt.id, lat: safeLat, lng: safeLng, tipo: 'M34' }
+            });
+            return true;
+          }
+          if (swReg && swReg.active && typeof swReg.active.postMessage === 'function') {
+            swReg.active.postMessage(payload);
+            return true;
+          }
+        } catch (err) {}
+        return false;
+      }
+
+      function stopM34CreatorWatch() {
+        if (m34CreatorWatchId !== null && navigator.geolocation) {
+          try { navigator.geolocation.clearWatch(m34CreatorWatchId); } catch (e) {}
+        }
+        m34CreatorWatchId = null;
+        m34CreatorEventId = null;
+        m34CreatorLastPushAt = 0;
+        m34CreatorLastLat = null;
+        m34CreatorLastLng = null;
+      }
+
+      function stopM34ResponderWatch() {
+        if (m34ResponderWatchId !== null && navigator.geolocation) {
+          try { navigator.geolocation.clearWatch(m34ResponderWatchId); } catch (e) {}
+        }
+        m34ResponderWatchId = null;
+        m34ResponderEventId = null;
+        m34ResponderLastPushAt = 0;
+        m34ResponderLastLat = null;
+        m34ResponderLastLng = null;
+        m34ResponderWasOnSite = false;
+      }
+
+      function startM34CreatorWatch(eventoId) {
+        if (!eventoId || !navigator.geolocation) return;
+        if (m34CreatorWatchId !== null && m34CreatorEventId === eventoId) return;
+        stopM34CreatorWatch();
+        m34CreatorEventId = eventoId;
+        m34CreatorWatchId = navigator.geolocation.watchPosition(
+          async (pos) => {
+            const user = auth.currentUser;
+            if (!user || !m34CreatorEventId || m34CreatorEventId !== eventoId) {
+              stopM34CreatorWatch();
+              return;
+            }
+            const evt = activeM34Events.find((e) => e.id === eventoId);
+            if (evt && evt.estado !== 'ACTIVA') {
+              stopM34CreatorWatch();
+              return;
+            }
+            const lat = Number(pos && pos.coords && pos.coords.latitude);
+            const lng = Number(pos && pos.coords && pos.coords.longitude);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+            const nowMs = Date.now();
+            const movedMeters = (m34CreatorLastLat !== null && m34CreatorLastLng !== null)
+              ? calcularDistanciaMetros(m34CreatorLastLat, m34CreatorLastLng, lat, lng)
+              : Infinity;
+            const elapsed = nowMs - m34CreatorLastPushAt;
+            if (elapsed < M34_GPS_MIN_INTERVAL_MS && movedMeters < 25) return;
+            if (movedMeters < M34_GPS_MIN_STEP_METERS && elapsed < 15000) return;
+
+            m34CreatorLastPushAt = nowMs;
+            m34CreatorLastLat = lat;
+            m34CreatorLastLng = lng;
+            const sector = getM34SafeSector(lat, lng);
+            try {
+              await updateDoc(doc(db, M34_COLLECTION, eventoId), {
+                lat,
+                lng,
+                sector,
+                updatedAt: serverTimestamp()
+              });
+            } catch (err) {
+              if (err && err.code === 'permission-denied') {
+                stopM34CreatorWatch();
+              }
+            }
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000, timeout: 12000 }
+        );
+      }
+
+      function startM34ResponderWatch(eventoId) {
+        if (!eventoId || !navigator.geolocation) return;
+        if (m34ResponderWatchId !== null && m34ResponderEventId === eventoId) return;
+        stopM34ResponderWatch();
+        m34ResponderEventId = eventoId;
+        m34ResponderWatchId = navigator.geolocation.watchPosition(
+          async (pos) => {
+            const user = auth.currentUser;
+            if (!user || !m34ResponderEventId || m34ResponderEventId !== eventoId) {
+              stopM34ResponderWatch();
+              return;
+            }
+            const target = activeM34Events.find((e) => e.id === eventoId);
+            if (!target || target.estado !== 'ACTIVA') {
+              stopM34ResponderWatch();
+              return;
+            }
+            const lat = Number(pos && pos.coords && pos.coords.latitude);
+            const lng = Number(pos && pos.coords && pos.coords.longitude);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+            const distToTarget = (Number.isFinite(Number(target.lat)) && Number.isFinite(Number(target.lng)))
+              ? calcularDistanciaMetros(lat, lng, Number(target.lat), Number(target.lng))
+              : Infinity;
+            const isNowOnSite = distToTarget <= M34_ARRIVAL_RADIUS_METERS;
+            const becameOnSite = isNowOnSite && !m34ResponderWasOnSite;
+
+            const nowMs = Date.now();
+            const movedMeters = (m34ResponderLastLat !== null && m34ResponderLastLng !== null)
+              ? calcularDistanciaMetros(m34ResponderLastLat, m34ResponderLastLng, lat, lng)
+              : Infinity;
+            const elapsed = nowMs - m34ResponderLastPushAt;
+            if (!becameOnSite) {
+              if (elapsed < M34_GPS_MIN_INTERVAL_MS && movedMeters < 25) return;
+              if (movedMeters < M34_GPS_MIN_STEP_METERS && elapsed < 15000) return;
+            }
+
+            m34ResponderLastPushAt = nowMs;
+            m34ResponderLastLat = lat;
+            m34ResponderLastLng = lng;
+            m34ResponderWasOnSite = isNowOnSite;
+
+            const sector = getM34SafeSector(lat, lng);
+            const estadoApoyo = isNowOnSite ? 'EN_SITIO' : 'EN_CAMINO';
+            try {
+              await updateDoc(doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid), {
+                apodo: getM34Apodo(user),
+                tipoVehiculo: getM34VehicleType(),
+                lat,
+                lng,
+                sector,
+                estadoApoyo,
+                updatedAt: serverTimestamp()
+              });
+              if (becameOnSite) {
+                showToast('📍 ¡Llegaste al sitio de la emergencia M34!');
+              }
+            } catch (err) {
+              if (err && err.code === 'permission-denied') {
+                stopM34ResponderWatch();
+              }
+            }
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000, timeout: 12000 }
+        );
+      }
+
+      async function resolveCurrentBestCoordsForM34() {
+        let lat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
+        let lng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
+        if (navigator.geolocation && (!hasUsableUserGps() || !hasReceivedLiveGps)) {
+          try {
+            const quickPos = await new Promise((resolve) => {
+              let done = false;
+              const tId = setTimeout(() => {
+                if (!done) {
+                  done = true;
+                  resolve(null);
+                }
+              }, 2600);
+              navigator.geolocation.getCurrentPosition(
+                (p) => {
+                  if (!done) {
+                    done = true;
+                    clearTimeout(tId);
+                    resolve(p);
+                  }
+                },
+                () => {
+                  if (!done) {
+                    done = true;
+                    clearTimeout(tId);
+                    resolve(null);
+                  }
+                },
+                { enableHighAccuracy: true, maximumAge: 5000, timeout: 2400 }
+              );
+            });
+            if (quickPos && quickPos.coords) {
+              const qLat = Number(quickPos.coords.latitude);
+              const qLng = Number(quickPos.coords.longitude);
+              if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
+                lat = qLat;
+                lng = qLng;
+              }
+            }
+          } catch (e) {}
+        }
+        return { lat, lng };
+      }
+
+      function getSelectedM34Event() {
+        if (activeM34Events.length === 0) return null;
+        const found = activeM34Events.find((e) => e.id === selectedM34EventId);
+        return found || activeM34Events[0];
+      }
+
+      function focusM34EventOnMap(evt) {
+        if (!evt || !Number.isFinite(Number(evt.lat)) || !Number.isFinite(Number(evt.lng))) return;
+        selectedM34EventId = evt.id;
+        renderM34All();
+        try {
+          map.setView([Number(evt.lat), Number(evt.lng)], Math.max(map.getZoom() || 15, 16), { animate: true });
+        } catch (e) {}
+      }
+
+      function clearPendingM34ClosePhoto() {
+        pendingM34ClosePhotoBase64 = null;
+        if (m34ClosePhotoInput) m34ClosePhotoInput.value = '';
+        if (m34ClosePhotoPreview) {
+          m34ClosePhotoPreview.src = '';
+          m34ClosePhotoPreview.style.display = 'none';
+        }
+        if (btnM34ClearClosePhoto) btnM34ClearClosePhoto.style.display = 'none';
+        if (m34ClosePhotoStatus) {
+          m34ClosePhotoStatus.textContent = 'Sin foto adjunta (recomendado tomar foto al verificar).';
+        }
+      }
+
+      function renderM34MapMarkers() {
+        m34Layer.clearLayers();
+        const selected = getSelectedM34Event();
+
+        activeM34Events.forEach((evt, idx) => {
+          const lat = Number(evt.lat);
+          const lng = Number(evt.lng);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+          const isSelected = Boolean(selected && selected.id === evt.id);
+          const eventNum = idx + 1;
+          const vehEmoji = getM34VehicleEmoji(evt.tipoVehiculo);
+          const sectorText = stripRawCoordinatesText(evt.sector || getM34SafeSector(lat, lng));
+          const apoyos = m34ApoyosByEvent.get(evt.id) || [];
+
+          L.circle([lat, lng], {
+            radius: M34_ARRIVAL_RADIUS_METERS,
+            color: '#ef4444',
+            weight: isSelected ? 2 : 1.5,
+            dashArray: '5, 5',
+            fillColor: '#ef4444',
+            fillOpacity: isSelected ? 0.12 : 0.06,
+            interactive: false
+          }).addTo(m34Layer);
+
+          const icon = L.divIcon({
+            className: 'm34-custom-marker',
+            html: `<div class="m34-marker-beacon">
+              <div class="m34-marker-ring"></div>
+              <div class="m34-marker-tag">M34 · Ev.${eventNum}</div>
+              <div class="m34-marker-core">${vehEmoji}</div>
+            </div>`,
+            iconSize: [46, 46],
+            iconAnchor: [23, 23]
+          });
+
+          const marker = L.marker([lat, lng], {
+            icon,
+            zIndexOffset: isSelected ? 980 : 940
+          }).addTo(m34Layer);
+
+          const distMe = hasUsableUserGps()
+            ? formatM34DistanceLabel(calcularDistanciaMetros(currentLat, currentLng, lat, lng))
+            : '';
+
+          const popupHtml = `
+            <div style="min-width:205px;color:#0f172a;font-size:12px;line-height:1.38;">
+              <div style="font-weight:900;color:#b91c1c;margin-bottom:3px;">🚨 DANGER · EMERGENCIA M34 (Evento ${eventNum})</div>
+              <div style="font-weight:800;">${vehEmoji} ${escapeHtml(evt.apodo || 'Compañero')} ${distMe ? `· ${escapeHtml(distMe)}` : ''}</div>
+              <div style="color:#334155;margin-top:2px;">📍 ${escapeHtml(sectorText)}</div>
+              ${evt.nota ? `<div style="color:#7f1d1d;margin-top:2px;font-weight:700;">"${escapeHtml(evt.nota)}"</div>` : ''}
+              <div style="margin-top:4px;font-weight:800;color:#047857;">🤝 ${apoyos.length} compañero(s) en apoyo</div>
+            </div>
+          `;
+          marker.bindPopup(popupHtml);
+          marker.on('click', () => {
+            selectedM34EventId = evt.id;
+            renderM34All();
+          });
+
+          // Renderizar compañeros en apoyo ("Yo Voy") del evento
+          apoyos.forEach((ap) => {
+            const aLat = Number(ap.lat);
+            const aLng = Number(ap.lng);
+            if (!Number.isFinite(aLat) || !Number.isFinite(aLng)) return;
+            const onSite = ap.estadoApoyo === 'EN_SITIO';
+            const aEmoji = getM34VehicleEmoji(ap.tipoVehiculo);
+
+            if (isSelected) {
+              L.polyline([[aLat, aLng], [lat, lng]], {
+                color: onSite ? '#10b981' : '#38bdf8',
+                weight: 3,
+                opacity: 0.82,
+                dashArray: '6, 8',
+                interactive: false
+              }).addTo(m34Layer);
+            }
+
+            const respIcon = L.divIcon({
+              className: 'm34-responder-marker',
+              html: `<div class="m34-responder-beacon ${onSite ? 'on-site' : ''}">
+                <span>${aEmoji}</span>
+                <div class="m34-responder-tag">${onSite ? '✅' : '🚨'} ${escapeHtml((ap.apodo || 'Apoyo').slice(0, 12))}</div>
+              </div>`,
+              iconSize: [34, 34],
+              iconAnchor: [17, 17]
+            });
+
+            L.marker([aLat, aLng], {
+              icon: respIcon,
+              zIndexOffset: 900
+            })
+              .addTo(m34Layer)
+              .bindPopup(
+                `<div style="font-size:12px;color:#0f172a;"><strong>${aEmoji} ${escapeHtml(ap.apodo || 'Compañero')}</strong><br/>${onSite ? '✅ En el sitio de emergencia' : '🚨 En camino en apoyo ("Yo Voy")'}<br/>📍 ${escapeHtml(stripRawCoordinatesText(ap.sector || 'En ruta'))}</div>`
+              );
+          });
+        });
+      }
+
+      function renderM34BannerUI() {
+        const user = auth.currentUser;
+        const selected = getSelectedM34Event();
+
+        if (btnEmergencyM34) {
+          btnEmergencyM34.classList.toggle('has-active', activeM34Events.length > 0);
+          const amCreator = Boolean(user && activeM34Events.some((e) => e.authorId === user.uid));
+          btnEmergencyM34.classList.toggle('is-creator-active', amCreator);
+          if (m34TriggerSubLabel) {
+            m34TriggerSubLabel.textContent = amCreator
+              ? 'ACTIVA'
+              : activeM34Events.length > 0
+              ? `${activeM34Events.length} ACT.`
+              : '1.5s / 2x';
+          }
+        }
+
+        if (btnToggleM34Mute) {
+          btnToggleM34Mute.textContent = isM34AudioMuted ? '🔇 M34' : '🔊 M34';
+          btnToggleM34Mute.title = isM34AudioMuted ? 'Activar alarma de voz M34' : 'Silenciar alarma de voz M34';
+        }
+
+        if (!m34DangerBanner) return;
+        if (activeM34Events.length === 0 || !selected) {
+          m34DangerBanner.classList.remove('visible');
+          return;
+        }
+
+        const selIdx = Math.max(0, activeM34Events.findIndex((e) => e.id === selected.id));
+        const apoyos = m34ApoyosByEvent.get(selected.id) || [];
+        const myApoyo = user ? apoyos.find((a) => a.uid === user.uid) : null;
+        const distMe = (hasUsableUserGps() && Number.isFinite(Number(selected.lat)) && Number.isFinite(Number(selected.lng)))
+          ? formatM34DistanceLabel(calcularDistanciaMetros(currentLat, currentLng, Number(selected.lat), Number(selected.lng)))
+          : '';
+        const vehEmoji = getM34VehicleEmoji(selected.tipoVehiculo);
+        const vehLabel = VEHICLE_LABELS[normalizeM34VehicleType(selected.tipoVehiculo)] || 'Vehículo';
+        const sectorText = stripRawCoordinatesText(selected.sector || getM34SafeSector(selected.lat, selected.lng));
+
+        if (m34DangerBannerBadge) {
+          m34DangerBannerBadge.textContent = activeM34Events.length > 1
+            ? `DANGER · EMERGENCIA M34 (${activeM34Events.length})`
+            : 'DANGER · EMERGENCIA M34';
+        }
+
+        if (m34BannerEventTabs) {
+          if (activeM34Events.length > 1) {
+            m34BannerEventTabs.style.display = 'flex';
+            m34BannerEventTabs.innerHTML = activeM34Events
+              .map((evt, idx) => {
+                const isSel = evt.id === selected.id;
+                const shortSector = stripRawCoordinatesText(evt.sector || '').split('·')[0].trim().slice(0, 18);
+                return `<button type="button" class="m34-event-tab ${isSel ? 'active' : ''}" data-m34-select="${escapeHtml(evt.id)}">Evento ${idx + 1}: ${escapeHtml((evt.apodo || 'Compañero').slice(0, 12))}${shortSector ? ` · ${escapeHtml(shortSector)}` : ''}</button>`;
+              })
+              .join('');
+          } else {
+            m34BannerEventTabs.style.display = 'none';
+            m34BannerEventTabs.innerHTML = '';
+          }
+        }
+
+        if (m34DangerBannerInfo) {
+          m34DangerBannerInfo.innerHTML = `
+            <div>${vehEmoji} <strong>Evento ${selIdx + 1}: ${escapeHtml(selected.apodo || 'Compañero')}</strong> (${escapeHtml(vehLabel)}) ${distMe ? `· <span style="color:#fef08a;">${escapeHtml(distMe)}</span>` : ''} · <span style="color:#a7f3d0;">${apoyos.length} en apoyo</span></div>
+            <div style="font-size:11px;color:#fee2e2;margin-top:2px;">📍 ${escapeHtml(sectorText)}${selected.nota ? ` · "${escapeHtml(selected.nota)}"` : ''}</div>
+          `;
+        }
+
+        if (btnM34YoVoyBanner) {
+          if (myApoyo) {
+            btnM34YoVoyBanner.classList.add('active');
+            btnM34YoVoyBanner.textContent = myApoyo.estadoApoyo === 'EN_SITIO'
+              ? '📍 En sitio (Yo Voy)'
+              : '✅ Voy en camino';
+          } else {
+            btnM34YoVoyBanner.classList.remove('active');
+            btnM34YoVoyBanner.textContent = '🚨 Yo Voy';
+          }
+        }
+
+        m34DangerBanner.classList.add('visible');
+      }
+
+      function renderM34ModalUI() {
+        updateM34ProfileBadge();
+        const user = auth.currentUser;
+        const selected = getSelectedM34Event();
+
+        if (m34ActiveCountLabel) {
+          m34ActiveCountLabel.textContent = `${activeM34Events.length} ${activeM34Events.length === 1 ? 'activo' : 'activos'}`;
+        }
+
+        if (m34ModalEventSelector) {
+          if (activeM34Events.length > 0) {
+            m34ModalEventSelector.style.display = 'flex';
+            m34ModalEventSelector.innerHTML = activeM34Events
+              .map((evt, idx) => {
+                const isSel = Boolean(selected && selected.id === evt.id);
+                return `<button type="button" class="m34-event-tab ${isSel ? 'active' : ''}" data-m34-select="${escapeHtml(evt.id)}">Evento ${idx + 1} · ${escapeHtml((evt.apodo || 'Compañero').slice(0, 14))}</button>`;
+              })
+              .join('');
+          } else {
+            m34ModalEventSelector.style.display = 'none';
+            m34ModalEventSelector.innerHTML = '';
+          }
+        }
+
+        if (!selected) {
+          if (m34SelectedEventDetails) {
+            m34SelectedEventDetails.innerHTML = '<div style="color:#94a3b8;">No hay emergencias M34 activas en este momento.</div>';
+          }
+          if (m34RespondersWrap) m34RespondersWrap.style.display = 'none';
+          if (m34FinalizeSection) m34FinalizeSection.style.display = 'none';
+        } else {
+          const selIdx = Math.max(0, activeM34Events.findIndex((e) => e.id === selected.id));
+          const apoyos = m34ApoyosByEvent.get(selected.id) || [];
+          const myApoyo = user ? apoyos.find((a) => a.uid === user.uid) : null;
+          const vehEmoji = getM34VehicleEmoji(selected.tipoVehiculo);
+          const vehLabel = VEHICLE_LABELS[normalizeM34VehicleType(selected.tipoVehiculo)] || 'Vehículo';
+          const sectorText = stripRawCoordinatesText(selected.sector || getM34SafeSector(selected.lat, selected.lng));
+          const distMe = (hasUsableUserGps() && Number.isFinite(Number(selected.lat)) && Number.isFinite(Number(selected.lng)))
+            ? formatM34DistanceLabel(calcularDistanciaMetros(currentLat, currentLng, Number(selected.lat), Number(selected.lng)))
+            : '';
+
+          if (m34SelectedEventDetails) {
+            m34SelectedEventDetails.innerHTML = `
+              <div style="padding:9px 10px;border-radius:11px;background:rgba(127,29,29,0.38);border:1px solid rgba(239,68,68,0.6);">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px;">
+                  <strong style="color:#fecaca;">🚨 Evento ${selIdx + 1}: ${vehEmoji} ${escapeHtml(selected.apodo || 'Compañero')}</strong>
+                  <span style="font-size:10.5px;font-weight:800;color:#fef08a;">${escapeHtml(formatM34ElapsedLabel(selected.createdAt))}</span>
+                </div>
+                <div style="font-size:11.5px;color:#fef2f2;">Vehículo: <strong>${escapeHtml(vehLabel)}</strong> ${distMe ? `· <span style="color:#fde047;">${escapeHtml(distMe)}</span>` : ''}</div>
+                <div style="font-size:11.5px;color:#fee2e2;margin-top:3px;">📍 ${escapeHtml(sectorText)}</div>
+                ${selected.nota ? `<div style="font-size:11px;color:#fecaca;margin-top:4px;font-style:italic;">"${escapeHtml(selected.nota)}"</div>` : ''}
+                <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;">
+                  <button type="button" class="m34-action-btn yovoy ${myApoyo ? 'active' : ''}" id="btnM34YoVoyModal" style="min-height:42px;">
+                    ${myApoyo ? (myApoyo.estadoApoyo === 'EN_SITIO' ? '📍 En sitio · Salir apoyo' : '✅ En camino · Cancelar') : '🚨 Yo Voy (Enviar GPS)'}
+                  </button>
+                  <button type="button" class="m34-action-btn" id="btnM34LocateModal" style="min-height:42px;flex:0 0 auto;">🗺️ Ver Mapa</button>
+                </div>
+              </div>
+            `;
+            const btnYoVoyModal = document.getElementById('btnM34YoVoyModal');
+            if (btnYoVoyModal) {
+              btnYoVoyModal.addEventListener('click', () => toggleM34YoVoy(selected.id));
+            }
+            const btnLocateModal = document.getElementById('btnM34LocateModal');
+            if (btnLocateModal) {
+              btnLocateModal.addEventListener('click', () => {
+                if (m34Modal) m34Modal.classList.remove('open');
+                focusM34EventOnMap(selected);
+              });
+            }
+          }
+
+          if (m34RespondersWrap && m34RespondersList) {
+            m34RespondersWrap.style.display = 'block';
+            if (apoyos.length === 0) {
+              m34RespondersList.innerHTML = '<div style="font-size:11px;color:#94a3b8;">Aún no hay compañeros vinculados. Toca "Yo Voy" para acudir con GPS en vivo.</div>';
+            } else {
+              m34RespondersList.innerHTML = apoyos
+                .map((ap) => {
+                  const onSite = ap.estadoApoyo === 'EN_SITIO';
+                  const aDist = (Number.isFinite(Number(ap.lat)) && Number.isFinite(Number(ap.lng)) && Number.isFinite(Number(selected.lat)) && Number.isFinite(Number(selected.lng)))
+                    ? formatM34DistanceLabel(calcularDistanciaMetros(Number(ap.lat), Number(ap.lng), Number(selected.lat), Number(selected.lng)))
+                    : '';
+                  const aSector = stripRawCoordinatesText(ap.sector || '');
+                  return `
+                    <div class="m34-responder-row">
+                      <div style="min-width:0;">
+                        <div style="font-weight:800;color:#f8fafc;">${getM34VehicleEmoji(ap.tipoVehiculo)} ${escapeHtml(ap.apodo || 'Compañero')} ${aDist ? `<span style="color:#94a3b8;font-weight:600;">(${escapeHtml(aDist)})</span>` : ''}</div>
+                        ${aSector ? `<div style="font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${escapeHtml(aSector)}</div>` : ''}
+                      </div>
+                      <span class="m34-status-chip ${onSite ? 'en-sitio' : 'en-camino'}">${onSite ? '✅ En sitio' : '🚗 En camino'}</span>
+                    </div>
+                  `;
+                })
+                .join('');
+            }
+          }
+
+          if (m34FinalizeSection) {
+            m34FinalizeSection.style.display = 'block';
+          }
+        }
+
+        if (m34RecentClosedSection && m34RecentClosedList) {
+          if (recentClosedM34Events.length === 0) {
+            m34RecentClosedSection.style.display = 'none';
+            m34RecentClosedList.innerHTML = '';
+          } else {
+            m34RecentClosedSection.style.display = 'block';
+            m34RecentClosedList.innerHTML = recentClosedM34Events
+              .slice(0, 3)
+              .map((ev) => {
+                const sector = stripRawCoordinatesText(ev.sector || 'Bucaramanga');
+                const imgHtml = ev.fotoCierre
+                  ? `<img src="${escapeHtml(ev.fotoCierre)}" alt="Cierre M34" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid rgba(52,211,153,0.65);flex-shrink:0;" />`
+                  : '';
+                return `
+                  <div class="m34-responder-row" style="align-items:flex-start;">
+                    <div style="min-width:0;flex:1;">
+                      <div style="font-weight:800;color:#6ee7b7;">✅ Todo está bien · ${escapeHtml(ev.apodo || 'Compañero')}</div>
+                      <div style="font-size:10.5px;color:#cbd5e1;">📍 ${escapeHtml(sector)}</div>
+                      <div style="font-size:10px;color:#94a3b8;">Cerrado por ${escapeHtml(ev.finalizadoPorApodo || 'Compañero')} · ${escapeHtml(formatM34ElapsedLabel(ev.finalizadoAt || ev.updatedAt))}</div>
+                    </div>
+                    ${imgHtml}
+                  </div>
+                `;
+              })
+              .join('');
+          }
+        }
+      }
+
+      function renderM34All() {
+        renderM34MapMarkers();
+        renderM34BannerUI();
+        renderM34ModalUI();
+      }
+
+      function syncM34ApoyosListeners() {
+        const activeIds = new Set(activeM34Events.map((e) => e.id));
+
+        m34ApoyosUnsubByEvent.forEach((unsub, eventId) => {
+          if (!activeIds.has(eventId)) {
+            try { unsub(); } catch (e) {}
+            m34ApoyosUnsubByEvent.delete(eventId);
+            m34ApoyosByEvent.delete(eventId);
+          }
+        });
+
+        activeM34Events.forEach((evt) => {
+          if (m34ApoyosUnsubByEvent.has(evt.id)) return;
+          const qApoyos = query(
+            collection(db, M34_COLLECTION, evt.id, M34_APOYOS_SUB),
+            limit(100)
+          );
+          const unsub = onSnapshot(
+            qApoyos,
+            (snap) => {
+              const list = [];
+              snap.forEach((d) => {
+                list.push({ id: d.id, ...d.data() });
+              });
+              list.sort((a, b) => {
+                if (a.estadoApoyo === 'EN_SITIO' && b.estadoApoyo !== 'EN_SITIO') return -1;
+                if (b.estadoApoyo === 'EN_SITIO' && a.estadoApoyo !== 'EN_SITIO') return 1;
+                return (m34ToMillis(a.createdAt) || 0) - (m34ToMillis(b.createdAt) || 0);
+              });
+              m34ApoyosByEvent.set(evt.id, list);
+
+              const curUser = auth.currentUser;
+              if (curUser && m34ResponderEventId === evt.id) {
+                const stillMine = list.some((a) => a.uid === curUser.uid);
+                if (!stillMine && Date.now() - m34ResponderLastPushAt > 4000) {
+                  stopM34ResponderWatch();
+                }
+              }
+              renderM34All();
+            },
+            (err) => {
+              if (err && err.code === 'permission-denied') {
+                handleFirestoreError(err, OperationType.LIST, `${M34_COLLECTION}/${evt.id}/${M34_APOYOS_SUB}`);
+              }
+            }
+          );
+          m34ApoyosUnsubByEvent.set(evt.id, unsub);
+        });
+      }
+
+      function startM34RealtimeListener() {
+        if (unsubscribeM34Main) return;
+        const qM34 = query(
+          collection(db, M34_COLLECTION),
+          orderBy('updatedAt', 'desc'),
+          limit(30)
+        );
+        unsubscribeM34Main = onSnapshot(
+          qM34,
+          (snap) => {
+            const nowMs = Date.now();
+            const nextActives = [];
+            const nextClosed = [];
+
+            snap.forEach((d) => {
+              const data = d.data() || {};
+              if (data.estado === 'ACTIVA') {
+                nextActives.push({ id: d.id, ...data });
+              } else if (data.estado === 'FINALIZADA') {
+                const finMs = m34ToMillis(data.finalizadoAt || data.updatedAt);
+                if (!finMs || nowMs - finMs <= M34_CLOSED_RETENTION_MS) {
+                  nextClosed.push({ id: d.id, ...data });
+                }
+              }
+            });
+
+            // Orden estable cronológico ascendente para numerar Evento 1, Evento 2, Evento 3...
+            nextActives.sort((a, b) => (m34ToMillis(a.createdAt) || 0) - (m34ToMillis(b.createdAt) || 0));
+            nextClosed.sort((a, b) => (m34ToMillis(b.finalizadoAt || b.updatedAt) || 0) - (m34ToMillis(a.finalizadoAt || a.updatedAt) || 0));
+
+            const newlyArrived = [];
+            const nextIds = new Set();
+            nextActives.forEach((evt, idx) => {
+              nextIds.add(evt.id);
+              if (!knownActiveM34Ids.has(evt.id)) {
+                newlyArrived.push({ evt, eventIndex: idx + 1 });
+              }
+            });
+
+            knownActiveM34Ids.clear();
+            nextIds.forEach((id) => knownActiveM34Ids.add(id));
+
+            activeM34Events = nextActives;
+            recentClosedM34Events = nextClosed;
+
+            if (activeM34Events.length === 0) {
+              selectedM34EventId = null;
+            } else if (!selectedM34EventId || !activeM34Events.some((e) => e.id === selectedM34EventId)) {
+              selectedM34EventId = activeM34Events[0].id;
+            }
+
+            const curUser = auth.currentUser;
+            if (m34CreatorEventId && !activeM34Events.some((e) => e.id === m34CreatorEventId)) {
+              stopM34CreatorWatch();
+            }
+            if (m34ResponderEventId && !activeM34Events.some((e) => e.id === m34ResponderEventId)) {
+              stopM34ResponderWatch();
+            }
+            if (curUser) {
+              const myActiveOwn = activeM34Events.find((e) => e.authorId === curUser.uid);
+              if (myActiveOwn && m34CreatorWatchId === null) {
+                startM34CreatorWatch(myActiveOwn.id);
+              }
+            }
+
+            syncM34ApoyosListeners();
+            renderM34All();
+
+            if (!hasSeededM34Snapshot) {
+              hasSeededM34Snapshot = true;
+              const nonSelf = curUser
+                ? nextActives.filter((e) => e.authorId !== curUser.uid)
+                : nextActives;
+              if (nonSelf.length > 0) {
+                pendingM34VoiceOnUnlock = true;
+                playM34EmergencyAlarmAndVoice(false);
+              }
+            } else if (newlyArrived.length > 0) {
+              const externalNew = newlyArrived.filter((x) => !curUser || x.evt.authorId !== curUser.uid);
+              if (externalNew.length > 0) {
+                const topNew = externalNew[0];
+                selectedM34EventId = topNew.evt.id;
+                renderM34All();
+                playM34EmergencyAlarmAndVoice(false);
+                showToast(`🚨 ¡EMERGENCIA M34! ${topNew.evt.apodo} solicita apoyo.`);
+                if (typeof isAppInBackground === 'function' && isAppInBackground()) {
+                  dispatchM34BackgroundNotification(topNew.evt, topNew.eventIndex);
+                }
+              }
+            }
+          },
+          (err) => {
+            if (err && err.code === 'permission-denied') {
+              handleFirestoreError(err, OperationType.LIST, M34_COLLECTION);
+            } else {
+              console.warn('Error escuchando módulo M34:', err);
+            }
+          }
+        );
+      }
+
+      async function activateM34Emergency() {
+        if (isActivatingM34) return;
+        isActivatingM34 = true;
+        try {
+          const user = await ensureAuthenticated();
+          if (!user) return;
+
+          const existingMine = activeM34Events.find((e) => e.authorId === user.uid);
+          if (existingMine) {
+            selectedM34EventId = existingMine.id;
+            startM34CreatorWatch(existingMine.id);
+            focusM34EventOnMap(existingMine);
+            if (m34Modal) m34Modal.classList.add('open');
+            showToast('🚨 Tu emergencia M34 ya está activa y transmitiendo GPS en vivo.');
+            return;
+          }
+
+          const { lat, lng } = await resolveCurrentBestCoordsForM34();
+          const sector = getM34SafeSector(lat, lng);
+          const apodo = getM34Apodo(user);
+          const tipoVehiculo = getM34VehicleType();
+          const nota = stripRawCoordinatesText(m34TriggerNotaInput ? m34TriggerNotaInput.value : '').slice(0, 240);
+          const eventoId = `m34_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+          await withTimeout(
+            setDoc(doc(db, M34_COLLECTION, eventoId), {
+              estado: 'ACTIVA',
+              authorId: user.uid,
+              apodo,
+              tipoVehiculo,
+              lat,
+              lng,
+              sector,
+              nota,
+              fotoCierre: null,
+              finalizadoPorUid: null,
+              finalizadoPorApodo: null,
+              finalizadoAt: null,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            }),
+            15000
+          );
+
+          if (m34TriggerNotaInput) m34TriggerNotaInput.value = '';
+          selectedM34EventId = eventoId;
+          pendingM34VoiceOnUnlock = false;
+          m34CreatorLastLat = lat;
+          m34CreatorLastLng = lng;
+          m34CreatorLastPushAt = Date.now();
+          startM34CreatorWatch(eventoId);
+          // Silencio total en el dispositivo del emisor: solo los demás compañeros escuchan la alarma y voz "M34, M34, M34"
+          showToast('🚨 ¡EMERGENCIA M34 ACTIVADA! Tu GPS en vivo ya es visible para los compañeros.');
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') return;
+          console.error('Error activando M34:', err);
+          if (err && err.code === 'permission-denied') {
+            showToast('⛔ Sin permiso para activar M34.');
+            try { handleFirestoreError(err, OperationType.CREATE, M34_COLLECTION); } catch (_) {}
+          } else {
+            showToast('No se pudo activar la alerta M34; verifica tu conexión.');
+          }
+        } finally {
+          isActivatingM34 = false;
+        }
+      }
+
+      async function toggleM34YoVoy(eventoId) {
+        if (isTogglingYoVoy || !eventoId) return;
+        const target = activeM34Events.find((e) => e.id === eventoId);
+        if (!target || target.estado !== 'ACTIVA') return;
+
+        isTogglingYoVoy = true;
+        try {
+          const user = await ensureAuthenticated();
+          if (!user) return;
+
+          const apoyos = m34ApoyosByEvent.get(eventoId) || [];
+          const existingMine = apoyos.find((a) => a.uid === user.uid);
+
+          if (existingMine) {
+            stopM34ResponderWatch();
+            await withTimeout(deleteDoc(doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid)), 12000);
+            showToast('Cancelaste tu apoyo "Yo Voy" para este evento.');
+            return;
+          }
+
+          if (m34ResponderEventId && m34ResponderEventId !== eventoId) {
+            const prevId = m34ResponderEventId;
+            stopM34ResponderWatch();
+            try {
+              await deleteDoc(doc(db, M34_COLLECTION, prevId, M34_APOYOS_SUB, user.uid));
+            } catch (e) {}
+          }
+
+          const { lat, lng } = await resolveCurrentBestCoordsForM34();
+          const sector = getM34SafeSector(lat, lng);
+          const dist = (Number.isFinite(Number(target.lat)) && Number.isFinite(Number(target.lng)))
+            ? calcularDistanciaMetros(lat, lng, Number(target.lat), Number(target.lng))
+            : Infinity;
+          const isOnSite = dist <= M34_ARRIVAL_RADIUS_METERS;
+          const estadoApoyo = isOnSite ? 'EN_SITIO' : 'EN_CAMINO';
+
+          await withTimeout(
+            setDoc(doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid), {
+              uid: user.uid,
+              apodo: getM34Apodo(user),
+              tipoVehiculo: getM34VehicleType(),
+              lat,
+              lng,
+              sector,
+              estadoApoyo,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            }),
+            15000
+          );
+
+          m34ResponderLastLat = lat;
+          m34ResponderLastLng = lng;
+          m34ResponderLastPushAt = Date.now();
+          m34ResponderWasOnSite = isOnSite;
+          startM34ResponderWatch(eventoId);
+
+          showToast(
+            isOnSite
+              ? '📍 ¡Ya estás en el sitio del evento M34! Tu llegada fue marcada.'
+              : `🚨 "Yo Voy" activo hacia ${target.apodo || 'compañero'} · GPS en vivo encendido.`
+          );
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') return;
+          console.error('Error en Yo Voy M34:', err);
+          if (err && err.code === 'permission-denied') {
+            showToast('⛔ Inicia sesión para vincularte con "Yo Voy".');
+            try { handleFirestoreError(err, OperationType.WRITE, `${M34_COLLECTION}/${eventoId}/${M34_APOYOS_SUB}`); } catch (_) {}
+          } else {
+            showToast('No se pudo registrar "Yo Voy". Intenta de nuevo.');
+          }
+        } finally {
+          isTogglingYoVoy = false;
+        }
+      }
+
+      async function finalizeM34Event(eventoId) {
+        if (isFinalizingM34 || !eventoId) return;
+        const target = activeM34Events.find((e) => e.id === eventoId);
+        if (!target || target.estado !== 'ACTIVA') return;
+
+        isFinalizingM34 = true;
+        if (btnM34FinalizeEvent) {
+          btnM34FinalizeEvent.disabled = true;
+          btnM34FinalizeEvent.textContent = 'Finalizando...';
+        }
+        try {
+          const user = await ensureAuthenticated();
+          if (!user) return;
+
+          const apodo = getM34Apodo(user);
+          const apoyos = m34ApoyosByEvent.get(eventoId) || [];
+          const hasExistingApoyo = apoyos.some((a) => a.uid === user.uid);
+          const isCreatorOrAdmin = target.authorId === user.uid || isAuthorizedAdminEmail(user);
+          const eventRef = doc(db, M34_COLLECTION, eventoId);
+          const closeData = {
+            estado: 'FINALIZADA',
+            fotoCierre: pendingM34ClosePhotoBase64 || null,
+            finalizadoPorUid: user.uid,
+            finalizadoPorApodo: apodo,
+            finalizadoAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          };
+
+          if (isCreatorOrAdmin || hasExistingApoyo) {
+            await withTimeout(updateDoc(eventRef, closeData), 15000);
+          } else {
+            // Compañero verificando físicamente en sitio sin haber tocado "Yo Voy" antes: registra apoyo EN_SITIO + finaliza en un lote atómico
+            const { lat, lng } = await resolveCurrentBestCoordsForM34();
+            const batch = writeBatch(db);
+            const apoyoRef = doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid);
+            batch.set(apoyoRef, {
+              uid: user.uid,
+              apodo,
+              tipoVehiculo: getM34VehicleType(),
+              lat,
+              lng,
+              sector: getM34SafeSector(lat, lng),
+              estadoApoyo: 'EN_SITIO',
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            });
+            batch.update(eventRef, closeData);
+            await withTimeout(batch.commit(), 15000);
+          }
+
+          if (m34CreatorEventId === eventoId) stopM34CreatorWatch();
+          if (m34ResponderEventId === eventoId) stopM34ResponderWatch();
+          clearPendingM34ClosePhoto();
+
+          if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+          }
+
+          showToast('✅ Todo está bien · Emergencia M34 finalizada y GPS detenido.');
+          if (activeM34Events.length <= 1 && m34Modal) {
+            m34Modal.classList.remove('open');
+          }
+        } catch (err) {
+          if (err && err.message === 'AUTH_CANCELLED') return;
+          console.error('Error finalizando M34:', err);
+          if (err && err.code === 'permission-denied') {
+            showToast('⛔ Sin permisos para finalizar este evento M34.');
+            try { handleFirestoreError(err, OperationType.UPDATE, `${M34_COLLECTION}/${eventoId}`); } catch (_) {}
+          } else {
+            showToast('No se pudo finalizar el evento M34.');
+          }
+        } finally {
+          isFinalizingM34 = false;
+          if (btnM34FinalizeEvent) {
+            btnM34FinalizeEvent.disabled = false;
+            btnM34FinalizeEvent.textContent = '✅ Todo está bien / Finalizar M34';
+          }
+        }
+      }
+
+      function bindM34HoldAndDoubleTap(btnEl, fillEl, opts = {}) {
+        if (!btnEl) return;
+        let holdInterval = null;
+        let holdStartedAt = 0;
+        let holdFired = false;
+        let lastTapAt = 0;
+        let singleTapTimer = null;
+
+        const resetHoldVisual = () => {
+          if (holdInterval !== null) {
+            clearInterval(holdInterval);
+            holdInterval = null;
+          }
+          if (fillEl) fillEl.style.width = '0%';
+        };
+
+        const startHold = () => {
+          resetHoldVisual();
+          holdFired = false;
+          holdStartedAt = Date.now();
+          holdInterval = setInterval(() => {
+            const elapsed = Date.now() - holdStartedAt;
+            const pct = Math.min(100, Math.round((elapsed / M34_HOLD_DURATION_MS) * 100));
+            if (fillEl) fillEl.style.width = `${pct}%`;
+            if (elapsed >= M34_HOLD_DURATION_MS) {
+              resetHoldVisual();
+              holdFired = true;
+              if (singleTapTimer) {
+                clearTimeout(singleTapTimer);
+                singleTapTimer = null;
+              }
+              lastTapAt = 0;
+              if (navigator.vibrate) {
+                try { navigator.vibrate([120, 60, 200]); } catch (e) {}
+              }
+              activateM34Emergency();
+            }
+          }, 45);
+        };
+
+        btnEl.addEventListener('pointerdown', (e) => {
+          if (e && e.button != null && e.button !== 0) return;
+          startHold();
+        });
+        btnEl.addEventListener('pointerup', resetHoldVisual);
+        btnEl.addEventListener('pointercancel', resetHoldVisual);
+        btnEl.addEventListener('pointerleave', resetHoldVisual);
+
+        btnEl.addEventListener('click', (e) => {
+          if (e) e.preventDefault();
+          if (holdFired) {
+            holdFired = false;
+            return;
+          }
+          const nowMs = Date.now();
+          if (nowMs - lastTapAt <= M34_DOUBLE_TAP_MS) {
+            lastTapAt = 0;
+            if (singleTapTimer) {
+              clearTimeout(singleTapTimer);
+              singleTapTimer = null;
+            }
+            activateM34Emergency();
+            return;
+          }
+          lastTapAt = nowMs;
+          if (typeof opts.onSingleTap === 'function') {
+            singleTapTimer = setTimeout(() => {
+              singleTapTimer = null;
+              lastTapAt = 0;
+              opts.onSingleTap();
+            }, M34_DOUBLE_TAP_MS + 20);
+          }
+        });
+      }
+
+      bindM34HoldAndDoubleTap(btnEmergencyM34, m34TriggerHoldFill, {
+        onSingleTap: () => {
+          renderM34ModalUI();
+          if (m34Modal) m34Modal.classList.add('open');
+        }
+      });
+
+      bindM34HoldAndDoubleTap(btnM34ModalHoldTrigger, m34ModalHoldFill, {
+        onSingleTap: () => {
+          showToast('🛡️ Mantén 1.5s o toca dos veces rápido para activar M34.');
+        }
+      });
+
+      if (btnCloseM34Modal && m34Modal) {
+        btnCloseM34Modal.addEventListener('click', () => m34Modal.classList.remove('open'));
+        m34Modal.addEventListener('click', (e) => {
+          if (e.target === m34Modal) m34Modal.classList.remove('open');
+        });
+      }
+
+      if (btnPreviewM34Alarm) {
+        btnPreviewM34Alarm.addEventListener('click', () => {
+          isM34AudioMuted = false;
+          playM34EmergencyAlarmAndVoice(true);
+          showToast('🔊 Reproduciendo alarma "M34, M34, M34".');
+        });
+      }
+
+      if (btnToggleM34Mute) {
+        btnToggleM34Mute.addEventListener('click', () => {
+          isM34AudioMuted = !isM34AudioMuted;
+          if (isM34AudioMuted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+          }
+          renderM34BannerUI();
+          showToast(isM34AudioMuted ? '🔇 Alarma de voz M34 silenciada.' : '🔊 Alarma de voz M34 reactivada.');
+        });
+      }
+
+      if (btnOpenM34FromBanner) {
+        btnOpenM34FromBanner.addEventListener('click', () => {
+          renderM34ModalUI();
+          if (m34Modal) m34Modal.classList.add('open');
+        });
+      }
+
+      if (m34DangerBannerInfo) {
+        m34DangerBannerInfo.addEventListener('click', () => {
+          const sel = getSelectedM34Event();
+          if (sel) focusM34EventOnMap(sel);
+        });
+      }
+
+      if (btnM34FocusBanner) {
+        btnM34FocusBanner.addEventListener('click', () => {
+          const sel = getSelectedM34Event();
+          if (sel) focusM34EventOnMap(sel);
+        });
+      }
+
+      if (btnM34YoVoyBanner) {
+        btnM34YoVoyBanner.addEventListener('click', () => {
+          const sel = getSelectedM34Event();
+          if (sel) toggleM34YoVoy(sel.id);
+        });
+      }
+
+      if (btnM34OpenCloseBanner) {
+        btnM34OpenCloseBanner.addEventListener('click', () => {
+          renderM34ModalUI();
+          if (m34Modal) m34Modal.classList.add('open');
+        });
+      }
+
+      const handleEventTabSelect = (e) => {
+        const btn = e && e.target && typeof e.target.closest === 'function'
+          ? e.target.closest('[data-m34-select]')
+          : null;
+        if (!btn) return;
+        const id = btn.getAttribute('data-m34-select');
+        if (!id) return;
+        selectedM34EventId = id;
+        renderM34All();
+      };
+      if (m34BannerEventTabs) m34BannerEventTabs.addEventListener('click', handleEventTabSelect);
+      if (m34ModalEventSelector) m34ModalEventSelector.addEventListener('click', handleEventTabSelect);
+
+      if (m34ClosePhotoInput) {
+        m34ClosePhotoInput.addEventListener('change', async (e) => {
+          const file = e && e.target && e.target.files ? e.target.files[0] : null;
+          if (!file) return;
+          if (file.type && !file.type.startsWith('image/')) {
+            showToast('Selecciona una imagen válida para confirmar el cierre.');
+            return;
+          }
+          if (m34ClosePhotoStatus) m34ClosePhotoStatus.textContent = 'Comprimiendo fotografía...';
+          try {
+            const compressed = await comprimirImagenACanvasBase64(file, 720, 0.64);
+            if (!compressed || compressed.length > 445000) {
+              showToast('La imagen supera el tamaño permitido incluso comprimida.');
+              clearPendingM34ClosePhoto();
+              return;
+            }
+            pendingM34ClosePhotoBase64 = compressed;
+            if (m34ClosePhotoPreview) {
+              m34ClosePhotoPreview.src = compressed;
+              m34ClosePhotoPreview.style.display = 'block';
+            }
+            if (btnM34ClearClosePhoto) btnM34ClearClosePhoto.style.display = 'inline-flex';
+            if (m34ClosePhotoStatus) {
+              m34ClosePhotoStatus.textContent = `📸 Foto lista (${Math.round(compressed.length / 1024)} KB).`;
+            }
+          } catch (err) {
+            console.error('Error comprimiendo foto M34:', err);
+            showToast('No se pudo procesar la fotografía.');
+            clearPendingM34ClosePhoto();
+          }
+        });
+      }
+
+      if (btnM34ClearClosePhoto) {
+        btnM34ClearClosePhoto.addEventListener('click', clearPendingM34ClosePhoto);
+      }
+
+      if (btnM34FinalizeEvent) {
+        btnM34FinalizeEvent.addEventListener('click', () => {
+          const sel = getSelectedM34Event();
+          if (sel) finalizeM34Event(sel.id);
+        });
+      }
+
+      window.__anthiSyncM34Auth = function(user) {
+        if (!user) {
+          stopM34CreatorWatch();
+          stopM34ResponderWatch();
+        } else if (!hasExternalActiveM34Events()) {
+          pendingM34VoiceOnUnlock = false;
+        }
+        renderM34All();
+      };
+
+      window.__anthiGetM34State = function() {
+        return {
+          activeCount: activeM34Events.length,
+          selectedEventId: selectedM34EventId,
+          activeEvents: activeM34Events,
+          recentClosedCount: recentClosedM34Events.length,
+          isCreatorWatching: m34CreatorWatchId !== null,
+          isResponderWatching: m34ResponderWatchId !== null,
+          isMuted: isM34AudioMuted
+        };
+      };
+
+      updateM34ProfileBadge();
+      startM34RealtimeListener();
+      window.__anthiM34Ready = true;
+    } catch (m34InitErr) {
+      console.error('Error inicializando módulo M34:', m34InitErr);
     }
     });
   </script>
