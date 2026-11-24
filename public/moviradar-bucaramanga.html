@@ -4654,7 +4654,7 @@
 
         <div id="authSignedOutView">
           <p style="font-size:12.5px;color:#cbd5e1;line-height:1.45;margin-bottom:14px;text-align:center;">
-            Ingresa en un toque con tu cuenta real de Google. <strong>Sin contraseñas manuales</strong> ni registros largos.
+            Ingresa directo a ANTHI con tu cuenta de Google. <strong>Sin contraseñas ni códigos adicionales</strong> (el acceso VIP es opcional dentro de la app).
           </p>
 
           <button type="button" class="btn-google-auth" id="googleLoginBtn" style="min-height:50px;font-size:14px;">
@@ -7849,10 +7849,6 @@
 
     let pendingAuthResolvers = [];
 
-    function hasVerifiedGoogleAccount(user) {
-      if (!user || !user.email) return false;
-      return user.emailVerified !== false;
-    }
 
     function clearAuthError() {
       if (!authErrorMsg) return;
@@ -8076,7 +8072,7 @@
     if (btnReloginAfterConflict) {
       btnReloginAfterConflict.addEventListener('click', () => {
         closeSessionConflictModal();
-        openAuthModal('login');
+        openAuthModal();
       });
     }
     if (sessionConflictModal) {
@@ -8311,15 +8307,7 @@
         return;
       }
 
-      if (!hasVerifiedGoogleAccount(user)) {
-        try {
-          await signOut(auth);
-        } catch (e) {}
-        openAuthModal();
-        showAuthError('Ingresa con tu cuenta real de Google para validar tu correo sin contraseña.');
-        return;
-      }
-
+      updateAuthUI(user);
       currentVipProfile = loadCachedVipProfile(user.uid);
       refreshVipUIEverywhere();
 
@@ -8388,11 +8376,11 @@
           await auth.authStateReady();
         } catch (e) {}
       }
-      if (auth.currentUser && hasVerifiedGoogleAccount(auth.currentUser)) {
+      if (auth.currentUser) {
         return auth.currentUser;
       }
       openAuthModal();
-      showToast('Toca "Continuar con Google" para ingresar rápido sin contraseña.');
+      showToast('Toca "Continuar con Google" para ingresar directo.');
       return new Promise((resolve, reject) => {
         pendingAuthResolvers.push({ resolve, reject });
       });
@@ -8412,29 +8400,29 @@
 
       try {
         const cred = await signInWithPopup(auth, googleProvider);
-        if (!hasVerifiedGoogleAccount(cred && cred.user)) {
-          await signOut(auth);
-          showAuthError('Tu cuenta de Google debe tener un correo real verificado para ingresar.');
+        const signedInUser = cred && cred.user ? cred.user : auth.currentUser;
+        if (!signedInUser) {
+          showAuthError('No se recibió la cuenta de Google. Inténtalo de nuevo.');
           return;
         }
-        await claimExclusiveSessionForUser(cred.user, { forceNew: false });
-        updateAuthUI(cred.user);
-        if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
-          window.__anthiSyncHojaVidaOnAuth(cred.user);
-        }
-        if (typeof window.__anthiSyncM34Auth === 'function') {
-          window.__anthiSyncM34Auth(cred.user);
-        }
-        if (pendingAuthResolvers.length > 0) {
-          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
-          waiters.forEach((w) => w.resolve(cred.user));
-        }
+        updateAuthUI(signedInUser);
         closeSessionConflictModal();
         closeAuthModal(false);
+        if (pendingAuthResolvers.length > 0) {
+          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
+          waiters.forEach((w) => w.resolve(signedInUser));
+        }
+        await claimExclusiveSessionForUser(signedInUser, { forceNew: false });
+        if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
+          window.__anthiSyncHojaVidaOnAuth(signedInUser);
+        }
+        if (typeof window.__anthiSyncM34Auth === 'function') {
+          window.__anthiSyncM34Auth(signedInUser);
+        }
         if (typeof window.requestAnthiNotificationPermission === 'function') {
           window.requestAnthiNotificationPermission({ interactive: true });
         }
-        showToast('¡Sesión única con Google activada en este dispositivo!');
+        showToast('¡Bienvenido a ANTHI! Sesión con Google activada.');
       } catch (err) {
         console.error('Error en acceso rápido con Google:', err);
         showAuthError(mapFirebaseAuthError(err));
