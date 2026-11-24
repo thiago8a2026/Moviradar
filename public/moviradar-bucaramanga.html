@@ -3882,7 +3882,7 @@
           <span id="mapControlsToggleIcon">▴</span>
           <span id="mapControlsToggleLabel">Panel</span>
         </button>
-        <button type="button" class="auth-btn" id="btnAuth" title="Iniciar sesión o registrarse con correo electrónico">
+        <button type="button" class="auth-btn" id="btnAuth" title="Acceso rápido en un toque con Google">
           Entrar
         </button>
       </div>
@@ -4644,7 +4644,7 @@
       </div>
     </div>
 
-    <!-- Modal de Acceso / Registro con Correo y Contraseña (Firebase Auth) -->
+    <!-- Modal de Acceso Rápido con Google (Firebase Auth) -->
     <div class="modal-backdrop" id="authModal">
       <div class="modal-card">
         <div class="modal-header">
@@ -4653,8 +4653,12 @@
         </div>
 
         <div id="authSignedOutView">
-          <button type="button" class="btn-google-auth" id="googleLoginBtn">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <p style="font-size:12.5px;color:#cbd5e1;line-height:1.45;margin-bottom:14px;text-align:center;">
+            Ingresa en un toque con tu cuenta real de Google. <strong>Sin contraseñas manuales</strong> ni registros largos.
+          </p>
+
+          <button type="button" class="btn-google-auth" id="googleLoginBtn" style="min-height:50px;font-size:14px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
               <path fill="#34A853" d="M12 24c3.3 0 6.08-1.09 8.11-2.96l-3.88-3.05c-1.09.73-2.48 1.16-4.23 1.16-3.25 0-6-2.19-6.98-5.15H1.01v3.14C3.03 21.15 7.21 24 12 24Z"/>
               <path fill="#FBBC05" d="M5.02 14a7.17 7.17 0 0 1 0-4.57V6.29H1.01a11.98 11.98 0 0 0 0 10.85L5.02 14Z"/>
@@ -4663,56 +4667,7 @@
             <span>Continuar con Google</span>
           </button>
 
-          <div class="auth-divider">o usa tu correo</div>
-
-          <div class="auth-tabs">
-            <button type="button" class="auth-tab active" id="tabLoginMode">Iniciar Sesión</button>
-            <button type="button" class="auth-tab" id="tabRegisterMode">Registrarse por primera vez</button>
-          </div>
-
-          <div class="auth-error" id="authErrorMsg"></div>
-
-          <div class="auth-verify-box" id="authVerifyBox">
-            <div id="authVerifyMessage">
-              Te enviamos un enlace real de verificación. Revisa tu bandeja de entrada o Spam y confirma tu correo antes de iniciar sesión.
-            </div>
-            <div class="auth-verify-actions">
-              <button type="button" class="btn-resend-verify" id="btnResendVerificationEmail">
-                📨 Reenviar enlace de verificación
-              </button>
-              <span id="authVerifyEmailTarget" style="font-size:11px;font-weight:700;color:#fef3c7;word-break:break-all;"></span>
-            </div>
-          </div>
-
-          <form id="authForm">
-            <label class="form-label" for="authEmail">Correo electrónico real *</label>
-            <input
-              type="email"
-              id="authEmail"
-              class="text-input"
-              required
-              autocomplete="email"
-              autocapitalize="none"
-              autocorrect="off"
-              spellcheck="false"
-              placeholder="tu.nombre@gmail.com"
-            />
-
-            <label class="form-label" for="authPassword">Contraseña * (mínimo 6 caracteres)</label>
-            <input
-              type="password"
-              id="authPassword"
-              class="text-input"
-              required
-              minlength="6"
-              autocomplete="current-password"
-              placeholder="••••••••"
-            />
-
-            <button type="submit" class="btn-submit" id="btnAuthSubmit">
-              Iniciar Sesión
-            </button>
-          </form>
+          <div class="auth-error" id="authErrorMsg" style="margin-top:12px;margin-bottom:0;"></div>
         </div>
 
         <div id="authSignedInView" style="display:none;">
@@ -5819,9 +5774,6 @@
         getAuth,
         GoogleAuthProvider,
         signInWithPopup,
-        createUserWithEmailAndPassword,
-        signInWithEmailAndPassword,
-        sendEmailVerification,
         signOut,
         onAuthStateChanged
       }
@@ -7888,12 +7840,6 @@
     const authSignedOutView = document.getElementById('authSignedOutView');
     const authSignedInView = document.getElementById('authSignedInView');
     const authModalTitle = document.getElementById('authModalTitle');
-    const tabLoginMode = document.getElementById('tabLoginMode');
-    const tabRegisterMode = document.getElementById('tabRegisterMode');
-    const authForm = document.getElementById('authForm');
-    const authEmailInput = document.getElementById('authEmail');
-    const authPasswordInput = document.getElementById('authPassword');
-    const btnAuthSubmit = document.getElementById('btnAuthSubmit');
     const authErrorMsg = document.getElementById('authErrorMsg');
     const authUserEmailLabel = document.getElementById('authUserEmailLabel');
     const btnSignOut = document.getElementById('btnSignOut');
@@ -7901,47 +7847,11 @@
     const googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-    const authVerifyBox = document.getElementById('authVerifyBox');
-    const authVerifyMessage = document.getElementById('authVerifyMessage');
-    const authVerifyEmailTarget = document.getElementById('authVerifyEmailTarget');
-    const btnResendVerificationEmail = document.getElementById('btnResendVerificationEmail');
-
-    let authMode = 'login';
     let pendingAuthResolvers = [];
-    let isProcessingAuthVerificationFlow = false;
-    let authVerifyCooldownUntil = 0;
 
-    const DISPOSABLE_OR_FAKE_EMAIL_DOMAINS = new Set([
-      'example.com', 'example.org', 'example.net', 'test.com', 'fake.com',
-      'correo.com', 'mailinator.com', 'yopmail.com', 'tempmail.com', 'temp-mail.org',
-      'guerrillamail.com', '10minutemail.com', 'trashmail.com', 'fakeinbox.com',
-      'getnada.com', 'sharklasers.com', 'dispostable.com', 'localhost', 'invalid'
-    ]);
-
-    function isValidRealEmailFormat(rawEmail) {
-      const email = String(rawEmail || '').trim().toLowerCase();
-      if (!email || email.length > 160 || email.includes('..')) return false;
-      const match = email.match(/^([a-z0-9._%+-]+)@([a-z0-9.-]+)\.([a-z]{2,18})$/);
-      if (!match) return false;
-      const localPart = match[1];
-      const domain = `${match[2]}.${match[3]}`;
-      if (localPart.length < 2 || localPart.startsWith('.') || localPart.endsWith('.')) return false;
-      if (match[2].startsWith('-') || match[2].endsWith('-') || match[2].startsWith('.')) return false;
-      if (DISPOSABLE_OR_FAKE_EMAIL_DOMAINS.has(domain)) return false;
-      return true;
-    }
-
-    function requiresEmailVerificationCheck(user) {
-      if (!user) return false;
-      const providers = Array.isArray(user.providerData) ? user.providerData : [];
-      const hasPasswordProvider = providers.some((p) => p && p.providerId === 'password');
-      if (hasPasswordProvider) {
-        return user.emailVerified !== true;
-      }
-      if (providers.length === 0 && user.email && user.emailVerified === false) {
-        return true;
-      }
-      return user.emailVerified === false;
+    function hasVerifiedGoogleAccount(user) {
+      if (!user || !user.email) return false;
+      return user.emailVerified !== false;
     }
 
     function clearAuthError() {
@@ -7956,53 +7866,10 @@
       authErrorMsg.classList.add('visible');
     }
 
-    function hideAuthVerificationBox() {
-      if (!authVerifyBox) return;
-      authVerifyBox.classList.remove('visible');
-    }
-
-    function showAuthVerificationBox(email, customMessage = '') {
-      if (!authVerifyBox) return;
-      if (authVerifyMessage) {
-        authVerifyMessage.textContent = customMessage ||
-          'Te enviamos un enlace real de verificación a tu correo. Revisa tu bandeja de entrada o Spam, confirma el enlace y vuelve a iniciar sesión.';
-      }
-      if (authVerifyEmailTarget) {
-        authVerifyEmailTarget.textContent = email ? String(email).trim() : '';
-      }
-      authVerifyBox.classList.add('visible');
-    }
-
-    function setAuthMode(mode, options = {}) {
-      authMode = mode === 'register' ? 'register' : 'login';
-      clearAuthError();
-      if (!options.keepVerifyBox) {
-        hideAuthVerificationBox();
-      }
-      if (authMode === 'register') {
-        tabRegisterMode.classList.add('active');
-        tabLoginMode.classList.remove('active');
-        btnAuthSubmit.textContent = 'Crear cuenta y verificar correo';
-        authPasswordInput.setAttribute('autocomplete', 'new-password');
-      } else {
-        tabLoginMode.classList.add('active');
-        tabRegisterMode.classList.remove('active');
-        btnAuthSubmit.textContent = 'Iniciar Sesión';
-        authPasswordInput.setAttribute('autocomplete', 'current-password');
-      }
-    }
-
     function mapFirebaseAuthError(err) {
       const code = err && err.code ? String(err.code) : '';
       const rawMessage = err && err.message ? String(err.message) : '';
-      if (code === 'auth/email-already-in-use') return 'Este correo ya está registrado. Cambia a "Iniciar Sesión".';
-      if (code === 'auth/invalid-email' || code === 'auth/missing-email') return 'Ingresa un correo electrónico real y válido.';
-      if (code === 'auth/weak-password') return 'La contraseña debe tener al menos 6 caracteres.';
-      if (code === 'auth/missing-password') return 'Ingresa tu contraseña para continuar.';
       if (code === 'auth/user-disabled') return 'Esta cuenta está deshabilitada. Contacta al administrador.';
-      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-        return 'Correo o contraseña incorrectos.';
-      }
       if (code === 'auth/too-many-requests') return 'Demasiados intentos. Espera un momento antes de volver a intentar.';
       if (code === 'auth/network-request-failed') return 'Error de red al conectar con Firebase. Verifica tu señal e inténtalo de nuevo.';
       if (code === 'auth/unauthorized-domain') {
@@ -8010,17 +7877,17 @@
       }
       if (code === 'auth/invalid-api-key') return 'La API Key de Firebase no es válida para este proyecto.';
       if (code === 'auth/popup-closed-by-user') return 'Cerraste la ventana de Google antes de terminar el acceso.';
-      if (code === 'auth/popup-blocked') return 'El navegador bloqueó la ventana emergente de Google. Permite pop-ups o usa tu correo.';
+      if (code === 'auth/popup-blocked') return 'El navegador bloqueó la ventana emergente de Google. Permite las ventanas emergentes e intenta de nuevo.';
       if (code === 'auth/cancelled-popup-request') return 'Ya hay una ventana de Google abierta.';
       if (code === 'auth/account-exists-with-different-credential') {
         return 'Este correo ya está registrado con otro método de acceso.';
       }
-      if (code === 'auth/operation-not-allowed' || rawMessage.includes('PASSWORD_LOGIN_DISABLED')) {
-        return 'Falta activar este método en Firebase Console -> Authentication -> Sign-in method.';
+      if (code === 'auth/operation-not-allowed' || rawMessage.includes('OPERATION_NOT_ALLOWED')) {
+        return 'Falta activar Google Sign-In en Firebase Console -> Authentication -> Sign-in method.';
       }
       return code
-        ? `No se pudo completar el acceso (${code}). Verifica tu conexión e inténtalo de nuevo.`
-        : 'No se pudo completar el acceso. Verifica tu conexión e inténtalo de nuevo.';
+        ? `No se pudo completar el acceso con Google (${code}). Verifica tu conexión e inténtalo de nuevo.`
+        : 'No se pudo completar el acceso con Google. Verifica tu conexión e inténtalo de nuevo.';
     }
 
     const authApodoInput = document.getElementById('authApodoInput');
@@ -8053,8 +7920,8 @@
       return clean;
     }
 
-    function openAuthModal(defaultMode = 'login') {
-      setAuthMode(defaultMode);
+    function openAuthModal() {
+      clearAuthError();
       const user = auth.currentUser;
       if (user) {
         authModalTitle.textContent = 'Cuenta ANTHI';
@@ -8109,7 +7976,7 @@
       } else {
         btnAuth.textContent = 'Entrar';
         btnAuth.classList.remove('signed-in');
-        btnAuth.title = 'Iniciar sesión o registrarse con correo y contraseña';
+        btnAuth.title = 'Acceso rápido en un toque con Google';
       }
     }
 
@@ -8418,10 +8285,6 @@
 
     onAuthStateChanged(auth, async (user) => {
       try {
-      if (isProcessingAuthVerificationFlow) {
-        return;
-      }
-
       if (!user) {
         detachUserSessionListener(true);
         if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
@@ -8448,30 +8311,13 @@
         return;
       }
 
-      if (requiresEmailVerificationCheck(user)) {
-        let verifiedUser = user;
-        if (typeof user.reload === 'function') {
-          try {
-            await user.reload();
-            verifiedUser = auth.currentUser || user;
-          } catch (e) {}
-        }
-        if (requiresEmailVerificationCheck(verifiedUser)) {
-          const blockedEmail = verifiedUser.email || '';
-          try {
-            await signOut(auth);
-          } catch (e) {}
-          if (authEmailInput && blockedEmail && !authEmailInput.value.trim()) {
-            authEmailInput.value = blockedEmail;
-          }
-          openAuthModal('login');
-          showAuthVerificationBox(
-            blockedEmail,
-            'Tu cuenta aún no tiene el correo verificado. Abre el enlace de verificación enviado a tu correo (revisa Spam) antes de ingresar.'
-          );
-          showToast('📧 Verifica tu correo real para activar tu cuenta en ANTHI.');
-          return;
-        }
+      if (!hasVerifiedGoogleAccount(user)) {
+        try {
+          await signOut(auth);
+        } catch (e) {}
+        openAuthModal();
+        showAuthError('Ingresa con tu cuenta real de Google para validar tu correo sin contraseña.');
+        return;
       }
 
       currentVipProfile = loadCachedVipProfile(user.uid);
@@ -8542,169 +8388,20 @@
           await auth.authStateReady();
         } catch (e) {}
       }
-      if (auth.currentUser && !requiresEmailVerificationCheck(auth.currentUser)) {
+      if (auth.currentUser && hasVerifiedGoogleAccount(auth.currentUser)) {
         return auth.currentUser;
       }
-      openAuthModal('login');
-      showToast('Inicia sesión con un correo verificado para continuar.');
+      openAuthModal();
+      showToast('Toca "Continuar con Google" para ingresar rápido sin contraseña.');
       return new Promise((resolve, reject) => {
         pendingAuthResolvers.push({ resolve, reject });
       });
     }
 
-    tabLoginMode.addEventListener('click', () => setAuthMode('login'));
-    tabRegisterMode.addEventListener('click', () => setAuthMode('register'));
-    btnAuth.addEventListener('click', () => openAuthModal('login'));
+    btnAuth.addEventListener('click', () => openAuthModal());
     btnCloseAuthModal.addEventListener('click', () => closeAuthModal(true));
     authModal.addEventListener('click', (e) => {
       if (e.target === authModal) closeAuthModal(true);
-    });
-
-    if (btnResendVerificationEmail) {
-      btnResendVerificationEmail.addEventListener('click', async () => {
-        clearAuthError();
-        const now = Date.now();
-        if (now < authVerifyCooldownUntil) {
-          const waitSec = Math.ceil((authVerifyCooldownUntil - now) / 1000);
-          showAuthError(`Espera ${waitSec}s antes de reenviar otro correo de verificación.`);
-          return;
-        }
-        const email = authEmailInput ? authEmailInput.value.trim() : '';
-        const password = authPasswordInput ? authPasswordInput.value : '';
-        if (!isValidRealEmailFormat(email) || password.length < 6) {
-          showAuthError('Ingresa tu correo real y tu contraseña (mínimo 6 caracteres) arriba para reenviar el enlace.');
-          return;
-        }
-
-        btnResendVerificationEmail.disabled = true;
-        btnResendVerificationEmail.textContent = 'Enviando enlace...';
-        isProcessingAuthVerificationFlow = true;
-        try {
-          const cred = await signInWithEmailAndPassword(auth, email, password);
-          let freshUser = cred.user;
-          if (freshUser && typeof freshUser.reload === 'function') {
-            try {
-              await freshUser.reload();
-              freshUser = auth.currentUser || freshUser;
-            } catch (e) {}
-          }
-          if (freshUser && !requiresEmailVerificationCheck(freshUser)) {
-            isProcessingAuthVerificationFlow = false;
-            await claimExclusiveSessionForUser(freshUser, { forceNew: false });
-            hideAuthVerificationBox();
-            closeSessionConflictModal();
-            authForm.reset();
-            closeAuthModal(false);
-            showToast('✅ ¡Tu correo ya estaba verificado! Sesión iniciada.');
-            return;
-          }
-          if (typeof sendEmailVerification === 'function' && freshUser) {
-            await sendEmailVerification(freshUser);
-          }
-          await signOut(auth);
-          authVerifyCooldownUntil = Date.now() + 45000;
-          showAuthVerificationBox(
-            email,
-            `Enlace de verificación reenviado a ${email}. Revisa bandeja principal y Spam, confirma tu correo y pulsa "Iniciar Sesión".`
-          );
-          showToast('📨 Enlace de verificación reenviado a tu correo.');
-        } catch (err) {
-          showAuthError(mapFirebaseAuthError(err));
-        } finally {
-          isProcessingAuthVerificationFlow = false;
-          btnResendVerificationEmail.disabled = false;
-          btnResendVerificationEmail.textContent = '📨 Reenviar enlace de verificación';
-        }
-      });
-    }
-
-    authForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      clearAuthError();
-      const email = authEmailInput.value.trim();
-      const password = authPasswordInput.value;
-
-      if (!isValidRealEmailFormat(email)) {
-        showAuthError('Ingresa un correo electrónico real y válido (ej: tu.nombre@gmail.com). No se permiten correos falsos o temporales.');
-        if (authEmailInput) authEmailInput.focus();
-        return;
-      }
-
-      if (password.length < 6) {
-        showAuthError('Ingresa una contraseña de al menos 6 caracteres.');
-        if (authPasswordInput) authPasswordInput.focus();
-        return;
-      }
-
-      btnAuthSubmit.disabled = true;
-      btnAuthSubmit.textContent = authMode === 'register' ? 'Creando y verificando...' : 'Verificando acceso...';
-      isProcessingAuthVerificationFlow = true;
-
-      try {
-        if (authMode === 'register') {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          if (typeof sendEmailVerification === 'function' && cred && cred.user) {
-            await sendEmailVerification(cred.user);
-          }
-          await signOut(auth);
-          authVerifyCooldownUntil = Date.now() + 45000;
-          setAuthMode('login', { keepVerifyBox: true });
-          showAuthVerificationBox(
-            email,
-            `¡Cuenta creada! Enviamos un enlace de verificación real a ${email}. Confirma el correo (revisa Spam) y luego pulsa "Iniciar Sesión".`
-          );
-          showToast('📧 Revisa tu correo para verificar la cuenta antes de entrar.');
-          return;
-        }
-
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        let verifiedUser = cred.user;
-        if (verifiedUser && typeof verifiedUser.reload === 'function') {
-          try {
-            await verifiedUser.reload();
-            verifiedUser = auth.currentUser || verifiedUser;
-          } catch (e) {}
-        }
-
-        if (requiresEmailVerificationCheck(verifiedUser)) {
-          await signOut(auth);
-          showAuthVerificationBox(
-            email,
-            `El correo ${email} aún no ha sido verificado. Abre el enlace que enviamos a tu correo (revisa Spam) o reenvíalo abajo.`
-          );
-          showAuthError('Debes verificar tu correo electrónico real antes de iniciar sesión.');
-          return;
-        }
-
-        isProcessingAuthVerificationFlow = false;
-        hideAuthVerificationBox();
-        await claimExclusiveSessionForUser(verifiedUser, { forceNew: false });
-        updateAuthUI(verifiedUser);
-        if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
-          window.__anthiSyncHojaVidaOnAuth(verifiedUser);
-        }
-        if (typeof window.__anthiSyncM34Auth === 'function') {
-          window.__anthiSyncM34Auth(verifiedUser);
-        }
-        if (pendingAuthResolvers.length > 0) {
-          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
-          waiters.forEach((w) => w.resolve(verifiedUser));
-        }
-        showToast('¡Sesión única activada en este dispositivo!');
-        closeSessionConflictModal();
-        authForm.reset();
-        closeAuthModal(false);
-        if (typeof window.requestAnthiNotificationPermission === 'function') {
-          window.requestAnthiNotificationPermission({ interactive: true });
-        }
-      } catch (err) {
-        console.error('Error en Firebase Auth:', err);
-        showAuthError(mapFirebaseAuthError(err));
-      } finally {
-        isProcessingAuthVerificationFlow = false;
-        btnAuthSubmit.disabled = false;
-        btnAuthSubmit.textContent = authMode === 'register' ? 'Crear cuenta y verificar correo' : 'Iniciar Sesión';
-      }
     });
 
     googleLoginBtn.addEventListener('click', async () => {
@@ -8715,9 +8412,24 @@
 
       try {
         const cred = await signInWithPopup(auth, googleProvider);
+        if (!hasVerifiedGoogleAccount(cred && cred.user)) {
+          await signOut(auth);
+          showAuthError('Tu cuenta de Google debe tener un correo real verificado para ingresar.');
+          return;
+        }
         await claimExclusiveSessionForUser(cred.user, { forceNew: false });
+        updateAuthUI(cred.user);
+        if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
+          window.__anthiSyncHojaVidaOnAuth(cred.user);
+        }
+        if (typeof window.__anthiSyncM34Auth === 'function') {
+          window.__anthiSyncM34Auth(cred.user);
+        }
+        if (pendingAuthResolvers.length > 0) {
+          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
+          waiters.forEach((w) => w.resolve(cred.user));
+        }
         closeSessionConflictModal();
-        authForm.reset();
         closeAuthModal(false);
         if (typeof window.requestAnthiNotificationPermission === 'function') {
           window.requestAnthiNotificationPermission({ interactive: true });
