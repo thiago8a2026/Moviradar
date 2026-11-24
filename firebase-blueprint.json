@@ -174,7 +174,7 @@
     },
     "HojaVidaVehiculo": {
       "title": "Hoja de Vida del Vehículo ANTHI",
-      "description": "Registro privado de placa, servicio (particular o taxi), kilometraje, documentos (SOAT, técnico-mecánica, pase, tarjeta de operación) y recordatorios de mantenimiento.",
+      "description": "Registro privado de placa (3 letras y 3 números), tipo de vehículo y documentos clave de control (SOAT, técnico-mecánica, tarjeta de operación y paz y salvo).",
       "type": "object",
       "properties": {
         "tipoVehiculo": {
@@ -184,12 +184,9 @@
         },
         "placa": {
           "type": "string",
-          "description": "Placa del vehículo registrada por el conductor.",
+          "description": "Placa del vehículo registrada en formato estándar de 3 letras y 3 números.",
+          "pattern": "^(|[A-Z]{3}[0-9]{3})$",
           "maxLength": 10
-        },
-        "kmActual": {
-          "type": "number",
-          "description": "Kilometraje actual del vehículo en km."
         },
         "soatVencimiento": {
           "type": "string",
@@ -201,19 +198,28 @@
           "description": "Fecha de vencimiento de la revisión técnico-mecánica en formato YYYY-MM-DD.",
           "maxLength": 20
         },
-        "paseVencimiento": {
-          "type": "string",
-          "description": "Fecha de vencimiento de la licencia/pase de conducción (taxi/público) en formato YYYY-MM-DD.",
-          "maxLength": 20
-        },
         "tarjetaOperacionVencimiento": {
           "type": "string",
           "description": "Fecha de vencimiento de la tarjeta de operación para taxi en formato YYYY-MM-DD.",
           "maxLength": 20
         },
+        "pazSalvoVencimiento": {
+          "type": "string",
+          "description": "Fecha de vencimiento o control del paz y salvo en formato YYYY-MM-DD.",
+          "maxLength": 20
+        },
+        "kmActual": {
+          "type": "number",
+          "description": "Campo legado opcional de kilometraje."
+        },
+        "paseVencimiento": {
+          "type": "string",
+          "description": "Campo legado opcional de pase.",
+          "maxLength": 20
+        },
         "recordatorios": {
           "type": "array",
-          "description": "Lista acotada de hasta 25 recordatorios adicionales por tiempo o kilometraje."
+          "description": "Campo legado opcional de recordatorios."
         },
         "updatedAt": {
           "type": "string",
@@ -224,12 +230,10 @@
       "required": [
         "tipoVehiculo",
         "placa",
-        "kmActual",
         "soatVencimiento",
         "tecnoVencimiento",
-        "paseVencimiento",
         "tarjetaOperacionVencimiento",
-        "recordatorios",
+        "pazSalvoVencimiento",
         "updatedAt"
       ]
     },

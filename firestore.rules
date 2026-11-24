@@ -243,26 +243,26 @@ service cloud.firestore {
 
     function isValidHojaVida(data) {
       return data.keys().hasAll([
-          'tipoVehiculo', 'placa', 'kmActual',
+          'tipoVehiculo', 'placa',
           'soatVencimiento', 'tecnoVencimiento',
-          'paseVencimiento', 'tarjetaOperacionVencimiento',
-          'recordatorios', 'updatedAt'
+          'tarjetaOperacionVencimiento', 'pazSalvoVencimiento',
+          'updatedAt'
         ])
         && data.keys().hasOnly([
           'tipoVehiculo', 'placa', 'kmActual',
           'soatVencimiento', 'tecnoVencimiento',
-          'paseVencimiento', 'tarjetaOperacionVencimiento',
+          'paseVencimiento', 'tarjetaOperacionVencimiento', 'pazSalvoVencimiento',
           'recordatorios', 'updatedAt'
         ])
         && (data.tipoVehiculo == 'particular' || data.tipoVehiculo == 'moto' || data.tipoVehiculo == 'taxi' || data.tipoVehiculo == 'camioneta')
-        && data.placa is string && data.placa.size() <= 10
-        && data.kmActual is number && data.kmActual >= 0 && data.kmActual <= 5000000
+        && data.placa is string && data.placa.size() <= 10 && (data.placa == '' || data.placa.matches('^[A-Z]{3}[0-9]{3}$'))
         && data.soatVencimiento is string && data.soatVencimiento.size() <= 20
         && data.tecnoVencimiento is string && data.tecnoVencimiento.size() <= 20
-        && data.paseVencimiento is string && data.paseVencimiento.size() <= 20
         && data.tarjetaOperacionVencimiento is string && data.tarjetaOperacionVencimiento.size() <= 20
-        && data.recordatorios is list && data.recordatorios.size() <= 25
-        && (data.recordatorios.size() == 0 || data.recordatorios[0] is map)
+        && data.pazSalvoVencimiento is string && data.pazSalvoVencimiento.size() <= 20
+        && (!('kmActual' in data) || (data.kmActual is number && data.kmActual >= 0 && data.kmActual <= 5000000))
+        && (!('paseVencimiento' in data) || (data.paseVencimiento is string && data.paseVencimiento.size() <= 20))
+        && (!('recordatorios' in data) || (data.recordatorios is list && data.recordatorios.size() <= 25 && (data.recordatorios.size() == 0 || data.recordatorios[0] is map)))
         && data.updatedAt is timestamp;
     }
 
@@ -615,7 +615,7 @@ service cloud.firestore {
           && incoming().diff(existing()).affectedKeys().hasOnly([
             'tipoVehiculo', 'placa', 'kmActual',
             'soatVencimiento', 'tecnoVencimiento',
-            'paseVencimiento', 'tarjetaOperacionVencimiento',
+            'paseVencimiento', 'tarjetaOperacionVencimiento', 'pazSalvoVencimiento',
             'recordatorios', 'updatedAt'
           ])
           && incoming().updatedAt == request.time;

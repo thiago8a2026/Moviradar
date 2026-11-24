@@ -2966,15 +2966,49 @@
 
     .hv-grid-2 {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 8px;
+      align-items: stretch;
+      margin-bottom: 12px;
+    }
+
+    .hv-grid-2 .hv-doc-row {
+      margin-bottom: 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .hv-grid-2 .hv-doc-head {
+      min-height: 22px;
+      flex-wrap: nowrap;
+      gap: 4px;
+    }
+
+    .hv-doc-label-compact {
+      white-space: nowrap;
+      font-size: 11px;
+      letter-spacing: 0.01em;
+    }
+
+    .hv-date-input {
+      width: 100%;
+      min-width: 0;
+      height: 42px;
+      min-height: 42px;
+      margin-bottom: 0 !important;
+      padding: 8px 9px !important;
+      font-size: 12.5px !important;
+      line-height: 1.2;
+      box-sizing: border-box;
     }
 
     .hv-plate-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 5px;
     }
 
     .hv-plate-row .text-input {
@@ -2983,6 +3017,74 @@
       text-transform: uppercase;
       font-weight: 800;
       letter-spacing: 0.08em;
+    }
+
+    .hv-plate-row .text-input.invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+    }
+
+    .hv-plate-row .text-input.valid {
+      border-color: rgba(16, 185, 129, 0.75) !important;
+    }
+
+    .hv-plate-msg {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 12px;
+      min-height: 15px;
+      color: #94a3b8;
+    }
+
+    .hv-plate-msg.error {
+      color: #fca5a5;
+    }
+
+    .hv-plate-msg.ok {
+      color: #6ee7b7;
+    }
+
+    .auth-verify-box {
+      display: none;
+      margin-bottom: 12px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      color: #fde68a;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .auth-verify-box.visible {
+      display: block;
+    }
+
+    .auth-verify-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 9px;
+      flex-wrap: wrap;
+    }
+
+    .btn-resend-verify {
+      min-height: 36px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(251, 191, 36, 0.7);
+      background: rgba(245, 158, 11, 0.24);
+      color: #fef3c7;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-resend-verify:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .hv-digit-pill {
@@ -4564,8 +4666,20 @@
 
           <div class="auth-error" id="authErrorMsg"></div>
 
+          <div class="auth-verify-box" id="authVerifyBox">
+            <div id="authVerifyMessage">
+              Te enviamos un enlace real de verificación. Revisa tu bandeja de entrada o Spam y confirma tu correo antes de iniciar sesión.
+            </div>
+            <div class="auth-verify-actions">
+              <button type="button" class="btn-resend-verify" id="btnResendVerificationEmail">
+                📨 Reenviar enlace de verificación
+              </button>
+              <span id="authVerifyEmailTarget" style="font-size:11px;font-weight:700;color:#fef3c7;word-break:break-all;"></span>
+            </div>
+          </div>
+
           <form id="authForm">
-            <label class="form-label" for="authEmail">Correo electrónico *</label>
+            <label class="form-label" for="authEmail">Correo electrónico real *</label>
             <input
               type="email"
               id="authEmail"
@@ -4575,7 +4689,7 @@
               autocapitalize="none"
               autocorrect="off"
               spellcheck="false"
-              placeholder="conductor@correo.com"
+              placeholder="tu.nombre@gmail.com"
             />
 
             <label class="form-label" for="authPassword">Contraseña * (mínimo 6 caracteres)</label>
@@ -5210,15 +5324,19 @@
           Consultando Pico y Placa AMB (Bucaramanga, Floridablanca, Girón y Piedecuesta)...
         </div>
 
-        <form id="hojaVidaForm">
-          <span class="form-label">Placa del vehículo y último dígito</span>
+        <form id="hojaVidaForm" novalidate>
+          <span class="form-label">Placa del vehículo * (3 letras y 3 números)</span>
           <div class="hv-plate-row">
             <input
               type="text"
               id="hvPlacaInput"
               class="text-input"
-              maxlength="10"
-              placeholder="Ej: ABC123"
+              maxlength="7"
+              required
+              autocapitalize="characters"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="Ej: ABC123 o ABC-123"
               autocomplete="off"
             />
             <div class="hv-digit-pill" id="hvUltimoDigitoBadge">
@@ -5226,61 +5344,37 @@
               <strong style="font-size:15px;">--</strong>
             </div>
           </div>
-
-          <div class="hv-doc-row">
-            <div class="hv-doc-head">
-              <label class="form-label" for="hvKmActualInput">Kilometraje actual (km)</label>
-              <span class="hv-status-pill" id="hvKmBadge">Registro vivo</span>
-            </div>
-            <input
-              type="number"
-              id="hvKmActualInput"
-              class="text-input"
-              min="0"
-              max="5000000"
-              step="1"
-              placeholder="Ej: 48500"
-              style="margin-bottom:0;"
-            />
-          </div>
+          <div class="hv-plate-msg" id="hvPlacaValidationMsg">Formato obligatorio: 3 letras y 3 números (ej. ABC123).</div>
 
           <div class="hv-grid-2">
             <div class="hv-doc-row">
               <div class="hv-doc-head">
-                <label class="form-label" for="hvSoatInput">SOAT (Vence)</label>
+                <label class="form-label hv-doc-label-compact" for="hvSoatInput">SOAT</label>
                 <span class="hv-status-pill" id="hvSoatBadge">Sin fecha</span>
               </div>
-              <input type="date" id="hvSoatInput" class="text-input" style="margin-bottom:0;" />
+              <input type="date" id="hvSoatInput" class="text-input hv-date-input" />
             </div>
 
             <div class="hv-doc-row">
               <div class="hv-doc-head">
-                <label class="form-label" for="hvTecnoInput">Técnico-mecánica</label>
+                <label class="form-label hv-doc-label-compact" for="hvTecnoInput">T. Mecánica</label>
                 <span class="hv-status-pill" id="hvTecnoBadge">Sin fecha</span>
               </div>
-              <input type="date" id="hvTecnoInput" class="text-input" style="margin-bottom:0;" />
+              <input type="date" id="hvTecnoInput" class="text-input hv-date-input" />
             </div>
+          </div>
+
+          <div class="hv-doc-row">
+            <div class="hv-doc-head">
+              <label class="form-label" for="hvPazSalvoInput">Paz y salvo (Vence)</label>
+              <span class="hv-status-pill" id="hvPazSalvoBadge">Sin fecha</span>
+            </div>
+            <input type="date" id="hvPazSalvoInput" class="text-input hv-date-input" />
           </div>
 
           <div class="hv-taxi-section" id="hvTaxiSection">
             <div style="font-size:11.5px;font-weight:800;color:#fde047;margin-bottom:8px;">
-              🚕 Documentos Servicio Público (Taxi)
-            </div>
-
-            <div class="hv-doc-row">
-              <div class="hv-doc-head">
-                <label class="form-label" for="hvPaseInput">Pase / Licencia de conducción</label>
-                <span class="hv-status-pill" id="hvPaseBadge">Sin fecha</span>
-              </div>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <input type="date" id="hvPaseInput" class="text-input" style="margin-bottom:0;flex:1;" />
-                <button type="button" class="hv-chip-btn" id="btnHvPasePlus3Years" title="Calcular renovación de servicio público (+3 años)">
-                  +3 años
-                </button>
-              </div>
-              <div style="font-size:10px;color:#cbd5e1;margin-top:4px;">
-                Ciclo público cada 3 años en Colombia. Alerta automática a ≤15 días.
-              </div>
+              🚕 Documento Servicio Público (Taxi)
             </div>
 
             <div class="hv-doc-row" style="margin-bottom:0;">
@@ -5288,7 +5382,7 @@
                 <label class="form-label" for="hvTarjetaOpInput">Tarjeta de operación</label>
                 <span class="hv-status-pill" id="hvTarjetaOpBadge">Sin fecha</span>
               </div>
-              <input type="date" id="hvTarjetaOpInput" class="text-input" style="margin-bottom:0;" />
+              <input type="date" id="hvTarjetaOpInput" class="text-input hv-date-input" />
             </div>
           </div>
 
@@ -5296,67 +5390,6 @@
             💾 Guardar Hoja de Vida
           </button>
         </form>
-
-        <div class="hv-section-divider">
-          <div class="hv-doc-head" style="margin-bottom:8px;">
-            <span class="form-label" style="margin-bottom:0;">Recordatorios adicionales (Tiempo o Km)</span>
-            <span class="hv-status-pill" id="hvRemCountPill">0 activos</span>
-          </div>
-
-          <div class="hv-preset-chips">
-            <button type="button" class="hv-chip-btn" data-hv-preset="Cambio de aceite" data-hv-mode="km" data-hv-km="5000">🛢️ Aceite (+5.000 km)</button>
-            <button type="button" class="hv-chip-btn" data-hv-preset="Correa de repartición" data-hv-mode="km" data-hv-km="50000">⚙️ Correa repartición</button>
-            <button type="button" class="hv-chip-btn" data-hv-preset="Batería" data-hv-mode="tiempo" data-hv-months="12">🔋 Batería (+1 año)</button>
-            <button type="button" class="hv-chip-btn" data-hv-preset="Frenos y llantas" data-hv-mode="km" data-hv-km="10000">🛞 Frenos (+10.000 km)</button>
-          </div>
-
-          <div class="hv-rem-card">
-            <label class="form-label" for="hvRemNameInput">Nombre del recordatorio *</label>
-            <input
-              type="text"
-              id="hvRemNameInput"
-              class="text-input"
-              maxlength="60"
-              placeholder="Ej: Correa de repartición, Cambio de aceite, Batería..."
-            />
-
-            <div class="loc-mode-row" style="margin-bottom:8px;">
-              <button type="button" class="loc-mode-btn active" id="hvRemModeTime">📅 Por Tiempo</button>
-              <button type="button" class="loc-mode-btn" id="hvRemModeKm">🛣️ Por Kilometraje</button>
-            </div>
-
-            <div id="hvRemTimeWrap">
-              <div class="hv-preset-chips">
-                <button type="button" class="hv-chip-btn" data-hv-add-months="3">+3 meses</button>
-                <button type="button" class="hv-chip-btn" data-hv-add-months="6">+6 meses</button>
-                <button type="button" class="hv-chip-btn" data-hv-add-months="12">+1 año</button>
-              </div>
-              <input type="date" id="hvRemDateInput" class="text-input" />
-            </div>
-
-            <div id="hvRemKmWrap" style="display:none;">
-              <div class="hv-preset-chips">
-                <button type="button" class="hv-chip-btn" data-hv-add-km="5000">+5.000 km</button>
-                <button type="button" class="hv-chip-btn" data-hv-add-km="10000">+10.000 km</button>
-                <button type="button" class="hv-chip-btn" data-hv-add-km="50000">+50.000 km</button>
-              </div>
-              <input
-                type="number"
-                id="hvRemKmInput"
-                class="text-input"
-                min="1"
-                max="6000000"
-                placeholder="Kilometraje objetivo (ej: 53500)"
-              />
-            </div>
-
-            <button type="button" class="dest-helper-btn" id="btnAddHvReminder" style="width:100%;border-color:rgba(16,185,129,0.55);color:#6ee7b7;">
-              + Agregar recordatorio
-            </button>
-          </div>
-
-          <div class="hv-rem-list" id="hvRemindersList"></div>
-        </div>
       </div>
     </div>
 
@@ -5782,6 +5815,7 @@
         signInWithPopup,
         createUserWithEmailAndPassword,
         signInWithEmailAndPassword,
+        sendEmailVerification,
         signOut,
         onAuthStateChanged
       }
@@ -7861,8 +7895,48 @@
     const googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
 
+    const authVerifyBox = document.getElementById('authVerifyBox');
+    const authVerifyMessage = document.getElementById('authVerifyMessage');
+    const authVerifyEmailTarget = document.getElementById('authVerifyEmailTarget');
+    const btnResendVerificationEmail = document.getElementById('btnResendVerificationEmail');
+
     let authMode = 'login';
     let pendingAuthResolvers = [];
+    let isProcessingAuthVerificationFlow = false;
+    let authVerifyCooldownUntil = 0;
+
+    const DISPOSABLE_OR_FAKE_EMAIL_DOMAINS = new Set([
+      'example.com', 'example.org', 'example.net', 'test.com', 'fake.com',
+      'correo.com', 'mailinator.com', 'yopmail.com', 'tempmail.com', 'temp-mail.org',
+      'guerrillamail.com', '10minutemail.com', 'trashmail.com', 'fakeinbox.com',
+      'getnada.com', 'sharklasers.com', 'dispostable.com', 'localhost', 'invalid'
+    ]);
+
+    function isValidRealEmailFormat(rawEmail) {
+      const email = String(rawEmail || '').trim().toLowerCase();
+      if (!email || email.length > 160 || email.includes('..')) return false;
+      const match = email.match(/^([a-z0-9._%+-]+)@([a-z0-9.-]+)\.([a-z]{2,18})$/);
+      if (!match) return false;
+      const localPart = match[1];
+      const domain = `${match[2]}.${match[3]}`;
+      if (localPart.length < 2 || localPart.startsWith('.') || localPart.endsWith('.')) return false;
+      if (match[2].startsWith('-') || match[2].endsWith('-') || match[2].startsWith('.')) return false;
+      if (DISPOSABLE_OR_FAKE_EMAIL_DOMAINS.has(domain)) return false;
+      return true;
+    }
+
+    function requiresEmailVerificationCheck(user) {
+      if (!user) return false;
+      const providers = Array.isArray(user.providerData) ? user.providerData : [];
+      const hasPasswordProvider = providers.some((p) => p && p.providerId === 'password');
+      if (hasPasswordProvider) {
+        return user.emailVerified !== true;
+      }
+      if (providers.length === 0 && user.email && user.emailVerified === false) {
+        return true;
+      }
+      return user.emailVerified === false;
+    }
 
     function clearAuthError() {
       if (!authErrorMsg) return;
@@ -7876,13 +7950,33 @@
       authErrorMsg.classList.add('visible');
     }
 
-    function setAuthMode(mode) {
+    function hideAuthVerificationBox() {
+      if (!authVerifyBox) return;
+      authVerifyBox.classList.remove('visible');
+    }
+
+    function showAuthVerificationBox(email, customMessage = '') {
+      if (!authVerifyBox) return;
+      if (authVerifyMessage) {
+        authVerifyMessage.textContent = customMessage ||
+          'Te enviamos un enlace real de verificación a tu correo. Revisa tu bandeja de entrada o Spam, confirma el enlace y vuelve a iniciar sesión.';
+      }
+      if (authVerifyEmailTarget) {
+        authVerifyEmailTarget.textContent = email ? String(email).trim() : '';
+      }
+      authVerifyBox.classList.add('visible');
+    }
+
+    function setAuthMode(mode, options = {}) {
       authMode = mode === 'register' ? 'register' : 'login';
       clearAuthError();
+      if (!options.keepVerifyBox) {
+        hideAuthVerificationBox();
+      }
       if (authMode === 'register') {
         tabRegisterMode.classList.add('active');
         tabLoginMode.classList.remove('active');
-        btnAuthSubmit.textContent = 'Crear cuenta';
+        btnAuthSubmit.textContent = 'Crear cuenta y verificar correo';
         authPasswordInput.setAttribute('autocomplete', 'new-password');
       } else {
         tabLoginMode.classList.add('active');
@@ -7896,7 +7990,7 @@
       const code = err && err.code ? String(err.code) : '';
       const rawMessage = err && err.message ? String(err.message) : '';
       if (code === 'auth/email-already-in-use') return 'Este correo ya está registrado. Cambia a "Iniciar Sesión".';
-      if (code === 'auth/invalid-email') return 'Ingresa un correo electrónico válido.';
+      if (code === 'auth/invalid-email' || code === 'auth/missing-email') return 'Ingresa un correo electrónico real y válido.';
       if (code === 'auth/weak-password') return 'La contraseña debe tener al menos 6 caracteres.';
       if (code === 'auth/missing-password') return 'Ingresa tu contraseña para continuar.';
       if (code === 'auth/user-disabled') return 'Esta cuenta está deshabilitada. Contacta al administrador.';
@@ -8318,6 +8412,10 @@
 
     onAuthStateChanged(auth, async (user) => {
       try {
+      if (isProcessingAuthVerificationFlow) {
+        return;
+      }
+
       if (!user) {
         detachUserSessionListener(true);
         if (window.__anthiAdminBuzonReady && typeof detachAdminBuzonListener === 'function') detachAdminBuzonListener();
@@ -8342,6 +8440,32 @@
           window.__anthiSyncM34Auth(null);
         }
         return;
+      }
+
+      if (requiresEmailVerificationCheck(user)) {
+        let verifiedUser = user;
+        if (typeof user.reload === 'function') {
+          try {
+            await user.reload();
+            verifiedUser = auth.currentUser || user;
+          } catch (e) {}
+        }
+        if (requiresEmailVerificationCheck(verifiedUser)) {
+          const blockedEmail = verifiedUser.email || '';
+          try {
+            await signOut(auth);
+          } catch (e) {}
+          if (authEmailInput && blockedEmail && !authEmailInput.value.trim()) {
+            authEmailInput.value = blockedEmail;
+          }
+          openAuthModal('login');
+          showAuthVerificationBox(
+            blockedEmail,
+            'Tu cuenta aún no tiene el correo verificado. Abre el enlace de verificación enviado a tu correo (revisa Spam) antes de ingresar.'
+          );
+          showToast('📧 Verifica tu correo real para activar tu cuenta en ANTHI.');
+          return;
+        }
       }
 
       currentVipProfile = loadCachedVipProfile(user.uid);
@@ -8412,9 +8536,11 @@
           await auth.authStateReady();
         } catch (e) {}
       }
-      if (auth.currentUser) return auth.currentUser;
+      if (auth.currentUser && !requiresEmailVerificationCheck(auth.currentUser)) {
+        return auth.currentUser;
+      }
       openAuthModal('login');
-      showToast('Inicia sesión o regístrate con tu correo para continuar.');
+      showToast('Inicia sesión con un correo verificado para continuar.');
       return new Promise((resolve, reject) => {
         pendingAuthResolvers.push({ resolve, reject });
       });
@@ -8428,31 +8554,137 @@
       if (e.target === authModal) closeAuthModal(true);
     });
 
+    if (btnResendVerificationEmail) {
+      btnResendVerificationEmail.addEventListener('click', async () => {
+        clearAuthError();
+        const now = Date.now();
+        if (now < authVerifyCooldownUntil) {
+          const waitSec = Math.ceil((authVerifyCooldownUntil - now) / 1000);
+          showAuthError(`Espera ${waitSec}s antes de reenviar otro correo de verificación.`);
+          return;
+        }
+        const email = authEmailInput ? authEmailInput.value.trim() : '';
+        const password = authPasswordInput ? authPasswordInput.value : '';
+        if (!isValidRealEmailFormat(email) || password.length < 6) {
+          showAuthError('Ingresa tu correo real y tu contraseña (mínimo 6 caracteres) arriba para reenviar el enlace.');
+          return;
+        }
+
+        btnResendVerificationEmail.disabled = true;
+        btnResendVerificationEmail.textContent = 'Enviando enlace...';
+        isProcessingAuthVerificationFlow = true;
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+          let freshUser = cred.user;
+          if (freshUser && typeof freshUser.reload === 'function') {
+            try {
+              await freshUser.reload();
+              freshUser = auth.currentUser || freshUser;
+            } catch (e) {}
+          }
+          if (freshUser && !requiresEmailVerificationCheck(freshUser)) {
+            isProcessingAuthVerificationFlow = false;
+            await claimExclusiveSessionForUser(freshUser, { forceNew: false });
+            hideAuthVerificationBox();
+            closeSessionConflictModal();
+            authForm.reset();
+            closeAuthModal(false);
+            showToast('✅ ¡Tu correo ya estaba verificado! Sesión iniciada.');
+            return;
+          }
+          if (typeof sendEmailVerification === 'function' && freshUser) {
+            await sendEmailVerification(freshUser);
+          }
+          await signOut(auth);
+          authVerifyCooldownUntil = Date.now() + 45000;
+          showAuthVerificationBox(
+            email,
+            `Enlace de verificación reenviado a ${email}. Revisa bandeja principal y Spam, confirma tu correo y pulsa "Iniciar Sesión".`
+          );
+          showToast('📨 Enlace de verificación reenviado a tu correo.');
+        } catch (err) {
+          showAuthError(mapFirebaseAuthError(err));
+        } finally {
+          isProcessingAuthVerificationFlow = false;
+          btnResendVerificationEmail.disabled = false;
+          btnResendVerificationEmail.textContent = '📨 Reenviar enlace de verificación';
+        }
+      });
+    }
+
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       clearAuthError();
       const email = authEmailInput.value.trim();
       const password = authPasswordInput.value;
 
-      if (!email || password.length < 6) {
-        showAuthError('Ingresa un correo válido y una contraseña de al menos 6 caracteres.');
+      if (!isValidRealEmailFormat(email)) {
+        showAuthError('Ingresa un correo electrónico real y válido (ej: tu.nombre@gmail.com). No se permiten correos falsos o temporales.');
+        if (authEmailInput) authEmailInput.focus();
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthError('Ingresa una contraseña de al menos 6 caracteres.');
+        if (authPasswordInput) authPasswordInput.focus();
         return;
       }
 
       btnAuthSubmit.disabled = true;
-      btnAuthSubmit.textContent = authMode === 'register' ? 'Creando cuenta...' : 'Ingresando...';
+      btnAuthSubmit.textContent = authMode === 'register' ? 'Creando y verificando...' : 'Verificando acceso...';
+      isProcessingAuthVerificationFlow = true;
 
       try {
-        let cred;
         if (authMode === 'register') {
-          cred = await createUserWithEmailAndPassword(auth, email, password);
-          await claimExclusiveSessionForUser(cred.user, { forceNew: false });
-          showToast('¡Cuenta creada y sesión única activada en este dispositivo!');
-        } else {
-          cred = await signInWithEmailAndPassword(auth, email, password);
-          await claimExclusiveSessionForUser(cred.user, { forceNew: false });
-          showToast('¡Sesión única activada en este dispositivo!');
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          if (typeof sendEmailVerification === 'function' && cred && cred.user) {
+            await sendEmailVerification(cred.user);
+          }
+          await signOut(auth);
+          authVerifyCooldownUntil = Date.now() + 45000;
+          setAuthMode('login', { keepVerifyBox: true });
+          showAuthVerificationBox(
+            email,
+            `¡Cuenta creada! Enviamos un enlace de verificación real a ${email}. Confirma el correo (revisa Spam) y luego pulsa "Iniciar Sesión".`
+          );
+          showToast('📧 Revisa tu correo para verificar la cuenta antes de entrar.');
+          return;
         }
+
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        let verifiedUser = cred.user;
+        if (verifiedUser && typeof verifiedUser.reload === 'function') {
+          try {
+            await verifiedUser.reload();
+            verifiedUser = auth.currentUser || verifiedUser;
+          } catch (e) {}
+        }
+
+        if (requiresEmailVerificationCheck(verifiedUser)) {
+          await signOut(auth);
+          showAuthVerificationBox(
+            email,
+            `El correo ${email} aún no ha sido verificado. Abre el enlace que enviamos a tu correo (revisa Spam) o reenvíalo abajo.`
+          );
+          showAuthError('Debes verificar tu correo electrónico real antes de iniciar sesión.');
+          return;
+        }
+
+        isProcessingAuthVerificationFlow = false;
+        hideAuthVerificationBox();
+        await claimExclusiveSessionForUser(verifiedUser, { forceNew: false });
+        updateAuthUI(verifiedUser);
+        if (typeof window.__anthiSyncHojaVidaOnAuth === 'function') {
+          window.__anthiSyncHojaVidaOnAuth(verifiedUser);
+        }
+        if (typeof window.__anthiSyncM34Auth === 'function') {
+          window.__anthiSyncM34Auth(verifiedUser);
+        }
+        if (pendingAuthResolvers.length > 0) {
+          const waiters = pendingAuthResolvers.splice(0, pendingAuthResolvers.length);
+          waiters.forEach((w) => w.resolve(verifiedUser));
+        }
+        showToast('¡Sesión única activada en este dispositivo!');
         closeSessionConflictModal();
         authForm.reset();
         closeAuthModal(false);
@@ -8463,8 +8695,9 @@
         console.error('Error en Firebase Auth:', err);
         showAuthError(mapFirebaseAuthError(err));
       } finally {
+        isProcessingAuthVerificationFlow = false;
         btnAuthSubmit.disabled = false;
-        btnAuthSubmit.textContent = authMode === 'register' ? 'Crear cuenta' : 'Iniciar Sesión';
+        btnAuthSubmit.textContent = authMode === 'register' ? 'Crear cuenta y verificar correo' : 'Iniciar Sesión';
       }
     });
 
@@ -17120,16 +17353,32 @@
       });
     }
 
+    const PLATE_3X3_STRICT_REGEX = /^([A-Z]{3})-?([0-9]{3})$/;
+
+    function isValidColombianPlate3x3(rawPlate) {
+      return PLATE_3X3_STRICT_REGEX.test(String(rawPlate || '').trim().toUpperCase());
+    }
+
+    function normalizeColombianPlate3x3(rawPlate) {
+      const match = String(rawPlate || '').trim().toUpperCase().match(PLATE_3X3_STRICT_REGEX);
+      return match ? `${match[1]}${match[2]}` : '';
+    }
+
+    function formatPlateInputLive(rawPlate) {
+      const upper = String(rawPlate || '').toUpperCase().replace(/[^A-Z0-9-]/g, '');
+      const noLeadDash = upper.replace(/^-+/, '');
+      const singleDash = noLeadDash.replace(/-{2,}/g, '-');
+      return singleDash.slice(0, 7);
+    }
+
     function createDefaultHojaVida() {
       return {
         tipoVehiculo: 'particular',
         placa: '',
-        kmActual: 0,
         soatVencimiento: '',
         tecnoVencimiento: '',
-        paseVencimiento: '',
         tarjetaOperacionVencimiento: '',
-        recordatorios: []
+        pazSalvoVencimiento: ''
       };
     }
 
@@ -17137,27 +17386,16 @@
       const base = createDefaultHojaVida();
       if (!raw || typeof raw !== 'object') return base;
       const tipo = VALID_VEHICLE_TYPES.includes(raw.tipoVehiculo) ? raw.tipoVehiculo : 'particular';
-      const placa = String(raw.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-      const kmNum = Math.max(0, Math.min(5000000, Math.round(Number(raw.kmActual) || 0)));
+      const placa = normalizeColombianPlate3x3(raw.placa);
       const cleanDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || '').trim()) ? String(v).trim() : '');
-      const rawRems = Array.isArray(raw.recordatorios) ? raw.recordatorios : [];
-      const recordatorios = rawRems.slice(0, 25).map((r, idx) => ({
-        id: String((r && r.id) || `rem_${Date.now()}_${idx}`),
-        nombre: String((r && r.nombre) || 'Mantenimiento').trim().slice(0, 60),
-        modo: r && r.modo === 'km' ? 'km' : 'tiempo',
-        fechaObjetivo: cleanDate(r && r.fechaObjetivo),
-        kmObjetivo: Math.max(0, Math.min(6000000, Math.round(Number(r && r.kmObjetivo) || 0)))
-      })).filter((r) => r.nombre.length > 0);
 
       return {
         tipoVehiculo: tipo,
         placa,
-        kmActual: kmNum,
         soatVencimiento: cleanDate(raw.soatVencimiento),
         tecnoVencimiento: cleanDate(raw.tecnoVencimiento),
-        paseVencimiento: cleanDate(raw.paseVencimiento),
         tarjetaOperacionVencimiento: cleanDate(raw.tarjetaOperacionVencimiento),
-        recordatorios
+        pazSalvoVencimiento: cleanDate(raw.pazSalvoVencimiento)
       };
     }
 
@@ -17313,7 +17551,6 @@
     let isPicoHudCollapsed = safeReadJson(STORAGE_KEYS.PICO_HUD_COLLAPSED, false) === true;
     let isPicoCalibratorOpen = false;
     let isHvPicoCalibratorOpen = false;
-    let hvReminderMode = 'tiempo';
     let hvToastNotifiedOnce = false;
 
     const gpsHudEl = document.getElementById('gpsHud');
@@ -17340,28 +17577,17 @@
     const hvPicoResumenCard = document.getElementById('hvPicoResumenCard');
     const hojaVidaForm = document.getElementById('hojaVidaForm');
     const hvPlacaInput = document.getElementById('hvPlacaInput');
+    const hvPlacaValidationMsg = document.getElementById('hvPlacaValidationMsg');
     const hvUltimoDigitoBadge = document.getElementById('hvUltimoDigitoBadge');
-    const hvKmActualInput = document.getElementById('hvKmActualInput');
     const hvSoatInput = document.getElementById('hvSoatInput');
     const hvSoatBadge = document.getElementById('hvSoatBadge');
     const hvTecnoInput = document.getElementById('hvTecnoInput');
     const hvTecnoBadge = document.getElementById('hvTecnoBadge');
+    const hvPazSalvoInput = document.getElementById('hvPazSalvoInput');
+    const hvPazSalvoBadge = document.getElementById('hvPazSalvoBadge');
     const hvTaxiSection = document.getElementById('hvTaxiSection');
-    const hvPaseInput = document.getElementById('hvPaseInput');
-    const hvPaseBadge = document.getElementById('hvPaseBadge');
-    const btnHvPasePlus3Years = document.getElementById('btnHvPasePlus3Years');
     const hvTarjetaOpInput = document.getElementById('hvTarjetaOpInput');
     const hvTarjetaOpBadge = document.getElementById('hvTarjetaOpBadge');
-    const hvRemCountPill = document.getElementById('hvRemCountPill');
-    const hvRemNameInput = document.getElementById('hvRemNameInput');
-    const hvRemModeTimeBtn = document.getElementById('hvRemModeTime');
-    const hvRemModeKmBtn = document.getElementById('hvRemModeKm');
-    const hvRemTimeWrap = document.getElementById('hvRemTimeWrap');
-    const hvRemKmWrap = document.getElementById('hvRemKmWrap');
-    const hvRemDateInput = document.getElementById('hvRemDateInput');
-    const hvRemKmInput = document.getElementById('hvRemKmInput');
-    const btnAddHvReminder = document.getElementById('btnAddHvReminder');
-    const hvRemindersList = document.getElementById('hvRemindersList');
 
     function evaluateDateStatus(dateStr, labelPrefix = '') {
       if (!dateStr) {
@@ -17394,6 +17620,33 @@
       el.textContent = status.text;
     }
 
+    function updatePlateValidationFeedback(rawInputVal, forceErrorOnEmpty = false) {
+      const value = String(rawInputVal !== undefined ? rawInputVal : (hvPlacaInput ? hvPlacaInput.value : hojaVidaState.placa || '')).trim().toUpperCase();
+      const valid = isValidColombianPlate3x3(value);
+      const normalized = normalizeColombianPlate3x3(value);
+      if (hvPlacaInput) {
+        hvPlacaInput.classList.remove('invalid', 'valid');
+        if (valid) {
+          hvPlacaInput.classList.add('valid');
+        } else if (value.length > 0 || forceErrorOnEmpty) {
+          hvPlacaInput.classList.add('invalid');
+        }
+      }
+      if (hvPlacaValidationMsg) {
+        hvPlacaValidationMsg.classList.remove('error', 'ok');
+        if (valid) {
+          hvPlacaValidationMsg.classList.add('ok');
+          hvPlacaValidationMsg.textContent = `✓ Placa válida (${normalized}): 3 letras y 3 números.`;
+        } else if (value.length > 0 || forceErrorOnEmpty) {
+          hvPlacaValidationMsg.classList.add('error');
+          hvPlacaValidationMsg.textContent = '⚠️ Debe tener exactamente 3 letras y 3 números (ej: ABC123 o ABC-123).';
+        } else {
+          hvPlacaValidationMsg.textContent = 'Formato obligatorio: 3 letras y 3 números (ej. ABC123).';
+        }
+      }
+      return valid;
+    }
+
     function collectHojaVidaEarlyAlerts(hv) {
       const alerts = [];
       const checkDoc = (name, dateStr) => {
@@ -17405,38 +17658,10 @@
 
       checkDoc('SOAT', hv.soatVencimiento);
       checkDoc('Técnico-mecánica', hv.tecnoVencimiento);
+      checkDoc('Paz y salvo', hv.pazSalvoVencimiento);
       if (hv.tipoVehiculo === 'taxi') {
-        checkDoc('Pase / Licencia (Taxi)', hv.paseVencimiento);
         checkDoc('Tarjeta de operación', hv.tarjetaOperacionVencimiento);
-      } else if (hv.paseVencimiento) {
-        checkDoc('Pase / Licencia', hv.paseVencimiento);
       }
-
-      (hv.recordatorios || []).forEach((rem) => {
-        if (rem.modo === 'km') {
-          if (rem.kmObjetivo > 0) {
-            const diff = rem.kmObjetivo - (Number(hv.kmActual) || 0);
-            if (diff <= 0) {
-              alerts.push({
-                name: rem.nombre,
-                level: 'danger',
-                detail: `Cumplido (${Math.abs(diff).toLocaleString('es-CO')} km pasados)`
-              });
-            } else if (diff <= HOJA_VIDA_ALERT_KM) {
-              alerts.push({
-                name: rem.nombre,
-                level: 'warn',
-                detail: `Faltan ${diff.toLocaleString('es-CO')} km`
-              });
-            }
-          }
-        } else {
-          const st = evaluateDateStatus(rem.fechaObjetivo);
-          if (st.level === 'danger' || st.level === 'warn') {
-            alerts.push({ name: rem.nombre, level: st.level, detail: st.text });
-          }
-        }
-      });
 
       return alerts;
     }
@@ -17662,91 +17887,6 @@
       }
     }
 
-    function renderHojaVidaRemindersList() {
-      if (!hvRemindersList) return;
-      const rems = hojaVidaState.recordatorios || [];
-      if (hvRemCountPill) {
-        hvRemCountPill.textContent = `${rems.length} ${rems.length === 1 ? 'activo' : 'activos'}`;
-      }
-      hvRemindersList.innerHTML = '';
-
-      if (rems.length === 0) {
-        hvRemindersList.innerHTML = '<div style="font-size:11.5px;color:#94a3b8;text-align:center;padding:10px;">Aún no tienes recordatorios de mantenimiento (ej. correa de repartición, aceite o batería).</div>';
-        return;
-      }
-
-      rems.forEach((rem) => {
-        const item = document.createElement('div');
-        item.className = 'hv-rem-item';
-
-        let pillText = 'Programado';
-        let pillLevel = 'ok';
-        let subText = '';
-
-        if (rem.modo === 'km') {
-          const targetKm = Number(rem.kmObjetivo) || 0;
-          const diff = targetKm - (Number(hojaVidaState.kmActual) || 0);
-          subText = `Meta: ${targetKm.toLocaleString('es-CO')} km`;
-          if (diff <= 0) {
-            pillLevel = 'danger';
-            pillText = `Pasado ${Math.abs(diff).toLocaleString('es-CO')} km`;
-          } else if (diff <= HOJA_VIDA_ALERT_KM) {
-            pillLevel = 'warn';
-            pillText = `Faltan ${diff.toLocaleString('es-CO')} km`;
-          } else {
-            pillLevel = 'ok';
-            pillText = `Faltan ${diff.toLocaleString('es-CO')} km`;
-          }
-        } else {
-          subText = rem.fechaObjetivo ? `Fecha: ${rem.fechaObjetivo}` : 'Sin fecha objetivo';
-          const st = evaluateDateStatus(rem.fechaObjetivo);
-          pillLevel = st.level === 'none' ? 'ok' : st.level;
-          pillText = st.text;
-        }
-
-        if (pillLevel === 'danger' || pillLevel === 'warn') {
-          item.classList.add(pillLevel);
-        }
-
-        const left = document.createElement('div');
-        left.style.minWidth = '0';
-        left.style.flex = '1';
-        left.innerHTML = `
-          <div style="font-size:12px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            ${rem.modo === 'km' ? '🛣️' : '📅'} ${escapeHtml(rem.nombre)}
-          </div>
-          <div style="font-size:10.5px;color:#94a3b8;margin-top:2px;">${escapeHtml(subText)}</div>
-        `;
-
-        const right = document.createElement('div');
-        right.style.display = 'flex';
-        right.style.alignItems = 'center';
-        right.style.gap = '6px';
-
-        const badge = document.createElement('span');
-        badge.className = `hv-status-pill ${pillLevel}`;
-        badge.textContent = pillText;
-
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'point-delete';
-        delBtn.style.minWidth = '30px';
-        delBtn.style.minHeight = '30px';
-        delBtn.title = 'Eliminar recordatorio';
-        delBtn.textContent = '🗑️';
-        delBtn.addEventListener('click', () => {
-          hojaVidaState.recordatorios = (hojaVidaState.recordatorios || []).filter((x) => x.id !== rem.id);
-          persistHojaVidaState({ showFeedback: false, syncCloud: true });
-        });
-
-        right.appendChild(badge);
-        right.appendChild(delBtn);
-        item.appendChild(left);
-        item.appendChild(right);
-        hvRemindersList.appendChild(item);
-      });
-    }
-
     function renderHojaVidaUI(triggerNotifs = false, fromUserSave = false) {
       const isTaxi = hojaVidaState.tipoVehiculo === 'taxi';
       hvServiceTabButtons.forEach((tabBtn) => {
@@ -17760,23 +17900,27 @@
       if (hvPlacaInput && document.activeElement !== hvPlacaInput) {
         hvPlacaInput.value = hojaVidaState.placa || '';
       }
-      const lastDigit = extractLastPlateDigit(hojaVidaState.placa);
+      const displayedPlate = hvPlacaInput && document.activeElement === hvPlacaInput
+        ? hvPlacaInput.value
+        : (hojaVidaState.placa || '');
+      updatePlateValidationFeedback(displayedPlate, false);
+
+      const lastDigit = extractLastPlateDigit(
+        isValidColombianPlate3x3(displayedPlate) ? displayedPlate : hojaVidaState.placa
+      );
       if (hvUltimoDigitoBadge) {
         const strong = hvUltimoDigitoBadge.querySelector('strong');
         if (strong) strong.textContent = lastDigit !== null ? String(lastDigit) : '--';
       }
 
-      if (hvKmActualInput && document.activeElement !== hvKmActualInput) {
-        hvKmActualInput.value = hojaVidaState.kmActual > 0 ? String(hojaVidaState.kmActual) : '';
-      }
       if (hvSoatInput && document.activeElement !== hvSoatInput) {
         hvSoatInput.value = hojaVidaState.soatVencimiento || '';
       }
       if (hvTecnoInput && document.activeElement !== hvTecnoInput) {
         hvTecnoInput.value = hojaVidaState.tecnoVencimiento || '';
       }
-      if (hvPaseInput && document.activeElement !== hvPaseInput) {
-        hvPaseInput.value = hojaVidaState.paseVencimiento || '';
+      if (hvPazSalvoInput && document.activeElement !== hvPazSalvoInput) {
+        hvPazSalvoInput.value = hojaVidaState.pazSalvoVencimiento || '';
       }
       if (hvTarjetaOpInput && document.activeElement !== hvTarjetaOpInput) {
         hvTarjetaOpInput.value = hojaVidaState.tarjetaOperacionVencimiento || '';
@@ -17784,10 +17928,9 @@
 
       applyStatusPill(hvSoatBadge, evaluateDateStatus(hojaVidaState.soatVencimiento));
       applyStatusPill(hvTecnoBadge, evaluateDateStatus(hojaVidaState.tecnoVencimiento));
-      applyStatusPill(hvPaseBadge, evaluateDateStatus(hojaVidaState.paseVencimiento));
+      applyStatusPill(hvPazSalvoBadge, evaluateDateStatus(hojaVidaState.pazSalvoVencimiento));
       applyStatusPill(hvTarjetaOpBadge, evaluateDateStatus(hojaVidaState.tarjetaOperacionVencimiento));
 
-      renderHojaVidaRemindersList();
       renderPicoYPlacaUI();
 
       const alerts = collectHojaVidaEarlyAlerts(hojaVidaState);
@@ -17819,12 +17962,10 @@
         await setDoc(doc(db, USERS_COLLECTION, user.uid, 'hojaVida', 'principal'), {
           tipoVehiculo: hv.tipoVehiculo,
           placa: hv.placa,
-          kmActual: Number(hv.kmActual) || 0,
           soatVencimiento: hv.soatVencimiento || '',
           tecnoVencimiento: hv.tecnoVencimiento || '',
-          paseVencimiento: hv.paseVencimiento || '',
           tarjetaOperacionVencimiento: hv.tarjetaOperacionVencimiento || '',
-          recordatorios: Array.isArray(hv.recordatorios) ? hv.recordatorios.slice(0, 25) : [],
+          pazSalvoVencimiento: hv.pazSalvoVencimiento || '',
           updatedAt: serverTimestamp()
         });
       } catch (err) {
@@ -17855,9 +17996,17 @@
             hojaVidaState.placa ||
             hojaVidaState.soatVencimiento ||
             hojaVidaState.tecnoVencimiento ||
-            (hojaVidaState.recordatorios && hojaVidaState.recordatorios.length > 0)
+            hojaVidaState.pazSalvoVencimiento ||
+            hojaVidaState.tarjetaOperacionVencimiento
           );
-          if (!hasLocalData || remote.placa || remote.soatVencimiento || remote.tecnoVencimiento) {
+          if (
+            !hasLocalData ||
+            remote.placa ||
+            remote.soatVencimiento ||
+            remote.tecnoVencimiento ||
+            remote.pazSalvoVencimiento ||
+            remote.tarjetaOperacionVencimiento
+          ) {
             hojaVidaState = remote;
             saveHojaVidaLocal(hojaVidaState);
             renderHojaVidaUI(true, false);
@@ -17866,21 +18015,26 @@
           hojaVidaState.placa ||
           hojaVidaState.soatVencimiento ||
           hojaVidaState.tecnoVencimiento ||
-          (hojaVidaState.recordatorios && hojaVidaState.recordatorios.length > 0)
+          hojaVidaState.pazSalvoVencimiento ||
+          hojaVidaState.tarjetaOperacionVencimiento
         ) {
           saveHojaVidaToFirestore(hojaVidaState);
         }
       } catch (e) {}
     };
 
-    function syncFormInputsIntoState() {
+    function syncFormInputsIntoState(options = {}) {
+      const { preserveExistingPlateIfInvalid = true } = options;
+      const rawPlateInput = hvPlacaInput ? hvPlacaInput.value : hojaVidaState.placa;
+      const normalizedPlate = normalizeColombianPlate3x3(rawPlateInput);
+      const nextPlaca = normalizedPlate || (preserveExistingPlateIfInvalid ? hojaVidaState.placa : '');
+
       hojaVidaState = normalizeHojaVida({
         ...hojaVidaState,
-        placa: hvPlacaInput ? hvPlacaInput.value : hojaVidaState.placa,
-        kmActual: hvKmActualInput ? hvKmActualInput.value : hojaVidaState.kmActual,
+        placa: nextPlaca,
         soatVencimiento: hvSoatInput ? hvSoatInput.value : hojaVidaState.soatVencimiento,
         tecnoVencimiento: hvTecnoInput ? hvTecnoInput.value : hojaVidaState.tecnoVencimiento,
-        paseVencimiento: hvPaseInput ? hvPaseInput.value : hojaVidaState.paseVencimiento,
+        pazSalvoVencimiento: hvPazSalvoInput ? hvPazSalvoInput.value : hojaVidaState.pazSalvoVencimiento,
         tarjetaOperacionVencimiento: hvTarjetaOpInput ? hvTarjetaOpInput.value : hojaVidaState.tarjetaOperacionVencimiento
       });
     }
@@ -18052,132 +18206,39 @@
 
     if (hvPlacaInput) {
       hvPlacaInput.addEventListener('input', () => {
-        const clean = hvPlacaInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-        if (hvPlacaInput.value !== clean) hvPlacaInput.value = clean;
-        syncFormInputsIntoState();
-        saveHojaVidaLocal(hojaVidaState);
+        const formatted = formatPlateInputLive(hvPlacaInput.value);
+        if (hvPlacaInput.value !== formatted) hvPlacaInput.value = formatted;
+        updatePlateValidationFeedback(formatted, false);
+        if (isValidColombianPlate3x3(formatted)) {
+          hojaVidaState.placa = normalizeColombianPlate3x3(formatted);
+          saveHojaVidaLocal(hojaVidaState);
+        }
         renderHojaVidaUI(false, false);
       });
     }
 
-    [hvKmActualInput, hvSoatInput, hvTecnoInput, hvPaseInput, hvTarjetaOpInput].forEach((inputEl) => {
+    [hvSoatInput, hvTecnoInput, hvPazSalvoInput, hvTarjetaOpInput].forEach((inputEl) => {
       if (!inputEl) return;
       inputEl.addEventListener('change', () => {
-        syncFormInputsIntoState();
+        syncFormInputsIntoState({ preserveExistingPlateIfInvalid: true });
         persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
       });
     });
-
-    if (btnHvPasePlus3Years && hvPaseInput) {
-      btnHvPasePlus3Years.addEventListener('click', () => {
-        const nextDate = addMonthsToDateStr(hvPaseInput.value || '', 36);
-        hvPaseInput.value = nextDate;
-        syncFormInputsIntoState();
-        persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
-        showToast(`🚕 Pase programado a +3 años (${nextDate}).`);
-      });
-    }
 
     if (hojaVidaForm) {
       hojaVidaForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        syncFormInputsIntoState();
+        const rawPlaca = hvPlacaInput ? hvPlacaInput.value.trim().toUpperCase() : '';
+        if (!isValidColombianPlate3x3(rawPlaca)) {
+          updatePlateValidationFeedback(rawPlaca, true);
+          if (hvPlacaInput) hvPlacaInput.focus();
+          showToast('⚠️ Placa inválida: debe tener exactamente 3 letras y 3 números (ej: ABC123).');
+          return;
+        }
+        const normalizedPlate = normalizeColombianPlate3x3(rawPlaca);
+        if (hvPlacaInput) hvPlacaInput.value = normalizedPlate;
+        syncFormInputsIntoState({ preserveExistingPlateIfInvalid: false });
         persistHojaVidaState({ showFeedback: true, syncCloud: true, triggerNotifs: true });
-      });
-    }
-
-    function setHvReminderMode(mode) {
-      hvReminderMode = mode === 'km' ? 'km' : 'tiempo';
-      if (hvRemModeTimeBtn) hvRemModeTimeBtn.classList.toggle('active', hvReminderMode === 'tiempo');
-      if (hvRemModeKmBtn) hvRemModeKmBtn.classList.toggle('active', hvReminderMode === 'km');
-      if (hvRemTimeWrap) hvRemTimeWrap.style.display = hvReminderMode === 'tiempo' ? 'block' : 'none';
-      if (hvRemKmWrap) hvRemKmWrap.style.display = hvReminderMode === 'km' ? 'block' : 'none';
-    }
-
-    if (hvRemModeTimeBtn) hvRemModeTimeBtn.addEventListener('click', () => setHvReminderMode('tiempo'));
-    if (hvRemModeKmBtn) hvRemModeKmBtn.addEventListener('click', () => setHvReminderMode('km'));
-
-    document.querySelectorAll('[data-hv-preset]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const presetName = btn.getAttribute('data-hv-preset') || '';
-        const mode = btn.getAttribute('data-hv-mode') || 'tiempo';
-        if (hvRemNameInput) hvRemNameInput.value = presetName;
-        setHvReminderMode(mode);
-        if (mode === 'km') {
-          const deltaKm = Number(btn.getAttribute('data-hv-km') || 5000);
-          const baseKm = Number(hvKmActualInput && hvKmActualInput.value) || hojaVidaState.kmActual || 0;
-          if (hvRemKmInput) hvRemKmInput.value = String(baseKm + deltaKm);
-        } else {
-          const months = Number(btn.getAttribute('data-hv-months') || 6);
-          if (hvRemDateInput) hvRemDateInput.value = addMonthsToDateStr('', months);
-        }
-      });
-    });
-
-    document.querySelectorAll('[data-hv-add-months]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const months = Number(btn.getAttribute('data-hv-add-months') || 3);
-        if (hvRemDateInput) hvRemDateInput.value = addMonthsToDateStr('', months);
-      });
-    });
-
-    document.querySelectorAll('[data-hv-add-km]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const deltaKm = Number(btn.getAttribute('data-hv-add-km') || 5000);
-        const baseKm = Number(hvKmActualInput && hvKmActualInput.value) || hojaVidaState.kmActual || 0;
-        if (hvRemKmInput) hvRemKmInput.value = String(baseKm + deltaKm);
-      });
-    });
-
-    if (btnAddHvReminder) {
-      btnAddHvReminder.addEventListener('click', () => {
-        const nombre = hvRemNameInput ? hvRemNameInput.value.trim().slice(0, 60) : '';
-        if (nombre.length < 2) {
-          showToast('Escribe el nombre del recordatorio (ej: Correa de repartición).');
-          if (hvRemNameInput) hvRemNameInput.focus();
-          return;
-        }
-        if ((hojaVidaState.recordatorios || []).length >= 25) {
-          showToast('Alcanzaste el límite de 25 recordatorios activos.');
-          return;
-        }
-
-        if (hvReminderMode === 'km') {
-          const kmObj = Math.round(Number(hvRemKmInput ? hvRemKmInput.value : 0));
-          if (!kmObj || kmObj <= 0) {
-            showToast('Ingresa el kilometraje objetivo del recordatorio.');
-            if (hvRemKmInput) hvRemKmInput.focus();
-            return;
-          }
-          hojaVidaState.recordatorios.unshift({
-            id: `rem_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
-            nombre,
-            modo: 'km',
-            fechaObjetivo: '',
-            kmObjetivo: kmObj
-          });
-          if (hvRemKmInput) hvRemKmInput.value = '';
-        } else {
-          const fechaObj = hvRemDateInput ? hvRemDateInput.value.trim() : '';
-          if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaObj)) {
-            showToast('Selecciona una fecha o toca un acceso rápido (+3m / +6m / +1 año).');
-            if (hvRemDateInput) hvRemDateInput.focus();
-            return;
-          }
-          hojaVidaState.recordatorios.unshift({
-            id: `rem_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
-            nombre,
-            modo: 'tiempo',
-            fechaObjetivo: fechaObj,
-            kmObjetivo: 0
-          });
-          if (hvRemDateInput) hvRemDateInput.value = '';
-        }
-
-        if (hvRemNameInput) hvRemNameInput.value = '';
-        syncFormInputsIntoState();
-        persistHojaVidaState({ showFeedback: false, syncCloud: true, triggerNotifs: true });
-        showToast(`✅ Recordatorio "${nombre}" agregado.`);
       });
     }
 
