@@ -37,7 +37,7 @@ service cloud.firestore {
     }
 
     function isValidVipTipo(t) {
-      return t == 'fundador' || t == 'estandar' || t == 'rastreo_cepos';
+      return t == 'fundador' || t == 'estandar' || t == 'rastreo_cepos' || t == 'vip_m34';
     }
 
     function hasUserDoc() {
@@ -56,12 +56,16 @@ service cloud.firestore {
         && (
           userData().vipTipo == 'fundador' ||
           (
-            (userData().vipTipo == 'estandar' || userData().vipTipo == 'rastreo_cepos') &&
+            (userData().vipTipo == 'estandar' || userData().vipTipo == 'rastreo_cepos' || userData().vipTipo == 'vip_m34') &&
             'vipExpiraAt' in userData() &&
             userData().vipExpiraAt is timestamp &&
             userData().vipExpiraAt > request.time
           )
         );
+    }
+
+    function isVipM34OrAdmin() {
+      return isAdmin() || (isActiveVip() && userData().vipTipo == 'vip_m34');
     }
 
     function isValidReporte(data) {
@@ -104,7 +108,8 @@ service cloud.firestore {
           data.activacionRapida == 'admin' ||
           data.activacionRapida == 'vip_fundador' ||
           data.activacionRapida == 'vip_estandar' ||
-          data.activacionRapida == 'vip_cepos'
+          data.activacionRapida == 'vip_cepos' ||
+          data.activacionRapida == 'vip_m34'
         ))
         && (!('radioMetros' in data) || data.radioMetros == null || (data.radioMetros is int && data.radioMetros >= 50 && data.radioMetros <= 100))
         && (!('vipNivel' in data) || data.vipNivel == null || isValidVipTipo(data.vipNivel));
@@ -145,7 +150,7 @@ service cloud.firestore {
         && data.usosActuales is int && data.usosActuales >= 0 && data.usosActuales <= data.maxUsos
         && (
           (data.tipoVip == 'fundador' && data.expiraAt == null) ||
-          ((data.tipoVip == 'estandar' || data.tipoVip == 'rastreo_cepos') && data.expiraAt is timestamp)
+          ((data.tipoVip == 'estandar' || data.tipoVip == 'rastreo_cepos' || data.tipoVip == 'vip_m34') && data.expiraAt is timestamp)
         )
         && (!('nota' in data) || (data.nota is string && data.nota.size() <= 120))
         && data.createdBy is string && isValidId(data.createdBy)
@@ -184,6 +189,7 @@ service cloud.firestore {
           data.eliminadoPorRol == 'vip_fundador' ||
           data.eliminadoPorRol == 'vip_estandar' ||
           data.eliminadoPorRol == 'vip_cepos' ||
+          data.eliminadoPorRol == 'vip_m34' ||
           data.eliminadoPorRol == 'autor'
         )
         && data.eliminadoAt is timestamp;
@@ -372,7 +378,8 @@ service cloud.firestore {
           (incoming().activacionRapida == 'admin' && isAdmin()) ||
           (incoming().activacionRapida == 'vip_fundador' && isActiveVip() && userData().vipTipo == 'fundador') ||
           (incoming().activacionRapida == 'vip_estandar' && isActiveVip() && userData().vipTipo == 'estandar') ||
-          (incoming().activacionRapida == 'vip_cepos' && isActiveVip() && userData().vipTipo == 'rastreo_cepos')
+          (incoming().activacionRapida == 'vip_cepos' && isActiveVip() && userData().vipTipo == 'rastreo_cepos') ||
+          (incoming().activacionRapida == 'vip_m34' && isActiveVip() && userData().vipTipo == 'vip_m34')
         ))
         && (!('confirmadoPor' in incoming()) || (
           incoming().confirmadoPor.size() == 1
@@ -478,7 +485,8 @@ service cloud.firestore {
             && (
               (incoming().eliminadoPorRol == 'vip_fundador' && userData().vipTipo == 'fundador') ||
               (incoming().eliminadoPorRol == 'vip_estandar' && userData().vipTipo == 'estandar') ||
-              (incoming().eliminadoPorRol == 'vip_cepos' && userData().vipTipo == 'rastreo_cepos')
+              (incoming().eliminadoPorRol == 'vip_cepos' && userData().vipTipo == 'rastreo_cepos') ||
+              (incoming().eliminadoPorRol == 'vip_m34' && userData().vipTipo == 'vip_m34')
             )
           )
         );
@@ -565,7 +573,7 @@ service cloud.firestore {
             && (
               (incoming().vipTipo == 'fundador' && incoming().vipExpiraAt == null) ||
               (
-                (incoming().vipTipo == 'estandar' || incoming().vipTipo == 'rastreo_cepos')
+                (incoming().vipTipo == 'estandar' || incoming().vipTipo == 'rastreo_cepos' || incoming().vipTipo == 'vip_m34')
                 && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt is timestamp
                 && get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt > request.time
                 && incoming().vipExpiraAt == get(/databases/$(database)/documents/codigos_vip/$(incoming().vipCodigo)).data.expiraAt
@@ -757,11 +765,11 @@ service cloud.firestore {
     }
 
     match /emergencias_m34/{eventoId} {
-      // Zero-PII guild emergency beacons (uses apodo/indicativo only, never email or phone); public bounded read for connected map viewers, writes require auth
-      allow get: if isValidId(eventoId);
-      allow list: if request.query.limit != null && request.query.limit <= 50;
+      // Guild emergency beacons restricted strictly to active VIP M34 users and verified Admins (zero PII: apodo only)
+      allow get: if isVipM34OrAdmin() && isValidId(eventoId);
+      allow list: if isVipM34OrAdmin() && request.query.limit != null && request.query.limit <= 50;
 
-      allow create: if isSignedIn()
+      allow create: if isVipM34OrAdmin()
         && isValidId(eventoId)
         && isValidEmergenciaM34(incoming())
         && incoming().estado == 'ACTIVA'
@@ -773,7 +781,7 @@ service cloud.firestore {
         && incoming().createdAt == request.time
         && incoming().updatedAt == request.time;
 
-      allow update: if isSignedIn()
+      allow update: if isVipM34OrAdmin()
         && isValidId(eventoId)
         && isValidEmergenciaM34(incoming())
         && incoming().authorId == existing().authorId
@@ -807,10 +815,10 @@ service cloud.firestore {
       allow delete: if isAdmin() && isValidId(eventoId);
 
       match /apoyos/{userId} {
-        allow get: if isValidId(eventoId) && isValidId(userId);
-        allow list: if request.query.limit != null && request.query.limit <= 100;
+        allow get: if isVipM34OrAdmin() && isValidId(eventoId) && isValidId(userId);
+        allow list: if isVipM34OrAdmin() && request.query.limit != null && request.query.limit <= 100;
 
-        allow create: if isSignedIn()
+        allow create: if isVipM34OrAdmin()
           && isValidId(eventoId)
           && isValidId(userId)
           && request.auth.uid == userId
@@ -821,7 +829,7 @@ service cloud.firestore {
           && incoming().createdAt == request.time
           && incoming().updatedAt == request.time;
 
-        allow update: if isSignedIn()
+        allow update: if isVipM34OrAdmin()
           && isValidId(eventoId)
           && isValidId(userId)
           && request.auth.uid == userId
@@ -835,7 +843,7 @@ service cloud.firestore {
             'apodo', 'tipoVehiculo', 'lat', 'lng', 'sector', 'estadoApoyo', 'updatedAt'
           ]);
 
-        allow delete: if isSignedIn()
+        allow delete: if isVipM34OrAdmin()
           && isValidId(eventoId)
           && isValidId(userId)
           && (request.auth.uid == userId || isAdmin());

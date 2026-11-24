@@ -895,6 +895,13 @@
       color: #bae6fd;
     }
 
+    .auth-util-btn.vip-btn.vip-m34,
+    .auth-util-btn.vip-btn.vip-active.vip-m34 {
+      border-color: rgba(248, 113, 113, 0.92);
+      background: rgba(127, 29, 29, 0.56);
+      color: #fecaca;
+    }
+
     .map-btn.qr-btn {
       border-color: rgba(34, 211, 238, 0.55);
       background: rgba(15, 23, 42, 0.96);
@@ -3294,6 +3301,12 @@
       background: rgba(12, 74, 110, 0.25);
     }
 
+    .vip-status-card.vip_m34,
+    .vip-status-card.is-vip.is-m34 {
+      border-color: rgba(248, 113, 113, 0.78);
+      background: rgba(127, 29, 29, 0.34);
+    }
+
     .vip-level-pill {
       display: inline-flex;
       align-items: center;
@@ -3319,6 +3332,11 @@
     .vip-level-pill.estandar {
       color: #7dd3fc;
       background: rgba(14, 165, 233, 0.18);
+    }
+
+    .vip-level-pill.vip_m34 {
+      color: #fecaca;
+      background: rgba(220, 38, 38, 0.24);
     }
 
     .vip-tiers-legend {
@@ -3377,26 +3395,30 @@
       gap: 8px;
     }
 
+    .m34-trigger-row.m34-hidden {
+      display: none !important;
+    }
+
     .m34-sos-btn {
       pointer-events: auto;
       position: relative;
       overflow: hidden;
-      min-height: 46px;
-      min-width: 104px;
-      padding: 6px 13px;
-      border-radius: 15px;
-      border: 1.5px solid rgba(254, 202, 202, 0.85);
-      background: linear-gradient(135deg, #991b1b, #dc2626);
-      color: #ffffff;
+      min-height: 44px;
+      min-width: 82px;
+      padding: 6px 12px;
+      border-radius: 13px;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      background: linear-gradient(135deg, #090d16, #111827);
+      color: #e2e8f0;
       font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.03em;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 6px;
       cursor: pointer;
-      box-shadow: 0 8px 22px rgba(185, 28, 28, 0.55);
+      box-shadow: 0 6px 16px rgba(2, 6, 23, 0.65);
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
@@ -3408,12 +3430,12 @@
     }
 
     .m34-sos-btn.has-active {
-      animation: anthiM34BannerGlow 1.5s ease-in-out infinite;
+      border-color: rgba(148, 163, 184, 0.52);
     }
 
     .m34-sos-btn.is-creator-active {
-      background: linear-gradient(135deg, #b91c1c, #ef4444);
-      border-color: #fef08a;
+      background: linear-gradient(135deg, #090d16, #0f172a);
+      border-color: rgba(148, 163, 184, 0.45);
     }
 
     .m34-hold-fill {
@@ -3422,7 +3444,7 @@
       top: 0;
       bottom: 0;
       width: 0%;
-      background: linear-gradient(90deg, rgba(254, 240, 138, 0.35), rgba(255, 255, 255, 0.45));
+      background: rgba(148, 163, 184, 0.18);
       pointer-events: none;
       transition: width 0.05s linear;
     }
@@ -3437,11 +3459,11 @@
 
     .m34-sos-sub {
       font-size: 9px;
-      font-weight: 800;
+      font-weight: 700;
       padding: 2px 5px;
       border-radius: 6px;
-      background: rgba(2, 6, 23, 0.58);
-      color: #fef08a;
+      background: rgba(15, 23, 42, 0.9);
+      color: #94a3b8;
       letter-spacing: 0.02em;
     }
 
@@ -3520,6 +3542,25 @@
       color: #450a0a;
     }
 
+    .m34-event-select {
+      width: 100%;
+      background: rgba(2, 6, 23, 0.9);
+      color: #fef2f2;
+      border: 1px solid rgba(254, 202, 202, 0.58);
+      border-radius: 9px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 800;
+      line-height: 1.3;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .m34-event-select option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
     .m34-danger-info {
       font-size: 11.5px;
       font-weight: 700;
@@ -3573,8 +3614,8 @@
 
     .m34-marker-beacon {
       position: relative;
-      width: 46px;
-      height: 46px;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -3584,26 +3625,24 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: rgba(239, 68, 68, 0.32);
+      background: rgba(239, 68, 68, 0.36);
       border: 2.5px solid #ef4444;
-      animation: anthiM34Pulse 1.3s ease-out infinite;
+      animation: anthiM34Pulse 1.25s ease-out infinite;
     }
 
     .m34-marker-core {
       position: relative;
       z-index: 2;
-      width: 32px;
-      height: 32px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #b91c1c, #ef4444);
+      background: radial-gradient(circle at 32% 30%, #ef4444, #b91c1c 65%, #7f1d1d 100%);
       border: 2.5px solid #ffffff;
       color: #ffffff;
-      font-size: 10px;
-      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.72);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.85), 0 4px 14px rgba(0, 0, 0, 0.78);
     }
 
     .m34-marker-tag {
@@ -3624,36 +3663,20 @@
 
     .m34-responder-beacon {
       position: relative;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0284c7, #10b981);
-      border: 2.5px solid #ffffff;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
-      font-size: 15px;
+      background: transparent;
+      border: none;
+      filter: drop-shadow(0 3px 8px rgba(2, 6, 23, 0.85)) drop-shadow(0 0 7px rgba(16, 185, 129, 0.75));
+      transition: transform 0.18s ease, filter 0.18s ease;
     }
 
     .m34-responder-beacon.on-site {
-      background: linear-gradient(135deg, #16a34a, #eab308);
-      border-color: #fef08a;
-    }
-
-    .m34-responder-tag {
-      position: absolute;
-      bottom: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      background: rgba(2, 6, 23, 0.92);
-      color: #a7f3d0;
-      border: 1px solid rgba(16, 185, 129, 0.7);
-      border-radius: 6px;
-      padding: 1px 5px;
-      font-size: 9px;
-      font-weight: 800;
+      transform: scale(1.1);
+      filter: drop-shadow(0 3px 9px rgba(2, 6, 23, 0.9)) drop-shadow(0 0 10px rgba(52, 211, 153, 0.95));
     }
 
     .m34-modal-card-box {
@@ -4087,6 +4110,7 @@
             <button type="button" class="route-banner-close" id="btnOpenM34FromBanner" title="Abrir Centro M34" style="width:auto;padding:0 8px;font-size:11px;font-weight:800;">📋 Panel</button>
           </div>
         </div>
+        <select class="m34-event-select" id="m34BannerEventDropdown" aria-label="Seleccionar evento M34 por barrio y referencia" style="display:none;"></select>
         <div class="m34-event-tabs" id="m34BannerEventTabs"></div>
         <div class="m34-danger-info" id="m34DangerBannerInfo" role="button" tabindex="0"></div>
         <div class="m34-danger-actions">
@@ -4096,11 +4120,11 @@
         </div>
       </div>
 
-      <div class="m34-trigger-row">
-        <button type="button" class="m34-sos-btn" id="btnEmergencyM34" title="Emergencia Gremial M34: doble toque o mantén 1.5s para activar SOS; 1 toque abre panel M34">
+      <div class="m34-trigger-row m34-hidden" id="m34TriggerRow">
+        <button type="button" class="m34-sos-btn" id="btnEmergencyM34" style="display:none;" title="Módulo M34 (VIP M34 / Admin): doble toque o mantén 1.5s para activar en silencio; 1 toque abre panel M34">
           <span class="m34-hold-fill" id="m34TriggerHoldFill"></span>
           <span class="m34-sos-btn-content">
-            <span>🆘 M34</span>
+            <span>M34</span>
             <span class="m34-sos-sub" id="m34TriggerSubLabel">1.5s / 2x</span>
           </span>
         </button>
@@ -4471,6 +4495,9 @@
           </div>
           <div class="vip-tier-desc">
             <strong style="color:#7dd3fc;">⭐ VIP Estándar / Suscripción:</strong> Vigencia configurable, reporte firme en primera instancia, excepción de 300 m y eliminación directa de alertas que ya no aplican en vía.
+          </div>
+          <div class="vip-tier-desc">
+            <strong style="color:#fecaca;">🆘 VIP M34 (Emergencia Gremial):</strong> Acceso exclusivo al módulo M34 (botón de emergencia gremial, alerta por sector/barrio + referencia, GPS en vivo y apoyo "Yo Voy"), además de publicación firme en primera instancia.
           </div>
         </div>
       </div>
@@ -5039,6 +5066,7 @@
                 <option value="fundador">🏅 VIP Fundador (Intocable · Permanente)</option>
                 <option value="estandar">⭐ VIP Estándar / Suscripción (Con vencimiento)</option>
                 <option value="rastreo_cepos">🛡️ VIP Operativo Cepos y Fotomultas (Alto nivel)</option>
+                <option value="vip_m34">🆘 VIP M34 (Emergencia Gremial)</option>
               </select>
               <div id="vipAdminExpiryRow" style="display:none;flex-direction:column;gap:6px;padding:8px;border-radius:10px;background:rgba(15,23,42,0.85);border:1px solid rgba(51,65,85,0.8);">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
@@ -5459,8 +5487,12 @@
         </div>
 
         <p style="font-size:12px;color:#cbd5e1;line-height:1.42;margin-bottom:10px;">
-          Red solidaria de apoyo inmediato entre compañeros (taxis, motos y particulares). Sin coordenadas crudas visibles y con ubicación en vivo mientras dure el evento.
+          Red solidaria de apoyo inmediato exclusiva para compañeros <strong>VIP M34</strong> y Administradores. Identificación clara por barrio y punto de referencia cercano, sin coordenadas crudas visibles.
         </p>
+
+        <div id="m34ModalVipGateNote" style="display:none;margin-bottom:10px;padding:9px 11px;border-radius:10px;border:1px solid rgba(248,113,113,0.65);background:rgba(127,29,29,0.45);font-size:11.5px;color:#fecaca;line-height:1.4;">
+          ⛔ Módulo exclusivo para compañeros con nivel <strong>🆘 VIP M34</strong> activo o Administradores autorizados.
+        </div>
 
         <div class="m34-modal-card-box" style="border-color:rgba(239,68,68,0.65);background:rgba(69,10,10,0.34);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
@@ -5491,6 +5523,7 @@
             <span id="m34ActiveCountLabel" style="font-size:10.5px;font-weight:800;color:#fca5a5;">0 activos</span>
           </div>
 
+          <select class="m34-event-select" id="m34ModalEventDropdown" aria-label="Seleccionar evento M34 por barrio y referencia" style="display:none;margin-bottom:8px;"></select>
           <div class="m34-event-tabs" id="m34ModalEventSelector" style="margin-bottom:8px;"></div>
 
           <div id="m34SelectedEventDetails" style="font-size:12px;color:#e2e8f0;line-height:1.4;">
@@ -6106,13 +6139,25 @@
         bg: 'rgba(168,85,247,0.22)',
         border: 'rgba(192,132,252,0.62)',
         permanent: false
+      },
+      vip_m34: {
+        tipo: 'vip_m34',
+        badge: '🆘 VIP M34',
+        shortLabel: 'M34',
+        activacionKey: 'vip_m34',
+        voteWeight: 3,
+        pillClass: 'vip_m34',
+        color: '#fecaca',
+        bg: 'rgba(220,38,38,0.22)',
+        border: 'rgba(248,113,113,0.65)',
+        permanent: false
       }
     };
 
     let currentVipProfile = null;
 
     function isValidVipTipoKey(tipo) {
-      return tipo === 'fundador' || tipo === 'estandar' || tipo === 'rastreo_cepos';
+      return tipo === 'fundador' || tipo === 'estandar' || tipo === 'rastreo_cepos' || tipo === 'vip_m34';
     }
 
     function normalizeVipCodeInput(raw) {
@@ -6218,17 +6263,31 @@
       const btnVipIcon = document.getElementById('btnVipIcon');
       const btnVipSubLabel = document.getElementById('btnVipSubLabel');
       if (btnOpenVipCodeModal) {
-        btnOpenVipCodeModal.classList.remove('vip-active', 'vip-cepos');
+        btnOpenVipCodeModal.classList.remove('vip-active', 'vip-cepos', 'vip-m34');
         if (activeVip) {
           btnOpenVipCodeModal.classList.add('vip-active');
           if (activeVip.tipoVip === 'rastreo_cepos') {
             btnOpenVipCodeModal.classList.add('vip-cepos');
+          } else if (activeVip.tipoVip === 'vip_m34') {
+            btnOpenVipCodeModal.classList.add('vip-m34');
           }
           if (btnVipIcon) {
-            btnVipIcon.textContent = activeVip.tipoVip === 'fundador' ? '🏅' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️' : '⭐';
+            btnVipIcon.textContent = activeVip.tipoVip === 'fundador'
+              ? '🏅'
+              : activeVip.tipoVip === 'rastreo_cepos'
+              ? '🛡️'
+              : activeVip.tipoVip === 'vip_m34'
+              ? '🆘'
+              : '⭐';
           }
           if (btnVipSubLabel) {
-            btnVipSubLabel.textContent = activeVip.tipoVip === 'fundador' ? 'Fundador' : activeVip.tipoVip === 'rastreo_cepos' ? 'Cepos' : 'VIP';
+            btnVipSubLabel.textContent = activeVip.tipoVip === 'fundador'
+              ? 'Fundador'
+              : activeVip.tipoVip === 'rastreo_cepos'
+              ? 'Cepos'
+              : activeVip.tipoVip === 'vip_m34'
+              ? 'M34'
+              : 'VIP';
           }
         } else {
           if (btnVipIcon) btnVipIcon.textContent = '🎟️';
@@ -6240,10 +6299,11 @@
       const authVipStatusLabel = document.getElementById('authVipStatusLabel');
       const authVipExpiryLabel = document.getElementById('authVipExpiryLabel');
       if (authVipStatusCard && authVipStatusLabel && authVipExpiryLabel) {
-        authVipStatusCard.classList.remove('is-vip', 'is-cepos');
+        authVipStatusCard.classList.remove('is-vip', 'is-cepos', 'is-m34');
         if (activeVip) {
           authVipStatusCard.classList.add('is-vip');
           if (activeVip.tipoVip === 'rastreo_cepos') authVipStatusCard.classList.add('is-cepos');
+          if (activeVip.tipoVip === 'vip_m34') authVipStatusCard.classList.add('is-m34');
           authVipStatusLabel.innerHTML = `<span class="vip-level-pill ${activeVip.meta.pillClass}">${escapeHtml(activeVip.meta.badge)}</span>`;
           authVipExpiryLabel.textContent = activeVip.tipoVip === 'fundador'
             ? `Permanente e intocable · Peso +${activeVip.meta.voteWeight} · Código: ${activeVip.codigo || '--'}`
@@ -6259,16 +6319,19 @@
 
       const vipModalStatusBox = document.getElementById('vipModalStatusBox');
       if (vipModalStatusBox) {
-        vipModalStatusBox.classList.remove('is-vip', 'is-cepos');
+        vipModalStatusBox.classList.remove('is-vip', 'is-cepos', 'is-m34');
         if (!user) {
           vipModalStatusBox.innerHTML = '🔐 <strong>Inicia sesión primero</strong> (o ingresa el código para iniciar sesión y activarlo directo en tu cuenta).';
         } else if (activeVip) {
           vipModalStatusBox.classList.add('is-vip');
           if (activeVip.tipoVip === 'rastreo_cepos') vipModalStatusBox.classList.add('is-cepos');
+          if (activeVip.tipoVip === 'vip_m34') vipModalStatusBox.classList.add('is-m34');
           const detail = activeVip.tipoVip === 'fundador'
             ? 'Nivel permanente sin vencimiento (intocable por otros códigos temporales).'
             : activeVip.tipoVip === 'rastreo_cepos'
             ? `Vigente hasta ${formatVipDateShort(activeVip.expiraAtMs)}. Distintivo operativo de alto valor en alertas y seguimiento móvil de cepos/fotomultas.`
+            : activeVip.tipoVip === 'vip_m34'
+            ? `Vigente hasta ${formatVipDateShort(activeVip.expiraAtMs)}. Acceso exclusivo al módulo de Emergencia Gremial M34, GPS en vivo, alertas por sector y publicación FIRME en primera instancia.`
             : `Vigente hasta ${formatVipDateShort(activeVip.expiraAtMs)}. Reportes firmes en primera instancia y mayor peso en confirmaciones.`;
           vipModalStatusBox.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
@@ -6292,6 +6355,9 @@
       }
       if (window.__anthiReportModalReady && typeof updateDuplicateGuardPreview === 'function') {
         updateDuplicateGuardPreview();
+      }
+      if (typeof window.__anthiSyncM34Auth === 'function') {
+        window.__anthiSyncM34Auth(user);
       }
     }
 
@@ -6597,6 +6663,16 @@
       { name: 'San Francisco', lat: 7.1310, lng: -73.1230, r: 680 },
       { name: 'Universidad', lat: 7.1388, lng: -73.1210, r: 780 },
       { name: 'Estadio / San Alonso', lat: 7.1362, lng: -73.1155, r: 650 },
+      { name: 'Norte · Regaderos', lat: 7.1478, lng: -73.1245, r: 750 },
+      { name: 'Norte · Los Ángeles', lat: 7.1502, lng: -73.1165, r: 700 },
+      { name: 'Norte · La Esperanza', lat: 7.1488, lng: -73.1305, r: 720 },
+      { name: 'Norte · Las Hamacas', lat: 7.1518, lng: -73.1215, r: 700 },
+      { name: 'Norte · La Juventud', lat: 7.1538, lng: -73.1180, r: 750 },
+      { name: 'Norte · Kennedy', lat: 7.1572, lng: -73.1286, r: 900 },
+      { name: 'Norte · Villa Rosa', lat: 7.1592, lng: -73.1248, r: 700 },
+      { name: 'Norte · Bavaria II', lat: 7.1608, lng: -73.1375, r: 850 },
+      { name: 'Norte · Café Madrid', lat: 7.1638, lng: -73.1335, r: 1050 },
+      { name: 'Norte · Colorados', lat: 7.1775, lng: -73.1312, r: 1100 },
       { name: 'La Concordia', lat: 7.1072, lng: -73.1202, r: 720 },
       { name: 'Ciudadela Real de Minas', lat: 7.1058, lng: -73.1252, r: 850 },
       { name: 'La Victoria', lat: 7.1012, lng: -73.1208, r: 650 },
@@ -6647,6 +6723,11 @@
       { name: 'Universidad UIS', lat: 7.1404, lng: -73.1211 },
       { name: 'Glorieta Caballo de Bolívar', lat: 7.1380, lng: -73.1228 },
       { name: 'Estadio Américo Montanini', lat: 7.1365, lng: -73.1166 },
+      { name: 'Colegio Dámaso Zapata (Norte)', lat: 7.1445, lng: -73.1235 },
+      { name: 'CAI Kennedy (Norte)', lat: 7.1566, lng: -73.1274 },
+      { name: 'Hospital Local del Norte', lat: 7.1574, lng: -73.1288 },
+      { name: 'Parque Estación Café Madrid', lat: 7.1642, lng: -73.1332 },
+      { name: 'Parque Los Colorados', lat: 7.1778, lng: -73.1310 },
       { name: 'SENA Girón / Quebradaseca', lat: 7.1262, lng: -73.1185 },
       { name: 'Glorieta La Meseta', lat: 7.1228, lng: -73.1310 },
       { name: 'Viaducto La Flora', lat: 7.1055, lng: -73.1100 },
@@ -6679,10 +6760,13 @@
       { name: 'Carrera 33', lat: 7.1170, lng: -73.1116 },
       { name: 'Carrera 36 (Cabecera)', lat: 7.1165, lng: -73.1090 },
       { name: 'Carrera 15', lat: 7.1195, lng: -73.1245 },
+      { name: 'Carrera 15 Norte', lat: 7.1495, lng: -73.1255 },
+      { name: 'Vía al Mar / Café Madrid', lat: 7.1620, lng: -73.1330 },
       { name: 'Carrera 9', lat: 7.1155, lng: -73.1275 },
       { name: 'Calle 36', lat: 7.1182, lng: -73.1225 },
       { name: 'Calle 45', lat: 7.1135, lng: -73.1210 },
       { name: 'Calle 56', lat: 7.1092, lng: -73.1145 },
+      { name: 'Av. La Rosita', lat: 7.1116, lng: -73.1205 },
       { name: 'Av. Quebradaseca', lat: 7.1256, lng: -73.1215 },
       { name: 'Bulevar Santander', lat: 7.1278, lng: -73.1235 },
       { name: 'Bulevar Bolívar', lat: 7.1255, lng: -73.1285 },
@@ -6780,6 +6864,10 @@
 
       const barrioName = bestBarrio && bestBarrioDist <= 2800
         ? bestBarrio.name
+        : nLat >= 7.143
+        ? 'Norte (Bucaramanga)'
+        : nLat <= 7.04
+        ? 'Sur · Área Metropolitana'
         : 'Bucaramanga';
 
       let refLabel = '';
@@ -7285,6 +7373,9 @@
       }
       if (rep.activacionRapida === 'vip_cepos') {
         return '🛡️ Primera instancia · VIP Cepos/Fotomultas';
+      }
+      if (rep.activacionRapida === 'vip_m34') {
+        return '🆘 Primera instancia · VIP M34';
       }
       if (rep.activacionRapida === 'vip_estandar') {
         return '⭐ Primera instancia · VIP';
@@ -7901,7 +7992,7 @@
         const alias = (apodo || user.email.split('@')[0]).slice(0, 12);
         const activeVip = getActiveVipProfile(user);
         const vipMark = activeVip
-          ? (activeVip.tipoVip === 'fundador' ? '🏅 ' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️ ' : '⭐ ')
+          ? (activeVip.tipoVip === 'fundador' ? '🏅 ' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️ ' : activeVip.tipoVip === 'vip_m34' ? '🆘 ' : '⭐ ')
           : '✓ ';
         btnAuth.textContent = `${vipMark}${alias}`;
         btnAuth.classList.add('signed-in');
@@ -7910,7 +8001,7 @@
         const apodo = getUserApodo(user);
         const activeVip = getActiveVipProfile(user);
         const vipMark = activeVip
-          ? (activeVip.tipoVip === 'fundador' ? '🏅 ' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️ ' : '⭐ ')
+          ? (activeVip.tipoVip === 'fundador' ? '🏅 ' : activeVip.tipoVip === 'rastreo_cepos' ? '🛡️ ' : activeVip.tipoVip === 'vip_m34' ? '🆘 ' : '⭐ ')
           : '✓ ';
         btnAuth.textContent = apodo ? `${vipMark}${apodo.slice(0, 12)}` : `${vipMark}Cuenta`;
         btnAuth.classList.add('signed-in');
@@ -9848,6 +9939,8 @@
         if (btnSubmit && !btnSubmit.disabled) {
           btnSubmit.textContent = activeVip.tipoVip === 'rastreo_cepos'
             ? '🛡️ Publicar FIRME (VIP Cepos)'
+            : activeVip.tipoVip === 'vip_m34'
+            ? '🆘 Publicar FIRME (VIP M34)'
             : activeVip.tipoVip === 'fundador'
             ? '🏅 Publicar FIRME (VIP Fundador)'
             : '⭐ Publicar FIRME (VIP)';
@@ -10668,6 +10761,8 @@
             ? '🏅 Alerta VIP · '
             : activeVip.tipoVip === 'rastreo_cepos' && isCeposTipo(tipoStr)
             ? '🛡️ Alerta VIP Cepos · '
+            : activeVip.tipoVip === 'vip_m34'
+            ? '🆘 Alerta VIP M34 · '
             : '⭐ Alerta VIP · ')
         : '⚠️ ¡Alerta ANTHI! · ';
 
@@ -12451,6 +12546,8 @@
             ? '🏅 ¡Alerta FIRME publicada en primera instancia (VIP Fundador)!'
             : activacionRapida === 'vip_cepos'
             ? '🛡️ ¡Alerta FIRME publicada en primera instancia (VIP Cepos/Fotomultas)!'
+            : activacionRapida === 'vip_m34'
+            ? '🆘 ¡Alerta FIRME publicada en primera instancia (VIP M34)!'
             : activacionRapida === 'vip_estandar'
             ? '⭐ ¡Alerta FIRME publicada en primera instancia (VIP Estándar)!'
             : activacionRapida === 'foto'
@@ -12904,6 +13001,7 @@
       if (rol === 'admin') return '👑 Admin';
       if (rol === 'vip_fundador') return '🏅 VIP Fundador';
       if (rol === 'vip_cepos') return '🛡️ VIP Cepos';
+      if (rol === 'vip_m34') return '🆘 VIP M34';
       if (rol === 'vip_estandar') return '⭐ VIP Estándar';
       if (rol === 'autor') return '👤 Autor';
       return '👤 Usuario';
@@ -16552,7 +16650,7 @@
 
     function updateAdminVipExpiryRowVisibility() {
       const tipo = vipAdminTipoSelect ? vipAdminTipoSelect.value : 'fundador';
-      const needsExpiry = tipo === 'estandar' || tipo === 'rastreo_cepos';
+      const needsExpiry = tipo === 'estandar' || tipo === 'rastreo_cepos' || tipo === 'vip_m34';
       if (vipAdminExpiryRow) {
         vipAdminExpiryRow.style.display = needsExpiry ? 'flex' : 'none';
       }
@@ -16575,7 +16673,13 @@
     if (btnGenerateVipCode && vipAdminCodeInput) {
       btnGenerateVipCode.addEventListener('click', () => {
         const tipo = vipAdminTipoSelect ? vipAdminTipoSelect.value : 'estandar';
-        const prefix = tipo === 'fundador' ? 'FUND' : tipo === 'rastreo_cepos' ? 'CEPOS' : 'VIP';
+        const prefix = tipo === 'fundador'
+          ? 'FUND'
+          : tipo === 'rastreo_cepos'
+          ? 'CEPOS'
+          : tipo === 'vip_m34'
+          ? 'M34'
+          : 'VIP';
         const token = Math.random().toString(36).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5).padEnd(5, 'X');
         vipAdminCodeInput.value = `ANTHI-${prefix}-${token}`;
       });
@@ -18671,6 +18775,7 @@
       const m34Layer = L.layerGroup().addTo(map);
       const m34DangerBanner = document.getElementById('m34DangerBanner');
       const m34DangerBannerBadge = document.getElementById('m34DangerBannerBadge');
+      const m34BannerEventDropdown = document.getElementById('m34BannerEventDropdown');
       const m34BannerEventTabs = document.getElementById('m34BannerEventTabs');
       const m34DangerBannerInfo = document.getElementById('m34DangerBannerInfo');
       const btnToggleM34Mute = document.getElementById('btnToggleM34Mute');
@@ -18679,12 +18784,14 @@
       const btnM34FocusBanner = document.getElementById('btnM34FocusBanner');
       const btnM34OpenCloseBanner = document.getElementById('btnM34OpenCloseBanner');
 
+      const m34TriggerRow = document.getElementById('m34TriggerRow');
       const btnEmergencyM34 = document.getElementById('btnEmergencyM34');
       const m34TriggerHoldFill = document.getElementById('m34TriggerHoldFill');
       const m34TriggerSubLabel = document.getElementById('m34TriggerSubLabel');
 
       const m34Modal = document.getElementById('m34Modal');
       const btnCloseM34Modal = document.getElementById('btnCloseM34Modal');
+      const m34ModalVipGateNote = document.getElementById('m34ModalVipGateNote');
       const m34MyProfileBadge = document.getElementById('m34MyProfileBadge');
       const m34TriggerNotaInput = document.getElementById('m34TriggerNotaInput');
       const btnM34ModalHoldTrigger = document.getElementById('btnM34ModalHoldTrigger');
@@ -18693,6 +18800,7 @@
       const btnPreviewM34Alarm = document.getElementById('btnPreviewM34Alarm');
 
       const m34ActiveCountLabel = document.getElementById('m34ActiveCountLabel');
+      const m34ModalEventDropdown = document.getElementById('m34ModalEventDropdown');
       const m34ModalEventSelector = document.getElementById('m34ModalEventSelector');
       const m34SelectedEventDetails = document.getElementById('m34SelectedEventDetails');
       const m34RespondersWrap = document.getElementById('m34RespondersWrap');
@@ -18738,6 +18846,13 @@
       let isActivatingM34 = false;
       let isFinalizingM34 = false;
       let isTogglingYoVoy = false;
+
+      function hasM34VipAccess(user = auth.currentUser) {
+        if (!user || !user.uid) return false;
+        if (typeof isAuthorizedAdminEmail === 'function' && isAuthorizedAdminEmail(user)) return true;
+        const vip = typeof getActiveVipProfile === 'function' ? getActiveVipProfile(user) : null;
+        return Boolean(vip && vip.tipoVip === 'vip_m34');
+      }
 
       function stripRawCoordinatesText(raw) {
         return String(raw || '')
@@ -18785,15 +18900,113 @@
         return 'Compañero';
       }
 
-      function getM34SafeSector(lat, lng, fallbackSector = '') {
+      function getM34SafeSector(lat, lng, fallbackSector = '', opts = { allowRemote: true }) {
         let place = '';
         try {
           if (typeof formatGeoPlaceText === 'function' && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng))) {
-            place = formatGeoPlaceText(Number(lat), Number(lng), 'full', '', { allowRemote: false });
+            place = formatGeoPlaceText(Number(lat), Number(lng), 'full', '', opts);
           }
         } catch (e) {}
-        const clean = stripRawCoordinatesText(place || fallbackSector || 'Bucaramanga · Sector activo');
-        return (clean || 'Bucaramanga · Sector activo').slice(0, 160);
+        const clean = stripRawCoordinatesText(place || fallbackSector || 'Bucaramanga • Sector activo');
+        return (clean || 'Bucaramanga • Sector activo').slice(0, 160);
+      }
+
+      function splitM34SectorParts(rawSector, lat, lng) {
+        const cleanedRaw = stripRawCoordinatesText(rawSector || '');
+        const resolved = (!cleanedRaw || /^bucaramanga$/i.test(cleanedRaw))
+          ? getM34SafeSector(lat, lng, cleanedRaw, { allowRemote: false })
+          : cleanedRaw;
+        const bulletParts = resolved.split('•').map((s) => s.trim()).filter(Boolean);
+        let barrio = bulletParts[0] || '';
+        let ref = bulletParts.slice(1).join(' • ').trim();
+        if (!ref && resolved.includes(' — ')) {
+          const dashParts = resolved.split(' — ').map((s) => s.trim()).filter(Boolean);
+          barrio = dashParts[0] || barrio;
+          ref = dashParts.slice(1).join(' · ').trim();
+        }
+        if ((!barrio || /^bucaramanga$/i.test(barrio)) && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng))) {
+          try {
+            const info = typeof getResolvedPlaceInfo === 'function'
+              ? getResolvedPlaceInfo(Number(lat), Number(lng), { allowRemote: false })
+              : null;
+            if (info && info.barrio) barrio = info.barrio;
+            if (!ref && info && info.ref) ref = info.ref;
+          } catch (e) {}
+        }
+        barrio = stripRawCoordinatesText(barrio || 'Bucaramanga');
+        ref = stripRawCoordinatesText(ref || '');
+        const full = ref ? `${barrio} • ${ref}` : barrio;
+        return { barrio, ref, full };
+      }
+
+      function formatM34EventSelectorLabel(evt, idx) {
+        const parts = splitM34SectorParts(evt && evt.sector, evt && evt.lat, evt && evt.lng);
+        const apodo = (evt && evt.apodo ? String(evt.apodo) : 'Compañero').slice(0, 14);
+        const placeLabel = parts.ref ? `${parts.barrio} — ${parts.ref}` : parts.barrio;
+        return `Evento ${idx + 1} · ${placeLabel} (${apodo})`;
+      }
+
+      async function resolveM34PlaceLabelAsync(lat, lng, timeoutMs = 1400) {
+        const nLat = Number(lat);
+        const nLng = Number(lng);
+        const immediate = getM34SafeSector(nLat, nLng, '', { allowRemote: true });
+        if (!Number.isFinite(nLat) || !Number.isFinite(nLng)) return immediate;
+        try {
+          const local = typeof resolveLocalBgaPlace === 'function' ? resolveLocalBgaPlace(nLat, nLng) : null;
+          const bKey = typeof getAnthiGeoBucketKey === 'function' ? getAnthiGeoBucketKey(nLat, nLng) : '';
+          if ((local && local.isExact) || (bKey && typeof geoMemoryPlaceCache !== 'undefined' && geoMemoryPlaceCache.has(bKey))) {
+            return getM34SafeSector(nLat, nLng, immediate, { allowRemote: false });
+          }
+          if (typeof fetch !== 'function' || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
+            return immediate;
+          }
+          const remotePromise = (async () => {
+            const controller = typeof AbortController === 'function' ? new AbortController() : null;
+            const tId = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+            try {
+              const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(nLat)}&lon=${encodeURIComponent(nLng)}&zoom=18&addressdetails=1&accept-language=es`;
+              const resp = await fetch(url, {
+                headers: { Accept: 'application/json' },
+                signal: controller ? controller.signal : undefined
+              });
+              if (resp && resp.ok) {
+                const data = await resp.json();
+                const addr = (data && data.address) || {};
+                const fallbackLocal = local || { barrio: 'Bucaramanga', ref: '', poiDist: Infinity };
+                const barrioRaw = addr.neighbourhood || addr.suburb || addr.quarter || addr.city_district || addr.town || addr.village || '';
+                const cleanBarrio = stripRawCoordinatesText(barrioRaw || fallbackLocal.barrio || 'Bucaramanga');
+                const poiRaw = addr.amenity || addr.shop || addr.leisure || addr.tourism || addr.building || (data && data.name) || '';
+                const roadRaw = addr.road || addr.pedestrian || '';
+                let cleanRef = fallbackLocal.ref || '';
+                if (poiRaw && String(poiRaw).trim().toLowerCase() !== cleanBarrio.toLowerCase()) {
+                  cleanRef = `Cerca de ${stripRawCoordinatesText(poiRaw)}`;
+                } else if (roadRaw && fallbackLocal.poiDist > 260) {
+                  cleanRef = `Sobre ${stripRawCoordinatesText(roadRaw)}`;
+                }
+                const enriched = {
+                  barrio: cleanBarrio || 'Bucaramanga',
+                  ref: cleanRef,
+                  ts: Date.now()
+                };
+                if (bKey && typeof geoMemoryPlaceCache !== 'undefined') {
+                  geoMemoryPlaceCache.set(bKey, enriched);
+                  if (typeof persistGeoPlaceCache === 'function') persistGeoPlaceCache();
+                }
+                return getM34SafeSector(nLat, nLng, `${enriched.barrio}${enriched.ref ? ` • ${enriched.ref}` : ''}`, { allowRemote: false });
+              }
+            } catch (e) {
+            } finally {
+              if (tId) clearTimeout(tId);
+            }
+            return immediate;
+          })();
+          return await Promise.race([
+            remotePromise,
+            new Promise((resolve) => setTimeout(() => resolve(immediate), timeoutMs))
+          ]);
+        } catch (e) {
+          return immediate;
+        }
       }
 
       function formatM34DistanceLabel(distMeters) {
@@ -18902,13 +19115,14 @@
 
       function hasExternalActiveM34Events() {
         const curUser = auth.currentUser;
-        if (!curUser) return activeM34Events.length > 0;
+        if (!curUser) return false;
+        if (!hasM34VipAccess(curUser)) return false;
         return activeM34Events.some((e) => e.authorId !== curUser.uid);
       }
 
       function playM34EmergencyAlarmAndVoice(forcePreview = false) {
         try {
-          if (!forcePreview && isM34AudioMuted) return false;
+          if (!forcePreview && (!hasM34VipAccess() || isM34AudioMuted)) return false;
           if (!forcePreview && !hasExternalActiveM34Events()) {
             pendingM34VoiceOnUnlock = false;
             return false;
@@ -18940,7 +19154,7 @@
           }
 
           setTimeout(() => {
-            if (!forcePreview && (isM34AudioMuted || !hasExternalActiveM34Events())) return;
+            if (!forcePreview && (!hasM34VipAccess() || isM34AudioMuted || !hasExternalActiveM34Events())) return;
             speakM34Phrase();
           }, 180);
 
@@ -18957,7 +19171,7 @@
 
       function unlockPendingM34Voice() {
         if (!pendingM34VoiceOnUnlock) return;
-        if (!hasExternalActiveM34Events() || isM34AudioMuted) {
+        if (!hasM34VipAccess() || !hasExternalActiveM34Events() || isM34AudioMuted) {
           pendingM34VoiceOnUnlock = false;
           return;
         }
@@ -18968,11 +19182,12 @@
       document.addEventListener('touchstart', unlockPendingM34Voice, { passive: true });
 
       async function dispatchM34BackgroundNotification(evt, eventIndex = 1) {
+        if (!hasM34VipAccess()) return false;
         if (!evt || typeof canDispatchBackgroundNotification !== 'function' || !canDispatchBackgroundNotification()) return false;
         const vehLabel = VEHICLE_LABELS[normalizeM34VehicleType(evt.tipoVehiculo)] || 'Vehículo';
-        const sector = stripRawCoordinatesText(evt.sector || getM34SafeSector(evt.lat, evt.lng));
-        const title = `🚨 DANGER · EMERGENCIA M34 (Evento ${eventIndex})`;
-        const body = `${evt.apodo || 'Compañero'} (${vehLabel}) solicita apoyo en ${sector}.`;
+        const parts = splitM34SectorParts(evt.sector, evt.lat, evt.lng);
+        const title = `🚨 DANGER · EMERGENCIA M34 (Evento ${eventIndex} · ${parts.barrio})`;
+        const body = `${evt.apodo || 'Compañero'} (${vehLabel}) en ${parts.full}.`;
         const safeLat = Number.isFinite(Number(evt.lat)) ? Number(evt.lat) : null;
         const safeLng = Number.isFinite(Number(evt.lng)) ? Number(evt.lng) : null;
         const payload = {
@@ -19037,14 +19252,14 @@
       }
 
       function startM34CreatorWatch(eventoId) {
-        if (!eventoId || !navigator.geolocation) return;
+        if (!eventoId || !navigator.geolocation || !hasM34VipAccess()) return;
         if (m34CreatorWatchId !== null && m34CreatorEventId === eventoId) return;
         stopM34CreatorWatch();
         m34CreatorEventId = eventoId;
         m34CreatorWatchId = navigator.geolocation.watchPosition(
           async (pos) => {
             const user = auth.currentUser;
-            if (!user || !m34CreatorEventId || m34CreatorEventId !== eventoId) {
+            if (!user || !hasM34VipAccess(user) || !m34CreatorEventId || m34CreatorEventId !== eventoId) {
               stopM34CreatorWatch();
               return;
             }
@@ -19068,7 +19283,7 @@
             m34CreatorLastPushAt = nowMs;
             m34CreatorLastLat = lat;
             m34CreatorLastLng = lng;
-            const sector = getM34SafeSector(lat, lng);
+            const sector = await resolveM34PlaceLabelAsync(lat, lng, 1000);
             try {
               await updateDoc(doc(db, M34_COLLECTION, eventoId), {
                 lat,
@@ -19088,14 +19303,14 @@
       }
 
       function startM34ResponderWatch(eventoId) {
-        if (!eventoId || !navigator.geolocation) return;
+        if (!eventoId || !navigator.geolocation || !hasM34VipAccess()) return;
         if (m34ResponderWatchId !== null && m34ResponderEventId === eventoId) return;
         stopM34ResponderWatch();
         m34ResponderEventId = eventoId;
         m34ResponderWatchId = navigator.geolocation.watchPosition(
           async (pos) => {
             const user = auth.currentUser;
-            if (!user || !m34ResponderEventId || m34ResponderEventId !== eventoId) {
+            if (!user || !hasM34VipAccess(user) || !m34ResponderEventId || m34ResponderEventId !== eventoId) {
               stopM34ResponderWatch();
               return;
             }
@@ -19129,7 +19344,7 @@
             m34ResponderLastLng = lng;
             m34ResponderWasOnSite = isNowOnSite;
 
-            const sector = getM34SafeSector(lat, lng);
+            const sector = getM34SafeSector(lat, lng, '', { allowRemote: true });
             const estadoApoyo = isNowOnSite ? 'EN_SITIO' : 'EN_CAMINO';
             try {
               await updateDoc(doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid), {
@@ -19206,6 +19421,7 @@
       }
 
       function focusM34EventOnMap(evt) {
+        if (!hasM34VipAccess()) return;
         if (!evt || !Number.isFinite(Number(evt.lat)) || !Number.isFinite(Number(evt.lng))) return;
         selectedM34EventId = evt.id;
         renderM34All();
@@ -19227,8 +19443,46 @@
         }
       }
 
+      const M34_SKULL_CROSSBONES_SVG = `
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <g stroke="#450a0a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5.5 23.8L24.5 14.2" stroke="#ffffff" stroke-width="2.6"/>
+            <circle cx="5.2" cy="22.8" r="1.5" fill="#ffffff"/>
+            <circle cx="6.4" cy="25.0" r="1.5" fill="#ffffff"/>
+            <circle cx="24.2" cy="13.2" r="1.5" fill="#ffffff"/>
+            <circle cx="25.4" cy="15.3" r="1.5" fill="#ffffff"/>
+            <path d="M26.5 23.8L7.5 14.2" stroke="#ffffff" stroke-width="2.6"/>
+            <circle cx="26.8" cy="22.8" r="1.5" fill="#ffffff"/>
+            <circle cx="25.6" cy="25.0" r="1.5" fill="#ffffff"/>
+            <circle cx="7.8" cy="13.2" r="1.5" fill="#ffffff"/>
+            <circle cx="6.6" cy="15.3" r="1.5" fill="#ffffff"/>
+          </g>
+          <path d="M16 4.2C11.1 4.2 7.8 7.6 7.8 12.1C7.8 14.9 9.1 17.0 10.9 18.2V20.5C10.9 21.4 11.6 22.0 12.5 22.0H19.5C20.4 22.0 21.1 21.4 21.1 20.5V18.2C22.9 17.0 24.2 14.9 24.2 12.1C24.2 7.6 20.9 4.2 16 4.2Z" fill="#ffffff" stroke="#450a0a" stroke-width="1.35" stroke-linejoin="round"/>
+          <circle cx="12.6" cy="12.4" r="2.2" fill="#180404"/>
+          <circle cx="19.4" cy="12.4" r="2.2" fill="#180404"/>
+          <path d="M16 14.4L14.7 16.9H17.3L16 14.4Z" fill="#180404"/>
+          <line x1="13.4" y1="19.2" x2="13.4" y2="21.6" stroke="#450a0a" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="16" y1="19.0" x2="16" y2="21.6" stroke="#450a0a" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="18.6" y1="19.2" x2="18.6" y2="21.6" stroke="#450a0a" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      `;
+
+      const M34_GREEN_RADAR_SHIELD_SVG = `
+        <svg width="32" height="32" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <path d="M32 5L55 14.5V31.2C55 46.0 45.1 56.6 32 60C18.9 56.6 9 46.0 9 31.2V14.5L32 5Z" fill="#052e16" stroke="#10b981" stroke-width="3.6" stroke-linejoin="round"/>
+          <path d="M32 9L51 17V31C51 43.3 42.8 52.3 32 55.3C21.2 52.3 13 43.3 13 31V17L32 9Z" fill="#064e3b" fill-opacity="0.72"/>
+          <circle cx="32" cy="31" r="14.5" stroke="#10b981" stroke-opacity="0.62" stroke-width="2.2"/>
+          <circle cx="32" cy="31" r="8.5" stroke="#34d399" stroke-opacity="0.88" stroke-width="2"/>
+          <path d="M32 31L32 16.5A14.5 14.5 0 0 1 46.5 31Z" fill="#22c55e" fill-opacity="0.48"/>
+          <line x1="32" y1="31" x2="43.5" y2="20.5" stroke="#6ee7b7" stroke-width="2.8" stroke-linecap="round"/>
+          <circle cx="32" cy="31" r="3.2" fill="#ffffff"/>
+          <circle cx="40.5" cy="23.5" r="2.7" fill="#4ade80"/>
+        </svg>
+      `;
+
       function renderM34MapMarkers() {
         m34Layer.clearLayers();
+        if (!hasM34VipAccess()) return;
         const selected = getSelectedM34Event();
 
         activeM34Events.forEach((evt, idx) => {
@@ -19239,7 +19493,7 @@
           const isSelected = Boolean(selected && selected.id === evt.id);
           const eventNum = idx + 1;
           const vehEmoji = getM34VehicleEmoji(evt.tipoVehiculo);
-          const sectorText = stripRawCoordinatesText(evt.sector || getM34SafeSector(lat, lng));
+          const parts = splitM34SectorParts(evt.sector, lat, lng);
           const apoyos = m34ApoyosByEvent.get(evt.id) || [];
 
           L.circle([lat, lng], {
@@ -19256,11 +19510,11 @@
             className: 'm34-custom-marker',
             html: `<div class="m34-marker-beacon">
               <div class="m34-marker-ring"></div>
-              <div class="m34-marker-tag">M34 · Ev.${eventNum}</div>
-              <div class="m34-marker-core">${vehEmoji}</div>
+              <div class="m34-marker-tag">Ev.${eventNum}</div>
+              <div class="m34-marker-core" aria-label="Alerta M34: compañero amenazado">${M34_SKULL_CROSSBONES_SVG}</div>
             </div>`,
-            iconSize: [46, 46],
-            iconAnchor: [23, 23]
+            iconSize: [52, 52],
+            iconAnchor: [26, 26]
           });
 
           const marker = L.marker([lat, lng], {
@@ -19273,12 +19527,13 @@
             : '';
 
           const popupHtml = `
-            <div style="min-width:205px;color:#0f172a;font-size:12px;line-height:1.38;">
-              <div style="font-weight:900;color:#b91c1c;margin-bottom:3px;">🚨 DANGER · EMERGENCIA M34 (Evento ${eventNum})</div>
+            <div style="min-width:215px;color:#0f172a;font-size:12px;line-height:1.38;">
+              <div style="font-weight:900;color:#b91c1c;margin-bottom:3px;">☠️ DANGER · EMERGENCIA M34 (Evento ${eventNum})</div>
               <div style="font-weight:800;">${vehEmoji} ${escapeHtml(evt.apodo || 'Compañero')} ${distMe ? `· ${escapeHtml(distMe)}` : ''}</div>
-              <div style="color:#334155;margin-top:2px;">📍 ${escapeHtml(sectorText)}</div>
+              <div style="color:#0f172a;margin-top:3px;">🏘️ <strong>Sector:</strong> ${escapeHtml(parts.barrio)}</div>
+              ${parts.ref ? `<div style="color:#334155;margin-top:2px;">📌 <strong>Ref:</strong> ${escapeHtml(parts.ref)}</div>` : ''}
               ${evt.nota ? `<div style="color:#7f1d1d;margin-top:2px;font-weight:700;">"${escapeHtml(evt.nota)}"</div>` : ''}
-              <div style="margin-top:4px;font-weight:800;color:#047857;">🤝 ${apoyos.length} compañero(s) en apoyo</div>
+              <div style="margin-top:4px;font-weight:800;color:#047857;">🛡️ ${apoyos.length} compañero(s) en apoyo</div>
             </div>
           `;
           marker.bindPopup(popupHtml);
@@ -19287,7 +19542,7 @@
             renderM34All();
           });
 
-          // Renderizar compañeros en apoyo ("Yo Voy") del evento
+          // Renderizar compañeros en apoyo ("Yo Voy") del evento con escudito radar verde institucional ANTHI (sin texto M34)
           apoyos.forEach((ap) => {
             const aLat = Number(ap.lat);
             const aLng = Number(ap.lng);
@@ -19297,9 +19552,9 @@
 
             if (isSelected) {
               L.polyline([[aLat, aLng], [lat, lng]], {
-                color: onSite ? '#10b981' : '#38bdf8',
+                color: onSite ? '#22c55e' : '#10b981',
                 weight: 3,
-                opacity: 0.82,
+                opacity: 0.85,
                 dashArray: '6, 8',
                 interactive: false
               }).addTo(m34Layer);
@@ -19307,21 +19562,19 @@
 
             const respIcon = L.divIcon({
               className: 'm34-responder-marker',
-              html: `<div class="m34-responder-beacon ${onSite ? 'on-site' : ''}">
-                <span>${aEmoji}</span>
-                <div class="m34-responder-tag">${onSite ? '✅' : '🚨'} ${escapeHtml((ap.apodo || 'Apoyo').slice(0, 12))}</div>
-              </div>`,
-              iconSize: [34, 34],
-              iconAnchor: [17, 17]
+              html: `<div class="m34-responder-beacon ${onSite ? 'on-site' : ''}" aria-label="Compañero en apoyo Yo Voy">${M34_GREEN_RADAR_SHIELD_SVG}</div>`,
+              iconSize: [36, 36],
+              iconAnchor: [18, 18]
             });
 
+            const apParts = splitM34SectorParts(ap.sector, aLat, aLng);
             L.marker([aLat, aLng], {
               icon: respIcon,
               zIndexOffset: 900
             })
               .addTo(m34Layer)
               .bindPopup(
-                `<div style="font-size:12px;color:#0f172a;"><strong>${aEmoji} ${escapeHtml(ap.apodo || 'Compañero')}</strong><br/>${onSite ? '✅ En el sitio de emergencia' : '🚨 En camino en apoyo ("Yo Voy")'}<br/>📍 ${escapeHtml(stripRawCoordinatesText(ap.sector || 'En ruta'))}</div>`
+                `<div style="font-size:12px;color:#0f172a;"><strong>${aEmoji} ${escapeHtml(ap.apodo || 'Compañero')}</strong><br/>${onSite ? '✅ En el sitio de emergencia' : '🛡️ En camino en apoyo ("Yo Voy")'}<br/>📍 ${escapeHtml(apParts.full || 'En ruta')}</div>`
               );
           });
         });
@@ -19329,17 +19582,24 @@
 
       function renderM34BannerUI() {
         const user = auth.currentUser;
-        const selected = getSelectedM34Event();
+        const canUseM34 = hasM34VipAccess(user);
+        const externalM34Events = user
+          ? activeM34Events.filter((e) => e.authorId !== user.uid)
+          : [];
 
+        if (m34TriggerRow) {
+          m34TriggerRow.classList.toggle('m34-hidden', !canUseM34);
+        }
         if (btnEmergencyM34) {
-          btnEmergencyM34.classList.toggle('has-active', activeM34Events.length > 0);
-          const amCreator = Boolean(user && activeM34Events.some((e) => e.authorId === user.uid));
+          btnEmergencyM34.style.display = canUseM34 ? 'inline-flex' : 'none';
+          btnEmergencyM34.classList.toggle('has-active', canUseM34 && externalM34Events.length > 0);
+          const amCreator = Boolean(canUseM34 && user && activeM34Events.some((e) => e.authorId === user.uid));
           btnEmergencyM34.classList.toggle('is-creator-active', amCreator);
           if (m34TriggerSubLabel) {
             m34TriggerSubLabel.textContent = amCreator
-              ? 'ACTIVA'
-              : activeM34Events.length > 0
-              ? `${activeM34Events.length} ACT.`
+              ? 'ON'
+              : externalM34Events.length > 0
+              ? `${externalM34Events.length} ACT.`
               : '1.5s / 2x';
           }
         }
@@ -19350,8 +19610,20 @@
         }
 
         if (!m34DangerBanner) return;
-        if (activeM34Events.length === 0 || !selected) {
+        const selectedCandidate = canUseM34 ? getSelectedM34Event() : null;
+        const selected = (selectedCandidate && user && selectedCandidate.authorId !== user.uid)
+          ? selectedCandidate
+          : (externalM34Events[0] || null);
+        if (!canUseM34 || externalM34Events.length === 0 || !selected) {
           m34DangerBanner.classList.remove('visible');
+          if (m34BannerEventDropdown) {
+            m34BannerEventDropdown.style.display = 'none';
+            m34BannerEventDropdown.innerHTML = '';
+          }
+          if (m34BannerEventTabs) {
+            m34BannerEventTabs.style.display = 'none';
+            m34BannerEventTabs.innerHTML = '';
+          }
           return;
         }
 
@@ -19363,22 +19635,40 @@
           : '';
         const vehEmoji = getM34VehicleEmoji(selected.tipoVehiculo);
         const vehLabel = VEHICLE_LABELS[normalizeM34VehicleType(selected.tipoVehiculo)] || 'Vehículo';
-        const sectorText = stripRawCoordinatesText(selected.sector || getM34SafeSector(selected.lat, selected.lng));
+        const parts = splitM34SectorParts(selected.sector, selected.lat, selected.lng);
 
         if (m34DangerBannerBadge) {
-          m34DangerBannerBadge.textContent = activeM34Events.length > 1
-            ? `DANGER · EMERGENCIA M34 (${activeM34Events.length})`
+          m34DangerBannerBadge.textContent = externalM34Events.length > 1
+            ? `DANGER · EMERGENCIA M34 (${externalM34Events.length})`
             : 'DANGER · EMERGENCIA M34';
         }
 
+        if (m34BannerEventDropdown) {
+          if (externalM34Events.length > 1) {
+            m34BannerEventDropdown.style.display = 'block';
+            m34BannerEventDropdown.innerHTML = externalM34Events
+              .map((evt) => {
+                const origIdx = Math.max(0, activeM34Events.findIndex((e) => e.id === evt.id));
+                return `<option value="${escapeHtml(evt.id)}" ${evt.id === selected.id ? 'selected' : ''}>${escapeHtml(formatM34EventSelectorLabel(evt, origIdx))}</option>`;
+              })
+              .join('');
+            m34BannerEventDropdown.value = selected.id;
+          } else {
+            m34BannerEventDropdown.style.display = 'none';
+            m34BannerEventDropdown.innerHTML = '';
+          }
+        }
+
         if (m34BannerEventTabs) {
-          if (activeM34Events.length > 1) {
+          if (externalM34Events.length > 1) {
             m34BannerEventTabs.style.display = 'flex';
-            m34BannerEventTabs.innerHTML = activeM34Events
-              .map((evt, idx) => {
+            m34BannerEventTabs.innerHTML = externalM34Events
+              .map((evt) => {
+                const origIdx = Math.max(0, activeM34Events.findIndex((e) => e.id === evt.id));
                 const isSel = evt.id === selected.id;
-                const shortSector = stripRawCoordinatesText(evt.sector || '').split('·')[0].trim().slice(0, 18);
-                return `<button type="button" class="m34-event-tab ${isSel ? 'active' : ''}" data-m34-select="${escapeHtml(evt.id)}">Evento ${idx + 1}: ${escapeHtml((evt.apodo || 'Compañero').slice(0, 12))}${shortSector ? ` · ${escapeHtml(shortSector)}` : ''}</button>`;
+                const p = splitM34SectorParts(evt.sector, evt.lat, evt.lng);
+                const locBadge = p.ref ? `${p.barrio} · ${p.ref}` : p.barrio;
+                return `<button type="button" class="m34-event-tab ${isSel ? 'active' : ''}" data-m34-select="${escapeHtml(evt.id)}">Evento ${origIdx + 1} · ${escapeHtml(locBadge)} (${escapeHtml((evt.apodo || 'Compañero').slice(0, 12))})</button>`;
               })
               .join('');
           } else {
@@ -19390,7 +19680,8 @@
         if (m34DangerBannerInfo) {
           m34DangerBannerInfo.innerHTML = `
             <div>${vehEmoji} <strong>Evento ${selIdx + 1}: ${escapeHtml(selected.apodo || 'Compañero')}</strong> (${escapeHtml(vehLabel)}) ${distMe ? `· <span style="color:#fef08a;">${escapeHtml(distMe)}</span>` : ''} · <span style="color:#a7f3d0;">${apoyos.length} en apoyo</span></div>
-            <div style="font-size:11px;color:#fee2e2;margin-top:2px;">📍 ${escapeHtml(sectorText)}${selected.nota ? ` · "${escapeHtml(selected.nota)}"` : ''}</div>
+            <div style="font-size:11px;color:#fef2f2;margin-top:2px;">🏘️ <strong>Sector:</strong> ${escapeHtml(parts.barrio)}${parts.ref ? ` · 📌 <strong>Ref:</strong> ${escapeHtml(parts.ref)}` : ''}</div>
+            ${selected.nota ? `<div style="font-size:10.5px;color:#fecaca;margin-top:2px;font-style:italic;">"${escapeHtml(selected.nota)}"</div>` : ''}
           `;
         }
 
@@ -19412,10 +19703,52 @@
       function renderM34ModalUI() {
         updateM34ProfileBadge();
         const user = auth.currentUser;
+        const canUseM34 = hasM34VipAccess(user);
+
+        if (m34ModalVipGateNote) {
+          m34ModalVipGateNote.style.display = canUseM34 ? 'none' : 'block';
+        }
+        if (btnM34ModalHoldTrigger) {
+          btnM34ModalHoldTrigger.disabled = !canUseM34;
+          btnM34ModalHoldTrigger.style.opacity = canUseM34 ? '1' : '0.55';
+        }
+
+        if (!canUseM34) {
+          if (m34ActiveCountLabel) m34ActiveCountLabel.textContent = 'Solo VIP M34';
+          if (m34ModalEventDropdown) {
+            m34ModalEventDropdown.style.display = 'none';
+            m34ModalEventDropdown.innerHTML = '';
+          }
+          if (m34ModalEventSelector) {
+            m34ModalEventSelector.style.display = 'none';
+            m34ModalEventSelector.innerHTML = '';
+          }
+          if (m34SelectedEventDetails) {
+            m34SelectedEventDetails.innerHTML = '<div style="color:#fca5a5;">Activa un código <strong>🆘 VIP M34</strong> para visualizar eventos activos y usar "Yo Voy".</div>';
+          }
+          if (m34RespondersWrap) m34RespondersWrap.style.display = 'none';
+          if (m34FinalizeSection) m34FinalizeSection.style.display = 'none';
+          if (m34RecentClosedSection) m34RecentClosedSection.style.display = 'none';
+          return;
+        }
+
         const selected = getSelectedM34Event();
 
         if (m34ActiveCountLabel) {
           m34ActiveCountLabel.textContent = `${activeM34Events.length} ${activeM34Events.length === 1 ? 'activo' : 'activos'}`;
+        }
+
+        if (m34ModalEventDropdown) {
+          if (activeM34Events.length > 0) {
+            m34ModalEventDropdown.style.display = 'block';
+            m34ModalEventDropdown.innerHTML = activeM34Events
+              .map((evt, idx) => `<option value="${escapeHtml(evt.id)}" ${selected && evt.id === selected.id ? 'selected' : ''}>${escapeHtml(formatM34EventSelectorLabel(evt, idx))}</option>`)
+              .join('');
+            if (selected) m34ModalEventDropdown.value = selected.id;
+          } else {
+            m34ModalEventDropdown.style.display = 'none';
+            m34ModalEventDropdown.innerHTML = '';
+          }
         }
 
         if (m34ModalEventSelector) {
@@ -19424,7 +19757,9 @@
             m34ModalEventSelector.innerHTML = activeM34Events
               .map((evt, idx) => {
                 const isSel = Boolean(selected && selected.id === evt.id);
-                return `<button type="button" class="m34-event-tab ${isSel ? 'active' : ''}" data-m34-select="${escapeHtml(evt.id)}">Evento ${idx + 1} · ${escapeHtml((evt.apodo || 'Compañero').slice(0, 14))}</button>`;
+                const p = splitM34SectorParts(evt.sector, evt.lat, evt.lng);
+                const locLabel = p.ref ? `${p.barrio} · ${p.ref}` : p.barrio;
+                return `<button type="button" class="m34-event-tab ${isSel ? 'active' : ''}" data-m34-select="${escapeHtml(evt.id)}">Evento ${idx + 1} · ${escapeHtml(locLabel)} (${escapeHtml((evt.apodo || 'Compañero').slice(0, 12))})</button>`;
               })
               .join('');
           } else {
@@ -19445,7 +19780,7 @@
           const myApoyo = user ? apoyos.find((a) => a.uid === user.uid) : null;
           const vehEmoji = getM34VehicleEmoji(selected.tipoVehiculo);
           const vehLabel = VEHICLE_LABELS[normalizeM34VehicleType(selected.tipoVehiculo)] || 'Vehículo';
-          const sectorText = stripRawCoordinatesText(selected.sector || getM34SafeSector(selected.lat, selected.lng));
+          const parts = splitM34SectorParts(selected.sector, selected.lat, selected.lng);
           const distMe = (hasUsableUserGps() && Number.isFinite(Number(selected.lat)) && Number.isFinite(Number(selected.lng)))
             ? formatM34DistanceLabel(calcularDistanciaMetros(currentLat, currentLng, Number(selected.lat), Number(selected.lng)))
             : '';
@@ -19458,7 +19793,8 @@
                   <span style="font-size:10.5px;font-weight:800;color:#fef08a;">${escapeHtml(formatM34ElapsedLabel(selected.createdAt))}</span>
                 </div>
                 <div style="font-size:11.5px;color:#fef2f2;">Vehículo: <strong>${escapeHtml(vehLabel)}</strong> ${distMe ? `· <span style="color:#fde047;">${escapeHtml(distMe)}</span>` : ''}</div>
-                <div style="font-size:11.5px;color:#fee2e2;margin-top:3px;">📍 ${escapeHtml(sectorText)}</div>
+                <div style="font-size:11.5px;color:#fef2f2;margin-top:4px;">🏘️ <strong>Barrio / Sector:</strong> ${escapeHtml(parts.barrio)}</div>
+                <div style="font-size:11.5px;color:#fee2e2;margin-top:2px;">📌 <strong>Referencia cercana:</strong> ${escapeHtml(parts.ref || 'Sector principal')}</div>
                 ${selected.nota ? `<div style="font-size:11px;color:#fecaca;margin-top:4px;font-style:italic;">"${escapeHtml(selected.nota)}"</div>` : ''}
                 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;">
                   <button type="button" class="m34-action-btn yovoy ${myApoyo ? 'active' : ''}" id="btnM34YoVoyModal" style="min-height:42px;">
@@ -19492,12 +19828,12 @@
                   const aDist = (Number.isFinite(Number(ap.lat)) && Number.isFinite(Number(ap.lng)) && Number.isFinite(Number(selected.lat)) && Number.isFinite(Number(selected.lng)))
                     ? formatM34DistanceLabel(calcularDistanciaMetros(Number(ap.lat), Number(ap.lng), Number(selected.lat), Number(selected.lng)))
                     : '';
-                  const aSector = stripRawCoordinatesText(ap.sector || '');
+                  const apParts = splitM34SectorParts(ap.sector, ap.lat, ap.lng);
                   return `
                     <div class="m34-responder-row">
                       <div style="min-width:0;">
                         <div style="font-weight:800;color:#f8fafc;">${getM34VehicleEmoji(ap.tipoVehiculo)} ${escapeHtml(ap.apodo || 'Compañero')} ${aDist ? `<span style="color:#94a3b8;font-weight:600;">(${escapeHtml(aDist)})</span>` : ''}</div>
-                        ${aSector ? `<div style="font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${escapeHtml(aSector)}</div>` : ''}
+                        ${apParts.full ? `<div style="font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${escapeHtml(apParts.full)}</div>` : ''}
                       </div>
                       <span class="m34-status-chip ${onSite ? 'en-sitio' : 'en-camino'}">${onSite ? '✅ En sitio' : '🚗 En camino'}</span>
                     </div>
@@ -19521,7 +19857,7 @@
             m34RecentClosedList.innerHTML = recentClosedM34Events
               .slice(0, 3)
               .map((ev) => {
-                const sector = stripRawCoordinatesText(ev.sector || 'Bucaramanga');
+                const parts = splitM34SectorParts(ev.sector, ev.lat, ev.lng);
                 const imgHtml = ev.fotoCierre
                   ? `<img src="${escapeHtml(ev.fotoCierre)}" alt="Cierre M34" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid rgba(52,211,153,0.65);flex-shrink:0;" />`
                   : '';
@@ -19529,7 +19865,7 @@
                   <div class="m34-responder-row" style="align-items:flex-start;">
                     <div style="min-width:0;flex:1;">
                       <div style="font-weight:800;color:#6ee7b7;">✅ Todo está bien · ${escapeHtml(ev.apodo || 'Compañero')}</div>
-                      <div style="font-size:10.5px;color:#cbd5e1;">📍 ${escapeHtml(sector)}</div>
+                      <div style="font-size:10.5px;color:#cbd5e1;">📍 ${escapeHtml(parts.full)}</div>
                       <div style="font-size:10px;color:#94a3b8;">Cerrado por ${escapeHtml(ev.finalizadoPorApodo || 'Compañero')} · ${escapeHtml(formatM34ElapsedLabel(ev.finalizadoAt || ev.updatedAt))}</div>
                     </div>
                     ${imgHtml}
@@ -19547,7 +19883,39 @@
         renderM34ModalUI();
       }
 
+      function stopM34RealtimeListener() {
+        if (typeof unsubscribeM34Main === 'function') {
+          try { unsubscribeM34Main(); } catch (e) {}
+        }
+        unsubscribeM34Main = null;
+        m34ApoyosUnsubByEvent.forEach((unsub) => {
+          try { unsub(); } catch (e) {}
+        });
+        m34ApoyosUnsubByEvent.clear();
+        m34ApoyosByEvent.clear();
+        activeM34Events = [];
+        recentClosedM34Events = [];
+        selectedM34EventId = null;
+        hasSeededM34Snapshot = false;
+        knownActiveM34Ids.clear();
+        pendingM34VoiceOnUnlock = false;
+        stopM34CreatorWatch();
+        stopM34ResponderWatch();
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+        renderM34All();
+      }
+
       function syncM34ApoyosListeners() {
+        if (!hasM34VipAccess()) {
+          m34ApoyosUnsubByEvent.forEach((unsub) => {
+            try { unsub(); } catch (e) {}
+          });
+          m34ApoyosUnsubByEvent.clear();
+          m34ApoyosByEvent.clear();
+          return;
+        }
         const activeIds = new Set(activeM34Events.map((e) => e.id));
 
         m34ApoyosUnsubByEvent.forEach((unsub, eventId) => {
@@ -19567,6 +19935,7 @@
           const unsub = onSnapshot(
             qApoyos,
             (snap) => {
+              if (!hasM34VipAccess()) return;
               const list = [];
               snap.forEach((d) => {
                 list.push({ id: d.id, ...d.data() });
@@ -19589,7 +19958,11 @@
             },
             (err) => {
               if (err && err.code === 'permission-denied') {
-                handleFirestoreError(err, OperationType.LIST, `${M34_COLLECTION}/${evt.id}/${M34_APOYOS_SUB}`);
+                if (!hasM34VipAccess()) {
+                  stopM34RealtimeListener();
+                  return;
+                }
+                console.warn('Sin permiso leyendo apoyos M34:', evt.id);
               }
             }
           );
@@ -19598,6 +19971,10 @@
       }
 
       function startM34RealtimeListener() {
+        if (!hasM34VipAccess()) {
+          stopM34RealtimeListener();
+          return;
+        }
         if (unsubscribeM34Main) return;
         const qM34 = query(
           collection(db, M34_COLLECTION),
@@ -19607,6 +19984,10 @@
         unsubscribeM34Main = onSnapshot(
           qM34,
           (snap) => {
+            if (!hasM34VipAccess()) {
+              stopM34RealtimeListener();
+              return;
+            }
             const nowMs = Date.now();
             const nextActives = [];
             const nextClosed = [];
@@ -19669,7 +20050,7 @@
               hasSeededM34Snapshot = true;
               const nonSelf = curUser
                 ? nextActives.filter((e) => e.authorId !== curUser.uid)
-                : nextActives;
+                : [];
               if (nonSelf.length > 0) {
                 pendingM34VoiceOnUnlock = true;
                 playM34EmergencyAlarmAndVoice(false);
@@ -19678,10 +20059,11 @@
               const externalNew = newlyArrived.filter((x) => !curUser || x.evt.authorId !== curUser.uid);
               if (externalNew.length > 0) {
                 const topNew = externalNew[0];
+                const parts = splitM34SectorParts(topNew.evt.sector, topNew.evt.lat, topNew.evt.lng);
                 selectedM34EventId = topNew.evt.id;
                 renderM34All();
                 playM34EmergencyAlarmAndVoice(false);
-                showToast(`🚨 ¡EMERGENCIA M34! ${topNew.evt.apodo} solicita apoyo.`);
+                showToast(`🚨 ¡EMERGENCIA M34! ${topNew.evt.apodo} solicita apoyo en ${parts.full}.`);
                 if (typeof isAppInBackground === 'function' && isAppInBackground()) {
                   dispatchM34BackgroundNotification(topNew.evt, topNew.eventIndex);
                 }
@@ -19690,12 +20072,30 @@
           },
           (err) => {
             if (err && err.code === 'permission-denied') {
-              handleFirestoreError(err, OperationType.LIST, M34_COLLECTION);
+              if (!hasM34VipAccess()) {
+                stopM34RealtimeListener();
+                return;
+              }
+              console.warn('Sin permiso leyendo módulo M34.');
             } else {
               console.warn('Error escuchando módulo M34:', err);
             }
           }
         );
+      }
+
+      function syncM34AccessState() {
+        const allowed = hasM34VipAccess(auth.currentUser);
+        if (!allowed) {
+          stopM34RealtimeListener();
+          if (m34Modal && m34Modal.classList.contains('open')) {
+            m34Modal.classList.remove('open');
+          }
+          return false;
+        }
+        startM34RealtimeListener();
+        renderM34All();
+        return true;
       }
 
       async function activateM34Emergency() {
@@ -19704,6 +20104,10 @@
         try {
           const user = await ensureAuthenticated();
           if (!user) return;
+          if (!hasM34VipAccess(user)) {
+            showToast('⛔ Módulo M34 exclusivo para compañeros VIP M34 y Administradores.');
+            return;
+          }
 
           const existingMine = activeM34Events.find((e) => e.authorId === user.uid);
           if (existingMine) {
@@ -19716,7 +20120,7 @@
           }
 
           const { lat, lng } = await resolveCurrentBestCoordsForM34();
-          const sector = getM34SafeSector(lat, lng);
+          const sector = await resolveM34PlaceLabelAsync(lat, lng, 1400);
           const apodo = getM34Apodo(user);
           const tipoVehiculo = getM34VehicleType();
           const nota = stripRawCoordinatesText(m34TriggerNotaInput ? m34TriggerNotaInput.value : '').slice(0, 240);
@@ -19749,14 +20153,13 @@
           m34CreatorLastLng = lng;
           m34CreatorLastPushAt = Date.now();
           startM34CreatorWatch(eventoId);
-          // Silencio total en el dispositivo del emisor: solo los demás compañeros escuchan la alarma y voz "M34, M34, M34"
-          showToast('🚨 ¡EMERGENCIA M34 ACTIVADA! Tu GPS en vivo ya es visible para los compañeros.');
+          // Silencio total en el dispositivo del emisor: solo los demás compañeros VIP M34 / Admin escuchan la alarma y voz "M34, M34, M34"
+          showToast('🚨 ¡EMERGENCIA M34 ACTIVADA! Tu GPS en vivo ya es visible para los compañeros VIP M34.');
         } catch (err) {
           if (err && err.message === 'AUTH_CANCELLED') return;
           console.error('Error activando M34:', err);
           if (err && err.code === 'permission-denied') {
-            showToast('⛔ Sin permiso para activar M34.');
-            try { handleFirestoreError(err, OperationType.CREATE, M34_COLLECTION); } catch (_) {}
+            showToast('⛔ Módulo M34 exclusivo para compañeros VIP M34 y Administradores.');
           } else {
             showToast('No se pudo activar la alerta M34; verifica tu conexión.');
           }
@@ -19774,6 +20177,10 @@
         try {
           const user = await ensureAuthenticated();
           if (!user) return;
+          if (!hasM34VipAccess(user)) {
+            showToast('⛔ Solo compañeros VIP M34 y Administradores pueden vincularse con "Yo Voy".');
+            return;
+          }
 
           const apoyos = m34ApoyosByEvent.get(eventoId) || [];
           const existingMine = apoyos.find((a) => a.uid === user.uid);
@@ -19794,7 +20201,7 @@
           }
 
           const { lat, lng } = await resolveCurrentBestCoordsForM34();
-          const sector = getM34SafeSector(lat, lng);
+          const sector = await resolveM34PlaceLabelAsync(lat, lng, 1000);
           const dist = (Number.isFinite(Number(target.lat)) && Number.isFinite(Number(target.lng)))
             ? calcularDistanciaMetros(lat, lng, Number(target.lat), Number(target.lng))
             : Infinity;
@@ -19831,8 +20238,7 @@
           if (err && err.message === 'AUTH_CANCELLED') return;
           console.error('Error en Yo Voy M34:', err);
           if (err && err.code === 'permission-denied') {
-            showToast('⛔ Inicia sesión para vincularte con "Yo Voy".');
-            try { handleFirestoreError(err, OperationType.WRITE, `${M34_COLLECTION}/${eventoId}/${M34_APOYOS_SUB}`); } catch (_) {}
+            showToast('⛔ Solo compañeros VIP M34 y Administradores pueden usar "Yo Voy".');
           } else {
             showToast('No se pudo registrar "Yo Voy". Intenta de nuevo.');
           }
@@ -19854,6 +20260,10 @@
         try {
           const user = await ensureAuthenticated();
           if (!user) return;
+          if (!hasM34VipAccess(user)) {
+            showToast('⛔ Solo compañeros VIP M34 y Administradores pueden cerrar eventos M34.');
+            return;
+          }
 
           const apodo = getM34Apodo(user);
           const apoyos = m34ApoyosByEvent.get(eventoId) || [];
@@ -19882,7 +20292,7 @@
               tipoVehiculo: getM34VehicleType(),
               lat,
               lng,
-              sector: getM34SafeSector(lat, lng),
+              sector: getM34SafeSector(lat, lng, '', { allowRemote: false }),
               estadoApoyo: 'EN_SITIO',
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
@@ -19908,7 +20318,6 @@
           console.error('Error finalizando M34:', err);
           if (err && err.code === 'permission-denied') {
             showToast('⛔ Sin permisos para finalizar este evento M34.');
-            try { handleFirestoreError(err, OperationType.UPDATE, `${M34_COLLECTION}/${eventoId}`); } catch (_) {}
           } else {
             showToast('No se pudo finalizar el evento M34.');
           }
@@ -19963,6 +20372,7 @@
 
         btnEl.addEventListener('pointerdown', (e) => {
           if (e && e.button != null && e.button !== 0) return;
+          if (!hasM34VipAccess()) return;
           startHold();
         });
         btnEl.addEventListener('pointerup', resetHoldVisual);
@@ -19971,6 +20381,10 @@
 
         btnEl.addEventListener('click', (e) => {
           if (e) e.preventDefault();
+          if (!hasM34VipAccess()) {
+            showToast('⛔ Módulo M34 exclusivo para compañeros VIP M34 y Administradores.');
+            return;
+          }
           if (holdFired) {
             holdFired = false;
             return;
@@ -20083,6 +20497,15 @@
       if (m34BannerEventTabs) m34BannerEventTabs.addEventListener('click', handleEventTabSelect);
       if (m34ModalEventSelector) m34ModalEventSelector.addEventListener('click', handleEventTabSelect);
 
+      const handleEventDropdownChange = (e) => {
+        const id = e && e.target ? e.target.value : '';
+        if (!id) return;
+        selectedM34EventId = id;
+        renderM34All();
+      };
+      if (m34BannerEventDropdown) m34BannerEventDropdown.addEventListener('change', handleEventDropdownChange);
+      if (m34ModalEventDropdown) m34ModalEventDropdown.addEventListener('change', handleEventDropdownChange);
+
       if (m34ClosePhotoInput) {
         m34ClosePhotoInput.addEventListener('change', async (e) => {
           const file = e && e.target && e.target.files ? e.target.files[0] : null;
@@ -20134,11 +20557,12 @@
         } else if (!hasExternalActiveM34Events()) {
           pendingM34VoiceOnUnlock = false;
         }
-        renderM34All();
+        syncM34AccessState();
       };
 
       window.__anthiGetM34State = function() {
         return {
+          hasAccess: hasM34VipAccess(),
           activeCount: activeM34Events.length,
           selectedEventId: selectedM34EventId,
           activeEvents: activeM34Events,
@@ -20150,7 +20574,7 @@
       };
 
       updateM34ProfileBadge();
-      startM34RealtimeListener();
+      syncM34AccessState();
       window.__anthiM34Ready = true;
     } catch (m34InitErr) {
       console.error('Error inicializando módulo M34:', m34InitErr);
