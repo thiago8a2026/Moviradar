@@ -9301,9 +9301,10 @@
       const lng = Number(pos.coords.longitude);
       if (Number.isNaN(lat) || Number.isNaN(lng)) return;
 
-      // 1. Umbral máximo de error (Accuracy Filter): descartar lecturas > 25m
+      // 1. Umbral máximo de error (Accuracy Filter): en primer enganche iOS/Safari tolerar hasta 120m; ya enganchado descartar rebotes > 25m
       const rawAccuracy = pos.coords.accuracy;
-      if (typeof rawAccuracy === 'number' && !Number.isNaN(rawAccuracy) && rawAccuracy > MAX_GPS_ACCURACY_METERS) {
+      const maxAllowedAccuracy = hasReceivedLiveGps ? MAX_GPS_ACCURACY_METERS : 120;
+      if (typeof rawAccuracy === 'number' && !Number.isNaN(rawAccuracy) && rawAccuracy > maxAllowedAccuracy) {
         const gpsNote = document.getElementById('gpsStatusText');
         if (gpsNote && hasKnownRealGps) {
           gpsNote.textContent = `🔵 GPS estable (rebote ±${Math.round(rawAccuracy)}m descartado)`;
@@ -9519,6 +9520,45 @@
       ejecutarSondeoGps(false);
       asegurarBucleSondeoGps();
     }
+
+    function refreshGpsWatchOnUserGesture() {
+      if (!navigator.geolocation) return false;
+      gpsPermissionDenied = false;
+      gpsPollInFlight = false;
+      if (gpsWatchId !== null) {
+        try {
+          navigator.geolocation.clearWatch(gpsWatchId);
+        } catch (e) {}
+        gpsWatchId = null;
+      }
+      asegurarBucleSondeoGps();
+      return true;
+    }
+
+    function applyM34GpsFix(pos) {
+      if (!pos || !pos.coords) return null;
+      const lat = Number(pos.coords.latitude);
+      const lng = Number(pos.coords.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+      const rawAccuracy = pos.coords.accuracy;
+      const accuracy = (typeof rawAccuracy === 'number' && !Number.isNaN(rawAccuracy) && rawAccuracy > 0)
+        ? rawAccuracy
+        : 20;
+      const nowMs = Date.now();
+      currentLat = lat;
+      currentLng = lng;
+      previousGpsFix = { lat, lng, timestamp: nowMs, accuracy };
+      lastGpsSuccessAt = nowMs;
+      hasReceivedLiveGps = true;
+      hasKnownRealGps = true;
+      gpsPermissionDenied = false;
+      saveCachedGps(lat, lng);
+      updateUserPositionOnMap(lat, lng, 'live', currentSpeedKmh, accuracy);
+      return { lat, lng, accuracy };
+    }
+
+    window.__anthiRefreshGpsWatchOnGesture = refreshGpsWatchOnUserGesture;
+    window.__anthiApplyM34GpsFix = applyM34GpsFix;
 
     window.__anthiOnBackgroundTick = function() {
       if (!gpsPermissionDenied) {
@@ -19117,9 +19157,10 @@
         m34ResponderWasOnSite = false;
       }
 
-      function startM34CreatorWatch(eventoId) {
+      function startM34CreatorWatch(eventoId, opts = {}) {
         if (!eventoId || !navigator.geolocation || !hasM34VipAccess()) return;
-        if (m34CreatorWatchId !== null && m34CreatorEventId === eventoId) return;
+        const { forceRestart = false } = opts;
+        if (!forceRestart && m34CreatorWatchId !== null && m34CreatorEventId === eventoId) return;
         stopM34CreatorWatch();
         m34CreatorEventId = eventoId;
         m34CreatorWatchId = navigator.geolocation.watchPosition(
@@ -19133,6 +19174,9 @@
             if (evt && evt.estado !== 'ACTIVA') {
               stopM34CreatorWatch();
               return;
+            }
+            if (typeof window.__anthiApplyM34GpsFix === 'function') {
+              window.__anthiApplyM34GpsFix(pos);
             }
             const lat = Number(pos && pos.coords && pos.coords.latitude);
             const lng = Number(pos && pos.coords && pos.coords.longitude);
@@ -19163,14 +19207,20 @@
               }
             }
           },
-          () => {},
-          { enableHighAccuracy: true, maximumAge: 3000, timeout: 12000 }
+          (err) => {
+            if (err && err.code === 1) {
+              gpsPermissionDenied = true;
+              showToast('📍 Permiso de ubicación denegado o desactivado en iOS/Safari para GPS en vivo M34.');
+            }
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
         );
       }
 
-      function startM34ResponderWatch(eventoId) {
+      function startM34ResponderWatch(eventoId, opts = {}) {
         if (!eventoId || !navigator.geolocation || !hasM34VipAccess()) return;
-        if (m34ResponderWatchId !== null && m34ResponderEventId === eventoId) return;
+        const { forceRestart = false } = opts;
+        if (!forceRestart && m34ResponderWatchId !== null && m34ResponderEventId === eventoId) return;
         stopM34ResponderWatch();
         m34ResponderEventId = eventoId;
         m34ResponderWatchId = navigator.geolocation.watchPosition(
@@ -19184,6 +19234,9 @@
             if (!target || target.estado !== 'ACTIVA') {
               stopM34ResponderWatch();
               return;
+            }
+            if (typeof window.__anthiApplyM34GpsFix === 'function') {
+              window.__anthiApplyM34GpsFix(pos);
             }
             const lat = Number(pos && pos.coords && pos.coords.latitude);
             const lng = Number(pos && pos.coords && pos.coords.longitude);
@@ -19231,53 +19284,147 @@
               }
             }
           },
-          () => {},
-          { enableHighAccuracy: true, maximumAge: 3000, timeout: 12000 }
+          (err) => {
+            if (err && err.code === 1) {
+              gpsPermissionDenied = true;
+              showToast('📍 Permiso de ubicación denegado o desactivado en iOS/Safari.');
+            }
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
         );
       }
 
-      async function resolveCurrentBestCoordsForM34() {
-        let lat = Number(currentLat || BUCARAMANGA_DEFAULT.lat);
-        let lng = Number(currentLng || BUCARAMANGA_DEFAULT.lng);
-        if (navigator.geolocation && (!hasUsableUserGps() || !hasReceivedLiveGps)) {
-          try {
-            const quickPos = await new Promise((resolve) => {
-              let done = false;
-              const tId = setTimeout(() => {
-                if (!done) {
-                  done = true;
-                  resolve(null);
-                }
-              }, 2600);
-              navigator.geolocation.getCurrentPosition(
-                (p) => {
-                  if (!done) {
-                    done = true;
-                    clearTimeout(tId);
-                    resolve(p);
-                  }
-                },
-                () => {
-                  if (!done) {
-                    done = true;
-                    clearTimeout(tId);
-                    resolve(null);
-                  }
-                },
-                { enableHighAccuracy: true, maximumAge: 5000, timeout: 2400 }
-              );
-            });
-            if (quickPos && quickPos.coords) {
-              const qLat = Number(quickPos.coords.latitude);
-              const qLng = Number(quickPos.coords.longitude);
-              if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
-                lat = qLat;
-                lng = qLng;
-              }
-            }
-          } catch (e) {}
+      const M34_GPS_FRESH_MAX_AGE_MS = 15000;
+
+      function isM34UsingDefaultOrUnverifiedGps() {
+        const latNum = Number(currentLat);
+        const lngNum = Number(currentLng);
+        const isDefaultStar =
+          !Number.isFinite(latNum) ||
+          !Number.isFinite(lngNum) ||
+          (Math.abs(latNum - BUCARAMANGA_DEFAULT.lat) < 0.00005 && Math.abs(lngNum - BUCARAMANGA_DEFAULT.lng) < 0.00005);
+        if (!latestGps || latestGps.isDefault) return true;
+        if (!hasReceivedLiveGps && isDefaultStar) return true;
+        if (!hasReceivedLiveGps && latestGps.isCached) return true;
+        return false;
+      }
+
+      function hasFreshRealGpsForM34() {
+        if (gpsPermissionDenied) return false;
+        if (isM34UsingDefaultOrUnverifiedGps()) return false;
+        if (!hasUsableUserGps() || !hasReceivedLiveGps) return false;
+        if (!lastGpsSuccessAt || (Date.now() - lastGpsSuccessAt) > M34_GPS_FRESH_MAX_AGE_MS) return false;
+        return Number.isFinite(Number(currentLat)) && Number.isFinite(Number(currentLng));
+      }
+
+      function wakeM34GeolocationWatch() {
+        if (typeof window.__anthiRefreshGpsWatchOnGesture === 'function') {
+          window.__anthiRefreshGpsWatchOnGesture();
+        } else if (typeof asegurarBucleSondeoGps === 'function') {
+          gpsPermissionDenied = false;
+          asegurarBucleSondeoGps();
         }
-        return { lat, lng };
+        if (m34CreatorEventId) {
+          startM34CreatorWatch(m34CreatorEventId, { forceRestart: true });
+        }
+        if (m34ResponderEventId) {
+          startM34ResponderWatch(m34ResponderEventId, { forceRestart: true });
+        }
+      }
+
+      async function resolveCurrentBestCoordsForM34() {
+        if (hasFreshRealGpsForM34()) {
+          return {
+            ok: true,
+            lat: Number(currentLat),
+            lng: Number(currentLng)
+          };
+        }
+
+        if (!navigator.geolocation) {
+          showToast('⛔ Tu dispositivo o navegador no soporta geolocalización GPS para enviar M34.');
+          return { ok: false, reason: 'UNSUPPORTED' };
+        }
+
+        wakeM34GeolocationWatch();
+
+        const readResult = await new Promise((resolve) => {
+          let settled = false;
+          const tId = setTimeout(() => {
+            if (!settled) {
+              settled = true;
+              resolve({ ok: false, code: 3, message: 'TIMEOUT' });
+            }
+          }, 8400);
+
+          try {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                if (!settled) {
+                  settled = true;
+                  clearTimeout(tId);
+                  resolve({ ok: true, pos });
+                }
+              },
+              (err) => {
+                if (!settled) {
+                  settled = true;
+                  clearTimeout(tId);
+                  resolve({
+                    ok: false,
+                    code: err && typeof err.code === 'number' ? err.code : 0,
+                    message: err && err.message ? err.message : ''
+                  });
+                }
+              },
+              { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            );
+          } catch (geoErr) {
+            if (!settled) {
+              settled = true;
+              clearTimeout(tId);
+              resolve({ ok: false, code: 0, message: geoErr && geoErr.message ? geoErr.message : '' });
+            }
+          }
+        });
+
+        if (readResult && readResult.ok && readResult.pos && readResult.pos.coords) {
+          const synced = typeof window.__anthiApplyM34GpsFix === 'function'
+            ? window.__anthiApplyM34GpsFix(readResult.pos)
+            : null;
+          const qLat = synced ? synced.lat : Number(readResult.pos.coords.latitude);
+          const qLng = synced ? synced.lng : Number(readResult.pos.coords.longitude);
+          if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
+            return { ok: true, lat: qLat, lng: qLng };
+          }
+        }
+
+        // Si watchPosition acaba de entregar una lectura real fresca mientras esperábamos, úsala
+        if (hasFreshRealGpsForM34()) {
+          return {
+            ok: true,
+            lat: Number(currentLat),
+            lng: Number(currentLng)
+          };
+        }
+
+        if (readResult && readResult.code === 1) {
+          gpsPermissionDenied = true;
+          showToast('📍 Permiso de ubicación denegado o desactivado en iOS/Safari. Activa Ubicación en Ajustes para enviar tu posición real en M34.');
+          return { ok: false, reason: 'PERMISSION_DENIED' };
+        }
+
+        // Si ya teníamos un GPS real previo de esta sesión (NO la estrellita por defecto), úsalo antes que fallar
+        if (!isM34UsingDefaultOrUnverifiedGps() && hasUsableUserGps() && hasReceivedLiveGps) {
+          return {
+            ok: true,
+            lat: Number(currentLat),
+            lng: Number(currentLng)
+          };
+        }
+
+        showToast('📡 No se pudo obtener tu ubicación GPS real (aún sin señal o ubicación desactivada). Inténtalo de nuevo.');
+        return { ok: false, reason: 'NO_REAL_GPS' };
       }
 
       function getSelectedM34Event() {
@@ -19984,7 +20131,9 @@
             return;
           }
 
-          const { lat, lng } = await resolveCurrentBestCoordsForM34();
+          const gpsRes = await resolveCurrentBestCoordsForM34();
+          if (!gpsRes || !gpsRes.ok) return;
+          const { lat, lng } = gpsRes;
           const sector = await resolveM34PlaceLabelAsync(lat, lng, 1400);
           const apodo = getM34Apodo(user);
           const tipoVehiculo = getM34VehicleType();
@@ -20065,7 +20214,9 @@
             } catch (e) {}
           }
 
-          const { lat, lng } = await resolveCurrentBestCoordsForM34();
+          const gpsRes = await resolveCurrentBestCoordsForM34();
+          if (!gpsRes || !gpsRes.ok) return;
+          const { lat, lng } = gpsRes;
           const sector = await resolveM34PlaceLabelAsync(lat, lng, 1000);
           const dist = (Number.isFinite(Number(target.lat)) && Number.isFinite(Number(target.lng)))
             ? calcularDistanciaMetros(lat, lng, Number(target.lat), Number(target.lng))
@@ -20148,7 +20299,9 @@
             await withTimeout(updateDoc(eventRef, closeData), 15000);
           } else {
             // Compañero verificando físicamente en sitio sin haber tocado "Yo Voy" antes: registra apoyo EN_SITIO + finaliza en un lote atómico
-            const { lat, lng } = await resolveCurrentBestCoordsForM34();
+            const gpsRes = await resolveCurrentBestCoordsForM34();
+            if (!gpsRes || !gpsRes.ok) return;
+            const { lat, lng } = gpsRes;
             const batch = writeBatch(db);
             const apoyoRef = doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid);
             batch.set(apoyoRef, {
@@ -20235,9 +20388,14 @@
           }, 45);
         };
 
+        btnEl.addEventListener('touchstart', () => {
+          if (!hasM34VipAccess()) return;
+          wakeM34GeolocationWatch();
+        }, { passive: true });
         btnEl.addEventListener('pointerdown', (e) => {
           if (e && e.button != null && e.button !== 0) return;
           if (!hasM34VipAccess()) return;
+          wakeM34GeolocationWatch();
           startHold();
         });
         btnEl.addEventListener('pointerup', resetHoldVisual);
@@ -20250,6 +20408,7 @@
             showToast('⛔ Módulo M34 exclusivo para compañeros VIP M34 y Administradores.');
             return;
           }
+          wakeM34GeolocationWatch();
           if (holdFired) {
             holdFired = false;
             return;
