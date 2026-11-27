@@ -3713,6 +3713,12 @@
       color: #052e16;
     }
 
+    .m34-action-btn.pulso {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border-color: #93c5fd;
+      color: #ffffff;
+    }
+
     .m34-marker-beacon {
       position: relative;
       width: 52px;
@@ -4215,7 +4221,8 @@
         <div class="m34-event-tabs" id="m34BannerEventTabs"></div>
         <div class="m34-danger-info" id="m34DangerBannerInfo" role="button" tabindex="0"></div>
         <div class="m34-danger-actions">
-          <button type="button" class="m34-action-btn yovoy" id="btnM34YoVoyBanner">🚨 Yo Voy</button>
+          <button type="button" class="m34-action-btn yovoy" id="btnM34YoVoyBanner">🚨 Sí voy</button>
+          <button type="button" class="m34-action-btn pulso" id="btnM34OpenPulsoBanner">🎙️ Pulso M34</button>
           <button type="button" class="m34-action-btn" id="btnM34FocusBanner">🗺️ Ubicar</button>
           <button type="button" class="m34-action-btn ok" id="btnM34OpenCloseBanner">✅ Todo bien</button>
         </div>
@@ -5776,18 +5783,29 @@
         signInWithPopup,
         signOut,
         onAuthStateChanged
+      },
+      {
+        getDatabase,
+        ref: rtdbRef,
+        set: rtdbSet,
+        update: rtdbUpdate,
+        remove: rtdbRemove,
+        serverTimestamp: rtdbServerTimestamp
       }
     ] = await Promise.all([
       import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
       import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
       import('https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js'),
-      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js')
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js')
     ]);
 
+    const pulsoOverride = (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG) ? window.__PULSO_M34_CONFIG : {};
     const firebaseConfig = {
       apiKey: "AIzaSyDM7XCVECGfDG0JpsWamMZto-RjT02ml6w",
       authDomain: "moviradar.firebaseapp.com",
       projectId: "moviradar",
+      databaseURL: pulsoOverride.databaseURL || "https://moviradar-default-rtdb.firebaseio.com",
       firestoreDatabaseId: "ai-studio-moviradar-632637ec-5b46-4bef-ac9f-005e7708bb75",
       storageBucket: "moviradar.firebasestorage.app",
       messagingSenderId: "535511934758",
@@ -5808,6 +5826,12 @@
     const auth = getAuth(app);
     auth.languageCode = 'es';
     const storage = getStorage(app);
+    let rtdb = null;
+    try {
+      rtdb = getDatabase(app);
+    } catch (rtdbErr) {
+      console.warn('No se pudo inicializar Firebase Realtime Database:', rtdbErr);
+    }
 
     const OperationType = {
       CREATE: 'create',
@@ -18571,6 +18595,12 @@
     try {
       const M34_COLLECTION = 'emergencias_m34';
       const M34_APOYOS_SUB = 'apoyos';
+      const PULSO_M34_RTDB_ROOT = 'eventos_m34';
+      const PULSO_M34_CONFIG = {
+        packageName: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.packageName) || 'com.anthi.pulsom34',
+        scheme: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.scheme) || 'pulso-m34',
+        host: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.host) || 'evento'
+      };
       const M34_ARRIVAL_RADIUS_METERS = 100;
       const M34_HOLD_DURATION_MS = 1500;
       const M34_DOUBLE_TAP_MS = 430;
@@ -18589,6 +18619,7 @@
       const btnToggleM34Mute = document.getElementById('btnToggleM34Mute');
       const btnOpenM34FromBanner = document.getElementById('btnOpenM34FromBanner');
       const btnM34YoVoyBanner = document.getElementById('btnM34YoVoyBanner');
+      const btnM34OpenPulsoBanner = document.getElementById('btnM34OpenPulsoBanner');
       const btnM34FocusBanner = document.getElementById('btnM34FocusBanner');
       const btnM34OpenCloseBanner = document.getElementById('btnM34OpenCloseBanner');
 
@@ -19201,6 +19232,7 @@
                 sector,
                 updatedAt: serverTimestamp()
               });
+              syncPulsoM34EventoCoordsRtdb(eventoId, lat, lng);
             } catch (err) {
               if (err && err.code === 'permission-denied') {
                 stopM34CreatorWatch();
@@ -19427,6 +19459,133 @@
         return { ok: false, reason: 'NO_REAL_GPS' };
       }
 
+      function buildPulsoM34DeepLink(eventId, rol = 'OYENTE') {
+        const eid = encodeURIComponent(String(eventId || ''));
+        const roleParam = encodeURIComponent(String(rol || 'OYENTE'));
+        return `${PULSO_M34_CONFIG.scheme}://${PULSO_M34_CONFIG.host}?eventId=${eid}&rol=${roleParam}`;
+      }
+
+      function buildPulsoM34IntentUrl(eventId, rol = 'OYENTE') {
+        const eid = encodeURIComponent(String(eventId || ''));
+        const roleParam = encodeURIComponent(String(rol || 'OYENTE'));
+        const pkg = encodeURIComponent(PULSO_M34_CONFIG.packageName);
+        return `intent://${PULSO_M34_CONFIG.host}?eventId=${eid}&rol=${roleParam}#Intent;scheme=${PULSO_M34_CONFIG.scheme};package=${pkg};end`;
+      }
+
+      function launchPulsoM34App(eventId, rol = 'OYENTE') {
+        if (!eventId) return false;
+        const roleClean = String(rol || 'OYENTE');
+        try {
+          if (typeof window !== 'undefined' && window.AnthiAndroidBridge && typeof window.AnthiAndroidBridge.openPulsoM34 === 'function') {
+            window.AnthiAndroidBridge.openPulsoM34(String(eventId), roleClean);
+            return true;
+          }
+          if (typeof window !== 'undefined' && window.AndroidBridge && typeof window.AndroidBridge.openPulsoM34 === 'function') {
+            window.AndroidBridge.openPulsoM34(String(eventId), roleClean);
+            return true;
+          }
+        } catch (bridgeErr) {
+          console.warn('Error en puente nativo Android Pulso M34:', bridgeErr);
+        }
+
+        const ua = typeof navigator !== 'undefined' ? (navigator.userAgent || '') : '';
+        const isAndroid = /Android/i.test(ua);
+        const deepLinkUrl = buildPulsoM34DeepLink(eventId, roleClean);
+        const targetUrl = isAndroid ? buildPulsoM34IntentUrl(eventId, roleClean) : deepLinkUrl;
+
+        try {
+          const anchor = document.createElement('a');
+          anchor.href = targetUrl;
+          anchor.rel = 'noopener';
+          anchor.style.display = 'none';
+          document.body.appendChild(anchor);
+          anchor.click();
+          document.body.removeChild(anchor);
+          if (isAndroid) {
+            setTimeout(() => {
+              if (!document.hidden) {
+                try {
+                  window.location.href = deepLinkUrl;
+                } catch (e) {}
+              }
+            }, 650);
+          }
+          return true;
+        } catch (launchErr) {
+          console.warn('No se pudo abrir Deep Link Pulso M34:', launchErr);
+          return false;
+        }
+      }
+
+      async function syncPulsoM34EventoRtdb(eventoId, { emisorUid, emisorNombre, lat, lng }) {
+        if (!rtdb || !eventoId) return false;
+        try {
+          await withTimeout(
+            rtdbSet(rtdbRef(rtdb, `${PULSO_M34_RTDB_ROOT}/${eventoId}`), {
+              activo: true,
+              emisorUid: String(emisorUid || ''),
+              emisorNombre: String(emisorNombre || 'Compañero'),
+              lat: Number(lat),
+              lng: Number(lng),
+              timestamp: rtdbServerTimestamp()
+            }),
+            8000
+          );
+          return true;
+        } catch (err) {
+          console.warn('Error sincronizando evento en RTDB /eventos_m34:', err && err.message ? err.message : err);
+          return false;
+        }
+      }
+
+      function syncPulsoM34EventoCoordsRtdb(eventoId, lat, lng) {
+        if (!rtdb || !eventoId) return;
+        try {
+          rtdbUpdate(rtdbRef(rtdb, `${PULSO_M34_RTDB_ROOT}/${eventoId}`), {
+            lat: Number(lat),
+            lng: Number(lng),
+            timestamp: rtdbServerTimestamp()
+          }).catch(() => {});
+        } catch (e) {}
+      }
+
+      async function syncPulsoM34ConfirmadoRtdb(eventoId, user, lat, lng, removeConfirmado = false) {
+        if (!rtdb || !eventoId || !user || !user.uid) return false;
+        const confRef = rtdbRef(rtdb, `${PULSO_M34_RTDB_ROOT}/${eventoId}/confirmados/${user.uid}`);
+        try {
+          if (removeConfirmado) {
+            await withTimeout(rtdbRemove(confRef), 8000);
+          } else {
+            await withTimeout(
+              rtdbSet(confRef, {
+                uid: user.uid,
+                nombre: getM34Apodo(user),
+                lat: Number(lat),
+                lng: Number(lng),
+                timestamp: rtdbServerTimestamp()
+              }),
+              8000
+            );
+          }
+          return true;
+        } catch (err) {
+          console.warn('Error registrando confirmado en RTDB /eventos_m34:', err && err.message ? err.message : err);
+          return false;
+        }
+      }
+
+      function closePulsoM34EventoRtdb(eventoId, user, apodo) {
+        if (!rtdb || !eventoId) return;
+        try {
+          rtdbUpdate(rtdbRef(rtdb, `${PULSO_M34_RTDB_ROOT}/${eventoId}`), {
+            activo: false,
+            finalizadoPorUid: user ? user.uid : null,
+            finalizadoPorNombre: apodo || 'Compañero',
+            finalizadoAt: rtdbServerTimestamp()
+          }).catch(() => {});
+        } catch (e) {}
+      }
+
       function getSelectedM34Event() {
         if (activeM34Events.length === 0) return null;
         const found = activeM34Events.find((e) => e.id === selectedM34EventId);
@@ -19539,17 +19698,33 @@
             ? formatM34DistanceLabel(calcularDistanciaMetros(currentLat, currentLng, lat, lng))
             : '';
 
-          const popupHtml = `
-            <div style="min-width:215px;color:#0f172a;font-size:12px;line-height:1.38;">
-              <div style="font-weight:900;color:#b91c1c;margin-bottom:3px;">☠️ DANGER · EMERGENCIA M34 (Evento ${eventNum})</div>
-              <div style="font-weight:800;">${vehEmoji} ${escapeHtml(evt.apodo || 'Compañero')} ${distMe ? `· ${escapeHtml(distMe)}` : ''}</div>
-              <div style="color:#0f172a;margin-top:3px;">🏘️ <strong>Sector:</strong> ${escapeHtml(parts.barrio)}</div>
-              ${parts.ref ? `<div style="color:#334155;margin-top:2px;">📌 <strong>Ref:</strong> ${escapeHtml(parts.ref)}</div>` : ''}
-              ${evt.nota ? `<div style="color:#7f1d1d;margin-top:2px;font-weight:700;">"${escapeHtml(evt.nota)}"</div>` : ''}
-              <div style="margin-top:4px;font-weight:800;color:#047857;">🛡️ ${apoyos.length} compañero(s) en apoyo</div>
+          const popupEl = document.createElement('div');
+          popupEl.style.cssText = 'min-width:225px;color:#0f172a;font-size:12px;line-height:1.38;';
+          popupEl.innerHTML = `
+            <div style="font-weight:900;color:#b91c1c;margin-bottom:3px;">☠️ DANGER · EMERGENCIA M34 (Evento ${eventNum})</div>
+            <div style="font-weight:800;">${vehEmoji} ${escapeHtml(evt.apodo || 'Compañero')} ${distMe ? `· ${escapeHtml(distMe)}` : ''}</div>
+            <div style="color:#0f172a;margin-top:3px;">🏘️ <strong>Sector:</strong> ${escapeHtml(parts.barrio)}</div>
+            ${parts.ref ? `<div style="color:#334155;margin-top:2px;">📌 <strong>Ref:</strong> ${escapeHtml(parts.ref)}</div>` : ''}
+            ${evt.nota ? `<div style="color:#7f1d1d;margin-top:2px;font-weight:700;">"${escapeHtml(evt.nota)}"</div>` : ''}
+            <div style="margin-top:4px;font-weight:800;color:#047857;">🛡️ ${apoyos.length} compañero(s) en apoyo</div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+              <button type="button" data-m34-popup-yovoy="${escapeHtml(evt.id)}" style="flex:1;min-height:34px;border:none;border-radius:8px;background:#10b981;color:#022c22;font-weight:900;font-size:11.5px;padding:5px 8px;cursor:pointer;">🚨 Sí voy</button>
+              <button type="button" data-m34-popup-pulso="${escapeHtml(evt.id)}" style="flex:1;min-height:34px;border:none;border-radius:8px;background:#2563eb;color:#ffffff;font-weight:900;font-size:11.5px;padding:5px 8px;cursor:pointer;">🎙️ Pulso M34</button>
             </div>
           `;
-          marker.bindPopup(popupHtml);
+          const popYoVoy = popupEl.querySelector('[data-m34-popup-yovoy]');
+          if (popYoVoy) {
+            popYoVoy.addEventListener('click', () => toggleM34YoVoy(evt.id));
+          }
+          const popPulso = popupEl.querySelector('[data-m34-popup-pulso]');
+          if (popPulso) {
+            popPulso.addEventListener('click', () => {
+              const curUid = auth.currentUser ? auth.currentUser.uid : null;
+              const rol = curUid && evt.authorId === curUid ? 'EMISOR_ALARMA' : 'APOYO';
+              launchPulsoM34App(evt.id, rol);
+            });
+          }
+          marker.bindPopup(popupEl);
           marker.on('click', () => {
             selectedM34EventId = evt.id;
             renderM34All();
@@ -19695,12 +19870,16 @@
           if (myApoyo) {
             btnM34YoVoyBanner.classList.add('active');
             btnM34YoVoyBanner.textContent = myApoyo.estadoApoyo === 'EN_SITIO'
-              ? '📍 En sitio (Yo Voy)'
+              ? '📍 En sitio (Sí voy)'
               : '✅ Voy en camino';
           } else {
             btnM34YoVoyBanner.classList.remove('active');
-            btnM34YoVoyBanner.textContent = '🚨 Yo Voy';
+            btnM34YoVoyBanner.textContent = '🚨 Sí voy';
           }
+        }
+        if (btnM34OpenPulsoBanner) {
+          btnM34OpenPulsoBanner.style.display = 'inline-flex';
+          btnM34OpenPulsoBanner.textContent = myApoyo ? '🎙️ Abrir Pulso M34' : '🎙️ Pulso M34';
         }
 
         m34DangerBanner.classList.add('visible');
@@ -19804,8 +19983,9 @@
                 ${selected.nota ? `<div style="font-size:11px;color:#fecaca;margin-top:4px;font-style:italic;">"${escapeHtml(selected.nota)}"</div>` : ''}
                 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;">
                   <button type="button" class="m34-action-btn yovoy ${myApoyo ? 'active' : ''}" id="btnM34YoVoyModal" style="min-height:42px;">
-                    ${myApoyo ? (myApoyo.estadoApoyo === 'EN_SITIO' ? '📍 En sitio · Salir apoyo' : '✅ En camino · Cancelar') : '🚨 Yo Voy (Enviar GPS)'}
+                    ${myApoyo ? (myApoyo.estadoApoyo === 'EN_SITIO' ? '📍 En sitio · Salir apoyo' : '✅ En camino · Cancelar') : '🚨 Sí voy (Enviar GPS)'}
                   </button>
+                  <button type="button" class="m34-action-btn pulso" id="btnM34OpenPulsoModal" style="min-height:42px;flex:1 1 auto;">🎙️ Abrir Pulso M34</button>
                   <button type="button" class="m34-action-btn" id="btnM34LocateModal" style="min-height:42px;flex:0 0 auto;">🗺️ Ver Mapa</button>
                 </div>
               </div>
@@ -19813,6 +19993,13 @@
             const btnYoVoyModal = document.getElementById('btnM34YoVoyModal');
             if (btnYoVoyModal) {
               btnYoVoyModal.addEventListener('click', () => toggleM34YoVoy(selected.id));
+            }
+            const btnOpenPulsoModal = document.getElementById('btnM34OpenPulsoModal');
+            if (btnOpenPulsoModal) {
+              btnOpenPulsoModal.addEventListener('click', () => {
+                const isCreator = user && selected.authorId === user.uid;
+                launchPulsoM34App(selected.id, isCreator ? 'EMISOR_ALARMA' : 'APOYO');
+              });
             }
             const btnLocateModal = document.getElementById('btnM34LocateModal');
             if (btnLocateModal) {
@@ -20127,7 +20314,8 @@
             startM34CreatorWatch(existingMine.id);
             focusM34EventOnMap(existingMine);
             if (m34Modal) m34Modal.classList.add('open');
-            showToast('🚨 Tu emergencia M34 ya está activa y transmitiendo GPS en vivo.');
+            launchPulsoM34App(existingMine.id, 'EMISOR_ALARMA');
+            showToast('🚨 Tu emergencia M34 ya está activa; abriendo radio Pulso M34.');
             return;
           }
 
@@ -20160,6 +20348,13 @@
             15000
           );
 
+          await syncPulsoM34EventoRtdb(eventoId, {
+            emisorUid: user.uid,
+            emisorNombre: apodo,
+            lat,
+            lng
+          });
+
           if (m34TriggerNotaInput) m34TriggerNotaInput.value = '';
           selectedM34EventId = eventoId;
           pendingM34VoiceOnUnlock = false;
@@ -20167,8 +20362,9 @@
           m34CreatorLastLng = lng;
           m34CreatorLastPushAt = Date.now();
           startM34CreatorWatch(eventoId);
+          launchPulsoM34App(eventoId, 'EMISOR_ALARMA');
           // Silencio total en el dispositivo del emisor: solo los demás compañeros VIP M34 / Admin escuchan la alarma y voz "M34, M34, M34"
-          showToast('🚨 ¡EMERGENCIA M34 ACTIVADA! Tu GPS en vivo ya es visible para los compañeros VIP M34.');
+          showToast('🚨 ¡EMERGENCIA M34 ACTIVADA! Evento guardado y conectando con Pulso M34.');
         } catch (err) {
           if (err && err.message === 'AUTH_CANCELLED') return;
           console.error('Error activando M34:', err);
@@ -20202,7 +20398,8 @@
           if (existingMine) {
             stopM34ResponderWatch();
             await withTimeout(deleteDoc(doc(db, M34_COLLECTION, eventoId, M34_APOYOS_SUB, user.uid)), 12000);
-            showToast('Cancelaste tu apoyo "Yo Voy" para este evento.');
+            await syncPulsoM34ConfirmadoRtdb(eventoId, user, 0, 0, true);
+            showToast('Cancelaste tu apoyo "Sí voy" para este evento.');
             return;
           }
 
@@ -20211,6 +20408,7 @@
             stopM34ResponderWatch();
             try {
               await deleteDoc(doc(db, M34_COLLECTION, prevId, M34_APOYOS_SUB, user.uid));
+              await syncPulsoM34ConfirmadoRtdb(prevId, user, 0, 0, true);
             } catch (e) {}
           }
 
@@ -20239,6 +20437,8 @@
             15000
           );
 
+          await syncPulsoM34ConfirmadoRtdb(eventoId, user, lat, lng, false);
+
           m34ResponderLastLat = lat;
           m34ResponderLastLng = lng;
           m34ResponderLastPushAt = Date.now();
@@ -20247,8 +20447,8 @@
 
           showToast(
             isOnSite
-              ? '📍 ¡Ya estás en el sitio del evento M34! Tu llegada fue marcada.'
-              : `🚨 "Yo Voy" activo hacia ${target.apodo || 'compañero'} · GPS en vivo encendido.`
+              ? '📍 ¡Confirmado "Sí voy" en el sitio! Pulsa "🎙️ Abrir Pulso M34" para hablar por radio.'
+              : `🚨 "Sí voy" confirmado hacia ${target.apodo || 'compañero'} · Ya puedes abrir Pulso M34.`
           );
         } catch (err) {
           if (err && err.message === 'AUTH_CANCELLED') return;
@@ -20321,6 +20521,7 @@
 
           if (m34CreatorEventId === eventoId) stopM34CreatorWatch();
           if (m34ResponderEventId === eventoId) stopM34ResponderWatch();
+          closePulsoM34EventoRtdb(eventoId, user, apodo);
           clearPendingM34ClosePhoto();
 
           if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -20499,6 +20700,16 @@
         btnM34YoVoyBanner.addEventListener('click', () => {
           const sel = getSelectedM34Event();
           if (sel) toggleM34YoVoy(sel.id);
+        });
+      }
+
+      if (btnM34OpenPulsoBanner) {
+        btnM34OpenPulsoBanner.addEventListener('click', () => {
+          const sel = getSelectedM34Event();
+          if (!sel) return;
+          const curUid = auth.currentUser ? auth.currentUser.uid : null;
+          const rol = curUid && sel.authorId === curUid ? 'EMISOR_ALARMA' : 'APOYO';
+          launchPulsoM34App(sel.id, rol);
         });
       }
 
