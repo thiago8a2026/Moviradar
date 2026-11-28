@@ -18599,7 +18599,8 @@
       const PULSO_M34_CONFIG = {
         packageName: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.packageName) || 'com.anthi.pulsom34',
         scheme: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.scheme) || 'pulso-m34',
-        host: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.host) || 'evento'
+        host: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.host) || 'evento',
+        fallbackUrl: (typeof window !== 'undefined' && window.__PULSO_M34_CONFIG && window.__PULSO_M34_CONFIG.fallbackUrl) || 'https://cm2026enero-creator.github.io/PULSO-M34-ANTHI/'
       };
       const M34_ARRIVAL_RADIUS_METERS = 100;
       const M34_HOLD_DURATION_MS = 1500;
@@ -19469,7 +19470,8 @@
         const eid = encodeURIComponent(String(eventId || ''));
         const roleParam = encodeURIComponent(String(rol || 'OYENTE'));
         const pkg = encodeURIComponent(PULSO_M34_CONFIG.packageName);
-        return `intent://${PULSO_M34_CONFIG.host}?eventId=${eid}&rol=${roleParam}#Intent;scheme=${PULSO_M34_CONFIG.scheme};package=${pkg};end`;
+        const fallback = encodeURIComponent(PULSO_M34_CONFIG.fallbackUrl);
+        return `intent://${PULSO_M34_CONFIG.host}?eventId=${eid}&rol=${roleParam}#Intent;scheme=${PULSO_M34_CONFIG.scheme};package=${pkg};S.browser_fallback_url=${fallback};end`;
       }
 
       function launchPulsoM34App(eventId, rol = 'OYENTE') {
@@ -19501,18 +19503,21 @@
           document.body.appendChild(anchor);
           anchor.click();
           document.body.removeChild(anchor);
-          if (isAndroid) {
+          if (!isAndroid) {
             setTimeout(() => {
               if (!document.hidden) {
                 try {
-                  window.location.href = deepLinkUrl;
+                  window.location.assign(PULSO_M34_CONFIG.fallbackUrl);
                 } catch (e) {}
               }
-            }, 650);
+            }, 900);
           }
           return true;
         } catch (launchErr) {
           console.warn('No se pudo abrir Deep Link Pulso M34:', launchErr);
+          try {
+            window.location.assign(PULSO_M34_CONFIG.fallbackUrl);
+          } catch (e) {}
           return false;
         }
       }
